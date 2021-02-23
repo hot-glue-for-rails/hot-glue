@@ -28,7 +28,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @<%= plural_name %> = [<%= auth_object %>]
     <% end %>
     respond_to do |format|
-       format.html {render 'all'}
+       format.html
     end
   end
 
