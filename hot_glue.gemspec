@@ -10,12 +10,13 @@ Gem::Specification.new do |spec|
   spec.license     = 'Nonstandard'
   spec.date        = Time.now.strftime("%Y-%m-%d")
   spec.summary     = "A gem build scaffolding."
-  spec.description = "Simple, plug & play Rails scaffolding for Turbo-rails and Hotwire"
+  spec.description = "Simple, plug & play Rails scaffold building companion for Turbo-Rails and Hotwire"
   spec.authors     = ["Jason Fleetwood-Boldt"]
   spec.email       = 'tech@datatravels.com'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
+
   if spec.respond_to?(:metadata)
     spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
   else
