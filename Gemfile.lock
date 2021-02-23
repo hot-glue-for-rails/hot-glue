@@ -6,7 +6,7 @@ PATH
       haml-rails (~> 2.0)
       kaminari (~> 1.2)
       rails (~> 6.0)
-      sass-rails (~> 5.0)
+      sass-rails
 
 GEM
   remote: https://rubygems.org/

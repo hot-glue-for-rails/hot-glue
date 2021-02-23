@@ -1,0 +1,5 @@
+- if resource.errors.any?
+  #error_explanation
+    - resource.errors.full_messages.each do |message|
+      %div.alert.alert-danger
+        = message

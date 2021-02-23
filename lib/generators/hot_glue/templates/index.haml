@@ -1,0 +1,5 @@
+.container-fluid
+  .row
+    .col-md-12
+      .<%= singular %>-list
+        = render partial: "<%= namespace_with_trailing_dash %><%= plural %>/list", locals: {<%= plural %>: <%= all_objects_root %>.order("created_at DESC").page(1)}

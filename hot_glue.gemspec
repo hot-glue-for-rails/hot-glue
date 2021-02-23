@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency('kaminari', '~> 1.2')
   spec.add_runtime_dependency('haml-rails', '~> 2.0')
-  spec.add_runtime_dependency "sass-rails", "~> 5.0"
+  spec.add_runtime_dependency "sass-rails"
 
   # spec.add_runtime_dependency 'bootsnap'
   # spec.add_runtime_dependency 'bootstrap'
