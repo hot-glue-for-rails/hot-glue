@@ -1,11 +1,11 @@
-require "hot_glue/engine"
+require "hotglue/engine"
 
 require 'kaminari'
 require 'haml-rails'
 
-require 'app/helpers/hot_glue_helper.rb'
 
 module HotGlue
+
   # module ControllerHelpers
   #   def modify_date_inputs_on_params(modified_params, authenticated_user = nil)
   #     use_timezone = authenticated_user.timezone || Time.now.strftime("%z")

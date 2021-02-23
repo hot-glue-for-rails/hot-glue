@@ -1,7 +1,7 @@
 $:.push File.expand_path("lib", __dir__)
 
 # Maintain your gem's version:
-require "hot_glue/version"
+require "hotglue/version"
 require 'byebug'
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
