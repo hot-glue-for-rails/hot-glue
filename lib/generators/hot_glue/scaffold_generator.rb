@@ -674,6 +674,13 @@ module HotGlue
       return !@no_create
     end
 
+    def namespace_with_slash
+      if @namespace
+        "#{@namespace}/"
+     else
+       ""
+     end
+   end
 
     private # thor does something fancy like sending the class all of its own methods during some strange run sequence
     # does not like public methods

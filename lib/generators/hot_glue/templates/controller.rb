@@ -3,8 +3,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 <% if any_nested? %> <% @nested_args.each do |arg| %>
   before_action :load_<%= arg %><% end %> <% end %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
-  helper :hot_glue
-  include HotGlue::ControllerHelpers
+  # helper :hot_glue
+  include HotGlue::ControllerHelper
+
   <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
     this_scope =   nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "@#{nest_chain.last}.#{arg}s"
       nest_chain << arg %>def load_<%= arg %>

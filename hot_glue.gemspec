@@ -25,7 +25,9 @@ Gem::Specification.new do |spec|
   end
 
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)}) ||  f.match(%r{(gemspec|gem)$}) }
+    files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)}) || f.match(%r{(gemspec|gem)$}) }
+    puts "files being built are #{files.join(' ')}"
+    files
   end
 
   spec.add_dependency "rails",  '~> 6.0'
