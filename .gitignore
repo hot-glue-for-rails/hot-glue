@@ -1,0 +1,16 @@
+.bundle/
+log/*.log
+pkg/
+test/dummy/db/*.sqlite3
+test/dummy/db/*.sqlite3-journal
+test/dummy/db/*.sqlite3-*
+test/dummy/log/*.log
+test/dummy/storage/
+test/dummy/tmp/
+.byebug_history
+
+.idea/
+*.gem
+.DS_Store
+
+dump.rdb
