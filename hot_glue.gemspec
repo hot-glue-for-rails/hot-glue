@@ -5,7 +5,7 @@ require "hot_glue/version"
 require 'byebug'
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
-  spec.name        = "hot_glue_js"
+  spec.name        = "hot-glue"
   spec.version     = HotGlue::VERSION
   spec.license     = 'Nonstandard'
   spec.date        = Time.now.strftime("%Y-%m-%d")
@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   end
 
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)}) ||  f.match(%r{(gemspec|gem)$}) }
   end
 
   spec.add_dependency "rails",  '~> 6.0'
