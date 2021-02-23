@@ -1,21 +1,11 @@
 
-<% if create_action %>
-= turbo_frame_tag "<%= singular %>-new" do
-  = link_to "New <%= singular.gsub('_',' ') %>", new_<%= path_helper_singular %>(<%= nested_arity_for_path %>), disable_with: "Loading...", class: "new-<%= singular %>-button btn btn-primary pull-right"
-.clearfix
-
-<% end %>
-
-
 %table.table.table-striped.<%= singular %>-table
   %thead
     %tr
 <%= list_column_headings %>
-
-
-
   %tbody
     - if <%= plural %>.empty?
       None
     - <%= plural %>.each do |<%= singular %>|
       = render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %>, <%= nested_assignments %> }
+

@@ -6,6 +6,10 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   helper :hot_glue
   include HotGlue::ControllerHelper
 
+<% if no_devise_installed %>
+  # TODO: implement current_user or use Devise
+<% end %>
+
   <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
     this_scope =   nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "@#{nest_chain.last}.#{arg}s"
       nest_chain << arg %>def load_<%= arg %>
@@ -21,12 +25,13 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @<%= singular_name %> = <%= auth_object %>
   end<% end %>
 
+  def load_all_<%= plural %>
+    <% if !@self_auth %>@<%= plural_name %> = <%= object_scope %><% if model_has_strings? %>.where(<%=class_name %>.arel_table[:email].matches("%#{@__general_string}%"))<% end %>.page(params[:page])
+    <% else %>@<%= plural_name %> = [<%= auth_object %>]<% end %>
+  end
+
   def index
-<% if !@self_auth %>
-    @<%= plural_name %> = <%= object_scope %><% if model_has_strings? %>.where(<%=class_name %>.arel_table[:email].matches("%#{@__general_string}%"))<% end %>.page(params[:page])
-    <% else %>
-    @<%= plural_name %> = [<%= auth_object %>]
-    <% end %>
+    load_all_<%= plural %>
     respond_to do |format|
        format.html
     end
@@ -45,12 +50,16 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   def create
     modified_params = modify_date_inputs_on_params(<%=singular_name %>_params.dup<% if !@object_owner_sym.empty? %>.merge!(<%= @object_owner_sym %>: <%= @object_owner_eval %> )<% end %> <%= @auth ? ', ' + @auth : '' %>)
     @<%=singular_name %> = <%=class_name %>.create(modified_params)
+
+    if @<%= singular_name %>.save
+
+    else
+      flash[:alert] = "Oops, your <%= singular_name %> could not be created."
+    end
+    load_all_<%= plural %>
     respond_to do |format|
-      if @<%= singular_name %>.save
-      else
-        flash[:alert] = "Oops, your <%=singular_name %> could not be created."
-      end
-      format.html
+      format.turbo_stream
+      format.html { redirect_to <%= plural %>_path }
     end
   end<% end %>
 

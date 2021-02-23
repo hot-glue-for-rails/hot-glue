@@ -244,7 +244,7 @@ module HotGlue
     end
 
     def list_column_headings
-      @columns.map(&:to_s).map{|col_name| '      %th{:scope => "col"} ' + col_name.humanize}.join("\r")
+      @columns.map(&:to_s).map{|col_name| '      %th{:scope => "col"} ' + col_name.humanize}.join("\n")
     end
 
     def columns_spec_with_sample_data
@@ -404,6 +404,12 @@ module HotGlue
       @auth
     end
 
+
+    def no_devise_installed
+      !Gem::Specification.sort_by{ |g| [g.name.downcase, g.version] }.group_by{ |g| g.name }['devise']
+    end
+
+
     def copy_view_files
       return if @specs_only
       # js_views.each do |view|
@@ -417,6 +423,13 @@ module HotGlue
       haml_views.each do |view|
         formats.each do |format|
           filename = cc_filename_with_extensions(view, "haml")
+          template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
+        end
+      end
+
+      turbo_stream_views.each do |view|
+        formats.each do |format|
+          filename = cc_filename_with_extensions(view, 'turbostream.haml')
           template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
         end
       end
@@ -443,11 +456,14 @@ module HotGlue
     # end
 
     def haml_views
-      res =  %w(index edit new _form _line _list)
+      res =  %w(index edit new _form _line _list _new_button )
 
       res
     end
 
+    def turbo_stream_views
+      res = %w(_create)
+    end
 
     def handler
       :erb

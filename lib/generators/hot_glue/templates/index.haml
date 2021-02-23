@@ -1,5 +1,11 @@
 .container-fluid
   .row
     .col-md-12
-      .<%= singular %>-list
-        = render partial: "<%= namespace_with_trailing_dash %><%= plural %>/list", locals: {<%= plural %>: <%= all_objects_root %>.order("created_at DESC").page(1)}
+      = turbo_frame_tag "<%= singular %>-new" do
+        = render partial: "new_button"
+      .clearfix
+      = turbo_frame_tag "<%= plural %>-list" do
+        = render partial: "<%= plural %>/list", locals: {<%= plural %>: @<%= plural %>}
+
+
+

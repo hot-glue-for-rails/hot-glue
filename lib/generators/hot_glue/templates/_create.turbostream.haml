@@ -1,0 +1,5 @@
+= turbo_stream.replace "<%= singular %>-list" do
+  = render partial: "list", locals: {<%= plural %>: @<%= plural %>}
+
+= turbo_stream.replace "<%= singular %-new" do
+  = render partial: "new_button"
