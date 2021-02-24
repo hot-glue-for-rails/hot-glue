@@ -84,14 +84,16 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     end
   end
 
-<% if destroy_action %>def destroy
+<% if destroy_action %>  def destroy
+    begin
+      @<%=singular_name%>.destroy
+    rescue StandardError => e
+      flash[:alert] = "<%= singular_name.titlecase %> could not be deleted"
+    end
+    load_all_<%= plural %>
     respond_to do |format|
-      begin
-        @<%=singular_name%>.destroy
-      rescue StandardError => e
-        flash[:alert] = "<%=singular_name.titlecase %> could not be deleted"
-      end
-      format.html
+      format.turbo_stream
+      format.html { redirect_to <%= plural %>_path }
     end
   end<% end %>
 

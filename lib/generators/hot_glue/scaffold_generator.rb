@@ -244,7 +244,7 @@ module HotGlue
     end
 
     def list_column_headings
-      @columns.map(&:to_s).map{|col_name| '      %th{:scope => "col"} ' + col_name.humanize}.join("\n")
+      @columns.map(&:to_s).map{|col_name| '        %th{:scope => "col"} ' + col_name.humanize}.join("\n")
     end
 
     def columns_spec_with_sample_data
@@ -462,7 +462,7 @@ module HotGlue
     end
 
     def turbo_stream_views
-      res = %w(_create)
+      res = %w(create destroy)
     end
 
     def handler

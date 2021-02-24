@@ -1,7 +1,7 @@
 <%= all_line_fields %>
   %td
     <% if destroy_action %>
-    = link_to "Delete <i class='fa fa-1x fa-remove'></i>".html_safe, <%= path_helper_full %>(<%= path_helper_args %>), remote: true, method: :delete, data: {confirm: 'Are you sure?'},  disable_with: "Loading...", class: "delete-<%= singular %>-button btn btn-primary "
+    = link_to "Delete <i class='fa fa-1x fa-remove'></i>".html_safe, <%= path_helper_full %>(<%= path_helper_args %>), method: :delete, data: {confirm: 'Are you sure?'},  disable_with: "Loading...", class: "delete-<%= singular %>-button btn btn-primary "
     <% end %>
     &nbsp;
-    = link_to "Edit <i class='fa fa-1x fa-list-alt'></i>".html_safe, edit_<%= path_helper_full %>(<%= path_helper_args %>), remote: true , disable_with: "Loading...", class: "edit-<%= singular %>-button btn btn-primary "
+    = link_to "Edit <i class='fa fa-1x fa-list-alt'></i>".html_safe, edit_<%= path_helper_full %>(<%= path_helper_args %>),  disable_with: "Loading...", class: "edit-<%= singular %>-button btn btn-primary "

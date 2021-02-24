@@ -1,11 +1,9 @@
 .container-fluid
   .row
     .col-md-12
-      = turbo_frame_tag "<%= singular %>-new" do
-        = render partial: "new_button"
+      = render partial: "new_button"
       .clearfix
-      = turbo_frame_tag "<%= plural %>-list" do
-        = render partial: "<%= plural %>/list", locals: {<%= plural %>: @<%= plural %>}
+      = render partial: "<%= plural %>/list", locals: {<%= plural %>: @<%= plural %>}
 
 
 

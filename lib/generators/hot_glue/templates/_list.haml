@@ -1,11 +1,11 @@
-
-%table.table.table-striped.<%= singular %>-table
-  %thead
-    %tr
+= turbo_frame_tag "<%= plural %>-list" do
+  %table.table.table-striped.<%= singular %>-table
+    %thead
+      %tr
 <%= list_column_headings %>
-  %tbody
-    - if <%= plural %>.empty?
-      None
-    - <%= plural %>.each do |<%= singular %>|
-      = render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %>, <%= nested_assignments %> }
+    %tbody
+      - if <%= plural %>.empty?
+        None
+      - <%= plural %>.each do |<%= singular %>|
+        = render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %>, <%= nested_assignments %> }
 
