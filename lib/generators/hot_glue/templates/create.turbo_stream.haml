@@ -1,4 +1,4 @@
-= turbo_stream.replace "<%= singular %>-list" do
+= turbo_stream.replace "<%= plural %>-list" do
   = render partial: "list", locals: {<%= plural %>: @<%= plural %>}
 
 = turbo_stream.replace "<%= singular %>-new" do

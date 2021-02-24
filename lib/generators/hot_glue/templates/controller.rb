@@ -71,6 +71,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   def edit
     respond_to do |format|
+      format.turbo_stream
       format.html
     end
   end

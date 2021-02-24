@@ -127,8 +127,8 @@ module HotGlue
       case (f)
       when "--god"
         @auth = nil
-      when "--with-index"
-        @with_index = true
+      # when "--with-index"
+      #   @with_index = true
       when "--specs-only"
         @specs_only = true
       when "--no-specs"
@@ -244,7 +244,7 @@ module HotGlue
     end
 
     def list_column_headings
-      @columns.map(&:to_s).map{|col_name| '        %th{:scope => "col"} ' + col_name.humanize}.join("\n")
+      @columns.map(&:to_s).map{|col_name| '        %div.th{:scope => "col"} ' + col_name.humanize}.join("\n")
     end
 
     def columns_spec_with_sample_data
@@ -352,6 +352,14 @@ module HotGlue
       @nested_args.map{|a| "#{a}: @#{a}"}.join(", ") #metaprgramming into Ruby hash
     end
 
+    def nested_assignments_with_leading_comma
+      if @nested_args.any?
+        ", #{nested_assignments}"
+      else
+        ""
+      end
+    end
+
     def nested_objects_arity
       @nested_args.map{|a| "@#{a}"}.join(", ")
     end
@@ -429,7 +437,7 @@ module HotGlue
 
       turbo_stream_views.each do |view|
         formats.each do |format|
-          filename = cc_filename_with_extensions(view, 'turbostream.haml')
+          filename = cc_filename_with_extensions(view, 'turbo_stream.haml')
           template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
         end
       end
@@ -456,13 +464,13 @@ module HotGlue
     # end
 
     def haml_views
-      res =  %w(index edit new _form _line _list _new_button )
+      res =  %w(index edit new _form _line _list _new_button _show)
 
       res
     end
 
     def turbo_stream_views
-      res = %w(create destroy)
+      res = %w(create destroy edit)
     end
 
     def handler
@@ -525,8 +533,8 @@ module HotGlue
 
           else
             ".row
-  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = f.text_field :#{col.to_s}, value: @#{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number'
+  %div{class: \"form-group col-md-4 \#{'alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+    = f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number'
     %label.form-text
       #{col.to_s.humanize}\n"
           end
@@ -578,9 +586,10 @@ module HotGlue
 
 
     def all_line_fields
-      res = "%tr{'data-id': #{singular}.id, 'data-edit': 'false'}\n"
+      columns = @columns.count + 1
+      perc_width = (100/columns).floor
 
-      res << @columns.map { |col|
+      @columns.map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         limit = eval("#{singular_class}.columns_hash['#{col}']").limit
         sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
@@ -599,8 +608,7 @@ module HotGlue
               puts "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
               exit
             end
-
-
+            
             assoc_class = eval(assoc.class_name)
 
             if assoc_class.column_names.include?("name")
@@ -617,57 +625,61 @@ module HotGlue
               puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
             end
 
-            "  %td
-    = #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe"
+            ".cell{style:'width: #{perc_width}%'}
+  = #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe"
 
           else
-            "  %td
-    = #{singular}.#{col}"
+            ".cell{style:'width: #{perc_width}%'}
+  = #{singular}.#{col}"
           end
+        when :float
+          width = (limit && limit < 40) ? limit : (40)
+          ".cell{style:'width: #{perc_width}%'}
+  = #{singular}.#{col}"
+
         when :string
           width = (limit && limit < 40) ? limit : (40)
-          "  %td
-    = #{singular}.#{col}"
+          ".cell{style:'width: #{perc_width}%'}
+  = #{singular}.#{col}"
         when :text
-          "  %td
-    = #{singular}.#{col}"
+          ".cell{style:'width: #{perc_width}%'}
+  = #{singular}.#{col}"
         when :datetime
-          "  %td
-    - unless #{singular}.#{col}.nil?
-      = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone)
-    - else
-      %span.alert-danger
-        MISSING
+          ".cell{style:'width: #{perc_width}%'}
+  - unless #{singular}.#{col}.nil?
+    = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone)
+  - else
+    %span.alert-danger
+      MISSING
 "
         when :date
-          "  %td
-    - unless #{singular}.#{col}.nil?
-      = #{singular}.#{col}
-    - else
-      %span.alert-danger
-        MISSING
+          ".cell{style:'width: #{perc_width}%'}
+  - unless #{singular}.#{col}.nil?
+    = #{singular}.#{col}
+  - else
+    %span.alert-danger
+      MISSING
 "
         when :time
-          "  %td
-    - unless #{singular}.#{col}.nil?
-      = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone)
-    - else
-      %span.alert-danger
-        MISSING
+          ".cell{style:'width: #{perc_width}%'}
+  - unless #{singular}.#{col}.nil?
+    = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone)
+  - else
+    %span.alert-danger
+      MISSING
 "
         when :boolean
-          "  %td
-    - if #{singular}.#{col}.nil?
-      %span.alert-danger
-        MISSING
-    - elsif #{singular}.#{col}
-      YES
-    - else
-      NO
+          ".cell{style:'width: #{perc_width}%'}
+  - if #{singular}.#{col}.nil?
+    %span.alert-danger
+      MISSING
+  - elsif #{singular}.#{col}
+    YES
+  - else
+    NO
 "
         end
       }.join("\n")
-      return res
     end
 
 

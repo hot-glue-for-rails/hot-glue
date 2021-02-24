@@ -1,1 +1,24 @@
-= render partial: "common/common_edit_form", locals: {singular: '<%= @singular %>', object: <%= @singular %>, url: <%= path_helper_singular %>(<%= path_arity %>), colspan: colspan}
+= turbo_frame_tag "<%= singular %>__#{<%= singular %>.id}" do
+  %div{style: "position: relative;"}
+    - if <%="@" + singular%>.errors.any?
+      = render(partial: "#{controller.namespace}errors", locals: {resource: <%="@" + singular%>})
+
+
+    Editing
+    - if <%="@" + singular%>.try(:to_label)
+      = <%="@" + singular%>.to_label
+    - elsif <%="@" + singular%>.try(:name)
+      = <%="@" + singular%>.name
+    - else
+      (no name)
+
+    = form_with model: <%= "@" + singular%>, url: <%= path_helper_singular %>(<%= path_arity %>) do |f|
+      = render partial: "form",  locals: {:<%=  singular  %> => <%= "@" + singular%>, f: f}
+      .row
+        .col-md-12
+          = f.submit "Save", class: "btn btn-primary pull-right"
+
+    %i.fa.fa-times-circle.fa-2x{ 'data-name' =>  <%= "@" + singular %>, 'data-row-id' =>  <%= "@" + singular %>.id, 'data-role' =>  'close-button'}
+
+
+  -# = render partial: "common/common_edit_form", locals: {singular: '<%= @singular %>', <%="@" + singular%>: <%= @singular %>, url: , colspan: colspan}
