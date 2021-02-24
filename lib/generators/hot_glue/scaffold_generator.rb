@@ -420,14 +420,6 @@ module HotGlue
 
     def copy_view_files
       return if @specs_only
-      # js_views.each do |view|
-      #   formats.each do |format|
-      #     filename = cc_filename_with_extensions(view, ["js","erb"])
-      #     template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
-      #   end
-      # end
-
-
       haml_views.each do |view|
         formats.each do |format|
           filename = cc_filename_with_extensions(view, "haml")
@@ -459,10 +451,6 @@ module HotGlue
       end
     end
 
-    # def js_views
-    #   %w(index create destroy edit new update)
-    # end
-
     def haml_views
       res =  %w(index edit new _form _line _list _new_button _show)
 
@@ -470,7 +458,7 @@ module HotGlue
     end
 
     def turbo_stream_views
-      res = %w(create destroy edit)
+      res = %w(create destroy edit update)
     end
 
     def handler

@@ -77,10 +77,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
   def update
+    if !@<%= singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>))
+        flash[:alert] = "<%= singular_name.titlecase %> could not be saved"
+    end
     respond_to do |format|
-      if !@<%=singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>))
-        flash[:alert] = "<%=singular_name.titlecase %> could not be saved"
-      end
+      format.turbo_stream
       format.html
     end
   end
