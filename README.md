@@ -1,6 +1,6 @@
 # Hot Glue
 
-Hot Glue is an evolution of the best of the admin-style scaffold builders of the 2010s ([https://github.com/activeadmin/activeadmin](activeadmin), [https://github.com/sferik/rails_admin](rails_admin), and [https://github.com/activescaffold/active_scaffold](active_scaffold) being the most popular of those). It harnesses the power of Rails 6, Turbo-Rails, and Hotwire to deliver a lightning fast experience. 
+Hot Glue is an evolution of the best of the admin-style scaffold builders of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold) being the most popular of those). It harnesses the power of Rails 6, Turbo-Rails, and Hotwire to deliver a lightning fast experience. 
 
 As well, 
 
