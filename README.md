@@ -1,26 +1,20 @@
 # Hot Glue Scaffold Builder & Rapid Prototype Developer
 
 
-Yes, it's a Rails scaffold builder. Yes, it builds scaffolding quickly and easily. 
+Hot Glue is an evolution of the best of the admin-style scaffold builders of the 2010s (activeadmin, rails_admin, and active_scaffold being the most popular of those). It harnesses the power of Rails 6, Turbo-Rails, and Hotwire to deliver a lightning fast experience. 
 
-This time using Turbo Rails and the awesome new 
-
-Yes, it's opinionated. Yes, it's metaprogramming. A lot of metaprogramming. Ruby on Ruby. 
-
-Ruby on Javascript. It's like a whole fun pile of metaprogramming.
-
-No, I would not use this to build an intricate app. Yes, it's a great tool for prototyping. Yes, I think prototyping is a lost art.
-
+As well, 
 
 ## THE SALES PITCH:
-* Build plug-and-play scaffolding mixing HAML with jQuery-based Javascript
+* Build plug-and-play scaffolding mixing HAML and turbo_stream responses
 * Automatically Reads Your Models (make them before building your scaffolding!)
-* Excellent for CRUD, lists with pagination, searching, ~~sorting.~~
+* CRUD, lists with pagination, (coming soon: sorting & searching)
 * Wonderful for prototyping.
-* Plays nicely with Devise, Kaminari, Haml-Rails, Rspec.
-* Create specs automatically along with the controllers.
-* Nest your routes model-by-model for built-in poor man's authentication
-* Throw the scaffolding away when your app is ready to graduate to its next phase.
+* Nest your routes model-by-model for built-in poor man's authentication.
+* Plays nicely with Devise, but you can implement your own current_user object instead.
+* Requires & uses Kaminari for pagination.
+* Create specs automatically along with the controllers (* rspec only for now).
+* Throw the scaffolding away when your app is ready to graduate to its next phase (or don't if you like it).
 
 ## THE BLOG POST
 
@@ -28,7 +22,7 @@ It's really easy to get started by following along with this blog post that crea
 
 Feel free to build your own tables when you get to the sections for building the 'Event' scaffold:
 
-https://blog.jasonfleetwoodboldt.com/common-core-js
+https://blog.jasonfleetwoodboldt.com/hot-glue
 
 ## HOW EASY?
 
@@ -39,9 +33,11 @@ rails generate hot_glue:scaffold Thing
 
 ## TO INSTALL
 
-- Add Turbo-Rails & install it with 
+- Add Turbo-Rails to your Gemfile & bundle install, then install it with `rails turbo:install`
 
-- Add hot_glue_js to your Gemfile it with 
+- The Turbo install has switched your action cable settings from 'async' to Redis, so be sure to start a redis server
+  
+- Add hot_glue to your Gemfile & bundle install, then install it with `rails hot_glue:install`
 
 - Install Bootstrap (optional)
 
@@ -222,30 +218,6 @@ end
 
 ```
 
-### `--with-index`
-
-By default no master index views get produced. Use this flag to produce an index view.
-
-The index views simply include the _list partial but pass them a query to use:
-
-`= render partial: "list", locals: {things: Thing.order("created_at DESC").page(1)}`
-
-You will note that unlike other scaffold you may have seen, the "all" view is found at
-```
-all.haml
-```
-
-Hot Glue generate ONLY this top-level (non-partial) HAML file, relying on Rails partials to do the rest. This lets us get little fancy with reloading and re-rendering, and provides for a smooth consistent starting point for you to customize the views.
-
-The intention is that you DO NOT generate any all.haml views, because you will probably be building a dashboard that composites several different tables into a single page.
-
-When you do that, load the list views from the build scaffolding to define the different sections of your page
-
-```
-= render partial: "dashboard/things/list", locals: {things: current_user.things.order("created_at DESC").page(1)}
-```
-
-Because it's rare that you actually want to build a page that is just a list of one table, the index views are not generate by default.
 
 
 ### `--specs-only`
@@ -258,79 +230,10 @@ Produces ONLY the controller spec file, nothing else.
 Produces all the files except the spec file.
 
 
-
-
-
-# TROUBLESHOOTING
-
-## NoMethodError in HellosController#index undefined method `authenticate_user!' for #<HellosController:0x00007fcc2decf828> Did you mean? authenticate_with_http_digest
-
---> Install Devise or implement current_user method on your controller or use with auth= and/or auth_identifier= to specify how you want to authenticate your user.
-
-
-## Uncaught ReferenceError: $ is not defined
-
---> Install Jquery + Rails UJS
-`yarn add jquery`
-`yarn add  @rails/ujs`
-
-Add to application.js
-```
-require("jquery")
-```
-
-And add to config/webpack/environment.js
-
-```
-const { environment } = require('@rails/webpacker')
-
-const webpack = require('webpack')
-environment.plugins.prepend('Provide',
-  new webpack.ProvidePlugin({
-    $: 'jquery/src/jquery',
-    jQuery: 'jquery/src/jquery',
-    Rails: ['@rails/ujs']
-  })
-)
-
-module.exports = environment
-
-```
 # VERSION HISTORY
+#### 2021-02-24 - v0.0.1 - first proof of concept release -- basic CRUD works 
 
-## 0.4.8  * IN PROGRESS (master branch)*
-
-- fixes an issue with the new action when in --god mode
-
-## 0.4.7
-- fixes some problems with display labeling through active record associations (was using a funky syntax for this)
-- significant improvments to error messaging, like:
-
-if you don't have a `current_user` and you don't specify an auth or auth_identifier (and you aren't using `--god` mode), helpful hint:
-
-"*** Oops: It looks like is no association from current_user to a class called Invoice. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
-
-
-If an association is on a model but the assocition has no field that can be used to display its name, you get this hint:
-
-"*** Oops: Can't find any column to use as the display label for the account association on the Invoice model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your Account model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
-
-## 0.4.6
-
-- Fixes a bug that would happen if you had no nested args
-
-## 0.4.2 - 0.4.5 - Oct 2020
-
-- Not sure what I was doing here or why I made 3 releases on the same day(?)
-- Several bugfixes happened during these iterations
-
-## 0.3.0 - 0.4.1 - August 2020
-
-- Solid beta release
-
-## 0.2.0 - 0.1.1
-
-- Alpha stage
+#### 2021-02-23 - v0.0.0 - Port of my prior work from github.com/jasonfb/common_core_js
 
 
 # ACKNOWLEDGEMENTS
