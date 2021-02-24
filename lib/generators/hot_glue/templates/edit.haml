@@ -1,5 +1,5 @@
-= turbo_frame_tag "<%= singular %>__#{<%= singular %>.id}" do
-  %div{style: "position: relative;"}
+= turbo_frame_tag "<%= singular %>__#{<%= "@" + singular %>.id}" do
+  .cell.editable{style: "position: relative;"}
     - if <%="@" + singular%>.errors.any?
       = render(partial: "#{controller.namespace}errors", locals: {resource: <%="@" + singular%>})
 
@@ -18,7 +18,5 @@
         .col-md-12
           = f.submit "Save", class: "btn btn-primary pull-right"
 
-    %i.fa.fa-times-circle.fa-2x{ 'data-name' =>  <%= "@" + singular %>, 'data-row-id' =>  <%= "@" + singular %>.id, 'data-role' =>  'close-button'}
+    %i.fa.fa-times-circle.fa-2x{ 'data-name' =>  'close-invoice__#{@invoice.id}', 'data-row-id' =>  <%= "@" + singular %>.id, 'data-role' =>  'close-button'}
 
-
-  -# = render partial: "common/common_edit_form", locals: {singular: '<%= @singular %>', <%="@" + singular%>: <%= @singular %>, url: , colspan: colspan}

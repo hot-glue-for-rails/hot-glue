@@ -1,4 +1,4 @@
 
-= turbo_stream.replace "<%=singular%>__#{<%= singular %>.id}" do
-  = render partial: 'edit', locals: {<%= singular %>: <%= singular %>, <%= nested_assignments %> }
+= turbo_stream.replace "<%= singular%>__#{@<%= singular %>.id}" do
+  = render 'edit'
 
