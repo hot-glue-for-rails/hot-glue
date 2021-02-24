@@ -1,10 +1,13 @@
 # Hot Glue
 
-Hot Glue is an evolution of the best of the admin-style scaffold builders of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold) being the most popular of those). It harnesses the power of Rails 6, Turbo-Rails, and Hotwire to deliver a lightning fast experience. 
+Hot Glue is an evolution of the best of the admin-style scaffold builders of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold) being the most popular of those). It harnesses the power of Rails 6, Turbo-Rails, and Hotwire to deliver a lightning fast experience.
 
-As well, 
+As well, its premise is a little different than the configuration-heavy admin interface toolkits. It will read your relationships and field types to generate your code for you, leaving you with a 'sourdough starter' to work from. If you modify the generated code, you're on your own if you want to preserve your changes and also re-generate scaffold after adding fields. 
 
-## THE SALES PITCH:
+It gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields. 
+
+Hot Glue generates functionality that's quick and dirty. It let's you be crafty. Like a real glue gun with hot glue, take care not to burn yourself while using it. 
+
 * Build plug-and-play scaffolding mixing HAML and turbo_stream responses
 * Automatically Reads Your Models (make them before building your scaffolding!)
 * CRUD, lists with pagination, (coming soon: sorting & searching)
@@ -15,7 +18,7 @@ As well,
 * Create specs automatically along with the controllers (* rspec only for now).
 * Throw the scaffolding away when your app is ready to graduate to its next phase (or don't if you like it).
 
-## THE BLOG POST
+## QUICK START (COMING SOON)
 
 It's really easy to get started by following along with this blog post that creates three simple tables (User, Event, and Format).
 
