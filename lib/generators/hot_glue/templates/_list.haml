@@ -2,8 +2,10 @@
   .container-fluid.<%= singular %>-table
     .row
 <%= list_column_headings %>
-    %div.tbody
+      .col
+    %div
       - if <%= plural %>.empty?
         None
       - <%= plural %>.each do |<%= singular %>|
         = render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %> <%= nested_assignments_with_leading_comma %> }
+    <%=  @no_paginate ? "" : paginate %>

@@ -90,8 +90,6 @@ module HotGlue
       case (f)
       when "--god"
         @auth = nil
-      # when "--with-index"
-      #   @with_index = true
       when "--specs-only"
         @specs_only = true
       when "--no-specs"
@@ -100,6 +98,8 @@ module HotGlue
         @no_delete = true
       when "--no-create"
         @no_create = true
+      when "--no-paginate"
+        @no_paginate = true
       end
     end
 
@@ -672,7 +672,13 @@ module HotGlue
      end
    end
 
-    private # thor does something fancy like sending the class all of its own methods during some strange run sequence
+
+
+  def paginate
+    "= paginate #{plural}"
+  end
+
+  private # thor does something fancy like sending the class all of its own methods during some strange run sequence
     # does not like public methods
 
     def cc_filename_with_extensions(name, file_format = format)
