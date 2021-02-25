@@ -14,9 +14,6 @@
 
     = form_with model: <%= "@" + singular%>, url: <%= path_helper_singular %>(<%= path_arity %>) do |f|
       = render partial: "form",  locals: {:<%=  singular  %> => <%= "@" + singular%>, f: f}
-      .row
-        .col-md-12
-          = f.submit "Save", class: "btn btn-primary pull-right"
 
     %i.fa.fa-times-circle.fa-2x{ 'data-name' =>  'close-invoice__#{@invoice.id}', 'data-row-id' =>  <%= "@" + singular %>.id, 'data-role' =>  'close-button'}
 

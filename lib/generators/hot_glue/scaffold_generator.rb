@@ -1,53 +1,16 @@
-# module HotGlue
-#   class ScaffoldGenerator < Rails::Generators::NamedBase
-#
-#     include Rails::Generators::ResourceHelpers
-#
-#
-#     #
-#     # hook_for :form_builder, :as => :scaffold
-#     #
-#     # source_root File.expand_path('templates', __dir__)
-#
-#
-#
-#
-#     # BECAUSE THIS CLASS REPLACES Erb::Generators::Base
-#     def formats
-#       [format]
-#     end
-#
-#     def format
-#       nil
-#     end
-#
-#     def handler
-#       :erb
-#     end
-#
-#     # def filename_with_extensions(*args)
-#     #   byebug
-#     #   # name, file_format = format
-#     #   [name, file_format, handler].compact.join(".")
-#     # end
-#   end
-# end
-
-
 require 'rails/generators/erb/scaffold/scaffold_generator'
 require 'ffaker'
 
 
 module HotGlue
   module GeneratorHelper
-    def text_area_output(col, field_length)
+    def text_area_output(col, field_length, col_identifier )
       lines = field_length % 40
       if lines > 5
         lines = 5
       end
 
-      ".row
-  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+      "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
     = f.text_area :#{col.to_s}, class: 'form-control', cols: 40, rows: '#{lines}'
     %label.form-text
       #{col.to_s.humanize}\n"
@@ -55,9 +18,9 @@ module HotGlue
 
 
 
-    def field_output(col, type = nil, width)
-      ".row
-  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+    def field_output(col, type = nil, width, col_identifier )
+
+      "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
     = f.text_field :#{col.to_s}, value: @#{singular}.#{col.to_s}, size: #{width}, class: 'form-control', type: '#{type}'
     %label.form-text
       #{col.to_s.humanize}\n"
@@ -475,9 +438,10 @@ module HotGlue
     end
 
     def all_form_fields
+      col_identifier = "  .col"
+      col_spaces_prepend = "    "
+
       res = @columns.map { |col|
-
-
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         limit = eval("#{singular_class}.columns_hash['#{col}']").limit
         sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
@@ -513,58 +477,55 @@ module HotGlue
               puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
             end
 
-            ".row
-  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
-    = f.collection_select(:#{col.to_s}, #{assoc_class}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
-    %label.small.form-text.text-muted
-      #{col.to_s.humanize}"
+            "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
+#{col_spaces_prepend}= f.collection_select(:#{col.to_s}, #{assoc_class}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
+#{col_spaces_prepend}  %label.small.form-text.text-muted
+#{col_spaces_prepend}    #{col.to_s.humanize}"
 
           else
-            ".row
-  %div{class: \"form-group col-md-4 \#{'alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number'
-    %label.form-text
-      #{col.to_s.humanize}\n"
+            "#{col_identifier}{class: \"form-group \#{'alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+#{col_spaces_prepend}= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number'
+#{col_spaces_prepend}  %label.form-text
+#{col_spaces_prepend}    #{col.to_s.humanize}\n"
           end
         when :string
           limit ||= 256
           if limit <= 256
-            field_output(col, nil, limit)
+            field_output(col, nil, limit, col_identifier)
           else
-            text_area_output(col, limit)
+            text_area_output(col, limit, col_identifier)
           end
 
         when :text
           limit ||= 256
           if limit <= 256
-            field_output(col, nil, limit)
+            field_output(col, nil, limit, col_identifier)
           else
-            text_area_output(col, limit)
+            text_area_output(col, limit, col_identifier)
           end
+        when :float
+          limit ||= 256
+          field_output(col, nil, limit, col_identifier)
+
 
         when :datetime
-          ".row
-  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = datetime_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
+          "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+#{col_spaces_prepend}= datetime_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
         when :date
-          ".row
-  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = date_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
+          "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+#{col_spaces_prepend}= date_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
         when :time
-          ".row
-  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = time_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
+          "#{col_identifier}{class: \"form-group  \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+#{col_spaces_prepend}= time_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
         when :boolean
-          ".row
-  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    %span
-      #{col.to_s.humanize}
-    = f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked')
-    = f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0')
+          "#{col_identifier}{class: \"form-group  \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+#{col_spaces_prepend}%span
+#{col_spaces_prepend}  #{col.to_s.humanize}
+#{col_spaces_prepend}= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked')
+#{col_spaces_prepend}= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0')
 
-    = f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '')
-    = f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1')
-
+#{col_spaces_prepend}= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '')
+#{col_spaces_prepend}= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1')
       "
         end
 
