@@ -221,6 +221,15 @@ Please note that this example would product non-functional code, so you would ne
 You don't need this if the pluralized version is just + "s" of the singular version. Only use for non-standard plurlizations, and be sure to pass it as TitleCase (as if  you pluralized the model name)
 
 
+### `exclude=`
+(separate field names by COMMA)
+
+By default, all fields are included unless they are on the exclude list. (The default for the exclude list is `id`, `created_at`, and `updated_at`  so you don't need to exclude those-- they are added.)
+
+If you specify an exclude list, those fields + id, created_at, and updated_at will be excluded.
+
+
+
 ### `--god`
 
 Use this flag to create controllers with no root authentication. You can still use an auth_identifier, which can be useful for a meta-leval authentication to the controoler.
@@ -247,7 +256,18 @@ Produces ONLY the controller spec file, nothing else.
 Produces all the files except the spec file.
 
 
+### `--no-paginate`
+
+Omits pagination. (All list views have pagination by default.)
+
+
+
+
 # VERSION HISTORY
+#### 2021-02-26 - v0.0.3
+
+#### 2021-02-25 - v0.0.2 - bootstrapy
+
 #### 2021-02-24 - v0.0.1 - first proof of concept release -- basic CRUD works 
 
 #### 2021-02-23 - v0.0.0 - Port of my prior work from github.com/jasonfb/common_core_js

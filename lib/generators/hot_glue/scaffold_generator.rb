@@ -62,6 +62,7 @@ module HotGlue
 
     @auth = "current_user"
     @auth_identifier = nil
+    @exclude_fields = []
 
     args[1..-1].each do |a|
       var_name, var_value = a.split("=")
@@ -77,6 +78,8 @@ module HotGlue
         @auth = var_value
       when "auth_identifier"
         @auth_identifier = var_value || ""
+      when "exclude"
+        @exclude_fields += var_value.split(",").collect(&:to_sym)
       end
     end
 
@@ -162,18 +165,19 @@ module HotGlue
       end
     end
 
-    exclude_fields = [ :id, :created_at, :updated_at, :encrypted_password, :reset_password_token,
-                       :reset_password_sent_at, :remember_created_at, :confirmation_token, :confirmed_at,
-                       :confirmation_sent_at, :unconfirmed_email]
+    @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
+                       :reset_password_token,
+                       :reset_password_sent_at, :remember_created_at,
+                       :confirmation_token, :confirmed_at,
+                       :confirmation_sent_at, :unconfirmed_email
 
-    exclude_fields << auth_assoc_field.to_sym if !auth_assoc_field.nil?
-    exclude_fields <<  ownership_field.to_sym if !ownership_field.nil?
-
+    @exclude_fields += auth_assoc_field.to_sym if !auth_assoc_field.nil?
+    @exclude_fields +=  ownership_field.to_sym if !ownership_field.nil?
 
     begin
-      @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| exclude_fields.include?(field) }
+      @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
     rescue StandardError => e
-      puts "Ooops... it looks like is an object for #{class_name}. Please create the database table with fields first. "
+      puts "Ooops... #{e} it looks like is no object for #{class_name}. Please create the database table with fields first. "
       exit
     end
 
