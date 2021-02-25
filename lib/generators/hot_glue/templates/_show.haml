@@ -1,5 +1,5 @@
 <%= all_line_fields %>
-.cell
+.col
   <% if destroy_action %>
   = link_to "Delete <i class='fa fa-1x fa-remove'></i>".html_safe, <%= path_helper_full %>(<%= path_helper_args %>), method: :delete, data: {confirm: 'Are you sure?'},  disable_with: "Loading...", class: "delete-<%= singular %>-button btn btn-primary "
   <% end %>

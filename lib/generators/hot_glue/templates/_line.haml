@@ -1,5 +1,5 @@
 = turbo_frame_tag "<%= singular %>__#{<%= singular %>.id}" do
-  %div.tr{'data-id': <%= singular %>.id, 'data-edit': 'false'}
+  .row{'data-id': <%= singular %>.id, 'data-edit': 'false'}
     = render partial: "show", locals: {<%= singular %>: <%= singular %>}
 
 

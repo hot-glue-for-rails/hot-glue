@@ -38,11 +38,9 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency('kaminari', '~> 1.2')
   spec.add_runtime_dependency('haml-rails', '~> 2.0')
+  spec.add_runtime_dependency('turbo-rails', '~> 0.5')
   spec.add_runtime_dependency "sass-rails"
 
-  # spec.add_runtime_dependency 'bootsnap'
-  # spec.add_runtime_dependency 'bootstrap'
-  # spec.add_runtime_dependency 'font-awesome-rails'
   spec.add_dependency 'ffaker', "~> 2.16"
 
   spec.post_install_message = <<~MSG

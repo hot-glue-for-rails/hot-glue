@@ -1,7 +1,6 @@
 = turbo_frame_tag "<%= plural %>-list" do
-  %div.table.table-striped.<%= singular %>-table
-    %div.thead
-      %div.tr
+  .container.<%= singular %>-table
+    .row
 <%= list_column_headings %>
     %div.tbody
       - if <%= plural %>.empty?

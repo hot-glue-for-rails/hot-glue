@@ -43,6 +43,21 @@ rails generate hot_glue:scaffold Thing
 
 - Install Bootstrap (optional)
 
+with Webpack: 
+  - change `stylesheet_link_tag` to `stylesheet_pack_tag` in your application layout
+  - `yarn add bootstrap`
+  - create a new file at `app/javascript/css/site.scss` with this contents
+    ```
+    @import "~bootstrap/scss/bootstrap.scss
+    ```
+    
+  - add to `app/javascript/packs/application.js` 
+    ```
+    import 'css/site'
+    ```
+    
+    
+
 - Install Devise or implement your own authentication
 
 

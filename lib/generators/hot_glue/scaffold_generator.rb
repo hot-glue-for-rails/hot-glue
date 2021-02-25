@@ -244,7 +244,7 @@ module HotGlue
     end
 
     def list_column_headings
-      @columns.map(&:to_s).map{|col_name| '        %div.th{:scope => "col"} ' + col_name.humanize}.join("\n")
+      @columns.map(&:to_s).map{|col_name| '      .col ' + col_name.humanize}.join("\n")
     end
 
     def columns_spec_with_sample_data
@@ -577,6 +577,7 @@ module HotGlue
       columns = @columns.count + 1
       perc_width = (100/columns).floor
 
+      col_identifer = ".col"
       @columns.map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         limit = eval("#{singular_class}.columns_hash['#{col}']").limit
@@ -613,27 +614,27 @@ module HotGlue
               puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
             end
 
-            ".cell{style:'width: #{perc_width}%'}
+            "#{col_identifer}
   = #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe"
 
           else
-            ".cell{style:'width: #{perc_width}%'}
+            "#{col_identifer}
   = #{singular}.#{col}"
           end
         when :float
           width = (limit && limit < 40) ? limit : (40)
-          ".cell{style:'width: #{perc_width}%'}
+          "#{col_identifer}
   = #{singular}.#{col}"
 
         when :string
           width = (limit && limit < 40) ? limit : (40)
-          ".cell{style:'width: #{perc_width}%'}
+          "#{col_identifer}
   = #{singular}.#{col}"
         when :text
-          ".cell{style:'width: #{perc_width}%'}
+          "#{col_identifer}
   = #{singular}.#{col}"
         when :datetime
-          ".cell{style:'width: #{perc_width}%'}
+          "#{col_identifer}
   - unless #{singular}.#{col}.nil?
     = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone)
   - else
@@ -641,7 +642,7 @@ module HotGlue
       MISSING
 "
         when :date
-          ".cell{style:'width: #{perc_width}%'}
+          ".cell
   - unless #{singular}.#{col}.nil?
     = #{singular}.#{col}
   - else
@@ -649,7 +650,7 @@ module HotGlue
       MISSING
 "
         when :time
-          ".cell{style:'width: #{perc_width}%'}
+          "#{col_identifer}
   - unless #{singular}.#{col}.nil?
     = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone)
   - else
@@ -657,7 +658,7 @@ module HotGlue
       MISSING
 "
         when :boolean
-          ".cell{style:'width: #{perc_width}%'}
+          "#{col_identifer}
   - if #{singular}.#{col}.nil?
     %span.alert-danger
       MISSING
