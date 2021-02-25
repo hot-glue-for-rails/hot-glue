@@ -3,7 +3,7 @@
     .col-md-12
       = render partial: "new_button"
       .clearfix
-      = render partial: "<%= plural %>/list", locals: {<%= plural %>: @<%= plural %>}
+      = render partial: "<%= list_path_partial %>", locals: {<%= plural %>: @<%= plural %>}
 
 
 

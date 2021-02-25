@@ -311,6 +311,18 @@ module HotGlue
       "#{@namespace+"/" if @namespace}#{plural}/line"
     end
 
+    def show_path_partial
+      "#{@namespace+"/" if @namespace}#{plural}/show"
+    end
+
+    def list_path_partial
+      "#{@namespace+"/" if @namespace}#{plural}/list"
+    end
+
+    def new_path_name
+      "new_#{@namespace+"_" if @namespace}#{singular}_path"
+    end
+
     def nested_assignments
       @nested_args.map{|a| "#{a}: @#{a}"}.join(", ") #metaprgramming into Ruby hash
     end
@@ -479,14 +491,14 @@ module HotGlue
 
             "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
 #{col_spaces_prepend}= f.collection_select(:#{col.to_s}, #{assoc_class}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
-#{col_spaces_prepend}  %label.small.form-text.text-muted
-#{col_spaces_prepend}    #{col.to_s.humanize}"
+#{col_spaces_prepend}%label.small.form-text.text-muted
+#{col_spaces_prepend}  #{col.to_s.humanize}"
 
           else
             "#{col_identifier}{class: \"form-group \#{'alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
 #{col_spaces_prepend}= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number'
-#{col_spaces_prepend}  %label.form-text
-#{col_spaces_prepend}    #{col.to_s.humanize}\n"
+#{col_spaces_prepend}%label.form-text
+#{col_spaces_prepend}  #{col.to_s.humanize}\n"
           end
         when :string
           limit ||= 256

@@ -26,7 +26,6 @@ Gem::Specification.new do |spec|
 
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
     files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)}) || f.match(%r{(gemspec|gem)$}) }
-    puts "files being built are #{files.join(' ')}"
     files
   end
 

@@ -6,7 +6,7 @@ As well, its premise is a little different than the configuration-heavy admin in
 
 It gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields. 
 
-Hot Glue generates functionality that's quick and dirty. It let's you be crafty. Like a real glue gun with hot glue, take care not to burn yourself while using it. 
+Hot Glue generates functionality that's quick and dirty. It let's you be crafty. As with a real glue gun, take care not to burn yourself while using it. 
 
 * Build plug-and-play scaffolding mixing HAML and turbo_stream responses
 * Automatically Reads Your Models (make them before building your scaffolding!)
