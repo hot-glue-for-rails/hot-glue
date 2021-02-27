@@ -264,7 +264,7 @@ Omits pagination. (All list views have pagination by default.)
 
 
 # VERSION HISTORY
-#### 2021-02-26 - v0.0.3
+#### 2021-02-27 - v0.0.3 - several fixes for namespaces; adds pagination; adds exclude list to fields
 
 #### 2021-02-25 - v0.0.2 - bootstrapy
 
