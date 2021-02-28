@@ -38,6 +38,21 @@ module HotGlue
     include GeneratorHelper
 
 
+    class_option :singular, type: :string, default: nil
+    class_option :plural, type: :string, default: nil
+    class_option :singular_class, type: :string, default: nil
+    class_option :nest, type: :string, default: ""
+    class_option :namespace, type: :string, default: nil
+    class_option :auth, type: :string, default: nil
+    class_option :auth_identifier, type: :string, default: nil
+    class_option :exclude, type: :string, default: ""
+    class_option :god, type: :boolean, default: false
+    class_option :spacs_only, type: :boolean, default: false
+    class_option :no_specs, type: :boolean, default: false
+    class_option :no_delete, type: :boolean, default: false
+    class_option :no_create, type: :boolean, default: false
+    class_option :no_paginate, type: :boolean, default: false
+
     def initialize(*meta_args) #:nodoc:
     super
 
@@ -47,81 +62,72 @@ module HotGlue
       puts "*** Oops: It looks like there is no object for #{class_name}. Please define the object + database table first."
       exit
     end
-
-
-
     args = meta_args[0]
-    @singular = args[0].tableize.singularize # should be in form hello_world
+    @singular = args.first.tableize.singularize # should be in form hello_world
 
 
-    @plural = @singular + "s" # supply to override; leave blank to use default
+    @plural = options['plural'] || @singular + "s" # supply to override; leave blank to use default
+    @auth = options['auth'] || "current_user"
+    @auth_identifier = options['auth'] || (!@auth.nil? && @auth.gsub("current_", "")) || nil
+
+    @nest = options['auth'] || nil
+    @namespace = options['namespace'] || nil
+
     @singular_class = @singular.titleize.gsub(" ", "")
-    @nest = nil
-    @namespace = nil
-    @nested_args = []
 
-    @auth = "current_user"
     @auth_identifier = nil
     @exclude_fields = []
 
-    args[1..-1].each do |a|
-      var_name, var_value = a.split("=")
-      case (var_name)
+    # args[1..-1].each do |a|
+    #   var_name, var_value = a.split("=")
+    #   case (var_name)
+    #
+    #   when "plural"
+    #     @plural = var_value
+    #   when "nest"
+    #     @nest = var_value
+    #   when "namespace"
+    #     @namespace = var_value
+    #   when "auth"
+    #     @auth = var_value
+    #   when "auth_identifier"
+    #     @auth_identifier = var_value || ""
+    #   when "exclude"
+    #     @exclude_fields += var_value.split(",").collect(&:to_sym)
+    #   end
+    # end
 
-      when "plural"
-        @plural = var_value
-      when "nest"
-        @nest = var_value
-      when "namespace"
-        @namespace = var_value
-      when "auth"
-        @auth = var_value
-      when "auth_identifier"
-        @auth_identifier = var_value || ""
-      when "exclude"
-        @exclude_fields += var_value.split(",").collect(&:to_sym)
-      end
-    end
+    # byebug
+
+    @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
 
     auth_assoc = @auth.gsub("current_","")
 
-    @no_delete = false
-    @no_create = false
 
-    flags = meta_args[1]
-    flags.each do |f|
-      case (f)
-      when "--god"
-        @auth = nil
-      when "--specs-only"
-        @specs_only = true
-      when "--no-specs"
-        @no_specs = true
-      when "--no-delete"
-        @no_delete = true
-      when "--no-create"
-        @no_create = true
-      when "--no-paginate"
-        @no_paginate = true
-      end
-    end
+    @god = options['god'] || options['gd'] || false
+    @specs_only = options['specs-only'] || false
+    @no_specs = options['no-specs'] || false
+    @no_delete = options['no-delete'] || false
+    @no_create = options['no-create'] || false
+    @no_paginate = options['no-paginate'] || false
 
     if @specs_only && @no_specs
       puts "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry."
       exit
     end
 
-
-                               # only used for the before_action
-    if @auth_identifier.nil? && !@auth.nil?
-      @auth_identifier = @auth.gsub("current_", "")
+    if @god
+      @auth = nil
     end
 
-                               # when in self auth, the object is the same as the authenticated object
+
+    # when in self auth, the object is the same as the authenticated object
     if @auth && auth_identifier == @singular
       @self_auth = true
     end
 
+
+    @nested_args = []
     if !@nest.nil?
       @nested_args = @nest.split("/")
       @nested_args_plural = {}
@@ -431,7 +437,7 @@ module HotGlue
     end
 
     def haml_views
-      res =  %w(index edit new _form _new_form _line _list _new_button _show)
+      res =  %w(index edit new _form _new_form _line _list _new_button _show _errors)
 
       res
     end
@@ -587,8 +593,11 @@ module HotGlue
               display_column = "display_name"
             elsif assoc_class.column_names.include?("email")
               display_column = "email"
+            elsif assoc_class.column_names.include?("number")
+              display_column = "number"
+
             else
-              puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+              puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
             end
 
             "#{col_identifer}
@@ -672,8 +681,11 @@ module HotGlue
           "display_name"
         elsif me.column_names.include?("email")
           "email"
+        elsif me.column_names.include?("number")
+          display_column = "number"
+
         else
-          raise "*** Oops: Can't find any column to use as the display label on #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{singular_class} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+          raise "*** Oops: Can't find any column to use as the display label on #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your #{singular_class} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
         end
     end
 
