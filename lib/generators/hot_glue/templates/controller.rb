@@ -52,14 +52,17 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @<%=singular_name %> = <%=class_name %>.create(modified_params)
 
     if @<%= singular_name %>.save
-
+      load_all_<%= plural %>
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to <%= plural %>_path }
+      end
     else
       flash[:alert] = "Oops, your <%= singular_name %> could not be created."
-    end
-    load_all_<%= plural %>
-    respond_to do |format|
-      format.turbo_stream
-      format.html { redirect_to <%= plural %>_path }
+      respond_to do |format|
+        format.turbo_stream
+        format.html
+      end
     end
   end<% end %>
 

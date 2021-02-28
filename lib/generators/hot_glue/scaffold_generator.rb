@@ -431,7 +431,7 @@ module HotGlue
     end
 
     def haml_views
-      res =  %w(index edit new _form _line _list _new_button _show)
+      res =  %w(index edit new _form _new_form _line _list _new_button _show)
 
       res
     end

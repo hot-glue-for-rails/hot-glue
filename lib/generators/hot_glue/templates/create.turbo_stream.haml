@@ -1,5 +1,12 @@
-= turbo_stream.replace "<%= plural %>-list" do
-  = render partial: "list", locals: {<%= plural %>: @<%= plural %>}
+- if @<%= singular %>.errors.none?
+  = turbo_stream.replace "<%= plural %>-list" do
+    = render partial: "list", locals: {<%= plural %>: @<%= plural %>}
 
 = turbo_stream.replace "<%= singular %>-new" do
-  = render partial: "new_button"
+  - if @<%= singular %>.errors.none?
+    = render partial: "new_button"
+  - else
+    = render partial: "new_form", locals: {<%= singular %>: @<%= singular %>}
+
+= turbo_stream.replace "flash_notices" do
+  = render partial: "layouts/flash_notices"
