@@ -2,7 +2,7 @@
   %h3
     New <%= singular.titlecase %>
 
-  = form_with model: @invoice, url: <%= path_helper_plural %>(<%= nested_objects_arity %>), method: "post" do  |f|
+  = form_with model: @<%= singular %>, url: <%= path_helper_plural %>(<%= nested_objects_arity %>), method: "post" do  |f|
     = render partial: "<%=namespace_with_slash%><%= @plural %>/form", locals: {<%= singular %>: @<%= singular %>, f: f}
 
     .row
