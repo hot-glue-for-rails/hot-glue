@@ -1,7 +1,8 @@
-- unless notice.nil?
-  %div.alert.alert-notice.alert-dismissible
-    = notice
+= turbo_frame_tag "flash_notices" do
+  - unless notice.nil?
+    %div.alert.alert-notice.alert-dismissible
+      = notice
 
-- unless alert.nil?
-  %div.alert.alert-danger.alert-dismissible
-    = alert
+  - unless alert.nil?
+    %div.alert.alert-danger.alert-dismissible
+      = alert

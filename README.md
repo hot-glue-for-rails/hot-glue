@@ -39,7 +39,12 @@ rails generate hot_glue:scaffold Thing
 
 - The Turbo install has switched your action cable settings from 'async' to Redis, so be sure to start a redis server
   
-- Add hot_glue to your Gemfile & bundle install, then install it with `rails hot_glue:install`
+- Add hot_glue to your Gemfile & bundle install, then install it with `rails generate hot_glue:install`
+
+- Add to your `application.html.erb`
+```
+  <%= render partial: 'layouts/flash_notices' %>
+```
 
 - Install Bootstrap (optional)
 
@@ -264,6 +269,9 @@ Omits pagination. (All list views have pagination by default.)
 
 
 # VERSION HISTORY
+
+#### 2021-03-?? - v0.0.4 - Validation magic
+
 #### 2021-02-27 - v0.0.3 - several fixes for namespaces; adds pagination; adds exclude list to fields
 
 #### 2021-02-25 - v0.0.2 - bootstrapy

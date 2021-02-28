@@ -658,6 +658,25 @@ module HotGlue
     end
 
 
+
+    def display_class
+      me = eval(singular_class)
+      @display_class ||=
+        if me.column_names.include?("name")
+          "name"
+        elsif me.column_names.include?("to_label")
+          "to_label"
+        elsif me.column_names.include?("full_name")
+          "full_name"
+        elsif me.column_names.include?("display_name")
+          "display_name"
+        elsif me.column_names.include?("email")
+          "email"
+        else
+          raise "*** Oops: Can't find any column to use as the display label on #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{singular_class} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+        end
+    end
+
     def destroy_action
       return false if @self_auth
       return !@no_delete
