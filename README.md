@@ -67,22 +67,22 @@ with Webpack:
 
 
 
-## Options
-
-Note that the arguments are not preceded by dashes and are followed by equal sign and the input you are giving.
-
-Flags take two dashes (--) and do not take any value. Always pass options first, followed by the flags (or else your options won't work!)
-
 ### First Argument
+(no double slash)
 
 TitleCase class name of the thing you want to build a scaffoling for.
 
-### `namespace=`
 
-pass `namespace=` as an option to denote a namespace to apply to the Rails path helpers
+## Options With Arguments 
+
+All options two dashes (--) and these take an `=` and a value
+
+### `--namespace=`
+
+pass `--namespace=` as an option to denote a namespace to apply to the Rails path helpers
 
 
-`rails generate hot_glue:scaffold Thing namespace=dashboard`
+`rails generate hot_glue:scaffold Thing --namespace=dashboard`
 
 This produces several views at `app/views/dashboard/things/` and a controller at`app/controllers/dashboard/things_controller.rb`
 
@@ -101,12 +101,12 @@ end
 ```
 
 
-### `nest=`
+### `--nest=`
 
-pass `nest=` to denote a nested resources
+pass `--nest=` to denote a nested resources
 
 
-`rails generate hot_glue:scaffold Line nest=invoice`
+`rails generate hot_glue:scaffold Line --nest=invoice`
 
 In this example, it is presumed that the current user has_many :invoices, and that invoices have many :lines
 
@@ -125,7 +125,7 @@ In this example, it is presumed that the current user has_many :invoices, and th
 
 
 To generate scaffold:
-`rails generate hot_glue:scaffold Charge nest=invoice/line`
+`rails generate hot_glue:scaffold Charge --nest=invoice/line`
 
 The order of the nest should match the nested resources you have in your own app.  In particular, you auth root will be used as the starting point when loading the objects from the URL:
 
@@ -148,7 +148,7 @@ It works, but it isn't granular. As well, it isn't appropriate for a large app w
 Your customers can delete their own objects by default (may be a good idea or a bad idea for you). If you don't want that, you should strip out the delete actions off the controllers.
 
 
-### `auth=`
+### `--auth=`
 
 By default, it will be assumed you have a `current_user` for your user authentication. This will be treated as the "authentication root" for the "poor man's auth" explained above.
 
@@ -162,7 +162,7 @@ If you use Devise, you probably already have a `current_user` method available i
 
 If you use a different object other than "User" for authentication, override using the `auth` option.
 
-`rails generate hot_glue:scaffold Thing auth=current_account`
+`rails generate hot_glue:scaffold Thing --auth=current_account`
 
 You will note that in this example it is presumed that the Account object will have an association for `things`
 
@@ -173,7 +173,7 @@ If you supply nesting (see below), your nest chain will automatically begin with
 
 
 
-### `auth_identifier=`
+### `--auth_identifier=`
 
 Your controller will call a method authenticate_ (AUTH IDENTIFIER) bang, like:
 
@@ -203,7 +203,7 @@ As well, the `after_sign_in_path_for(user)` here is a hook for Devise also that 
 The default (do not pass `auth_identifier=`) will match the `auth` (So if you use 'account' as the auth, `authenticate_account!` will get invoked from your generated controller; the default is always 'user', so you can leave both auth and auth_identifier off if you want 'user')
 
 
-`rails generate hot_glue:scaffold Thing auth=current_account auth_identifier=login`
+`rails generate hot_glue:scaffold Thing --auth=current_account --auth_identifier=login`
 In this example, the controller produced with:
 ```
    before_action :authenticate_login!
@@ -214,19 +214,19 @@ However, the object graph anchors would continue to start from current_account. 
 ```
 
 Use empty string to **turn this method off**:
-`rails generate hot_glue:scaffold Thing auth=current_account auth_identifier=''`
+`rails generate hot_glue:scaffold Thing --auth=current_account --auth_identifier=''`
 
 In this case a controller would be generated that would have NO before_action to authenticate the account, but it would still treat the current_account as the auth root for the purpose of loading the objects.
 
 Please note that this example would product non-functional code, so you would need to manually fix your controllers to make sure `current_account` is available to the controller.
 
 
-### `plural=`
+### `--plural=`
 
 You don't need this if the pluralized version is just + "s" of the singular version. Only use for non-standard plurlizations, and be sure to pass it as TitleCase (as if  you pluralized the model name)
 
 
-### `exclude=`
+### `--exclude=`
 (separate field names by COMMA)
 
 By default, all fields are included unless they are on the exclude list. (The default for the exclude list is `id`, `created_at`, and `updated_at`  so you don't need to exclude those-- they are added.)
@@ -235,11 +235,11 @@ If you specify an exclude list, those fields + id, created_at, and updated_at wi
 
 
 
-### `--god`
+### `--god` or `--gd`
 
-Use this flag to create controllers with no root authentication. You can still use an auth_identifier, which can be useful for a meta-leval authentication to the controoler.
+Use this flag to create controllers with no root authentication. You can still use an auth_identifier, which can be useful for a meta-leval authentication to the controller.
 
-For example, FOR ADMIN CONTROLLERS ONLY, supply a auth_identifier and use `--god` flag
+For example, FOR ADMIN CONTROLLERS ONLY, supply a auth_identifier and use `--god` flag. 
 
 In God mode, the objects are loaded directly from the base class (these controllers have full access)
 ```
@@ -249,7 +249,8 @@ end
 
 ```
 
-
+## FLAGS (Options with no values)
+These options (flags) also uses `--` syntax but do not take any values. Everything is assumed (default) to be false unless specified.
 
 ### `--specs-only`
 
@@ -266,11 +267,20 @@ Produces all the files except the spec file.
 Omits pagination. (All list views have pagination by default.)
 
 
+### `--no-create`
+
+Omits create action. 
+
+### `--no-delete`
+
+Omits delete action. 
+
+
 
 
 # VERSION HISTORY
 
-#### 2021-03-?? - v0.0.4 - Validation magic
+#### 2021-03-01 - v0.0.4 - Validation magic; refactors the options to the correct Rails::Generators syntax
 
 #### 2021-02-27 - v0.0.3 - several fixes for namespaces; adds pagination; adds exclude list to fields
 

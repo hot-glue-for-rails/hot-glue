@@ -78,26 +78,7 @@ module HotGlue
     @auth_identifier = nil
     @exclude_fields = []
 
-    # args[1..-1].each do |a|
-    #   var_name, var_value = a.split("=")
-    #   case (var_name)
-    #
-    #   when "plural"
-    #     @plural = var_value
-    #   when "nest"
-    #     @nest = var_value
-    #   when "namespace"
-    #     @namespace = var_value
-    #   when "auth"
-    #     @auth = var_value
-    #   when "auth_identifier"
-    #     @auth_identifier = var_value || ""
-    #   when "exclude"
-    #     @exclude_fields += var_value.split(",").collect(&:to_sym)
-    #   end
-    # end
 
-    # byebug
 
     @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
 
