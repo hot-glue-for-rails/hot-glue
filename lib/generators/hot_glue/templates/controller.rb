@@ -1,5 +1,5 @@
 class <%= controller_class_name %> < <%= controller_descends_from %>
-<% unless @auth_identifier == '' || @auth.nil? %>before_action :authenticate_<%= auth_identifier %>!<% end %>
+<% unless @auth_identifier == '' || @auth.nil? %>before_action :authenticate_<%= @auth_identifier %>!<% end %>
 <% if any_nested? %> <% @nested_args.each do |arg| %>
   before_action :load_<%= arg %><% end %> <% end %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
@@ -51,7 +51,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @<%=singular_name %> = <%=class_name %>.create(modified_params)
 
     if @<%= singular_name %>.save
-      flash[:notice] = "Successfully created #{<%= singular %>.<%= display_class %>}"
+      flash[:notice] = "Successfully created #{@<%= singular %>.<%= display_class %>}"
       load_all_<%= plural %>
       respond_to do |format|
         format.turbo_stream
