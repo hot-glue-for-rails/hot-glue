@@ -14,3 +14,10 @@ test/dummy/tmp/
 .DS_Store
 
 dump.rdb
+
+tmp/
+
+
+spec/dummy/app/controllers/
+spec/dummy/app/views/
+spec/dummy/app/specs/

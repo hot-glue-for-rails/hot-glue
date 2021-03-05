@@ -13,3 +13,13 @@ gemspec
 
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
+
+# THESE GEMS ARE USED BY THE GEM SPECS ONLY AND
+# HAVE NOTHING TO DO WITH YOUR APP
+#
+
+gem 'simplecov'
+gem 'byebug'
+gem 'factory_girl'
+gem 'factory_girl_rails'
+gem 'rspec-rails'
