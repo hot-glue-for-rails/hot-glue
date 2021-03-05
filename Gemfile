@@ -20,6 +20,6 @@ gemspec
 
 gem 'simplecov'
 gem 'byebug'
-gem 'factory_girl'
-gem 'factory_girl_rails'
+gem 'factory_bot'
+gem 'factory_bot_rails'
 gem 'rspec-rails'
