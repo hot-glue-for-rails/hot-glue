@@ -282,7 +282,7 @@ Omits delete action.
 
 # VERSION HISTORY
 
-#### 2021-03-08 - v0.1   - testing, testing, testing
+#### 2021-03-06 - v0.0.6 - internal specs test the error catches and cover basic code generation (dummy testing only)
 
 #### 2021-03-01 - v0.0.5 - Validation magic; refactors the options to the correct Rails::Generators syntax
 
