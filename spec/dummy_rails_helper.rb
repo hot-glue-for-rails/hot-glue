@@ -13,12 +13,19 @@ require "rails/all"
 Dir["./lib**/*.rb"].each do |x|
   require(x)
 end
-require "dummy/application"
-require 'dummy/config/environment/test'
 
+
+puts "...... BUILDING THE DUMMY APP AT spec/dummy/ ......."
+
+`rails new spec/dummy/`
+`cd spec/dummy/ && rails webpacker:install`
+
+
+puts "...... LOADING THE DUMMY APP BEFORE RUNNING INTERNAL SPECS ......."
+
+require "spec/dummy/application"
+require 'spec/dummy/config/environment/test'
 require "rspec/rails"
-
-
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 Dir[Rails.root.join("spec/dummy/app/**/*.rb")].each { |f| require f }
 

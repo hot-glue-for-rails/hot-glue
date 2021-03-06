@@ -1,2 +1,0 @@
-class OmnitableB < ApplicationRecord
-end
