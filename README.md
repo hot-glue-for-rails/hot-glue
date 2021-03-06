@@ -282,7 +282,11 @@ Omits delete action.
 
 # VERSION HISTORY
 
-#### 2021-03-01 - v0.0.4 - Validation magic; refactors the options to the correct Rails::Generators syntax
+#### 2021-03-08 - v0.1   - testing, testing, testing
+
+#### 2021-03-01 - v0.0.5 - Validation magic; refactors the options to the correct Rails::Generators syntax
+
+#### (yanked)   - v0.0.4
 
 #### 2021-02-27 - v0.0.3 - several fixes for namespaces; adds pagination; adds exclude list to fields
 

@@ -131,6 +131,7 @@ module HotGlue
       if !@object_owner_sym.empty?
         auth_assoc_field = auth_assoc + "_id"
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
+
         if assoc
           ownership_field = assoc.name.to_s + "_id"
         else
@@ -143,23 +144,73 @@ module HotGlue
         end
       end
 
+
+
       @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
                          :reset_password_token,
                          :reset_password_sent_at, :remember_created_at,
                          :confirmation_token, :confirmed_at,
                          :confirmation_sent_at, :unconfirmed_email
 
-      @exclude_fields.push(auth_assoc_field.to_sym) if !auth_assoc_field.nil?
-      @exclude_fields.push(ownership_field.to_sym) if !ownership_field.nil?
-
       begin
+        @exclude_fields.push(auth_assoc_field.to_sym) if !auth_assoc_field.nil?
+        @exclude_fields.push(ownership_field.to_sym) if !ownership_field.nil?
         @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
+        @columns.each do |col|
+          if object.columns_hash[col.to_s].type == :integer
+
+
+            if col.to_s.ends_with?("_id")
+              # guess the association name label
+
+
+              assoc_name = col.to_s.gsub("_id","")
+              assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+
+
+              begin
+                eval(assoc.class_name)
+              rescue NameError => e
+                exit_message = "*** Oops: The table #{singular_class} has an association for '#{assoc.name.to_s}', but I can't find an assoicated model for that association. TODO: Please implement a model for #{assoc.name.to_s} that belongs to #{singular_class} "
+                raise(HotGlue::Error, exit_message)
+
+              end
+
+
+              if assoc.nil?
+                exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+                raise(HotGlue::Error,exit_message)
+              end
+              assoc_class = eval(assoc.class_name)
+              if assoc_class.column_names.include?("name")
+                display_column = "name"
+              elsif assoc_class.column_names.include?("to_label")
+                display_column = "to_label"
+              elsif assoc_class.column_names.include?("full_name")
+                display_column = "full_name"
+              elsif assoc_class.column_names.include?("display_name")
+                display_column = "display_name"
+              elsif assoc_class.column_names.include?("email")
+                display_column = "email"
+              else
+                exit_message= "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+                raise(HotGlue::Error,exit_message)
+              end
+            end
+          end
+        end
+      # look for a belongs_to on this object
       rescue StandardError => e
-        puts "Ooops... #{e} it looks like is no object for #{class_name}. Please create the database table with fields first. "
-        exit
+        exit_message = "Ooops... #{e} it looks like is no object for #{class_name}. Please create the database table with fields first. "
+        raise(HotGlue::Error, exit_message)
       end
+
+
     end
 
+
+
+    #
     def formats
       [format]
     end
@@ -654,7 +705,8 @@ module HotGlue
           display_column = "number"
 
         else
-          raise "*** Oops: Can't find any column to use as the display label on #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your #{singular_class} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+          exit_message = "*** Oops: Can't find any column to use as the display label on #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your #{singular_class} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+          raise(HotGlue::Error, exit_message)
         end
     end
 
