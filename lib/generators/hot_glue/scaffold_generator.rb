@@ -3,6 +3,12 @@ require 'ffaker'
 
 
 module HotGlue
+
+
+  class Error < StandardError
+  end
+
+
   module GeneratorHelper
     def text_area_output(col, field_length, col_identifier )
       lines = field_length % 40
@@ -59,32 +65,26 @@ module HotGlue
       begin
         object = eval(class_name)
       rescue StandardError => e
-        puts "*** Oops: It looks like there is no object for #{class_name}. Please define the object + database table first."
-        exit
+        message = "*** Oops: It looks like there is no object for #{class_name}. Please define the object + database table first."
+        raise(HotGlue::Error, message)
       end
+
+      if @specs_only && @no_specs
+        raise(HotGlue::Error, "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry.")
+      end
+
+
       args = meta_args[0]
       @singular = args.first.tableize.singularize # should be in form hello_world
-
-
       @plural = options['plural'] || @singular + "s" # supply to override; leave blank to use default
       @auth = options['auth'] || "current_user"
       @auth_identifier = options['auth'] || (!@auth.nil? && @auth.gsub("current_", "")) || nil
-
-
       @nest = options['auth'] || nil
       @namespace = options['namespace'] || nil
-
       @singular_class = @singular.titleize.gsub(" ", "")
-
       @exclude_fields = []
-
-
-
       @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
-
       auth_assoc = @auth.gsub("current_","")
-
-
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs-only'] || false
       @no_specs = options['no-specs'] || false
@@ -92,21 +92,14 @@ module HotGlue
       @no_create = options['no-create'] || false
       @no_paginate = options['no-paginate'] || false
 
-      if @specs_only && @no_specs
-        puts "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry."
-        exit
-      end
-
       if @god
         @auth = nil
       end
-
 
       # when in self auth, the object is the same as the authenticated object
       if @auth && auth_identifier == @singular
         @self_auth = true
       end
-
 
       @nested_args = []
       if !@nest.nil?
@@ -134,7 +127,7 @@ module HotGlue
         end
       end
 
-                                 # create the columns
+
       if !@object_owner_sym.empty?
         auth_assoc_field = auth_assoc + "_id"
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
@@ -142,11 +135,11 @@ module HotGlue
           ownership_field = assoc.name.to_s + "_id"
         else
           if @auth
-            puts "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
+            exit_message= "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
           else
-            puts "*** Oops:  god mode could not find the association(?). something is wrong."
+            exit_message= "*** Oops:  god mode could not find the association(?). something is wrong."
           end
-          exit
+          raise(HotGlue::Error, exit_message)
         end
       end
 
@@ -165,9 +158,6 @@ module HotGlue
         puts "Ooops... #{e} it looks like is no object for #{class_name}. Please create the database table with fields first. "
         exit
       end
-
-
-
     end
 
     def formats

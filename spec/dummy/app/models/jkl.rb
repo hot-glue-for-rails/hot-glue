@@ -1,0 +1,2 @@
+class Jkl < ApplicationRecord
+end

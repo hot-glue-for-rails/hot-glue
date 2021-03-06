@@ -300,3 +300,34 @@ Omits delete action.
 I hope one day I will leave this Earth a poor man (like my code) owning only the most simple structure for the simple form of my existence. Thanks for having educated me in this wisdom goes to my former mentor [@trak3r](https://github.com/trak3r)! 
 
 
+
+
+# HOW THIS GEM IS TESTED
+
+The testing of functionality-within-functionality is a little tricky and requires thinking outside the box.
+
+We have two kinds of "sandboxes": a DUMMY sandbox, and also a STRAWMAN sandbox
+
+The dummy sandbox is found at `spec/dummy`
+
+The dummy lives as mostly checked- into the repository, except the folders where the generated code goes (`spec/dummy/app/views/`, `spec/dummy/app/controllers/`, `spec/dummy/specs/` are excluded from Git)
+
+When you run the **internal specs**, which you can do **at the root of this repo** using the command `rspec`, a set of specs will run to assert the generators are erroring when they are supposed to and producing code when they are supposed to.
+
+
+The DUMMY testing DOES NOT test the actual functionality of the output code (it just tests the functionality of the generation process).
+
+For this reason, I've also added something I call STRAWMAN testing, which is a set of steps that does these things:
+
+The Strawman isn't in the repository, but if you build it locally, it will create itself into
+
+`spec/strawman/`
+
+1) Builds you a strawman sandbox app from scratch, using the native `rails new`
+2) Makes a few small modifications to the new app to support this gem
+3) Create two nonsense tables called OmnitableA and OmnitableB. Each omnitable has one of each kind of field (integer, text, string, date, time, etc)
+4) In this way, it is a "Noah's Arc" testing strategy: It will build you a fully functional app using all of the feature sets of the gem.
+5) The built app itself will contain its own specs
+6) You will then cd into `spec/strawman` and run `rspec`. This second test suite now runs to full test all of the *generated* code. 
+
+

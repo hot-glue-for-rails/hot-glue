@@ -1,0 +1,2 @@
+class Hgi < ApplicationRecord
+end
