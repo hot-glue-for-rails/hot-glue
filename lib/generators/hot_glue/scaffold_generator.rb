@@ -202,7 +202,7 @@ module HotGlue
     def columns_spec_with_sample_data
       @columns.map { |c|
         if eval("#{singular_class}.columns_hash['#{c}']").nil?
-          byebug
+          raise "#{singular_class}.columns_hash['#{c}'] is nil"
         end
         type = eval("#{singular_class}.columns_hash['#{c}']").type
         random_data = case type

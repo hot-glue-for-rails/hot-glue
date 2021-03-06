@@ -18,8 +18,15 @@ gemspec
 # HAVE NOTHING TO DO WITH YOUR APP
 #
 
-gem 'simplecov'
-gem 'byebug'
-gem 'factory_bot'
-gem 'factory_bot_rails'
-gem 'rspec-rails'
+
+
+group :development, :test do
+  gem 'sqlite3'
+  gem 'simplecov'
+  gem 'byebug'
+  gem 'factory_bot'
+  gem 'factory_bot_rails'
+  gem "rspec-rails", "~> 4.0.0.beta2"
+
+  gem 'rails', '6.1.3'
+end

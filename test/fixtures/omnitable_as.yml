@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  field_integer: 1
+  field_string: MyString
+  field_text: MyText
+  field_float: 1.5
+  field_datetime: 2021-03-05 19:41:22
+  field_date: 2021-03-05
+  field_time: 2021-03-05 19:41:22
+  field_boolean: false
+  omnittable_b_id: 1
+
+two:
+  field_integer: 1
+  field_string: MyString
+  field_text: MyText
+  field_float: 1.5
+  field_datetime: 2021-03-05 19:41:22
+  field_date: 2021-03-05
+  field_time: 2021-03-05 19:41:22
+  field_boolean: false
+  omnittable_b_id: 1

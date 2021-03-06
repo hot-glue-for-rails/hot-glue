@@ -1,5 +1,4 @@
-require 'rails_helper'
-
+require 'dummy_rails_helper'
 
 
 Rspec.describe HotGlue::InstallGenerator do

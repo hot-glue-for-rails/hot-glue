@@ -206,6 +206,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
+    sqlite3 (1.4.2)
     temple (0.8.2)
     thor (1.1.0)
     tilt (2.0.10)
@@ -226,8 +227,10 @@ DEPENDENCIES
   factory_bot
   factory_bot_rails
   hot-glue!
-  rspec-rails
+  rails (= 6.1.3)
+  rspec-rails (~> 4.0.0.beta2)
   simplecov
+  sqlite3
 
 BUNDLED WITH
    2.1.4

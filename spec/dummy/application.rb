@@ -1,5 +1,4 @@
 require "rails/all"
-# require "universal_track_manager"
 
 module Dummy
   APP_ROOT = File.expand_path("..", __FILE__).freeze
@@ -23,6 +22,9 @@ module Dummy
     config.paths["app/views"] << "#{APP_ROOT}/app/views"
     config.paths["config/database"] = "#{APP_ROOT}/config/database.yml"
     config.paths["log"] = "tmp/log/development.log"
+
+
+
 
     config.paths.add "config/routes.rb", with: "#{APP_ROOT}/config/routes.rb"
     config.secret_key_base = "SECRET_KEY_BASE"
