@@ -7,53 +7,53 @@ require 'spec_helper'
 
 # DUMMY SETUP
 # require rails first
-require "rails/all"
 # require the gem's core code
 
-Dir["./lib**/*.rb"].each do |x|
-  require(x)
-end
+
+# require 'rspec/rails'
+# require 'rails/generators/actions'
+# require 'rails/generators/erb/scaffold/scaffold_generator'
+#
+
+require "rails/all"
+require 'rspec/rails'
 
 
-puts "...... BUILDING THE DUMMY APP AT spec/dummy/ ......."
-
-`rails new spec/dummy/`
-`cd spec/dummy/ && rails webpacker:install`
+require "dummy/config/application"
+require 'dummy/config/environments/test'
 
 
-puts "...... LOADING THE DUMMY APP BEFORE RUNNING INTERNAL SPECS ......."
 
-require "spec/dummy/application"
-require 'spec/dummy/config/environment/test'
-require "rspec/rails"
-Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
-Dir[Rails.root.join("spec/dummy/app/**/*.rb")].each { |f| require f }
+# Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+Dir[Rails.root.join("dummy/app/**/*.rb")].each { |f| require f }
 
-Dummy::Application.initialize!
 
+# Dir["./lib/**/*.rb"].each do |x|
+#   puts "requiring #{x}"
+#   require(x)
+# end
+
+# Dummy::Application.initialize!
 
 # require File.expand_path('../../config/environment', __FILE__)
 
-
-
-
 ActiveRecord::Migration.maintain_test_schema!
-
 # set up db
 # be sure to update the schema if required by doing
 # - cd spec/rails_app
 # - rake db:migrate
 ActiveRecord::Schema.verbose = false
-load 'spec/dummy/db/schema.rb' # use db agnostic schema by default
 
+# TODO: RE-ESTABLISH DB CONNECTION HERE
+
+
+load 'dummy/db/schema.rb' # use db agnostic schema by default
 # require 'spec/dummy/factory'
 # require 'spec/dummy/factories'
 
 
 
-
-require 'rspec/rails'
-require 'database_cleaner'
+# require 'database_cleaner'
 
 # Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
@@ -62,9 +62,14 @@ require 'database_cleaner'
 RSpec.configure do |config|
   # config.use_transactional_fixtures = false
 
-  # config.before(:suite) do
-  #   DatabaseCleaner.clean_with(:truncation)
-  # end
+  config.before(:suite) do
+
+
+
+
+    # load the gem
+
+   end
   #
   # config.before(:each) do
   #   DatabaseCleaner.strategy = :truncation
@@ -85,5 +90,5 @@ RSpec.configure do |config|
   # config.after(:all) do
   #   DatabaseCleaner.clean
   # end
-  config.infer_spec_type_from_file_location!
+  # config.infer_spec_type_from_file_location!
 end

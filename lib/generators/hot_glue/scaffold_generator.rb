@@ -2,6 +2,7 @@ require 'rails/generators/erb/scaffold/scaffold_generator'
 require 'ffaker'
 
 
+
 module HotGlue
   module GeneratorHelper
     def text_area_output(col, field_length, col_identifier )
@@ -29,6 +30,11 @@ module HotGlue
 
 
   class ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
+
+
+
+
+
     hook_for :form_builder, :as => :scaffold
 
     source_root File.expand_path('templates', __dir__)

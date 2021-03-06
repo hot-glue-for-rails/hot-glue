@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+`rm -rf spec/dummy/`
+
+`rails new spec/dummy/ --skip-webpack-install `
+`cd spec/dummy/ && rails webpacker:install`
+
+

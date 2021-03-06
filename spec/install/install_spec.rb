@@ -1,7 +1,6 @@
 require 'dummy_rails_helper'
 
-
-Rspec.describe HotGlue::InstallGenerator do
+RSpec.describe HotGlue::InstallGenerator do
   include GeneratorsTestHelper
 
   def setup
