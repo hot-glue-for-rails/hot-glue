@@ -135,16 +135,14 @@ module HotGlue
         if assoc
           ownership_field = assoc.name.to_s + "_id"
         else
-          if @auth
+          # if @auth
             exit_message= "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
-          else
-            exit_message= "*** Oops:  god mode could not find the association(?). something is wrong."
-          end
+          # else
+          #   exit_message= "*** Oops:  god mode could not find the association(?). something is wrong."
+          # end
           raise(HotGlue::Error, exit_message)
         end
       end
-
-
 
       @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
                          :reset_password_token,
@@ -152,60 +150,49 @@ module HotGlue
                          :confirmation_token, :confirmed_at,
                          :confirmation_sent_at, :unconfirmed_email
 
-      begin
-        @exclude_fields.push(auth_assoc_field.to_sym) if !auth_assoc_field.nil?
-        @exclude_fields.push(ownership_field.to_sym) if !ownership_field.nil?
-        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
-        @columns.each do |col|
-          if object.columns_hash[col.to_s].type == :integer
+      @exclude_fields.push(auth_assoc_field.to_sym) if !auth_assoc_field.nil?
+      @exclude_fields.push(ownership_field.to_sym) if !ownership_field.nil?
+      @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
+
+      @columns.each do |col|
+        if object.columns_hash[col.to_s].type == :integer
+          if col.to_s.ends_with?("_id")
+            # guess the association name label
+            assoc_name = col.to_s.gsub("_id","")
+            assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
 
-            if col.to_s.ends_with?("_id")
-              # guess the association name label
+            begin
+              eval(assoc.class_name)
+            rescue NameError => e
+              exit_message = "*** Oops: The table #{singular_class} has an association for '#{assoc.name.to_s}', but I can't find an assoicated model for that association. TODO: Please implement a model for #{assoc.name.to_s} that belongs to #{singular_class} "
+              raise(HotGlue::Error, exit_message)
+
+            end
 
 
-              assoc_name = col.to_s.gsub("_id","")
-              assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-
-
-              begin
-                eval(assoc.class_name)
-              rescue NameError => e
-                exit_message = "*** Oops: The table #{singular_class} has an association for '#{assoc.name.to_s}', but I can't find an assoicated model for that association. TODO: Please implement a model for #{assoc.name.to_s} that belongs to #{singular_class} "
-                raise(HotGlue::Error, exit_message)
-
-              end
-
-
-              if assoc.nil?
-                exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-                raise(HotGlue::Error,exit_message)
-              end
-              assoc_class = eval(assoc.class_name)
-              if assoc_class.column_names.include?("name")
-                display_column = "name"
-              elsif assoc_class.column_names.include?("to_label")
-                display_column = "to_label"
-              elsif assoc_class.column_names.include?("full_name")
-                display_column = "full_name"
-              elsif assoc_class.column_names.include?("display_name")
-                display_column = "display_name"
-              elsif assoc_class.column_names.include?("email")
-                display_column = "email"
-              else
-                exit_message= "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
-                raise(HotGlue::Error,exit_message)
-              end
+            if assoc.nil?
+              exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+              raise(HotGlue::Error,exit_message)
+            end
+            assoc_class = eval(assoc.class_name)
+            if assoc_class.column_names.include?("name")
+              # display_column = "name"
+            elsif assoc_class.column_names.include?("to_label")
+              # display_column = "to_label"
+            elsif assoc_class.column_names.include?("full_name")
+              # display_column = "full_name"
+            elsif assoc_class.column_names.include?("display_name")
+              # display_column = "display_name"
+            elsif assoc_class.column_names.include?("email")
+              # display_column = "email"
+            else
+              exit_message= "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+              raise(HotGlue::Error,exit_message)
             end
           end
         end
-      # look for a belongs_to on this object
-      rescue StandardError => e
-        exit_message = "Ooops... #{e} it looks like is no object for #{class_name}. Please create the database table with fields first. "
-        raise(HotGlue::Error, exit_message)
       end
-
-
     end
 
 
@@ -223,17 +210,17 @@ module HotGlue
       @default_colspan = @columns.size
 
       unless @specs_only
-        template "controller.rb", File.join("app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
+        template "controller.rb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
         if @namespace &&  defined?(controller_descends_from) == nil
-          template "base_controller.rb", File.join("app/controllers#{namespace_with_dash}", "base_controller.rb")
+          template "base_controller.rb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "base_controller.rb")
         end
       end
 
       unless @no_specs
-        template "controller_spec.rb", File.join("spec/controllers#{namespace_with_dash}", "#{plural}_controller_spec.rb")
+        template "controller_spec.rb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/controllers#{namespace_with_dash}", "#{plural}_controller_spec.rb")
       end
 
-      template "_errors.haml", File.join("app/views#{namespace_with_dash}", "_errors.haml")
+      template "_errors.haml", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.haml")
     end
 
     def list_column_headings
@@ -428,14 +415,14 @@ module HotGlue
       haml_views.each do |view|
         formats.each do |format|
           filename = cc_filename_with_extensions(view, "haml")
-          template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
+          template filename, File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", controller_file_path, filename)
         end
       end
 
       turbo_stream_views.each do |view|
         formats.each do |format|
           filename = cc_filename_with_extensions(view, 'turbo_stream.haml')
-          template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
+          template filename, File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", controller_file_path, filename)
         end
       end
     end
@@ -492,15 +479,15 @@ module HotGlue
         when :integer
           # look for a belongs_to on this object
           if col.to_s.ends_with?("_id")
-            # guess the association name label
-
-
-            assoc_name = col.to_s.gsub("_id","")
-            assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-            if assoc.nil?
-              puts "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-              exit
-            end
+            # # guess the association name label
+            #
+            #
+            # assoc_name = col.to_s.gsub("_id","")
+            # assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+            # if assoc.nil?
+            #   exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+            #   exit
+            # end
 
 
             assoc_class = eval(assoc.class_name)
@@ -516,7 +503,8 @@ module HotGlue
             elsif assoc_class.column_names.include?("email")
               display_column = "email"
             else
-              puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+              raise("this should have been caught by the checker in the initializer")
+              # puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
             end
 
             "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
@@ -597,8 +585,8 @@ module HotGlue
             assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
             if assoc.nil?
-              puts "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-              exit
+              exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+              raise(HotGlue::Error,exit_message)
             end
             
             assoc_class = eval(assoc.class_name)

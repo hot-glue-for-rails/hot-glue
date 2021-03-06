@@ -46,7 +46,7 @@ describe HotGlue::ScaffoldGenerator do
       response = Rails::Generators.invoke("hot_glue:scaffold", ["Xyz"])
     rescue StandardError => e
       expect(e.class).to eq(HotGlue::Error)
-      expect(e.message).to eq("Ooops... *** Oops: The table Xyz has an association for 'nothing', but I can't find an assoicated model for that association. TODO: Please implement a model for nothing that belongs to Xyz  it looks like is no object for Xyz. Please create the database table with fields first. ")
+      expect(e.message).to eq("*** Oops: The table Xyz has an association for 'nothing', but I can't find an assoicated model for that association. TODO: Please implement a model for nothing that belongs to Xyz ")
     end
   end
 
