@@ -86,11 +86,12 @@ module HotGlue
       @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
       auth_assoc = @auth.gsub("current_","")
       @god = options['god'] || options['gd'] || false
-      @specs_only = options['specs-only'] || false
-      @no_specs = options['no-specs'] || false
-      @no_delete = options['no-delete'] || false
-      @no_create = options['no-create'] || false
-      @no_paginate = options['no-paginate'] || false
+      @specs_only = options['specs_only'] || false
+      @no_specs = options['no_specs'] || false
+      @no_delete = options['no_delete'] || false
+
+      @no_create = options['no_create'] || false
+      @no_paginate = options['no_paginate'] || false
 
       if @god
         @auth = nil
@@ -446,7 +447,11 @@ module HotGlue
     end
 
     def haml_views
-      res =  %w(index edit new _form _new_form _line _list _new_button _show _errors)
+      res =  %w(index edit _form _line _list _show _errors)
+
+      unless @no_create
+        res += %w(new _new_form _new_button)
+      end
 
       res
     end
