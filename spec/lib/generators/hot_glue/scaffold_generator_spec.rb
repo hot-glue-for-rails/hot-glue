@@ -85,7 +85,7 @@ describe HotGlue::ScaffoldGenerator do
     it "should NOT create a file at specs/request/ and specs/system" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--no-only"])
+                                            ["Def","--no-specs"])
       rescue StandardError => e
         expect("error building in spec #{e}")
       end
@@ -96,7 +96,8 @@ describe HotGlue::ScaffoldGenerator do
 
   it "with an association to an object that doesn't exist" do
     begin
-      response = Rails::Generators.invoke("hot_glue:scaffold", ["Xyz"])
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Xyz"])
     rescue StandardError => e
       expect(e.class).to eq(HotGlue::Error)
       expect(e.message).to eq("*** Oops: The table Xyz has an association for 'nothing', but I can't find an assoicated model for that association. TODO: Please implement a model for nothing that belongs to Xyz ")
@@ -108,9 +109,9 @@ describe HotGlue::ScaffoldGenerator do
       it "should create all the haml files" do
         begin
           response = Rails::Generators.invoke("hot_glue:scaffold",
-                                              ["Def","--no-only"])
+                                              ["Def"])
         rescue StandardError => e
-          expect("error building in spec #{e}")
+          raise("error building in spec #{e}")
         end
         expect(File.exist?("spec/dummy/app/views/defs/edit.haml")).to be(true)
         expect(File.exist?("spec/dummy/app/views/defs/index.haml")).to be(true)
@@ -127,68 +128,56 @@ describe HotGlue::ScaffoldGenerator do
       it "should create all of the turbo stream files" do
         begin
           response = Rails::Generators.invoke("hot_glue:scaffold",
-                                              ["Def","--no-only"])
+                                              ["Def"])
         rescue StandardError => e
-          expect("error building in spec #{e}")
+          raise("error building in spec #{e}")
         end
         expect(File.exist?("spec/dummy/app/views/defs/create.turbo_stream.haml")).to be(true)
         expect(File.exist?("spec/dummy/app/views/defs/destroy.turbo_stream.haml")).to be(true)
         expect(File.exist?("spec/dummy/app/views/defs/edit.turbo_stream.haml")).to be(true)
         expect(File.exist?("spec/dummy/app/views/defs/update.turbo_stream.haml")).to be(true)
       end
-    end
 
-    it "should create the controler" do
+
+      it "should create the controler" do
+        begin
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Def"])
+        rescue StandardError => e
+          raise("error building in spec #{e}")
+        end
+        expect(File.exist?("spec/dummy/app/controllers/defs_controller.rb")).to be(true)
+      end
+    end
+  end
+
+
+
+  describe "--namespace" do
+    it "should create with a namespace" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--no-only"])
+                                            ["Def","--namespace=hello"])
       rescue StandardError => e
-        expect("error building in spec #{e}")
+        raise("error building in spec #{e}")
       end
-      expect(File.exist?("spec/dummy/app/controllers/defs_controller.rb")).to be(true)
-    end
-
-    describe "--namespace" do
-
-    end
-
-    describe "--nest" do
-
-    end
-
-    describe "--auth" do
-
-    end
-
-    describe "--auth_identifier" do
-
-    end
-
-    describe "--plural" do
+      expect(File.exist?("spec/dummy/app/views/hello/defs/edit.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/index.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/new.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_form.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_new_form.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_line.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_list.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_new_button.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_show.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/controllers/hello/defs_controller.rb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/create.turbo_stream.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/destroy.turbo_stream.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/edit.turbo_stream.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/update.turbo_stream.haml")).to be(true)
+      expect(File.exist?("spec/dummy/spec/request/hello/defs_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/hello/defs_spec.rb")).to be(true)
 
     end
-
-    describe "--exclude" do
-
-    end
-
-    describe "--gd" do
-
-    end
-
-    describe "--no-paginate" do
-
-    end
-
-    describe "--no-create" do
-
-    end
-
-    describe "--no-delete" do
-
-    end
-
-    describe "--big-edit" do
-
-    end  end
+  end
 end
