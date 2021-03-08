@@ -210,14 +210,16 @@ module HotGlue
       @default_colspan = @columns.size
 
       unless @specs_only
-        template "controller.rb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
+        template "controller.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
         if @namespace &&  defined?(controller_descends_from) == nil
-          template "base_controller.rb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "base_controller.rb")
+          template "base_controller.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "base_controller.rb")
         end
       end
 
       unless @no_specs
-        template "controller_spec.rb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/controllers#{namespace_with_dash}", "#{plural}_controller_spec.rb")
+        template "request_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/request#{namespace_with_dash}", "#{plural}_spec.rb")
+        template "system_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_spec.rb")
+
       end
 
       template "_errors.haml", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.haml")

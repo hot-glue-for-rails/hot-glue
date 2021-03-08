@@ -10,34 +10,20 @@ describe HotGlue::ScaffoldGenerator do
   end
 
 
-  def remove_dir(path)
-
+  def remove_dir_with_namespace(path)
     FileUtils.rm_rf(path + "defs/")
-    # Dir.foreach(path) do |file1|
-    #   fn = File.join(path, file1)
-    #
-    #   if (file1.to_s == ".") || (file1.to_s == "..")
-    #     # do nothing
-    #   elsif File.directory?(fn)
-    #     Dir.foreach(fn) do |file2|
-    #       if ((file2.to_s != ".") and (file2.to_s != ".."))
-    #         puts "calling remove_dir #{fn}/#{file2}"
-    #         remove_dir("#{fn}/#{file2}") if File.directory?("#{fn}/#{file2}")
-    #         # File.delete(fn) if !File.directory?("#{fn}/#{file2}")
-    #       end
-    #     end
-    #     # Dir.delete(fn)
-    #   else
-    #   end
-    #
-    #   # File.delete(fn) if file.end_with?('.haml') || file.end_with?('.rb')
-    # end
   end
 
-  after(:all) do
-    remove_dir('spec/dummy/app/views/')
-    remove_dir('spec/dummy/app/controllers/')
-    remove_dir('spec/dummy/app/specs/')
+  def remove_dir(path)
+    FileUtils.rm_rf(path)
+  end
+
+  after(:each) do
+    remove_dir_with_namespace('spec/dummy/app/views/')
+    remove_dir_with_namespace('spec/dummy/app/controllers/')
+    remove_dir('spec/dummy/spec/')
+
+    # FileUtils.rm('controllers/defs_controller.rb')
   end
 
 
@@ -65,7 +51,6 @@ describe HotGlue::ScaffoldGenerator do
         end
       end
     end
-
   end
 
 
@@ -82,9 +67,32 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "--specs-only" do
+    it "should create a file at specs/request/ and specs/system" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Def","--specs-only"])
+      rescue StandardError => e
+        expect("error building in spec #{e}")
+      end
+      expect(File.exist?("spec/dummy/spec/request/defs_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/defs_spec.rb")).to be(true)
 
+    end
   end
 
+
+  describe "--no-specs" do
+    it "should NOT create a file at specs/request/ and specs/system" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Def","--no-only"])
+      rescue StandardError => e
+        expect("error building in spec #{e}")
+      end
+      expect(File.exist?("spec/dummy/app/spec/system/defs_spec.rb")).to be(false)
+      expect(File.exist?("spec/dummy/app/spec/request/defs_spec.rb")).to be(false)
+    end
+  end
 
   it "with an association to an object that doesn't exist" do
     begin
@@ -95,9 +103,92 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-
-
   describe "GOOD RESPONSES" do
-    # test good builds here
-  end
+    describe "with no parameters" do
+      it "should create all the haml files" do
+        begin
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Def","--no-only"])
+        rescue StandardError => e
+          expect("error building in spec #{e}")
+        end
+        expect(File.exist?("spec/dummy/app/views/defs/edit.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/index.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/new.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_form.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_new_form.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_line.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_list.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_new_button.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_show.haml")).to be(true)
+      end
+
+
+      it "should create all of the turbo stream files" do
+        begin
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Def","--no-only"])
+        rescue StandardError => e
+          expect("error building in spec #{e}")
+        end
+        expect(File.exist?("spec/dummy/app/views/defs/create.turbo_stream.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/destroy.turbo_stream.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/edit.turbo_stream.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/update.turbo_stream.haml")).to be(true)
+      end
+    end
+
+    it "should create the controler" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Def","--no-only"])
+      rescue StandardError => e
+        expect("error building in spec #{e}")
+      end
+      expect(File.exist?("spec/dummy/app/controllers/defs_controller.rb")).to be(true)
+    end
+
+    describe "--namespace" do
+
+    end
+
+    describe "--nest" do
+
+    end
+
+    describe "--auth" do
+
+    end
+
+    describe "--auth_identifier" do
+
+    end
+
+    describe "--plural" do
+
+    end
+
+    describe "--exclude" do
+
+    end
+
+    describe "--gd" do
+
+    end
+
+    describe "--no-paginate" do
+
+    end
+
+    describe "--no-create" do
+
+    end
+
+    describe "--no-delete" do
+
+    end
+
+    describe "--big-edit" do
+
+    end  end
 end

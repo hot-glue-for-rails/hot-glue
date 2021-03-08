@@ -20,6 +20,9 @@ end
 
 # require rails first
 require "rails/all"
+
+FileUtils.rm_rf("spec/dummy/spec/")
+
 require 'rails/generators'
 # require the gem's core code
 Dir["rails/generators/*.rb"].each do |x|
