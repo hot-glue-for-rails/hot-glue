@@ -457,7 +457,11 @@ module HotGlue
     end
 
     def turbo_stream_views
-      res = %w(create destroy edit update)
+      res = %w(create  edit update)
+      unless @no_delete
+        res << 'destroy'
+      end
+      res
     end
 
     def handler

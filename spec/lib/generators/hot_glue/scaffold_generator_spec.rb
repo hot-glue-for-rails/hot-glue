@@ -233,7 +233,15 @@ describe HotGlue::ScaffoldGenerator do
 
 
   describe "--no-delete" do
-
+    it "should not make the delete turbostream file" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Def","--no-delete"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
+      expect(File.exist?("spec/dummy/app/views/defs/destroy.turbo_stream.haml")).to be(false)
+    end
   end
 
   describe "--big-edit" do
