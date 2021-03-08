@@ -192,10 +192,12 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "--auth" do
+    # not sure how to test this with the dummy
 
   end
 
   describe "--auth_identifier" do
+    # not sure how to test this with the dummy
 
   end
 
@@ -204,14 +206,17 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "--exclude" do
+    # not sure how to test this with the dummy
 
   end
 
   describe "--gd" do
+    # not sure how to test this with the dummy
 
   end
 
   describe "--no-paginate" do
+    # not sure how to test this with the dummy
 
   end
 
