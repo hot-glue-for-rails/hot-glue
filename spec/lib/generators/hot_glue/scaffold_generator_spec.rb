@@ -18,16 +18,17 @@ describe HotGlue::ScaffoldGenerator do
     FileUtils.rm_rf(path)
   end
 
-
-
-
   def remove_everything
+    # TODO: this feels a little ugly but is effective
     remove_dir_with_namespace('spec/dummy/app/views/')
     remove_dir_with_namespace('spec/dummy/app/controllers/')
 
+    FileUtils.rm("spec/dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/dummy/app/controllers/xyzs_controller.rb")
     FileUtils.rm("spec/dummy/app/controllers/defs_controller.rb") if File.exists?("spec/dummy/app/controllers/defs_controller.rb")
     FileUtils.rm("spec/dummy/app/controllers/hello/defs_controller.rb") if File.exists?("spec/dummy/app/controllers/hello/defs_controller.rb")
     FileUtils.rm_rf('spec/dummy/spec/')
+    FileUtils.rm_rf('spec/dummy/spec/views/hello')
+    FileUtils.rm_rf('spec/dummy/spec/views/xyzs')
 
     remove_dir_with_namespace('spec/dummy/app/views/hello')
     remove_dir_with_namespace('spec/dummy/app/controllers/hello')

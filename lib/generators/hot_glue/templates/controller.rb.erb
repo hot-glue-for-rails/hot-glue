@@ -46,6 +46,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       format.html
     end
   end
+
   def create
     modified_params = modify_date_inputs_on_params(<%=singular_name %>_params.dup<% if !@object_owner_sym.empty? %>.merge!(<%= @object_owner_sym %>: <%= @object_owner_eval %> )<% end %> <%= @auth ? ', ' + @auth : '' %>)
     @<%=singular_name %> = <%=class_name %>.create(modified_params)

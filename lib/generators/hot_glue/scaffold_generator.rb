@@ -52,12 +52,15 @@ module HotGlue
     class_option :auth, type: :string, default: nil
     class_option :auth_identifier, type: :string, default: nil
     class_option :exclude, type: :string, default: ""
+    class_option :include, type: :string, default: ""
     class_option :god, type: :boolean, default: false
+    class_option :gd, type: :boolean, default: false # alias for god
     class_option :spacs_only, type: :boolean, default: false
     class_option :no_specs, type: :boolean, default: false
     class_option :no_delete, type: :boolean, default: false
     class_option :no_create, type: :boolean, default: false
     class_option :no_paginate, type: :boolean, default: false
+    class_option :big_edit, type: :boolean, default: false
 
     def initialize(*meta_args) #:nodoc:
       super
@@ -84,7 +87,13 @@ module HotGlue
       @singular_class = @singular.titleize.gsub(" ", "")
       @exclude_fields = []
       @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
+
+      if options['include']
+        @include_fields = []
+        @include_fields += options['include'].split(",").collect(&:to_sym)
+      end
       auth_assoc = @auth.gsub("current_","")
+
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs_only'] || false
       @no_specs = options['no_specs'] || false
@@ -92,6 +101,7 @@ module HotGlue
 
       @no_create = options['no_create'] || false
       @no_paginate = options['no_paginate'] || false
+      @big_edit = options['big_edit']
 
       if @god
         @auth = nil
@@ -145,15 +155,26 @@ module HotGlue
         end
       end
 
-      @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
-                         :reset_password_token,
-                         :reset_password_sent_at, :remember_created_at,
-                         :confirmation_token, :confirmed_at,
-                         :confirmation_sent_at, :unconfirmed_email
 
-      @exclude_fields.push(auth_assoc_field.to_sym) if !auth_assoc_field.nil?
-      @exclude_fields.push(ownership_field.to_sym) if !ownership_field.nil?
-      @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
+      if !@include_fields
+        @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
+                             :reset_password_token,
+                             :reset_password_sent_at, :remember_created_at,
+                             :confirmation_token, :confirmed_at,
+                             :confirmation_sent_at, :unconfirmed_email
+
+        @exclude_fields.push(auth_assoc_field.to_sym) if !auth_assoc_field.nil?
+        @exclude_fields.push(ownership_field.to_sym) if !ownership_field.nil?
+
+
+        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
+
+      else
+        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
+
+      end
+
+
 
       @columns.each do |col|
         if object.columns_hash[col.to_s].type == :integer
@@ -176,6 +197,7 @@ module HotGlue
               exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
               raise(HotGlue::Error,exit_message)
             end
+
             assoc_class = eval(assoc.class_name)
             if assoc_class.column_names.include?("name")
               # display_column = "name"
@@ -689,18 +711,19 @@ module HotGlue
 
     def display_class
       me = eval(singular_class)
+
       @display_class ||=
-        if me.column_names.include?("name")
+        if me.respond_to?("name")
           "name"
-        elsif me.column_names.include?("to_label")
+        elsif me.respond_to?("to_label")
           "to_label"
-        elsif me.column_names.include?("full_name")
+        elsif me.respond_to?("full_name")
           "full_name"
-        elsif me.column_names.include?("display_name")
+        elsif me.respond_to?("display_name")
           "display_name"
-        elsif me.column_names.include?("email")
+        elsif me.respond_to?("email")
           "email"
-        elsif me.column_names.include?("number")
+        elsif me.respond_to?("number")
           display_column = "number"
 
         else
