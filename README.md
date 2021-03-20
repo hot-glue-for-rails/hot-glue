@@ -233,8 +233,20 @@ You don't need this if the pluralized version is just + "s" of the singular vers
 
 By default, all fields are included unless they are on the exclude list. (The default for the exclude list is `id`, `created_at`, and `updated_at`  so you don't need to exclude those-- they are added.)
 
-If you specify an exclude list, those fields + id, created_at, and updated_at will be excluded.
+If you specify an exclude list, those and the default excluded list will be excluded.
 
+
+`rails generate hot_glue:scaffold Account --exclude=password`
+
+(The default excluded list is: :id, :created_at, :updated_at, :encrypted_password, :reset_password_token, :reset_password_sent_at, :remember_created_at, :confirmation_token, :confirmed_at, :confirmation_sent_at, :unconfirmed_email. If you want to edit any fields with the same name, you must use the include flag instead.)
+
+
+### `--include=`
+(separate field names by COMMA)
+
+You may not specify both include and exclude. If you specify an include list, it will be treated as a whitelist: no fields will be included unless specified on the include list. 
+
+`rails generate hot_glue:scaffold Account --include=first_name,last_name,company_name,created_at,kyc_verified_at`
 
 
 ### `--god` or `--gd`
@@ -277,10 +289,15 @@ Omits create action.
 
 Omits delete action. 
 
+### `--big-edit`
+
+If you do not want inline editing of your list items but instead to fall back to old fashioned new page behavior for your edit views, use `--big-edit`.
 
 
 
 # VERSION HISTORY
+
+#### 2021-03-20 - v0.0.7 - adds lots of spec coverage; cleans up generated cruft code on each run;  adds no-delete, no-create; a working --big-edit with basic data-turbo false to disable inline editing
 
 #### 2021-03-06 - v0.0.6 - internal specs test the error catches and cover basic code generation (dummy testing only)
 
