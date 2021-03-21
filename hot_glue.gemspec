@@ -50,11 +50,11 @@ Gem::Specification.new do |spec|
 
         * Build plug-and-play scaffolding mixing HAML with the power of Hotwire and Turbo-Rails
         * Automatically Reads Your Models (make them before building your scaffolding!)
-        * Excellent for CRUD, lists with pagination, searching, sorting.
-        * Great for prototyping very.
-        * Plays nicely with Devise, Kaminari, Haml-Rails, Rspec.
-        * Create specs automatically along with the controllers.
-        * Nest your routes model-by-model for built-in poor man's authentication
+        * Excellent for CRUD, lists with pagination (coming soon: searching & sorting)
+        * Great for prototyping.
+        * Plays nicely with Devise, Kaminari, Haml-Rails, Rspec, FontAwesome
+        * Create specs automatically along with the generated controllers.
+        * Nest your routes model-by-model for built-in poor man's authentication.
         * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
     see README for complete instructions.
