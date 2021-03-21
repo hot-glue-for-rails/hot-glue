@@ -211,6 +211,11 @@ describe HotGlue::ScaffoldGenerator do
 
   end
 
+  describe "--incldue" do
+    # not sure how to test this with the dummy
+
+  end
+
   describe "--gd" do
     # not sure how to test this with the dummy
 
@@ -218,9 +223,19 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--no-paginate" do
     # not sure how to test this with the dummy
+    it "should not make the create files" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Def","--no-paginate"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
 
+      expect(
+        File.read("spec/dummy/app/views/defs/_list.haml") =~ /paginate defs/
+      ).to be(nil)
+    end
   end
-
 
   describe "--no-create" do
     it "should not make the create files" do
@@ -251,7 +266,33 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "--big-edit" do
+    it "should not make the delete turbostream file" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Def","--big-edit"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
 
+      expect(
+        File.read("spec/dummy/app/views/defs/_show.haml") =~ /edit_def_path\(def\), 'data-turbo' => 'false',/
+      ).to_not be(nil)
+    end
   end
 
+  describe "--show-only" do
+    it "should make the show only fields visible only" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Def","--show-only=name"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
+
+      expect(
+        File.read("spec/dummy/app/views/defs/_form.haml") =~ /f\.text_field :name/
+      ).to be(nil)
+
+    end
+  end
 end

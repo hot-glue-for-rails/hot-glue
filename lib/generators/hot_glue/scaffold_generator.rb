@@ -88,7 +88,7 @@ module HotGlue
       @exclude_fields = []
       @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
 
-      if options['include']
+      if !options['include'].empty?
         @include_fields = []
         @include_fields += options['include'].split(",").collect(&:to_sym)
       end
@@ -154,7 +154,6 @@ module HotGlue
           raise(HotGlue::Error, exit_message)
         end
       end
-
 
       if !@include_fields
         @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
