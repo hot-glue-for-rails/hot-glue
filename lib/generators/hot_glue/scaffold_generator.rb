@@ -199,15 +199,15 @@ module HotGlue
             end
 
             assoc_class = eval(assoc.class_name)
-            if assoc_class.column_names.include?("name")
+            if assoc_class.respond_to?(:name)
               # display_column = "name"
-            elsif assoc_class.column_names.include?("to_label")
+            elsif assoc_class.respond_to?(:to_label)
               # display_column = "to_label"
-            elsif assoc_class.column_names.include?("full_name")
+            elsif assoc_class.respond_to?(:full_name)
               # display_column = "full_name"
-            elsif assoc_class.column_names.include?("display_name")
+            elsif assoc_class.respond_to?(:display_name)
               # display_column = "display_name"
-            elsif assoc_class.column_names.include?("email")
+            elsif assoc_class.respond_to?(:email)
               # display_column = "email"
             else
               exit_message= "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
@@ -512,28 +512,25 @@ module HotGlue
         when :integer
           # look for a belongs_to on this object
           if col.to_s.ends_with?("_id")
-            # # guess the association name label
-            #
-            #
-            # assoc_name = col.to_s.gsub("_id","")
-            # assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-            # if assoc.nil?
-            #   exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-            #   exit
-            # end
+            assoc_name = col.to_s.gsub("_id","")
+            assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+            if assoc.nil?
+              exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+              exit
+            end
 
 
             assoc_class = eval(assoc.class_name)
 
-            if assoc_class.column_names.include?("name")
+            if assoc_class.respond_to?("name")
               display_column = "name"
-            elsif assoc_class.column_names.include?("to_label")
+            elsif assoc_class.respond_to?("to_label")
               display_column = "to_label"
-            elsif assoc_class.column_names.include?("full_name")
+            elsif assoc_class.respond_to?("full_name")
               display_column = "full_name"
-            elsif assoc_class.column_names.include?("display_name")
+            elsif assoc_class.respond_to?("display_name")
               display_column = "display_name"
-            elsif assoc_class.column_names.include?("email")
+            elsif assoc_class.respond_to?("email")
               display_column = "email"
             else
               raise("this should have been caught by the checker in the initializer")
@@ -624,17 +621,17 @@ module HotGlue
             
             assoc_class = eval(assoc.class_name)
 
-            if assoc_class.column_names.include?("name")
+            if assoc_class.respond_to?("name")
               display_column = "name"
-            elsif assoc_class.column_names.include?("to_label")
+            elsif assoc_class.respond_to?("to_label")
               display_column = "to_label"
-            elsif assoc_class.column_names.include?("full_name")
+            elsif assoc_class.respond_to?("full_name")
               display_column = "full_name"
-            elsif assoc_class.column_names.include?("display_name")
+            elsif assoc_class.respond_to?("display_name")
               display_column = "display_name"
-            elsif assoc_class.column_names.include?("email")
+            elsif assoc_class.respond_to?("email")
               display_column = "email"
-            elsif assoc_class.column_names.include?("number")
+            elsif assoc_class.respond_to?("number")
               display_column = "number"
 
             else
