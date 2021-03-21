@@ -61,6 +61,7 @@ module HotGlue
     class_option :no_create, type: :boolean, default: false
     class_option :no_paginate, type: :boolean, default: false
     class_option :big_edit, type: :boolean, default: false
+    class_option :show_only, type: :string, default: ""
 
     def initialize(*meta_args) #:nodoc:
       super
@@ -92,6 +93,13 @@ module HotGlue
         @include_fields = []
         @include_fields += options['include'].split(",").collect(&:to_sym)
       end
+
+
+      @show_only = []
+      if !options['show_only'].empty?
+        @show_only += options['show_only'].split(",").collect(&:to_sym)
+      end
+
       auth_assoc = @auth.gsub("current_","")
 
       @god = options['god'] || options['gd'] || false
@@ -173,9 +181,11 @@ module HotGlue
 
       end
 
-
-
       @columns.each do |col|
+        if col.to_s.starts_with?("_")
+          @show_only << col
+        end
+
         if object.columns_hash[col.to_s].type == :integer
           if col.to_s.ends_with?("_id")
             # guess the association name label
@@ -503,6 +513,16 @@ module HotGlue
       col_spaces_prepend = "    "
 
       res = @columns.map { |col|
+
+        if @show_only.include?(col)
+
+          "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+    = @#{singular}.#{col.to_s}
+    %label.form-text
+      #{col.to_s.humanize}\n"
+        else
+
+
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         limit = eval("#{singular_class}.columns_hash['#{col}']").limit
         sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
@@ -587,7 +607,7 @@ module HotGlue
 #{col_spaces_prepend}= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1')
       "
         end
-
+        end
       }.join("\n")
       return res
     end

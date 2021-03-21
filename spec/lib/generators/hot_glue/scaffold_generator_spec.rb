@@ -189,40 +189,40 @@ describe HotGlue::ScaffoldGenerator do
 
 
   describe "--nest" do
-
+    # TODO: implement specs
   end
 
-  describe "--auth" do
-    # not sure how to test this with the dummy
+  describe "authorization and object ownership" do
+    describe "--auth" do
+      # TODO: implement specs
+    end
 
-  end
+    describe "--auth_identifier" do
+      # TODO: implement specs
+    end
 
-  describe "--auth_identifier" do
-    # not sure how to test this with the dummy
-
+    describe "--gd" do
+      # TODO: implement specs
+    end
   end
 
   describe "--plural" do
-
+    # TODO: implement specs
   end
 
-  describe "--exclude" do
-    # not sure how to test this with the dummy
 
+  describe "choosing which fields to include" do
+    describe "--exclude" do
+      # TODO: implement specs
+    end
+
+    describe "--incldue" do
+      # TODO: implement specs
+    end
   end
 
-  describe "--incldue" do
-    # not sure how to test this with the dummy
-
-  end
-
-  describe "--gd" do
-    # not sure how to test this with the dummy
-
-  end
 
   describe "--no-paginate" do
-    # not sure how to test this with the dummy
     it "should not make the create files" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
