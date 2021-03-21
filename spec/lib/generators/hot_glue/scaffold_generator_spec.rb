@@ -298,7 +298,7 @@ describe HotGlue::ScaffoldGenerator do
     it "should not include the show-only fields in the allowed parameters" do
       # TODO ***IMPLEMENT ME FOR SECURITY***
       # WITHOUT THIS THE CONTROLLERS GENERATED CAN BE HACKED!!!
-      
+
     end
   end
 end

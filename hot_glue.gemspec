@@ -32,8 +32,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rails",  '~> 6.0'
   spec.homepage    = 'https://blog.jasonfleetwoodboldt.com/hot-glue/'
   spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/hot-glue",
-                       "documentation_uri" => "https://jfb.teachable.com/p/gems-by-jason",
-                       "homepage_uri" => 'https://blog.jasonfleetwoodboldt.com/hot-glue/'}
+                       "documentation_uri" => "https://www.instagram.com/jfbcodes/",
+                       "homepage_uri" => 'https://jasonfleetwoodboldt.com/hot-glue/'}
 
   spec.add_runtime_dependency('kaminari', '~> 1.2')
   spec.add_runtime_dependency('haml-rails', '~> 2.0')
