@@ -35,11 +35,15 @@ rails generate hot_glue:scaffold Thing
 
 ## TO INSTALL
 
-- Add Turbo-Rails to your Gemfile & bundle install, then install it with `rails turbo:install`
+- Add Turbo-Rails to your Gemfile & bundle install 
+  
+- Then install it with `rails turbo:install`
 
 - The Turbo install has switched your action cable settings from 'async' to Redis, so be sure to start a redis server
   
-- Add hot_glue to your Gemfile & bundle install, then install it with `rails generate hot_glue:install`
+- Add `hot_glue` to your Gemfile & `bundle install`
+  
+- Then install it with `rails generate hot_glue:install`
 
 - Add to your `application.html.erb`
 ```
@@ -67,6 +71,7 @@ Bootstrap with Sprockets:
 
 - Install Devise or implement your own authentication
 
+- Also recommended: font-awesome-sass
 
 
 ### First Argument
@@ -225,7 +230,7 @@ Please note that this example would product non-functional code, so you would ne
 
 ### `--plural=`
 
-You don't need this if the pluralized version is just + "s" of the singular version. Only use for non-standard plurlizations, and be sure to pass it as TitleCase (as if  you pluralized the model name)
+You don't need this if the pluralized version is just + "s" of the singular version. Only use for non-standard plurlizations, and be sure to pass it as TitleCase (as if you pluralized the model name which is non-standard for Rails)
 
 
 ### `--exclude=`
@@ -249,13 +254,22 @@ You may not specify both include and exclude. If you specify an include list, it
 `rails generate hot_glue:scaffold Account --include=first_name,last_name,company_name,created_at,kyc_verified_at`
 
 
+### `--show-only=`
+(separate field names by COMMA)
+
+Any fields only the 'show-only' list will appear as non-editable on the generate form. (visible only)
+
+IMPORTANT: By default, all fields that begin with an underscore (`_`) are automatically show-only.
+
+I would recommend this for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
+
 ### `--god` or `--gd`
 
 Use this flag to create controllers with no root authentication. You can still use an auth_identifier, which can be useful for a meta-leval authentication to the controller.
 
 For example, FOR ADMIN CONTROLLERS ONLY, supply a auth_identifier and use `--god` flag. 
 
-In God mode, the objects are loaded directly from the base class (these controllers have full access)
+In Gd mode, the objects are loaded directly from the base class (these controllers have full access)
 ```
 def load_thing
     @thing = Thing.find(params[:id])
@@ -295,7 +309,11 @@ If you do not want inline editing of your list items but instead to fall back to
 
 
 
+
+
 # VERSION HISTORY
+
+#### 2021-03-21 - v0.0.8 - show only flag; more specific spec coverage in generator spec
 
 #### 2021-03-20 - v0.0.7 - adds lots of spec coverage; cleans up generated cruft code on each run;  adds no-delete, no-create; a working --big-edit with basic data-turbo false to disable inline editing
 
