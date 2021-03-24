@@ -313,6 +313,8 @@ If you do not want inline editing of your list items but instead to fall back to
 
 # VERSION HISTORY
 
+#### 2021-03-24 - v0.0.9 - fixes in the automatic field label detection; cleans up junk in spec output
+
 #### 2021-03-21 - v0.0.8 - show only flag; more specific spec coverage in generator spec
 
 #### 2021-03-20 - v0.0.7 - adds lots of spec coverage; cleans up generated cruft code on each run;  adds no-delete, no-create; a working --big-edit with basic data-turbo false to disable inline editing
