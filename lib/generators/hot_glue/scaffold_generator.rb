@@ -248,7 +248,7 @@ module HotGlue
       end
 
       unless @no_specs
-        template "request_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/request#{namespace_with_dash}", "#{plural}_spec.rb")
+        template "request_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/requests#{namespace_with_dash}", "#{plural}_spec.rb")
         template "system_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_spec.rb")
 
       end

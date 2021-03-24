@@ -74,14 +74,14 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "--specs-only" do
-    it "should create a file at specs/request/ and specs/system" do
+    it "should create a file at specs/requests/ and specs/system" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Def","--specs-only"])
       rescue StandardError => e
         expect("error building in spec #{e}")
       end
-      expect(File.exist?("spec/dummy/spec/request/defs_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/requests/defs_spec.rb")).to be(true)
       expect(File.exist?("spec/dummy/spec/system/defs_spec.rb")).to be(true)
 
     end
@@ -89,7 +89,7 @@ describe HotGlue::ScaffoldGenerator do
 
 
   describe "--no-specs" do
-    it "should NOT create a file at specs/request/ and specs/system" do
+    it "should NOT create a file at specs/requests/ and specs/system" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Def","--no-specs"])
@@ -97,7 +97,7 @@ describe HotGlue::ScaffoldGenerator do
         expect("error building in spec #{e}")
       end
       expect(File.exist?("spec/dummy/app/spec/system/defs_spec.rb")).to be(false)
-      expect(File.exist?("spec/dummy/app/spec/request/defs_spec.rb")).to be(false)
+      expect(File.exist?("spec/dummy/app/spec/requests/defs_spec.rb")).to be(false)
     end
   end
 
@@ -182,7 +182,7 @@ describe HotGlue::ScaffoldGenerator do
       expect(File.exist?("spec/dummy/app/views/hello/defs/destroy.turbo_stream.haml")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/defs/edit.turbo_stream.haml")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/defs/update.turbo_stream.haml")).to be(true)
-      expect(File.exist?("spec/dummy/spec/request/hello/defs_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/requests/hello/defs_spec.rb")).to be(true)
       expect(File.exist?("spec/dummy/spec/system/hello/defs_spec.rb")).to be(true)
     end
   end

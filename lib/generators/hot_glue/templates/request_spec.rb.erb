@@ -1,59 +1,52 @@
 require 'rails_helper'
 
-describe <%= controller_class_name %> do
-  render_views
+RSpec.describe "Invoices", type: :request do
   <% unless @auth.nil? %>  let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
   let(:<%= singular %>) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
-
-<%= objest_nest_factory_setup %>
+  <%= objest_nest_factory_setup %>
 
   before(:each) do
-    @request.env["devise.mapping"] = Devise.mappings[:account]
-
-    sign_in <%= @auth %>, scope: :<%= @auth %>
+    sign_in account
   end
 
-  describe "index" do
-    it "should respond" do
-      get :index, xhr: true, format: 'js', params: {
-          <%= objest_nest_params_by_id_for_specs %>
+  describe "<%= namespace_with_trailing_dash %><%= plural %> [#index]" do
+    it "loads a list of <%= plural %>" do
+      get <%= path_helper_plural %>, params: {
+        <%= objest_nest_params_by_id_for_specs %>
       }
+      expect(response).to have_http_status(200)
     end
   end
 
-  describe "new" do
-    it "should show form" do
-      get :new, xhr: true, format: 'js', params: {
-          <%= objest_nest_params_by_id_for_specs %>
+  describe "<%= namespace_with_trailing_dash %><%= singular %> [#new]" do
+    it "loads the create template for a new <%= singular %>" do
+      get <%= new_path_name %>, params: {
+        <%= objest_nest_params_by_id_for_specs %>
       }
+      expect(response).to have_http_status(200)
     end
   end
 
-  describe "create" do
+  describe "<%= namespace_with_trailing_dash %><%= plural %> [#create]" do
     it "should create a new <%= singular %>" do
+      pending
       expect {
-        post :create, xhr: true, format: 'js', params: {
+        post <%= path_helper_plural %>, xhr: true,  params: {
           <%= (@nested_args.empty? ? "" : objest_nest_params_by_id_for_specs + ",") %>
-            <%= singular %>: {
-                <%= columns_spec_with_sample_data %>
+          <%= singular %>: {
+          <%= columns_spec_with_sample_data %>
         }}
       }.to change { <%= @singular_class %>.all.count }.by(1)
       assert_response :ok
     end
-
-    # it "should not create if there are errors" do
-    #   post :create, xhr: true, format: 'js',  params: {id: <%= singular %>.id,
-    #                                                    <%= singular %>: {skin_id: nil}}
-    #
-    #   expect(controller).to set_flash.now[:alert].to(/Oops, your <%= singular %> could not be saved/)
-    # end
   end
+
 
   describe "edit" do
     it "should return an editable form" do
-      get :edit, xhr: true, format: 'js',  params: {
-          <%= (@nested_args.empty? ? "" : objest_nest_params_by_id_for_specs + ",") %>
-          id: <%= singular %>.id
+      pending
+      get <%= path_helper_singular %>(<%= singular %>.id), params: {
+        <%= (@nested_args.empty? ? "" : objest_nest_params_by_id_for_specs ) %>
       }
       assert_response :ok
     end
@@ -61,50 +54,41 @@ describe <%= controller_class_name %> do
 
   describe "show" do
     it "should return a view form" do
-      get :show, xhr: true, format: 'js',  params: {
-          <%= (@nested_args.empty? ? "" : objest_nest_params_by_id_for_specs + ",") %>
-          id: <%= singular %>.id
-        }
+      pending
+      get <%= path_helper_singular %>(<%= singular %>.id),  params: {
+        <%= (@nested_args.empty? ? "" : objest_nest_params_by_id_for_specs ) %>
+      }
       assert_response :ok
     end
   end
 
   describe "update" do
     it "should update" do
-      put :update, xhr: true, format: 'js',
+      pending
+      put :update, xhr: true,
           params: {
             <%= (@nested_args.empty? ? "" : objest_nest_params_by_id_for_specs + ",") %>
             id: <%= singular %>.id,
             <%= singular %>: {
-                <%= columns_spec_with_sample_data %>
-            }}
+            <%= columns_spec_with_sample_data %>
+          }}
 
       assert_response :ok
     end
-
-    # it "should not update if invalid" do
-    #   put :update, xhr: true, format: 'js',
-    #       params: {
-    #         id: <%= singular %>.id,
-    #         <%= singular %>: {
-    #           <%= columns_spec_with_sample_data %>
-    #       }}
-    #
-    #   assert_response :ok
-    #
-    #   expect(controller).to set_flash.now[:alert].to(/Oops, your <%= singular %> could not be saved/)
-    # end
   end
 
   describe "#destroy" do
     it "should destroy" do
-      post :destroy, format: 'js', params: {
-          <%= (@nested_args.empty? ? "" : objest_nest_params_by_id_for_specs + ",") %>
-          id: <%= singular %>.id
+      pending
+      post :destroy, params: {
+        <%= (@nested_args.empty? ? "" : objest_nest_params_by_id_for_specs + ",") %>
+        id: <%= singular %>.id
       }
       assert_response :ok
       expect(<%= @singular_class %>.count).to be(0)
     end
   end
 end
+
+
 
