@@ -55,7 +55,7 @@ module HotGlue
     class_option :include, type: :string, default: ""
     class_option :god, type: :boolean, default: false
     class_option :gd, type: :boolean, default: false # alias for god
-    class_option :spacs_only, type: :boolean, default: false
+    class_option :specs_only, type: :boolean, default: false
     class_option :no_specs, type: :boolean, default: false
     class_option :no_delete, type: :boolean, default: false
     class_option :no_create, type: :boolean, default: false
@@ -104,6 +104,7 @@ module HotGlue
 
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs_only'] || false
+
       @no_specs = options['no_specs'] || false
       @no_delete = options['no_delete'] || false
 
@@ -209,15 +210,15 @@ module HotGlue
 
             assoc_class = eval(assoc.class_name)
 
+            name_list = [:name, :to_label, :full_name, :display_name, :email]
 
-            if assoc_class.include?("name") ||
-              assoc_class.respond_to?(:to_label) ||
-              assoc_class.respond_to?(:full_name) ||
-              assoc_class.respond_to?(:display_name) ||
-              assoc_class.respond_to?(:email)
+
+            if name_list.collect{ |field|
+              assoc_class.column_names.include?(field.to_s) ||  assoc_class.instance_methods.include?(field)
+            }.any?
               # do nothing here
             else
-              exit_message= "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+              exit_message= "*** Oops: Missing a label for #{assoc.class_name.upcase}. Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name.upcase} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
               raise(HotGlue::Error,exit_message)
             end
           end
