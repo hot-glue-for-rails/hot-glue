@@ -339,9 +339,7 @@ If you do not want inline editing of your list items but instead to fall back to
 
 # HOW THIS GEM IS TESTED
 
-The testing of functionality-within-functionality is a little tricky and requires thinking outside the box.
-
-We have one kinds of "sandboxes": a DUMMY sandbox
+We have one kind of "sandboxes": a DUMMY sandbox
 
 The dummy sandbox is found at `spec/dummy`
 
