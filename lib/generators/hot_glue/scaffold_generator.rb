@@ -208,16 +208,14 @@ module HotGlue
             end
 
             assoc_class = eval(assoc.class_name)
-            if assoc_class.respond_to?(:name)
-              # display_column = "name"
-            elsif assoc_class.respond_to?(:to_label)
-              # display_column = "to_label"
-            elsif assoc_class.respond_to?(:full_name)
-              # display_column = "full_name"
-            elsif assoc_class.respond_to?(:display_name)
-              # display_column = "display_name"
-            elsif assoc_class.respond_to?(:email)
-              # display_column = "email"
+
+
+            if assoc_class.include?("name") ||
+              assoc_class.respond_to?(:to_label) ||
+              assoc_class.respond_to?(:full_name) ||
+              assoc_class.respond_to?(:display_name) ||
+              assoc_class.respond_to?(:email)
+              # do nothing here
             else
               exit_message= "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
               raise(HotGlue::Error,exit_message)
@@ -729,18 +727,20 @@ module HotGlue
       me = eval(singular_class)
 
       @display_class ||=
-        if me.respond_to?("name")
+        if me.column_names.include?("name")
+          # note that all class object respond_to?(:name) with the name of their own class
+          # this one is unique
           "name"
-        elsif me.respond_to?("to_label")
+        elsif me.column_names.include?("to_label") || me.instance_methods(false).include?(:to_label)
           "to_label"
-        elsif me.respond_to?("full_name")
+        elsif me.column_names.include?("full_name") || me.instance_methods(false).include?(:full_name)
           "full_name"
-        elsif me.respond_to?("display_name")
+        elsif me.column_names.include?("display_name") || me.instance_methods(false).include?(:display_name)
           "display_name"
-        elsif me.respond_to?("email")
+        elsif me.column_names.include?("email") || me.instance_methods(false).include?(:email)
           "email"
-        elsif me.respond_to?("number")
-          display_column = "number"
+        elsif me.column_names.include?("number") || me.instance_methods(false).include?(:number)
+          "number"
 
         else
           exit_message = "*** Oops: Can't find any column to use as the display label on #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your #{singular_class} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
@@ -769,7 +769,8 @@ module HotGlue
 
 
   def paginate
-    "= paginate #{plural}"
+    "- if #{plural}.respond_to?(:total_pages)
+      = paginate #{plural}"
   end
 
   private # thor does something fancy like sending the class all of its own methods during some strange run sequence
