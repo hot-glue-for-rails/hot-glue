@@ -334,12 +334,6 @@ If you do not want inline editing of your list items but instead to fall back to
 #### 2021-02-23 - v0.0.0 - Port of my prior work from github.com/jasonfb/common_core_js
 
 
-# ACKNOWLEDGEMENTS
-
-### "POOR MAN"
-
-I hope one day I will leave this Earth a poor man (like my code) owning only the most simple structure for the simple form of my existence. Thanks for having educated me in this wisdom goes to my former mentor [@trak3r](https://github.com/trak3r)! 
-
 
 
 
