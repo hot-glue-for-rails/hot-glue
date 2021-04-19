@@ -3,11 +3,8 @@ require 'ffaker'
 
 
 module HotGlue
-
-
   class Error < StandardError
   end
-
 
   module GeneratorHelper
     def text_area_output(col, field_length, col_identifier )
@@ -83,7 +80,9 @@ module HotGlue
       @plural = options['plural'] || @singular + "s" # supply to override; leave blank to use default
       @auth = options['auth'] || "current_user"
       @auth_identifier = options['auth'] || (!@auth.nil? && @auth.gsub("current_", "")) || nil
-      @nest = options['auth'] || nil
+
+
+      @nest = (!options['nest'].empty? && options['nest']) || nil
       @namespace = options['namespace'] || nil
       @singular_class = @singular.titleize.gsub(" ", "")
       @exclude_fields = []
@@ -154,12 +153,25 @@ module HotGlue
 
         if assoc
           ownership_field = assoc.name.to_s + "_id"
+        elsif !@nest
+            exit_message = "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
+
         else
-          # if @auth
-            exit_message= "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
-          # else
-          #   exit_message= "*** Oops:  god mode could not find the association(?). something is wrong."
-          # end
+          if @god
+
+            exit_message= "*** Oops:  god mode could not find the association(?). something is wrong."
+          else
+            @auth_check = "current_user"
+            @nested_args.each do |arg|
+
+              if !@auth_check.method("#{arg}s")
+                exit_message= "*** Oops:  your nesting chain does not have a assocation for #{arg}s on #{@auth_check}  something is wrong."
+              end
+              byebug
+              puts ""
+            end
+          end
+
           raise(HotGlue::Error, exit_message)
         end
       end
@@ -197,7 +209,7 @@ module HotGlue
             begin
               eval(assoc.class_name)
             rescue NameError => e
-              exit_message = "*** Oops: The table #{singular_class} has an association for '#{assoc.name.to_s}', but I can't find an assoicated model for that association. TODO: Please implement a model for #{assoc.name.to_s} that belongs to #{singular_class} "
+              exit_message = "*** Oops: The model #{singular_class} is missing an association for #{assoc_name} or the model doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; your model #{singular_class.titlecase} should have_many :#{assoc_name}s.  To make a controller that can read all records, specify with --god."
               raise(HotGlue::Error, exit_message)
 
             end
@@ -249,7 +261,7 @@ module HotGlue
 
       unless @no_specs
         template "request_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/requests#{namespace_with_dash}", "#{plural}_spec.rb")
-        template "system_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_spec.rb")
+        template "system_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
 
       end
 
@@ -728,7 +740,7 @@ module HotGlue
       me = eval(singular_class)
 
       @display_class ||=
-        if me.column_names.include?("name")
+        if me.column_names.include?("name") || me.instance_methods(false).include?(:name)
           # note that all class object respond_to?(:name) with the name of their own class
           # this one is unique
           "name"
@@ -742,7 +754,6 @@ module HotGlue
           "email"
         elsif me.column_names.include?("number") || me.instance_methods(false).include?(:number)
           "number"
-
         else
           exit_message = "*** Oops: Can't find any column to use as the display label on #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your #{singular_class} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
           raise(HotGlue::Error, exit_message)

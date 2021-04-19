@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(version: 2021_03_06_225506) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "hgis", force: :cascade do |t|
+  create_table "ghis", force: :cascade do |t|
     t.integer "def_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

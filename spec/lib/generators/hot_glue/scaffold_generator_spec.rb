@@ -53,8 +53,9 @@ describe HotGlue::ScaffoldGenerator do
           response = Rails::Generators.invoke("hot_glue:scaffold",
                                               ["Abc"])
         rescue StandardError => e
+
           expect(e.class).to eq(HotGlue::Error)
-          expect(e.message).to eq("*** Oops: It looks like is no association from current_user to a class called Abc. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god.")
+          expect(e.message).to eq("*** Oops: The model Abc is missing an association for def or the model doesn't exist. TODO: Please implement a model for Def; your model Abc should have_many :defs.  To make a controller that can read all records, specify with --god.")
         end
       end
     end
@@ -82,7 +83,7 @@ describe HotGlue::ScaffoldGenerator do
         expect("error building in spec #{e}")
       end
       expect(File.exist?("spec/dummy/spec/requests/defs_spec.rb")).to be(true)
-      expect(File.exist?("spec/dummy/spec/system/defs_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/defs_behavior_spec.rb")).to be(true)
 
     end
   end
@@ -107,7 +108,10 @@ describe HotGlue::ScaffoldGenerator do
                                           ["Xyz"])
     rescue StandardError => e
       expect(e.class).to eq(HotGlue::Error)
-      expect(e.message).to eq("*** Oops: The table Xyz has an association for 'nothing', but I can't find an assoicated model for that association. TODO: Please implement a model for nothing that belongs to Xyz ")
+
+      expect(e.message).to eq(
+                             "*** Oops: The model Xyz is missing an association for nothing or the model doesn't exist. TODO: Please implement a model for Nothing; your model Xyz should have_many :nothings.  To make a controller that can read all records, specify with --god."
+                           )
     end
   end
 
@@ -154,6 +158,7 @@ describe HotGlue::ScaffoldGenerator do
           raise("error building in spec #{e}")
         end
         expect(File.exist?("spec/dummy/app/controllers/defs_controller.rb")).to be(true)
+        expect(File.exist?("spec/dummy/spec/requests/defs_spec.rb")).to be(true)
       end
     end
   end
@@ -183,13 +188,41 @@ describe HotGlue::ScaffoldGenerator do
       expect(File.exist?("spec/dummy/app/views/hello/defs/edit.turbo_stream.haml")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/defs/update.turbo_stream.haml")).to be(true)
       expect(File.exist?("spec/dummy/spec/requests/hello/defs_spec.rb")).to be(true)
-      expect(File.exist?("spec/dummy/spec/system/hello/defs_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/hello/defs_behavior_spec.rb")).to be(true)
     end
   end
 
 
   describe "--nest" do
-    # TODO: implement specs
+    it "should NOT create a file at specs/requests/ and specs/system" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Ghi","--nest=def"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
+
+      expect(File.exist?("spec/dummy/app/controllers/ghis_controller.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/ghis_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/requests/ghis_spec.rb")).to be(true)
+
+      # crude snapshot testing
+      expect(
+        File.read("spec/dummy/app/controllers/ghis_controller.rb") =~ /def load_def/
+      ).to_not eq(nil)
+
+      expect(
+        File.read("spec/dummy/app/controllers/ghis_controller.rb") =~ /@def = current_user.defs.find\(params\[:def_id\]\)/
+      ).to_not eq(nil)
+
+      expect(
+        File.read("spec/dummy/app/controllers/ghis_controller.rb") =~ /def load_ghi/
+      ).to_not eq(nil)
+
+      expect(
+        File.read("spec/dummy/app/controllers/ghis_controller.rb") =~ /@ghi = @def.ghis.find\(params\[:id\]\)/
+      ).to_not eq(nil)
+    end
   end
 
   describe "authorization and object ownership" do
