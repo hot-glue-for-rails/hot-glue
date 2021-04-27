@@ -79,7 +79,7 @@ module HotGlue
       @singular = args.first.tableize.singularize # should be in form hello_world
       @plural = options['plural'] || @singular + "s" # supply to override; leave blank to use default
       @auth = options['auth'] || "current_user"
-      @auth_identifier = options['auth'] || (!@auth.nil? && @auth.gsub("current_", "")) || nil
+      @auth_identifier = options['auth_identifier'] || (!@auth.nil? && @auth.gsub("current_", "")) || nil
 
 
       @nest = (!options['nest'].empty? && options['nest']) || nil
@@ -268,7 +268,6 @@ module HotGlue
       unless @no_specs
         template "request_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/requests#{namespace_with_dash}", "#{plural}_spec.rb")
         template "system_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
-
       end
 
       template "_errors.haml", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.haml")
@@ -347,9 +346,9 @@ module HotGlue
     end
 
 
-    def path_helper_full
-      "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
-    end
+    # def path_helper_full
+    #   "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
+    # end
 
     def path_helper_args
       if @nested_args.any?

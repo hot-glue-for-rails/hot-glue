@@ -1,52 +1,89 @@
 require 'rails_helper'
 
 describe "interaction for <%= controller_class_name %>", type: :feature do
-  <% unless @auth.nil? %>  let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
-  let(:<%= singular %>) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
+  include HotGlue::ControllerHelper
+  <% unless @auth.nil? %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
 
-<%= objest_nest_factory_setup %>
+  let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
+  let!(:<%= singular %>2) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
+  let!(:<%= singular %>3) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
+
+  <%= objest_nest_factory_setup %>
 
   before(:each) do
-
+    login_as(<%= @auth %>)
   end
 
   describe "index" do
     it "should show me the list" do
+      visit <%= path_helper_plural %>
+
+<%=
+@columns.map { |col|
+  type = eval("#{singular_class}.columns_hash['#{col}']").type
+  # limit = eval("#{singular_class}.columns_hash['#{col}']").limit
+  # sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
+  #
+
+  case type
+  when :datetime
+    "      " + ["expect(page).to have_content(#{singular}#{rand(3)+1}.#{col}.in_time_zone(#{ @auth }.timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(#{ @auth }.timezone)  )"].join("\n      ")
+
+  else
+    "      " + ["expect(page).to have_content(#{singular}#{rand(3)+1}.#{col})"].join("\n      ")
+
+  end
+
+}.join("\n")
+     
+      %>
 
     end
   end
 
-  describe "new" do
-    it "should show form" do
+  describe "new & create" do
+    it "should create a new target" do
+      visit dashboard_targets_path
+      click_link "New Target"
+      expect(page).to have_selector(:xpath, './/h3[contains(., "New Target")]')
+      find('input#target_email').fill_in(with: "new_test-email@nowhere.com")
+      click_button "Save"
 
-    end
-  end
-
-  describe "create" do
-    it "should create a new <%= singular %>" do
-
-    end
-  end
-
-  describe "edit" do
-    it "should return an editable form" do
-
+      expect(page).to have_content("new_test-email@nowhere.com")
+      expect(Target.last.email).to eq("new_test-email@nowhere.com")
     end
   end
 
   describe "show" do
     it "should return a view form" do
-
+      visit dashboard_targets_path
+      expect(page).to have_content(target1.email)
+      expect(page).to have_content(target2.email)
     end
   end
 
-  describe "update" do
-    it "should update" do
+  describe "edit & update" do
+    it "should return an editable form" do
+      visit dashboard_targets_path
+      find("a.edit-target-button[href='/dashboard/targets/#{target1.id}/edit']").click
+      expect(page).to have_content("Editing #{target1.email}")
+      find("input[name='target[email]']").fill_in(with: "differentemail@nowhere.com")
+      click_button "Save"
+      within("turbo-frame#target__#{target1.id} ") do
+        expect(page).to have_content("differentemail@nowhere.com")
+      end
+      expect(target1.reload.email).to eq("differentemail@nowhere.com")
     end
   end
 
   describe "destroy" do
     it "should destroy" do
+      visit dashboard_targets_path
+      accept_alert do
+        find("a.delete-target-button[href='/dashboard/targets/#{target1.id}']").click
+      end
+      expect(page).to_not have_content("#{target1.email}")
+      expect(Target.where(email: target1.email).count).to eq(0)
     end
   end
 end
