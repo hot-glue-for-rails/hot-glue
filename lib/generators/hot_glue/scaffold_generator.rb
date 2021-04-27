@@ -6,7 +6,32 @@ module HotGlue
   class Error < StandardError
   end
 
+
+
+
+
   module GeneratorHelper
+    def derrive_reference_name thing_as_string
+      assoc_class = eval(thing_as_string)
+
+      if assoc_class.respond_to?("name")
+        display_column = "name"
+      elsif assoc_class.respond_to?("to_label")
+        display_column = "to_label"
+      elsif assoc_class.respond_to?("full_name")
+        display_column = "full_name"
+      elsif assoc_class.respond_to?("display_name")
+        display_column = "display_name"
+      elsif assoc_class.respond_to?("email")
+        display_column = "email"
+      else
+        raise("this should have been caught by the checker in the initializer")
+        # puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+      end
+      display_column
+    end
+
+
     def text_area_output(col, field_length, col_identifier )
       lines = field_length % 40
       if lines > 5
@@ -460,6 +485,9 @@ module HotGlue
     end
 
 
+
+
+
     def copy_view_files
       return if @specs_only
       haml_views.each do |view|
@@ -553,24 +581,8 @@ module HotGlue
               exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
               exit
             end
+            display_column = derrive_reference_name(assoc.class_name)
 
-
-            assoc_class = eval(assoc.class_name)
-
-            if assoc_class.respond_to?("name")
-              display_column = "name"
-            elsif assoc_class.respond_to?("to_label")
-              display_column = "to_label"
-            elsif assoc_class.respond_to?("full_name")
-              display_column = "full_name"
-            elsif assoc_class.respond_to?("display_name")
-              display_column = "display_name"
-            elsif assoc_class.respond_to?("email")
-              display_column = "email"
-            else
-              raise("this should have been caught by the checker in the initializer")
-              # puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
-            end
 
             "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
 #{col_spaces_prepend}= f.collection_select(:#{col.to_s}, #{assoc_class}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
@@ -653,25 +665,9 @@ module HotGlue
               exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
               raise(HotGlue::Error,exit_message)
             end
-            
-            assoc_class = eval(assoc.class_name)
 
-            if assoc_class.respond_to?("name")
-              display_column = "name"
-            elsif assoc_class.respond_to?("to_label")
-              display_column = "to_label"
-            elsif assoc_class.respond_to?("full_name")
-              display_column = "full_name"
-            elsif assoc_class.respond_to?("display_name")
-              display_column = "display_name"
-            elsif assoc_class.respond_to?("email")
-              display_column = "email"
-            elsif assoc_class.respond_to?("number")
-              display_column = "number"
+            display_column =  derrive_reference_name(assoc.class_name)
 
-            else
-              puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
-            end
 
             "#{col_identifer}
   = #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe"

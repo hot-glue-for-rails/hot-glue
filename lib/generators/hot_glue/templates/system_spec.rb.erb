@@ -43,36 +43,83 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
 
   describe "new & create" do
     it "should create a new target" do
-      visit dashboard_targets_path
-      click_link "New Target"
-      expect(page).to have_selector(:xpath, './/h3[contains(., "New Target")]')
-      find('input#target_email').fill_in(with: "new_test-email@nowhere.com")
-      click_button "Save"
+      visit <%= path_helper_plural %>
+      click_link "New <%= singular.titlecase %>"
+      expect(page).to have_selector(:xpath, './/h3[contains(., "New <%= singular.titlecase %>")]')
 
-      expect(page).to have_content("new_test-email@nowhere.com")
-      expect(Target.last.email).to eq("new_test-email@nowhere.com")
+<%=
+  @columns.map { |col|
+    type = eval("#{singular_class}.columns_hash['#{col}']").type
+    # limit = eval("#{singular_class}.columns_hash['#{col}']").limit
+    # sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
+    #
+
+    case type
+    when :datetime
+    when :integer
+      "      " + 'find("input#' + singular + '_' + col.to_s + '").fill_in(with: rand(10))'
+    else
+      "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
+      '      ' + 'find("input#' + singular + '_' + col.to_s + '").fill_in(with: new_' + col.to_s + ')'
+    end
+
+  }.join("\n")
+
+        %>
+      click_button "Save"
+      expect(page).to have_content("Successfully created")
+
+      <%=
+  @columns.map { |col|
+    type = eval("#{singular_class}.columns_hash['#{col}']").type
+
+    case type
+    when :datetime
+    when :integer
+    else
+      "expect(page).to have_content(new_#{col})"
+    end
+
+  }.join("\n")
+  %>
+
     end
   end
 
   describe "show" do
     it "should return a view form" do
-      visit dashboard_targets_path
-      expect(page).to have_content(target1.email)
-      expect(page).to have_content(target2.email)
+      visit <%= path_helper_plural %>
+
     end
   end
 
   describe "edit & update" do
     it "should return an editable form" do
-      visit dashboard_targets_path
-      find("a.edit-target-button[href='/dashboard/targets/#{target1.id}/edit']").click
-      expect(page).to have_content("Editing #{target1.email}")
-      find("input[name='target[email]']").fill_in(with: "differentemail@nowhere.com")
+      visit <%= path_helper_plural %>
+      find("a.edit-<%= singular %>-button[href='/<%= namespace_with_slash %><%= plural %>/#{<%= singular %>1.id}/edit']").click
+
+      expect(page).to have_content("Editing #{<%= singular %>1.<%= derrive_reference_name(singular_class) %>}")
+<%=
+    @columns.map { |col|
+      type = eval("#{singular_class}.columns_hash['#{col}']").type
+
+      case type
+      when :datetime
+      when :integer
+      else
+        '      find("input[name=\'' + singular + '[' + col.to_s + ']\'").fill_in(with: "differentemail@nowhere.com")'
+      end
+    }.join("\n")
+    %>
+
+
+
+
       click_button "Save"
-      within("turbo-frame#target__#{target1.id} ") do
+      within("turbo-frame#<%= singular %>__#{<%= singular %>1.id} ") do
         expect(page).to have_content("differentemail@nowhere.com")
       end
-      expect(target1.reload.email).to eq("differentemail@nowhere.com")
+      expect(<%= singular %>1.reload.email).to eq("differentemail@nowhere.com")
     end
   end
 
@@ -83,7 +130,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
         find("a.delete-target-button[href='/dashboard/targets/#{target1.id}']").click
       end
       expect(page).to_not have_content("#{target1.email}")
-      expect(Target.where(email: target1.email).count).to eq(0)
+      expect(<%= singular_class %>.where(email: <%= singular %>1.email).count).to eq(0)
     end
   end
 end
