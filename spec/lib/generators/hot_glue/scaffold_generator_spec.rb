@@ -194,7 +194,7 @@ describe HotGlue::ScaffoldGenerator do
 
 
   describe "--nest" do
-    it "should NOT create a file at specs/requests/ and specs/system" do
+    it "should create a file at specs/requests/ and specs/system" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Ghi","--nest=def"])
@@ -206,22 +206,7 @@ describe HotGlue::ScaffoldGenerator do
       expect(File.exist?("spec/dummy/spec/system/ghis_behavior_spec.rb")).to be(true)
       expect(File.exist?("spec/dummy/spec/requests/ghis_spec.rb")).to be(true)
 
-      # crude snapshot testing
-      expect(
-        File.read("spec/dummy/app/controllers/ghis_controller.rb") =~ /def load_def/
-      ).to_not eq(nil)
 
-      expect(
-        File.read("spec/dummy/app/controllers/ghis_controller.rb") =~ /@def = current_user.defs.find\(params\[:def_id\]\)/
-      ).to_not eq(nil)
-
-      expect(
-        File.read("spec/dummy/app/controllers/ghis_controller.rb") =~ /def load_ghi/
-      ).to_not eq(nil)
-
-      expect(
-        File.read("spec/dummy/app/controllers/ghis_controller.rb") =~ /@ghi = @def.ghis.find\(params\[:id\]\)/
-      ).to_not eq(nil)
     end
   end
 
