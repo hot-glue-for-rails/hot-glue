@@ -9,13 +9,14 @@ It gives users full control over objects they 'own' and by default it spits out 
 Hot Glue generates functionality that's quick and dirty. It let's you be crafty. As with a real glue gun, take care not to burn yourself while using it. 
 
 * Build plug-and-play scaffolding mixing HAML and turbo_stream responses
-* Automatically Reads Your Models (make them before building your scaffolding!)
-* CRUD, lists with pagination, (coming soon: sorting & searching)
-* Wonderful for prototyping.
-* Nest your routes model-by-model for built-in poor man's authentication.
+* Everything edits-in-place (unless you use --big-edit, then it won't)  
+* Automatically reads your ActiveRecord models and relationships (make them before building your scaffolding!)
+* Create-read-update-delete (CRUD) with pagination (one day: sorting & searching)
+* Excellent tool for prototyping and hackathons, but a knowledge of Rails is needed. 
+* Nest your routes model-by-model for built-in poor man's authentication. (Customers have_many :invoices; Invoices have_many :line_items; etc)
 * Plays nicely with Devise, but you can implement your own current_user object instead.
-* Requires & uses Kaminari for pagination.
-* Create specs automatically along with the controllers (* rspec only for now).
+* Kaminari for pagination.
+* Create specs automatically along with the controllers.
 * Throw the scaffolding away when your app is ready to graduate to its next phase (or don't if you like it).
 
 ## QUICK START (COMING SOON)
@@ -54,24 +55,25 @@ rails generate hot_glue:scaffold Thing
 
 Bootstrap with Webpack: 
   - change `stylesheet_link_tag` to `stylesheet_pack_tag` in your application layout
-  - `yarn add bootstrap`
-  - create a new file at `app/javascript/css/site.scss` with this content
+  - run `yarn add bootstrap`
+  - create a new file at `app/javascript/require_bootstrap.scss` with this content
     ```
     @import "~bootstrap/scss/bootstrap.scss";
     ```
     
   - add to `app/javascript/packs/application.js` 
     ```
-    import 'css/site'
+    import 'require_bootstrap'
     ```
     
 Bootstrap with Sprockets:
-  - use bootstrap-rails gem 
-    
+  - use bootstrap-rubygem gem 
+  - see README for bootstrap-rubygem to install
+  
 
 - Install Devise or implement your own authentication
 
-- Also recommended: font-awesome-sass
+- Also recommended: 
 
 
 ### First Argument

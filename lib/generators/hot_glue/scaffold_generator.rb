@@ -84,6 +84,7 @@ module HotGlue
 
       @nest = (!options['nest'].empty? && options['nest']) || nil
       @namespace = options['namespace'] || nil
+
       @singular_class = @singular.titleize.gsub(" ", "")
       @exclude_fields = []
       @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
@@ -254,8 +255,13 @@ module HotGlue
 
       unless @specs_only
         template "controller.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
-        if @namespace &&  defined?(controller_descends_from) == nil
-          template "base_controller.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "base_controller.rb")
+        if @namespace
+          begin
+            eval(controller_descends_from)
+            puts "   skipping   base controller #{controller_descends_from}"
+          rescue NameError => e
+            template "base_controller.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "base_controller.rb")
+          end
         end
       end
 

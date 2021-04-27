@@ -1,7 +1,6 @@
 class <%= controller_class_name %> < <%= controller_descends_from %>
 <% unless @auth_identifier == '' || @auth.nil? %>before_action :authenticate_<%= @auth_identifier %>!<% end %>
-<% if any_nested? %> <% @nested_args.each do |arg| %>
-  before_action :load_<%= arg %><% end %> <% end %>
+
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
   helper :hot_glue
   include HotGlue::ControllerHelper
@@ -11,22 +10,23 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 <% end %>
 
   <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
-    this_scope =   nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "@#{nest_chain.last}.#{arg}s"
-      nest_chain << arg %>def load_<%= arg %>
-    @<%= arg %> = <%= this_scope %>.find(params[:<%= arg %>_id])
+    this_scope =   nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "#{nest_chain.last}.#{arg}s"
+      nest_chain << arg %>
+  def <%= arg %>
+    @<%= arg %> ||= <%= this_scope %>.find(params[:<%= arg %>_id])
   end<% } %><% end %>
 
 <% if !@self_auth %>
   def load_<%= singular_name %>
-    @<%= singular_name %> = <%= object_scope %>.find(params[:id])
+    @<%= singular_name %> = <%= object_scope.gsub("@",'') %>.find(params[:id])
   end
   <% else %>
   def load_<%= singular_name %>
-    @<%= singular_name %> = <%= auth_object %>
+    @<%= singular_name %> = <%= auth_object.gsub("@",'') %>
   end<% end %>
 
   def load_all_<%= plural %>
-    <% if !@self_auth %>@<%= plural_name %> = <%= object_scope %><% if model_has_strings? %>.where(<%=class_name %>.arel_table[:email].matches("%#{@__general_string}%"))<% end %>.page(params[:page])
+    <% if !@self_auth %>@<%= plural_name %> = <%= object_scope.gsub("@",'') %><% if model_has_strings? %>.where(<%=class_name %>.arel_table[:email].matches("%#{@__general_string}%"))<% end %>.page(params[:page])
     <% else %>@<%= plural_name %> = [<%= auth_object %>]<% end %>
   end
 
