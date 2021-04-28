@@ -42,7 +42,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   end
 
   describe "new & create" do
-    it "should create a new target" do
+    it "should create a new <%= singular.titlecase %>" do
       visit <%= path_helper_plural %>
       click_link "New <%= singular.titlecase %>"
       expect(page).to have_selector(:xpath, './/h3[contains(., "New <%= singular.titlecase %>")]')
@@ -111,10 +111,6 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       end
     }.join("\n")
     %>
-
-
-
-
       click_button "Save"
       within("turbo-frame#<%= singular %>__#{<%= singular %>1.id} ") do
         expect(page).to have_content("differentemail@nowhere.com")
@@ -125,12 +121,12 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
 
   describe "destroy" do
     it "should destroy" do
-      visit dashboard_targets_path
+      visit <%= path_helper_plural %>
       accept_alert do
-        find("a.delete-target-button[href='/dashboard/targets/#{target1.id}']").click
+        find("a.delete-<%= singular %>-button[href='/dashboard/<%= plural %>/#{<%= singular %>1.id}']").click
       end
-      expect(page).to_not have_content("#{target1.email}")
-      expect(<%= singular_class %>.where(email: <%= singular %>1.email).count).to eq(0)
+      expect(page).to_not have_content(<%= singular %>1.email)
+      expect(<%= singular_class %>.where(id: <%= singular %>1.id).count).to eq(0)
     end
   end
 end
