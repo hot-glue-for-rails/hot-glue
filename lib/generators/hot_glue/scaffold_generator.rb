@@ -584,7 +584,7 @@ module HotGlue
 
 
             "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
-#{col_spaces_prepend}= f.collection_select(:#{col.to_s}, #{assoc_class}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
+#{col_spaces_prepend}= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
 #{col_spaces_prepend}%label.small.form-text.text-muted
 #{col_spaces_prepend}  #{col.to_s.humanize}"
 

@@ -1,14 +1,17 @@
 # Hot Glue
 
-Hot Glue is an evolution of the best of the admin-style scaffold builders of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold) being the most popular of those). It harnesses the power of Rails 6, Turbo-Rails, and Hotwire to deliver a lightning fast experience.
+Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of the admin-interface style scaffolding systems of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold)). 
 
-As well, its premise is a little different than the configuration-heavy admin interface toolkits. It will read your relationships and field types to generate your code for you, leaving you with a 'sourdough starter' to work from. If you modify the generated code, you're on your own if you want to preserve your changes and also re-generate scaffold after adding fields. 
+Using Turbo-Rails and Hotwire you get a lightning-fast out-of-the-box CRUD building experience. Every page displays only a list view: new and edit operations happen as 'edit-in-place', so the user never leaves the page. 
 
-It gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields. 
+It will read your relationships and field types to generate your code for you, leaving you with a 'sourdough starter' to work from. If you modify the generated code, you're on your own if you want to preserve your changes and also re-generate scaffold after adding fields. 
 
-Hot Glue generates functionality that's quick and dirty. It let's you be crafty. As with a real glue gun, take care not to burn yourself while using it. 
+By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields. 
 
-* Build plug-and-play scaffolding mixing HAML and turbo_stream responses
+Hot Glue generates functionality that's quick and dirty. It let's you be crafty. As with a real hot glue gun, use with caution. 
+
+* Build plug-and-play scaffolding for any CRUD on any object
+* mixes HAML and turbo_stream responses
 * Everything edits-in-place (unless you use --big-edit, then it won't)  
 * Automatically reads your ActiveRecord models and relationships (make them before building your scaffolding!)
 * Create-read-update-delete (CRUD) with pagination (one day: sorting & searching)
@@ -19,37 +22,70 @@ Hot Glue generates functionality that's quick and dirty. It let's you be crafty.
 * Create specs automatically along with the controllers.
 * Throw the scaffolding away when your app is ready to graduate to its next phase (or don't if you like it).
 
-## QUICK START (COMING SOON)
+## QUICK START
 
 It's really easy to get started by following along with this blog post that creates three simple tables (User, Event, and Format).
 
 Feel free to build your own tables when you get to the sections for building the 'Event' scaffold:
 
-https://blog.jasonfleetwoodboldt.com/hot-glue
+https://jasonfleetwoodboldt.com/hot-glue
 
 ## HOW EASY?
-
 
 ```
 rails generate hot_glue:scaffold Thing 
 ```
 
+Generate a quick scaffold to manage a table called `pronouns`
+
+
+
+Instantly get a simple CRUD interface
+
+
+
 ## TO INSTALL
 
-- Add Turbo-Rails to your Gemfile & bundle install 
+- Add `gem 'turbo-rails'` to your Gemfile & `bundle install`
   
 - Then install it with `rails turbo:install`
 
 - The Turbo install has switched your action cable settings from 'async' to Redis, so be sure to start a redis server
   
-- Add `hot_glue` to your Gemfile & `bundle install`
+- Add `gem 'hot-glue'` to your Gemfile & `bundle install`
   
-- Then install it with `rails generate hot_glue:install`
+- Run the hot-glue installation with `rails generate hot_glue:install`
 
 - Add to your `application.html.erb`
 ```
   <%= render partial: 'layouts/flash_notices' %>
 ```
+
+- Rspec setup
+  add `gem 'rspec-rails'` to your gemfile inside :development and :test
+  add `gem 'factory_bot_rails'` to your gemfile inside :development and :test
+  run `rails generate rspec:install`
+  configure Rspec to work with Factory Bot inside of `rails_helper.rb`
+    ```
+    RSpec.configure do |config|
+        // ... more rspec configuration (not shown)
+        config.include FactoryBot::Syntax::Methods
+    end
+    ```  
+
+  https://github.com/thoughtbot/factory_bot/blob/master/GETTING_STARTED.md#rspec
+
+  - for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
+    ```
+    def login_as(account)
+      visit '/accounts/sign_in'
+      within("#new_account") do
+      fill_in 'Email', with: account.email
+      fill_in 'Password', with: 'password'
+      end
+      click_button 'Log in'
+    end
+    ```
 
 - Install Bootstrap (optional)
 
@@ -72,8 +108,9 @@ Bootstrap with Sprockets:
   
 
 - Install Devise or implement your own authentication
+  (or only use --gd mode, see below)
 
-- Also recommended: 
+- font-awesome
 
 
 ### First Argument
