@@ -37,11 +37,13 @@ rails generate hot_glue:scaffold Thing
 ```
 
 Generate a quick scaffold to manage a table called `pronouns`
+![hot-glue-3](https://user-images.githubusercontent.com/59002/116405509-bdee2f00-a7fd-11eb-9723-4c6e22f81bd3.gif)
 
 
 
 Instantly get a simple CRUD interface
 
+![hot-glue-4](https://user-images.githubusercontent.com/59002/116405517-c2b2e300-a7fd-11eb-8423-d43e3afc9fa6.gif)
 
 
 ## TO INSTALL
