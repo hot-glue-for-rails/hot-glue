@@ -107,15 +107,30 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       when :datetime
       when :integer
       else
-        '      find("input[name=\'' + singular + '[' + col.to_s + ']\'").fill_in(with: "differentemail@nowhere.com")'
+        "      " + "new_#{col.to_s} = Faker::Name.new \n" +
+
+        '      find("input[name=\'' + singular + '[' + col.to_s + ']\'").fill_in(with: new_' + col.to_s + ')'
+
       end
     }.join("\n")
     %>
       click_button "Save"
       within("turbo-frame#<%= singular %>__#{<%= singular %>1.id} ") do
-        expect(page).to have_content("differentemail@nowhere.com")
+
+
+<%=
+    @columns.map { |col|
+      type = eval("#{singular_class}.columns_hash['#{col}']").type
+      case type
+      when :datetime
+      when :integer
+      else
+        '        expect(page).to have_content(new_' + col.to_s + ')'
       end
-      expect(<%= singular %>1.reload.email).to eq("differentemail@nowhere.com")
+    }.join("\n")
+    %>
+
+      end
     end
   end
 
@@ -123,7 +138,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     it "should destroy" do
       visit <%= path_helper_plural %>
       accept_alert do
-        find("a.delete-<%= singular %>-button[href='/dashboard/<%= plural %>/#{<%= singular %>1.id}']").click
+        find("a.delete-<%= singular %>-button[href='<%= namespace_with_dash %>/<%= plural %>/#{<%= singular %>1.id}']").click
       end
       expect(page).to_not have_content(<%= singular %>1.email)
       expect(<%= singular_class %>.where(id: <%= singular %>1.id).count).to eq(0)
