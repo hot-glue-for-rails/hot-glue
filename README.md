@@ -378,15 +378,11 @@ If you do not want inline editing of your list items but instead to fall back to
 
 
 
-
-
 # HOW THIS GEM IS TESTED
-
-We have one kind of "sandboxes": a DUMMY sandbox
 
 The dummy sandbox is found at `spec/dummy`
 
-The dummy lives as mostly checked- into the repository, except the folders where the generated code goes (`spec/dummy/app/views/`, `spec/dummy/app/controllers/`, `spec/dummy/specs/` are excluded from Git)
+The dummy sandbox lives as mostly checked- into the repository, **except** the folders where the generated code goes (`spec/dummy/app/views/`, `spec/dummy/app/controllers/`, `spec/dummy/specs/` are excluded from Git)
 
 When you run the **internal specs**, which you can do **at the root of this repo** using the command `rspec`, a set of specs will run to assert the generators are erroring when they are supposed to and producing code when they are supposed to.
 
