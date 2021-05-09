@@ -1,4 +1,5 @@
 .row
 <%= all_form_fields %>
   .col
+    = link_to "Cancel", accounts_path,  {class: "btn btn-secondary"}
     = f.submit "Save", class: "btn btn-primary pull-right"
