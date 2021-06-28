@@ -6,10 +6,6 @@ module HotGlue
   class Error < StandardError
   end
 
-
-
-
-
   module GeneratorHelper
     def derrive_reference_name thing_as_string
       assoc_class = eval(thing_as_string)

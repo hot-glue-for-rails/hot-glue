@@ -383,6 +383,11 @@ If you do not want inline editing of your list items but instead to fall back to
 
 # HOW THIS GEM IS TESTED
 
+SETUP:
+• Run bundle install
+• if you can't get through see https://stackoverflow.com/questions/68050807/gem-install-mimemagic-v-0-3-10-fails-to-install-on-big-sur/68170982#68170982
+
+
 The dummy sandbox is found at `spec/dummy`
 
 The dummy sandbox lives as mostly checked- into the repository, **except** the folders where the generated code goes (`spec/dummy/app/views/`, `spec/dummy/app/controllers/`, `spec/dummy/specs/` are excluded from Git)
