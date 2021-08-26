@@ -80,6 +80,7 @@ module HotGlue
     class_option :no_paginate, type: :boolean, default: false
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
+    # class_option :markup, type: :string, default: "erb"
 
     def initialize(*meta_args) #:nodoc:
       super
@@ -94,6 +95,19 @@ module HotGlue
       if @specs_only && @no_specs
         raise(HotGlue::Error, "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry.")
       end
+
+      # if options['markup'] == "erb"
+      #   puts "ERB IS NOT IMPLEMENTED"
+      #   abort
+      #   # raise "erb not implemented"
+      # elsif options['markup'] == "slim"
+      #   puts "SLIM IS NOT IMPLEMENTED"
+      #   abort
+      #
+      # elsif options['markup'] == "haml"
+      #   byebug
+      #   @template_builder = HotGlue::TemplateBuilders::Haml.new(self)
+      # end
 
 
       args = meta_args[0]
