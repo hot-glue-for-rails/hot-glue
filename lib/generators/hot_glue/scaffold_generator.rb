@@ -1,6 +1,10 @@
 require 'rails/generators/erb/scaffold/scaffold_generator'
 require 'ffaker'
 
+require_relative './markup_templates/base'
+require_relative './markup_templates/erb'
+require_relative './markup_templates/haml'
+require_relative './markup_templates/slim'
 
 module HotGlue
   class Error < StandardError
@@ -42,13 +46,7 @@ module HotGlue
 
 
 
-    def field_output(col, type = nil, width, col_identifier )
 
-      "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = f.text_field :#{col.to_s}, value: @#{singular}.#{col.to_s}, size: #{width}, class: 'form-control', type: '#{type}'
-    %label.form-text
-      #{col.to_s.humanize}\n"
-    end
   end
 
 
@@ -80,12 +78,23 @@ module HotGlue
     class_option :no_paginate, type: :boolean, default: false
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
+    class_option :markup, type: :string, default: "erb"
 
-    def initialize(*meta_args) #:nodoc:
+
+
+    # def erb_replace_ampersands
+    #   if @template_builder.is_a?(HotGlue::ErbTemplate)
+    #     @output_buffer.gsub!('\%', '%')
+    #   end
+    # end
+
+
+
+    def initialize(*meta_args)
       super
 
       begin
-        object = eval(class_name)
+        @the_object = eval(class_name)
       rescue StandardError => e
         message = "*** Oops: It looks like there is no object for #{class_name}. Please define the object + database table first."
         raise(HotGlue::Error, message)
@@ -94,6 +103,18 @@ module HotGlue
       if @specs_only && @no_specs
         raise(HotGlue::Error, "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry.")
       end
+
+      if options['markup'] == "erb"
+        @template_builder = HotGlue::ErbTemplate.new
+      elsif options['markup'] == "slim"
+        puts "SLIM IS NOT IMPLEMENTED; please see https://github.com/jasonfb/hot-glue/issues/3"
+        abort
+        @template_builder = HotGlue::SlimTemplate.new
+
+      elsif options['markup'] == "haml"
+        @template_builder = HotGlue::HamlTemplate.new
+      end
+      @markup =  options['markup']
 
 
       args = meta_args[0]
@@ -121,7 +142,6 @@ module HotGlue
         @show_only += options['show_only'].split(",").collect(&:to_sym)
       end
 
-      auth_assoc = @auth.gsub("current_","")
 
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs_only'] || false
@@ -168,15 +188,21 @@ module HotGlue
         end
       end
 
+      identify_object_owner
+      setup_fields
+    end
+
+    def identify_object_owner
+      auth_assoc = @auth && @auth.gsub("current_","")
 
       if !@object_owner_sym.empty?
         auth_assoc_field = auth_assoc + "_id"
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
 
         if assoc
-          ownership_field = assoc.name.to_s + "_id"
+          @ownership_field = assoc.name.to_s + "_id"
         elsif !@nest
-            exit_message = "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
+          exit_message = "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
 
         else
           if @god
@@ -197,6 +223,11 @@ module HotGlue
           raise(HotGlue::Error, exit_message)
         end
       end
+    end
+
+
+    def setup_fields
+      auth_assoc = @auth && @auth.gsub("current_","")
 
       if !@include_fields
         @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
@@ -205,15 +236,14 @@ module HotGlue
                              :confirmation_token, :confirmed_at,
                              :confirmation_sent_at, :unconfirmed_email
 
-        @exclude_fields.push(auth_assoc_field.to_sym) if !auth_assoc_field.nil?
-        @exclude_fields.push(ownership_field.to_sym) if !ownership_field.nil?
+        @exclude_fields.push( (auth_assoc + "_id").to_sym) if ! auth_assoc.nil?
+        @exclude_fields.push( @ownership_field.to_sym ) if ! @ownership_field.nil?
 
 
-        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
+        @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
 
       else
-        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
-
+        @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
       end
 
       @columns.each do |col|
@@ -221,7 +251,7 @@ module HotGlue
           @show_only << col
         end
 
-        if object.columns_hash[col.to_s].type == :integer
+        if @the_object.columns_hash[col.to_s].type == :integer
           if col.to_s.ends_with?("_id")
             # guess the association name label
             assoc_name = col.to_s.gsub("_id","")
@@ -260,8 +290,6 @@ module HotGlue
       end
     end
 
-
-
     #
     def formats
       [format]
@@ -290,11 +318,12 @@ module HotGlue
         template "system_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
       end
 
-      template "_errors.haml", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.haml")
+      template "#{@markup}/_errors.#{@markup}", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.#{@markup}")
     end
 
     def list_column_headings
-      @columns.map(&:to_s).map{|col_name| '      .col ' + col_name.humanize}.join("\n")
+      @template_builder.list_column_headings(columns: @columns)
+
     end
 
     def columns_spec_with_sample_data
@@ -364,11 +393,6 @@ module HotGlue
     def auth_identifier
       @auth_identifier
     end
-
-
-    # def path_helper_full
-    #   "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
-    # end
 
     def path_helper_args
       if @nested_args.any?
@@ -462,22 +486,28 @@ module HotGlue
     end
 
     def all_objects_variable
-
-      # needs the authenticated root user
-      # "#{@auth}.#{ @nested_args.map{|a| "#{@nested_args_plural[a]}.find(@#{a})"}.join('.') + "." if @nested_args.any?}#{plural}"
-
       all_objects_root + ".page(params[:page])"
-
     end
 
     def auth_object
       @auth
     end
 
-
     def no_devise_installed
       !Gem::Specification.sort_by{ |g| [g.name.downcase, g.version] }.group_by{ |g| g.name }['devise']
     end
+
+    # def erb_replace_ampersands!(filename = nil)
+    #
+    #   return if filename.nil?
+    #   file = File.open(filename, "r")
+    #   contents = file.read
+    #   file.close
+    #
+    #   file = File.open(filename, "w")
+    #   file.write( contents.gsub('\%', '%'))
+    #   file.close
+    # end
 
 
 
@@ -485,17 +515,31 @@ module HotGlue
 
     def copy_view_files
       return if @specs_only
-      haml_views.each do |view|
+      all_views.each do |view|
         formats.each do |format|
-          filename = cc_filename_with_extensions(view, "haml")
-          template filename, File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", controller_file_path, filename)
+          source_filename = cc_filename_with_extensions("#{@markup}/#{view}", "#{@markup}")
+          dest_filename = cc_filename_with_extensions("#{view}", "#{@markup}")
+          dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
+                                    controller_file_path, dest_filename)
+
+
+          template source_filename, dest_filepath
+          gsub_file dest_filepath,  '\%', '%'
+
         end
       end
 
       turbo_stream_views.each do |view|
         formats.each do |format|
-          filename = cc_filename_with_extensions(view, 'turbo_stream.haml')
-          template filename, File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", controller_file_path, filename)
+          source_filename = cc_filename_with_extensions( "#{@markup}/#{view}.turbo_stream.#{@markup}")
+          dest_filename = cc_filename_with_extensions("#{view}", "turbo_stream.#{@markup}")
+          dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
+                                    controller_file_path, dest_filename)
+
+
+          template source_filename, dest_filepath
+          gsub_file dest_filepath,  '\%', '%'
+
         end
       end
     end
@@ -516,7 +560,7 @@ module HotGlue
       end
     end
 
-    def haml_views
+    def all_views
       res =  %w(index edit _form _line _list _show _errors)
 
       unless @no_create
@@ -548,179 +592,22 @@ module HotGlue
     end
 
     def all_form_fields
-      col_identifier = "  .col"
-      col_spaces_prepend = "    "
-
-      res = @columns.map { |col|
-
-        if @show_only.include?(col)
-
-          "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = @#{singular}.#{col.to_s}
-    %label.form-text
-      #{col.to_s.humanize}\n"
-        else
-
-
-        type = eval("#{singular_class}.columns_hash['#{col}']").type
-        limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-        sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
-
-        case type
-        when :integer
-          # look for a belongs_to on this object
-          if col.to_s.ends_with?("_id")
-            assoc_name = col.to_s.gsub("_id","")
-            assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-            if assoc.nil?
-              exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-              exit
-            end
-            display_column = derrive_reference_name(assoc.class_name)
-
-
-            "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
-#{col_spaces_prepend}= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
-#{col_spaces_prepend}%label.small.form-text.text-muted
-#{col_spaces_prepend}  #{col.to_s.humanize}"
-
-          else
-            "#{col_identifier}{class: \"form-group \#{'alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-#{col_spaces_prepend}= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number'
-#{col_spaces_prepend}%label.form-text
-#{col_spaces_prepend}  #{col.to_s.humanize}\n"
-          end
-        when :string
-          limit ||= 256
-          if limit <= 256
-            field_output(col, nil, limit, col_identifier)
-          else
-            text_area_output(col, limit, col_identifier)
-          end
-
-        when :text
-          limit ||= 256
-          if limit <= 256
-            field_output(col, nil, limit, col_identifier)
-          else
-            text_area_output(col, limit, col_identifier)
-          end
-        when :float
-          limit ||= 256
-          field_output(col, nil, limit, col_identifier)
-
-
-        when :datetime
-          "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-#{col_spaces_prepend}= datetime_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
-        when :date
-          "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-#{col_spaces_prepend}= date_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
-        when :time
-          "#{col_identifier}{class: \"form-group  \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-#{col_spaces_prepend}= time_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
-        when :boolean
-          "#{col_identifier}{class: \"form-group  \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-#{col_spaces_prepend}%span
-#{col_spaces_prepend}  #{col.to_s.humanize}
-#{col_spaces_prepend}= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked')
-#{col_spaces_prepend}= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0')
-
-#{col_spaces_prepend}= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '')
-#{col_spaces_prepend}= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1')
-      "
-        end
-        end
-      }.join("\n")
-      return res
+      @template_builder.all_form_fields(
+        columns: @columns,
+        show_only: @show_only,
+        singular_class: singular_class,
+        singular: singular
+      )
     end
-
 
     def all_line_fields
-      columns = @columns.count + 1
-      perc_width = (100/columns).floor
-
-      col_identifer = ".col"
-      @columns.map { |col|
-        type = eval("#{singular_class}.columns_hash['#{col}']").type
-        limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-        sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
-
-        case type
-        when :integer
-          # look for a belongs_to on this object
-          if col.to_s.ends_with?("_id")
-
-            assoc_name = col.to_s.gsub("_id","")
-
-
-            assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-
-            if assoc.nil?
-              exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-              raise(HotGlue::Error,exit_message)
-            end
-
-            display_column =  derrive_reference_name(assoc.class_name)
-
-
-            "#{col_identifer}
-  = #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe"
-
-          else
-            "#{col_identifer}
-  = #{singular}.#{col}"
-          end
-        when :float
-          width = (limit && limit < 40) ? limit : (40)
-          "#{col_identifer}
-  = #{singular}.#{col}"
-
-        when :string
-          width = (limit && limit < 40) ? limit : (40)
-          "#{col_identifer}
-  = #{singular}.#{col}"
-        when :text
-          "#{col_identifer}
-  = #{singular}.#{col}"
-        when :datetime
-          "#{col_identifer}
-  - unless #{singular}.#{col}.nil?
-    = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone)
-  - else
-    %span.alert-danger
-      MISSING
-"
-        when :date
-          ".cell
-  - unless #{singular}.#{col}.nil?
-    = #{singular}.#{col}
-  - else
-    %span.alert-danger
-      MISSING
-"
-        when :time
-          "#{col_identifer}
-  - unless #{singular}.#{col}.nil?
-    = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone)
-  - else
-    %span.alert-danger
-      MISSING
-"
-        when :boolean
-          "#{col_identifer}
-  - if #{singular}.#{col}.nil?
-    %span.alert-danger
-      MISSING
-  - elsif #{singular}.#{col}
-    YES
-  - else
-    NO
-"
-        end
-      }.join("\n")
+      @template_builder.all_line_fields(
+        columns: @columns,
+        show_only: @show_only,
+        singular_class: singular_class,
+        singular: singular
+      )
     end
-
 
     def controller_descends_from
       if defined?(@namespace.titlecase + "::BaseController")
@@ -774,13 +661,9 @@ module HotGlue
      end
    end
 
-
-
-  def paginate
-    "- if #{plural}.respond_to?(:total_pages)
-      = paginate #{plural}"
-  end
-
+    def paginate
+      @template_builder.paginate(plural: plural)
+    end
   private # thor does something fancy like sending the class all of its own methods during some strange run sequence
     # does not like public methods
 

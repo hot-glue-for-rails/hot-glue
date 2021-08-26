@@ -1,4 +1,3 @@
-# Hot Glue
 
 Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of the admin-interface style scaffolding systems of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold)). 
 
@@ -318,6 +317,12 @@ end
 
 ```
 
+
+### `--markup` (default: 'erb')
+
+ERB is default. For HAML, `--markup=haml`. 
+
+
 ## FLAGS (Options with no values)
 These options (flags) also uses `--` syntax but do not take any values. Everything is assumed (default) to be false unless specified.
 
@@ -353,6 +358,8 @@ If you do not want inline editing of your list items but instead to fall back to
 
 
 # VERSION HISTORY
+
+#### 2021-09-06 - v0.2.0 - SLIM and ERB ; use the option --markup=erb or --markup=haml (default is now erb)
 
 #### 2021-06-28 - v0.1.2 - fixes problem with namespaces on path helpers
 

@@ -1,0 +1,3 @@
+<\%= turbo_stream.replace "<%=plural%>-list" do %>
+  <\%= render partial: "list", locals: {<%=plural%>: @<%=plural%>}  %>
+<\% end %>

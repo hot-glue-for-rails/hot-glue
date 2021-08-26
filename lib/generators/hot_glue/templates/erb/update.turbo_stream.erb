@@ -1,0 +1,10 @@
+<\%= turbo_stream.replace "<%= singular%>__#{@<%= singular %>.id}" do %>
+  <\%= render partial: 'line', locals: {<%= singular %>: @<%= singular %> <%= nested_assignments_with_leading_comma %> } %>
+<\% end %>
+
+<\%= turbo_stream.replace "flash_notices" do %>
+  <\%= render partial: "layouts/flash_notices" %>
+  <\% if @<%= singular %>.errors.any? %>
+  <\%= render partial: "errors", locals: {resource: @<%= singular %>} %>
+  <\% end %>
+<\% end %>

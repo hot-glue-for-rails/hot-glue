@@ -1,0 +1,18 @@
+<\% if @<%= singular %>.errors.none? %>
+  <\%= turbo_stream.replace "<%= plural %>-list" do %>
+  <\%= render partial: "list", locals: {<%= plural %>: @<%= plural %>} %>
+  <\% end %>
+  <\% end %>
+  <\%= turbo_stream.replace "<%= singular %>-new" do %>
+  <\% if @<%= singular %>.errors.none? %>
+  <\%= render partial: "new_button" %>
+  <\% else %>
+  <\%= render partial: "new_form", locals: {<%= singular %>: @<%= singular %>} %>
+  <\% end %>
+  <\% end %>
+  <\%= turbo_stream.replace "flash_notices" do %>
+  <\%= render partial: "layouts/flash_notices" %>
+  <\% if @<%= singular %>.errors.any? %>
+  <\%= render partial: "errors", locals: {resource: @<%= singular %>} %>
+  <\% end %>
+<\% end %>
