@@ -84,7 +84,7 @@ module HotGlue
       super
 
       begin
-        object = eval(class_name)
+        @the_object = eval(class_name)
       rescue StandardError => e
         message = "*** Oops: It looks like there is no object for #{class_name}. Please define the object + database table first."
         raise(HotGlue::Error, message)
@@ -95,18 +95,14 @@ module HotGlue
       end
 
       if options['markup'] == "erb"
-        puts "ERB IS NOT IMPLEMENTED"
-        abort
-        # raise "erb not implemented"
-
-        @template_builder = ::Erb.new(self)
+        @template_builder = HotGlue::ErbTemplate.new
       elsif options['markup'] == "slim"
         puts "SLIM IS NOT IMPLEMENTED"
         abort
-        @template_builder = ::Slim.new(self)
+        @template_builder = HotGlue::SlimTemplate.new
 
       elsif options['markup'] == "haml"
-        @template_builder = HotGlue::HamlTemplate.new(self)
+        @template_builder = HotGlue::HamlTemplate.new
       end
 
 
@@ -135,7 +131,6 @@ module HotGlue
         @show_only += options['show_only'].split(",").collect(&:to_sym)
       end
 
-      auth_assoc = @auth.gsub("current_","")
 
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs_only'] || false
@@ -182,15 +177,21 @@ module HotGlue
         end
       end
 
+      identify_object_owner
+      setup_fields
+    end
+
+    def identify_object_owner
+      auth_assoc = @auth && @auth.gsub("current_","")
 
       if !@object_owner_sym.empty?
         auth_assoc_field = auth_assoc + "_id"
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
 
         if assoc
-          ownership_field = assoc.name.to_s + "_id"
+          @ownership_field = assoc.name.to_s + "_id"
         elsif !@nest
-            exit_message = "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
+          exit_message = "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
 
         else
           if @god
@@ -211,6 +212,11 @@ module HotGlue
           raise(HotGlue::Error, exit_message)
         end
       end
+    end
+
+
+    def setup_fields
+      auth_assoc = @auth && @auth.gsub("current_","")
 
       if !@include_fields
         @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
@@ -219,15 +225,14 @@ module HotGlue
                              :confirmation_token, :confirmed_at,
                              :confirmation_sent_at, :unconfirmed_email
 
-        @exclude_fields.push(auth_assoc_field.to_sym) if !auth_assoc_field.nil?
-        @exclude_fields.push(ownership_field.to_sym) if !ownership_field.nil?
+        @exclude_fields.push( (auth_assoc + "_id").to_sym) if ! auth_assoc.nil?
+        @exclude_fields.push( @ownership_field.to_sym ) if ! @ownership_field.nil?
 
 
-        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
+        @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
 
       else
-        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
-
+        @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
       end
 
       @columns.each do |col|
@@ -235,7 +240,7 @@ module HotGlue
           @show_only << col
         end
 
-        if object.columns_hash[col.to_s].type == :integer
+        if @the_object.columns_hash[col.to_s].type == :integer
           if col.to_s.ends_with?("_id")
             # guess the association name label
             assoc_name = col.to_s.gsub("_id","")
@@ -273,8 +278,6 @@ module HotGlue
         end
       end
     end
-
-
 
     #
     def formats
@@ -379,11 +382,6 @@ module HotGlue
       @auth_identifier
     end
 
-
-    # def path_helper_full
-    #   "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
-    # end
-
     def path_helper_args
       if @nested_args.any?
         [(@nested_args).collect{|a| "@#{a}"} , singular].join(",")
@@ -476,18 +474,12 @@ module HotGlue
     end
 
     def all_objects_variable
-
-      # needs the authenticated root user
-      # "#{@auth}.#{ @nested_args.map{|a| "#{@nested_args_plural[a]}.find(@#{a})"}.join('.') + "." if @nested_args.any?}#{plural}"
-
       all_objects_root + ".page(params[:page])"
-
     end
 
     def auth_object
       @auth
     end
-
 
     def no_devise_installed
       !Gem::Specification.sort_by{ |g| [g.name.downcase, g.version] }.group_by{ |g| g.name }['devise']

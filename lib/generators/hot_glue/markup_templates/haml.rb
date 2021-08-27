@@ -13,6 +13,7 @@ module  HotGlue
 
 
     def all_form_fields(*args)
+
       columns = args[0][:columns]
       show_only = args[0][:show_only]
       singular_class = args[0][:singular_class]
