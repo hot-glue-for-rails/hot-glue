@@ -317,6 +317,12 @@ end
 
 ```
 
+
+### `--markup` (default: 'erb')
+
+ERB is default. For HAML, `--markup=haml`. For SLIM, `--markup=haml`
+
+
 ## FLAGS (Options with no values)
 These options (flags) also uses `--` syntax but do not take any values. Everything is assumed (default) to be false unless specified.
 
@@ -352,6 +358,8 @@ If you do not want inline editing of your list items but instead to fall back to
 
 
 # VERSION HISTORY
+
+#### 2021-08-26 - v0.2.0 - SLIM and ERB ; use the option --markup!!!
 
 #### 2021-06-28 - v0.1.2 - fixes problem with namespaces on path helpers
 
