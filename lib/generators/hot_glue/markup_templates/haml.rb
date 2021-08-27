@@ -12,12 +12,11 @@ module  HotGlue
     end
 
 
-  def all_form_fields(*args)
-
-    columns = args[0][:columns]
-    show_only = args[0][:show_only]
-    singular_class = args[0][:singular_class]
-    singular = args[0][:singular]
+    def all_form_fields(*args)
+      columns = args[0][:columns]
+      show_only = args[0][:show_only]
+      singular_class = args[0][:singular_class]
+      singular = args[0][:singular]
 
 
       col_identifier = "  .col"
@@ -106,14 +105,16 @@ module  HotGlue
       }.join("\n")
       return res
     end
-  end
 
 
   def all_line_fields(*args)
-    columns = args[0][:args]
-    byebug
-    # num_columns = @columns.count + 1
-    perc_width = (100/columns).floor
+    columns = args[0][:columns]
+    show_only = args[0][:show_only]
+    singular_class = args[0][:singular_class]
+    singular = args[0][:singular]
+
+    columns_count = columns.count + 1
+    perc_width = (100/columns_count).floor
 
     col_identifer = ".col"
     columns.map { |col|
@@ -192,7 +193,8 @@ module  HotGlue
   - else
     NO
 "
-      end
+      end #end of switch
     }.join("\n")
+  end
   end
 end
