@@ -631,13 +631,9 @@ module HotGlue
      end
    end
 
-
-
-  def paginate
-    "- if #{plural}.respond_to?(:total_pages)
-      = paginate #{plural}"
-  end
-
+    def paginate
+      @template_builder.paginate(plural: plural)
+    end
   private # thor does something fancy like sending the class all of its own methods during some strange run sequence
     # does not like public methods
 

@@ -6,7 +6,7 @@ module  HotGlue
     def field_output(col, type = nil, width, col_identifier )
 
       "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = f.text_field :#{col.to_s}, value: @#{singular}.#{col.to_s}, size: #{width}, class: 'form-control', type: '#{type}'
+    = f.text_field :#{col.to_s}, value: @#{@singular}.#{col.to_s}, size: #{width}, class: 'form-control', type: '#{type}'
     %label.form-text
       #{col.to_s.humanize}\n"
     end
@@ -16,7 +16,10 @@ module  HotGlue
       columns = args[0][:columns]
       show_only = args[0][:show_only]
       singular_class = args[0][:singular_class]
-      singular = args[0][:singular]
+
+      # TODO: CLEAN ME
+      @singular = args[0][:singular]
+      singular = @singular
 
 
       col_identifier = "  .col"
@@ -107,7 +110,15 @@ module  HotGlue
     end
 
 
-  def all_line_fields(*args)
+
+    def paginate(*args)
+      plural = args[0][:plural]
+
+      "- if #{plural}.respond_to?(:total_pages)
+      = paginate #{plural}"
+    end
+
+    def all_line_fields(*args)
     columns = args[0][:columns]
     show_only = args[0][:show_only]
     singular_class = args[0][:singular_class]
