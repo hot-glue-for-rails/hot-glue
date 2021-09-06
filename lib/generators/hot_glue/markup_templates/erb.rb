@@ -24,7 +24,7 @@ module  HotGlue
       singular = @singular
 
 
-      col_identifier = "  .col"
+      col_identifier = "col"
       col_spaces_prepend = "    "
 
       res = columns.map { |col|
@@ -152,12 +152,13 @@ module  HotGlue
             display_column =  derrive_reference_name(assoc.class_name)
 
 
-            "#{col_identifer}
-  = #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe"
+            "<div class='#{col_identifer}'>
+  <%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>
+</div>"
 
           else
-            "#{col_identifer}
-  = #{singular}.#{col}"
+            "<div class='#{col_identifer}'>
+  <%= #{singular}.#{col}%></div>"
           end
         when :float
           width = (limit && limit < 40) ? limit : (40)
@@ -166,19 +167,22 @@ module  HotGlue
 
         when :string
           width = (limit && limit < 40) ? limit : (40)
-          "#{col_identifer}
-  = #{singular}.#{col}"
+          "<div class='#{col_identifer}'>
+  <%= #{singular}.#{col} %>
+</div>"
         when :text
-          "#{col_identifer}
-  = #{singular}.#{col}"
+          "<div class='#{col_identifer}'>
+  <%= #{singular}.#{col} %>
+</div>"
         when :datetime
-          "#{col_identifer}
-  - unless #{singular}.#{col}.nil?
-    = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone)
-  - else
-    %span.alert-danger
-      MISSING
-"
+
+          "<div class='#{col_identifer}'>
+  <% unless #{singular}.#{col}.nil? %>
+<% = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
+<% else %>
+<span class='alert-danger'>MISSING</span>
+<% end %>
+</div>"
         when :date
           ".cell
   - unless #{singular}.#{col}.nil?

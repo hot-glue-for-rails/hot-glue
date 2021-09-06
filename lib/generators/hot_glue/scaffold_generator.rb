@@ -80,7 +80,17 @@ module HotGlue
     class_option :show_only, type: :string, default: ""
     class_option :markup, type: :string, default: "erb"
 
-    def initialize(*meta_args) #:nodoc:
+
+
+    # def erb_replace_ampersands
+    #   if @template_builder.is_a?(HotGlue::ErbTemplate)
+    #     @output_buffer.gsub!('\%', '%')
+    #   end
+    # end
+
+
+
+    def initialize(*meta_args)
       super
 
       begin
@@ -486,17 +496,21 @@ module HotGlue
       !Gem::Specification.sort_by{ |g| [g.name.downcase, g.version] }.group_by{ |g| g.name }['devise']
     end
 
-    def erb_replace_ampersands!(filename = nil)
+    # def erb_replace_ampersands!(filename = nil)
+    #
+    #   return if filename.nil?
+    #   file = File.open(filename, "r")
+    #   contents = file.read
+    #   file.close
+    #
+    #   file = File.open(filename, "w")
+    #   file.write( contents.gsub('\%', '%'))
+    #   file.close
+    # end
 
-      return if filename.nil?
-      file = File.open(filename, "r")
-      contents = file.read
-      file.close
 
-      file = File.open(filename, "w")
-      file.write( contents.gsub('\%', '%'))
-      file.close
-    end
+
+
 
     def copy_view_files
       return if @specs_only
@@ -508,10 +522,8 @@ module HotGlue
                                     controller_file_path, dest_filename)
 
 
-          ## TODO: copy the source files, evaluate them as ERB first in a temp dir, then pass the tmp dit
-          # as the template here
           template source_filename, dest_filepath
-          erb_replace_ampersands!(dest_filepath)
+          gsub_file dest_filepath,  '\%', '%'
         end
       end
 
@@ -522,11 +534,9 @@ module HotGlue
           dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
                                     controller_file_path, dest_filename)
 
-          ## TODO: copy the source files, evaluate them as ERB first in a temp dir, then pass the tmp dit
-          # as the template here; this will fix the problem of the Rails generatoe thinking they are new every time
 
           template source_filename, dest_filepath
-          erb_replace_ampersands!(dest_filepath)
+          gsub_file dest_filepath,  '\%', '%'
 
         end
       end
