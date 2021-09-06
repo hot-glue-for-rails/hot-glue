@@ -359,7 +359,7 @@ If you do not want inline editing of your list items but instead to fall back to
 
 # VERSION HISTORY
 
-#### 2021-08-26 - v0.2.0 - SLIM and ERB ; use the option --markup!!!
+#### 2021-09-06 - v0.2.0 - SLIM and ERB ; use the option --markup=erb or --markup=haml (default is now erb)
 
 #### 2021-06-28 - v0.1.2 - fixes problem with namespaces on path helpers
 
