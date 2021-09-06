@@ -5,7 +5,7 @@ module  HotGlue
 
     def field_output(col, type = nil, width, col_identifier )
 
-      "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+      "#{col_identifier}{class: \"form-group \#{'alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
     = f.text_field :#{col.to_s}, value: @#{@singular}.#{col.to_s}, size: #{width}, class: 'form-control', type: '#{type}'
     %label.form-text
       #{col.to_s.humanize}\n"

@@ -1,0 +1,17 @@
+<\%= link_to "<i class='fa fa-arrow-circle-left  2x'></i> Back to list".html_safe, <%= path_helper_plural %> %>
+
+<\% turbo_frame_tag "<%= singular %>__#{<%= "@" + singular %>.id}" do  %>
+
+  <div class="cell editable" style="position: relative;">
+
+    <\% if @<%= singular %>.errors.any? %>
+      <\%= render(partial: "#{controller.namespace}errors", locals: {resource: @<%= singular%> }) %>
+    <\% end %>
+
+
+
+  </div>
+
+<\% end %>
+
+

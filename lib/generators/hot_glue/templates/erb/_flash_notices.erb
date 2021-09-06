@@ -1,0 +1,12 @@
+<%= turbo_frame_tag "flash_notices" do %>
+  <% unless notice.nil? %>
+    <div class="alert alert-notice alert-dismissible">
+      <%= notice %>
+    </div>
+  <% end %>
+  <% unless alert.nil? %>
+    <div class="alert alert-danger alert-dismissible">
+      <%= alert %>
+    </div>
+  <% end %>
+<% end %>

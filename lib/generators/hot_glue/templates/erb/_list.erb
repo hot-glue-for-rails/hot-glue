@@ -1,0 +1,24 @@
+<\%= turbo_frame_tag "<%= plural %>-list" do %>
+  <div class="container-fluid "><%= singular %>-table
+    <div class="row">
+
+
+    <%= list_column_headings %>
+
+
+    <div class="col">
+      <div>
+        <\% if <%= plural %>.empty? %>
+          None
+        <\% end %>
+        <\% <%= plural %>.each do |<%= singular %>| %>
+          <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %> <%= nested_assignments_with_leading_comma %> } %>
+        <\% end %>
+      </div>
+    </div>
+
+    <%=  @no_paginate ? "" : paginate %>
+
+    </div>
+  </div>
+<\% end %>

@@ -104,6 +104,7 @@ module HotGlue
       elsif options['markup'] == "haml"
         @template_builder = HotGlue::HamlTemplate.new
       end
+      @markup =  options['markup']
 
 
       args = meta_args[0]
@@ -307,7 +308,7 @@ module HotGlue
         template "system_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
       end
 
-      template "_errors.haml", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.haml")
+      template "#{@markup}/_errors.#{@markup}", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.#{@markup}")
     end
 
     def list_column_headings
@@ -485,23 +486,48 @@ module HotGlue
       !Gem::Specification.sort_by{ |g| [g.name.downcase, g.version] }.group_by{ |g| g.name }['devise']
     end
 
+    def erb_replace_ampersands!(filename = nil)
 
+      return if filename.nil?
+      file = File.open(filename, "r")
+      contents = file.read
+      file.close
 
-
+      file = File.open(filename, "w")
+      file.write( contents.gsub('\%', '%'))
+      file.close
+    end
 
     def copy_view_files
       return if @specs_only
-      haml_views.each do |view|
+      all_views.each do |view|
         formats.each do |format|
-          filename = cc_filename_with_extensions(view, "haml")
-          template filename, File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", controller_file_path, filename)
+          source_filename = cc_filename_with_extensions("#{@markup}/#{view}", "#{@markup}")
+          dest_filename = cc_filename_with_extensions("#{view}", "#{@markup}")
+          dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
+                                    controller_file_path, dest_filename)
+
+
+          ## TODO: copy the source files, evaluate them as ERB first in a temp dir, then pass the tmp dit
+          # as the template here
+          template source_filename, dest_filepath
+          erb_replace_ampersands!(dest_filepath)
         end
       end
 
       turbo_stream_views.each do |view|
         formats.each do |format|
-          filename = cc_filename_with_extensions(view, 'turbo_stream.haml')
-          template filename, File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", controller_file_path, filename)
+          source_filename = cc_filename_with_extensions( "#{@markup}/#{view}.turbo_stream.#{@markup}")
+          dest_filename = cc_filename_with_extensions("#{view}", "turbo_stream.#{@markup}")
+          dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
+                                    controller_file_path, dest_filename)
+
+          ## TODO: copy the source files, evaluate them as ERB first in a temp dir, then pass the tmp dit
+          # as the template here; this will fix the problem of the Rails generatoe thinking they are new every time
+
+          template source_filename, dest_filepath
+          erb_replace_ampersands!(dest_filepath)
+
         end
       end
     end
@@ -522,7 +548,7 @@ module HotGlue
       end
     end
 
-    def haml_views
+    def all_views
       res =  %w(index edit _form _line _list _show _errors)
 
       unless @no_create
