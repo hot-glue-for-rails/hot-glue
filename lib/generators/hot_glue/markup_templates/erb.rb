@@ -10,7 +10,11 @@ module  HotGlue
       "</div>"
     end
 
+    def list_column_headings(*args)
+      columns = args[0][:columns]
 
+      columns.map(&:to_s).map{|col_name| "<div class='col'>#{col_name.humanize}</div>"}.join("\n")
+    end
 
 
     def all_form_fields(*args)
@@ -104,7 +108,7 @@ module  HotGlue
             "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
               "  <span>#{col.to_s.humanize}</span>" +
               "  <%= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked') %>\n" +
-              "  <%= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0') %>\n"
+              "  <%= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0') %>\n" +
               "  <%= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '') %>\n" +
               "  <%= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1') %>\n" +
             "</div>"
@@ -189,7 +193,7 @@ module  HotGlue
         when :date
           "<div class='#{col_identifer}'>
   <% unless #{singular}.#{col}.nil? %>
-    = #{singular}.#{col}
+    <%= #{singular}.#{col} %>
   <% else %>
   <span class='alert-danger'>MISSING</span>
   <% end %>
@@ -218,6 +222,7 @@ module  HotGlue
       }.join("\n")
     end
   end
+
 
 
 end

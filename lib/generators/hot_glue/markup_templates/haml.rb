@@ -208,5 +208,16 @@ module  HotGlue
       end #end of switch
     }.join("\n")
   end
+
+    def list_column_headings(*args)
+      columns = args[0][:columns]
+
+      columns.map(&:to_s).map{|col_name| '      .col ' + col_name.humanize}.join("\n")
+    end
+
   end
+
+
+
+
 end

@@ -322,7 +322,8 @@ module HotGlue
     end
 
     def list_column_headings
-      @columns.map(&:to_s).map{|col_name| '      .col ' + col_name.humanize}.join("\n")
+      @template_builder.list_column_headings(columns: @columns)
+
     end
 
     def columns_spec_with_sample_data
