@@ -43,7 +43,7 @@ module HotGlue
                                     type: 'time',
                                     value: date_to_current_timezone(value, timezone))
 
-      res << timezonize(tz)
+      res << timezonize(timezone)
       res
     end
 

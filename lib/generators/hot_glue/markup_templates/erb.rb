@@ -4,9 +4,9 @@ module  HotGlue
     attr_accessor :singular
 
     def field_output(col, type = nil, width, col_identifier )
-      "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s}) %>\n" +
+      "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
       "  <%= f.text_field :#{col.to_s}, value: @#{@singular}.#{col.to_s}, size: #{width}, class: 'form-control', type: '#{type}' %>\n "+
-      "  <label class='form-text' >" "%= col.to_s.humanize %></label>\n" +
+      "  <label class='form-text' >#{col.to_s.humanize}</label>\n" +
       "</div>"
     end
 
@@ -55,16 +55,15 @@ module  HotGlue
               display_column = derrive_reference_name(assoc.class_name)
 
 
-              "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
-#{col_spaces_prepend}= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
-#{col_spaces_prepend}%label.small.form-text.text-muted
-#{col_spaces_prepend}  #{col.to_s.humanize}"
+              "<div class='#{col_identifier} form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}>
+<%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
+<label class='small form-text text-muted'>#{col.to_s.humanize}</label></div>"
 
             else
-              "#{col_identifier}{class: \"form-group \#{'alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-#{col_spaces_prepend}= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number'
-#{col_spaces_prepend}%label.form-text
-#{col_spaces_prepend}  #{col.to_s.humanize}\n"
+              "<div class=\"#{col_identifier} form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col})}\" >
+<%= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number' %>
+<label class='small form-text text-muted'>#{col.to_s.humanize}</label></div>"
+
             end
           when :string
             limit ||= 256
@@ -87,24 +86,28 @@ module  HotGlue
 
 
           when :datetime
-            "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-#{col_spaces_prepend}= datetime_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
-          when :date
-            "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-#{col_spaces_prepend}= date_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
-          when :time
-            "#{col_identifier}{class: \"form-group  \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-#{col_spaces_prepend}= time_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
-          when :boolean
-            "#{col_identifier}{class: \"form-group  \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-#{col_spaces_prepend}%span
-#{col_spaces_prepend}  #{col.to_s.humanize}
-            #{col_spaces_prepend}= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked')
-#{col_spaces_prepend}= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0')
 
-#{col_spaces_prepend}= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '')
-#{col_spaces_prepend}= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1')
-      "
+
+            "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
+"<%= datetime_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>" +
+              "</div>"
+          when :date
+            "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
+              "<%= date_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>" +
+              "</div>"
+          when :time
+            "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
+              "<%= time_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s},  '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>" +
+              "</div>"
+
+          when :boolean
+            "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
+              "  <span>#{col.to_s.humanize}</span>" +
+              "  <%= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked') %>\n" +
+              "  <%= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0') %>\n"
+              "  <%= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '') %>\n" +
+              "  <%= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1') %>\n" +
+            "</div>"
           end
         end
       }.join("\n")
@@ -128,7 +131,7 @@ module  HotGlue
       columns_count = columns.count + 1
       perc_width = (100/columns_count).floor
 
-      col_identifer = ".col"
+      col_identifer = "col"
       columns.map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         limit = eval("#{singular_class}.columns_hash['#{col}']").limit
@@ -178,7 +181,7 @@ module  HotGlue
 
           "<div class='#{col_identifer}'>
   <% unless #{singular}.#{col}.nil? %>
-<% = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
+<%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
 <% else %>
 <span class='alert-danger'>MISSING</span>
 <% end %>

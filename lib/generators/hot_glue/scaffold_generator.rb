@@ -524,6 +524,7 @@ module HotGlue
 
           template source_filename, dest_filepath
           gsub_file dest_filepath,  '\%', '%'
+
         end
       end
 
