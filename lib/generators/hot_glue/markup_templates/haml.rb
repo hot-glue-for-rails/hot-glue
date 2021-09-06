@@ -98,7 +98,7 @@ module  HotGlue
             "#{col_identifier}{class: \"form-group  \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
 #{col_spaces_prepend}%span
 #{col_spaces_prepend}  #{col.to_s.humanize}
-            #{col_spaces_prepend}= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked')
+#{col_spaces_prepend}= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked')
 #{col_spaces_prepend}= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0')
 
 #{col_spaces_prepend}= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '')
@@ -180,7 +180,7 @@ module  HotGlue
       MISSING
 "
       when :date
-        ".cell
+        "#{col_identifer}
   - unless #{singular}.#{col}.nil?
     = #{singular}.#{col}
   - else
