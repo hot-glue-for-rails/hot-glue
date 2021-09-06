@@ -187,30 +187,32 @@ module  HotGlue
 <% end %>
 </div>"
         when :date
-          ".cell
-  - unless #{singular}.#{col}.nil?
+          "<div class='#{col_identifer}'>
+  <% unless #{singular}.#{col}.nil? %>
     = #{singular}.#{col}
-  - else
-    %span.alert-danger
-      MISSING
-"
+  <% else %>
+  <span class='alert-danger'>MISSING</span>
+  <% end %>
+</div>"
         when :time
-          "#{col_identifer}
-  - unless #{singular}.#{col}.nil?
-    = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone)
-  - else
-    %span.alert-danger
-      MISSING
+          "<div class='#{col_identifer}'>
+  <% unless #{singular}.#{col}.nil? %>
+    <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone) %>
+   <% else %>
+  <span class='alert-danger'>MISSING</span>
+  <% end %>
+</div>
 "
         when :boolean
-          "#{col_identifer}
-  - if #{singular}.#{col}.nil?
-    %span.alert-danger
-      MISSING
-  - elsif #{singular}.#{col}
+          "<div class='#{col_identifer}'>
+  <% if #{singular}.#{col}.nil? %>
+      <span class='alert-danger'>MISSING</span>
+  <% elsif #{singular}.#{col} %>
     YES
-  - else
+  <% else %>
     NO
+  <% end %>
+</div>
 "
         end #end of switch
       }.join("\n")

@@ -1,6 +1,6 @@
 <\%= link_to "<i class='fa fa-arrow-circle-left  2x'></i> Back to list".html_safe, <%= path_helper_plural %> %>
 
-<\% turbo_frame_tag "<%= singular %>__#{<%= "@" + singular %>.id}" do  %>
+<\%= turbo_frame_tag "<%= singular %>__#{<%= "@" + singular %>.id}" do  %>
 
   <div class="cell editable" style="position: relative;">
 
@@ -8,8 +8,21 @@
       <\%= render(partial: "#{controller.namespace}errors", locals: {resource: @<%= singular%> }) %>
     <\% end %>
 
-
-
+    <h2>Editing</h2>
+    <% if eval("@" + singular).try(:to_label) %>
+    <%="@" + singular%>.to_label
+    <%  elsif eval("@" + singular).try(:name)  %>
+   <%="@" + singular%>.name %>
+    <% else %>
+    (no name)
+      <% end %>
+    <\%= form_with model: <%= "@" + singular%>, url: <%= path_helper_singular %>(<%= path_arity %>) do |f| %>
+    <\%=  render partial: "form",  locals: {:<%=  singular  %> => <%= "@" + singular%>, f: f} %>
+    <\% end %>
+    <i class='fa fa-times-circle fa-2x'
+       data-name='close-<%=  singular  %>__<\% <%= "@" + singular %>.id %> }'
+       data-row-id=<%= "@" + singular %>.id,
+       data-role='close-button'></i>
   </div>
 
 <\% end %>
