@@ -320,7 +320,7 @@ end
 
 ### `--markup` (default: 'erb')
 
-ERB is default. For HAML, `--markup=haml`. For SLIM, `--markup=haml`
+ERB is default. For HAML, `--markup=haml`. 
 
 
 ## FLAGS (Options with no values)

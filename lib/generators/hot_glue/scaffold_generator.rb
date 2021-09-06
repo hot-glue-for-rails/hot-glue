@@ -107,7 +107,7 @@ module HotGlue
       if options['markup'] == "erb"
         @template_builder = HotGlue::ErbTemplate.new
       elsif options['markup'] == "slim"
-        puts "SLIM IS NOT IMPLEMENTED"
+        puts "SLIM IS NOT IMPLEMENTED; please see https://github.com/jasonfb/hot-glue/issues/3"
         abort
         @template_builder = HotGlue::SlimTemplate.new
 
