@@ -1,6 +1,11 @@
 class <%= controller_class_name %> < <%= controller_descends_from %>
 <% unless @auth_identifier == '' || @auth.nil? %>before_action :authenticate_<%= @auth_identifier %>!<% end %>
 
+  <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
+    this_scope =   nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "#{nest_chain.last}.#{arg}s"
+      nest_chain << arg %>
+  before_action :<%= arg %>
+    <% } %><% end %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
   helper :hot_glue
   include HotGlue::ControllerHelper
@@ -9,9 +14,16 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   # TODO: implement current_user or use Devise
 <% end %>
 
+
+
   <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
-    this_scope =   nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "#{nest_chain.last}.#{arg}s"
-      nest_chain << arg %>
+    if !@god
+      this_scope = nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "#{nest_chain.last}.#{arg}s"
+    else
+      this_scope = eval(class_name + ".reflect_on_association(:#{arg})").class_name
+    end
+    nest_chain << arg
+    %>
   def <%= arg %>
     @<%= arg %> ||= <%= this_scope %>.find(params[:<%= arg %>_id])
   end<% } %><% end %>

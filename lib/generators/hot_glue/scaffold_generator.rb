@@ -196,7 +196,7 @@ module HotGlue
       auth_assoc = @auth && @auth.gsub("current_","")
 
       if !@object_owner_sym.empty?
-        auth_assoc_field = auth_assoc + "_id"
+        auth_assoc_field = auth_assoc + "_id" unless @god
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
 
         if assoc
@@ -431,7 +431,14 @@ module HotGlue
     end
 
     def new_path_name
-      "new_#{@namespace+"_" if @namespace}#{singular}_path"
+
+      base =      "new_#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_") if @nested_args.any?}#{singular}_path"
+      if @nested_args.any?
+        base += "(" + @nested_args.collect { |arg|
+          "@#{arg}.id"
+        }.join(", ") + ")"
+
+      end
     end
 
     def nested_assignments
