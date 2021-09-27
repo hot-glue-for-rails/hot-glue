@@ -362,6 +362,8 @@ If you do not want inline editing of your list items but instead to fall back to
 
 
 # VERSION HISTORY
+#### 2021-09-27  - v0.2.2 - Fixes some issues with related fields; unlocks Rails 7 in Gemspec file
+
 #### 2021-09-20  - v0.2.1 - Fixes nesting behavior when using gd option
 
 #### 2021-09-06 - v0.2.0 - ERB or HAML; use the option --markup=erb or --markup=haml (default is now erb)
