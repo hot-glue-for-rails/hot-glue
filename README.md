@@ -90,7 +90,8 @@ Instantly get a simple CRUD interface
 
 - Install Bootstrap (optional)
 
-Bootstrap with Webpack: 
+Bootstrap with Webpack:
+  FOR RAILS 6 using Webpacker: 
   - change `stylesheet_link_tag` to `stylesheet_pack_tag` in your application layout
   - run `yarn add bootstrap`
   - create a new file at `app/javascript/require_bootstrap.scss` with this content
@@ -103,11 +104,29 @@ Bootstrap with Webpack:
     import 'require_bootstrap'
     ```
     
+  FOR RAILS 7 using Webpacker:
+  - make sure to add `gem 'webpacker'` to your Gemfile
+  - Add or enable `gem "sassc-rails"` in your Gemfile
+  - remove `importmap-rails` from the Gemfile completely
+  - run `rails webpacker:install`
+  - in webpacker.yml change `source_path: app/javascript` to `source_path: app`
+  - `extract_css: false` to extract_css: true`
+  - create a folder at app/javascripts/packs
+  - make a enw file in this folder `load_bootstrap.js` which contains only:
+  - `import '../require_bootstrap.scss'`
+  - make a new file at `javasript/reuqire_bootstrap.scss` which contains only:
+  - `@import "~bootstrap/scss/bootstrap.scss";`
+  - in `application.erb` remove the javascript_maptag and replace the `stylesheet_load_tag` with 
+``` 
+ <%= stylesheet_pack_tag "application", "data-turbo-track": "reload" %>
+ <%= javascript_pack_tag 'load_bootstrap', 'data-turbolinks-track': 'reload' %>
+```
+
+
 Bootstrap with Sprockets:
   - use bootstrap-rubygem gem 
   - see README for bootstrap-rubygem to install
   
-
 - Install Devise or implement your own authentication
   (or only use --gd mode, see below)
 

@@ -5,7 +5,6 @@ require_relative './markup_templates/base'
 require_relative './markup_templates/erb'
 require_relative './markup_templates/haml'
 require_relative './markup_templates/slim'
-require 'byebug'
 
 module HotGlue
   class Error < StandardError
@@ -410,13 +409,13 @@ module HotGlue
 
     def new_path_name
 
-      base =      "new_#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_") if @nested_args.any?}#{singular}_path"
+      base =   "new_#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_") if @nested_args.any?}#{singular}_path"
       if @nested_args.any?
         base += "(" + @nested_args.collect { |arg|
           "@#{arg}.id"
         }.join(", ") + ")"
-
       end
+      base
     end
 
     def nested_assignments

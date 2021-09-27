@@ -36,7 +36,7 @@ module  HotGlue
 
         if show_only.include?(col)
 
-          "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+          "#{col_identifier}{class: \"form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s}) %> \"}
     = @#{singular}.#{col.to_s}
     %label.form-text
       #{col.to_s.humanize}\n"
@@ -59,12 +59,12 @@ module  HotGlue
               end
               display_column = HotGlue.derrive_reference_name(assoc.class_name)
 
-              "<div class='#{col_identifier} form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}>
-<%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
+              "<div class='#{col_identifier} form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s}) %>' >
+<%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
 <label class='small form-text text-muted'>#{col.to_s.humanize}</label></div>"
 
             else
-              "<div class=\"#{col_identifier} form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col})}\" >
+              "<div class=\"#{col_identifier} form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col}) %> \" >
 <%= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number' %>
 <label class='small form-text text-muted'>#{col.to_s.humanize}</label></div>"
 
