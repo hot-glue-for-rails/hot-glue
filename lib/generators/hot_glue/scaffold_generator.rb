@@ -5,60 +5,37 @@ require_relative './markup_templates/base'
 require_relative './markup_templates/erb'
 require_relative './markup_templates/haml'
 require_relative './markup_templates/slim'
+require 'byebug'
 
 module HotGlue
   class Error < StandardError
   end
 
-  module GeneratorHelper
-    def derrive_reference_name thing_as_string
-      assoc_class = eval(thing_as_string)
+  def self.derrive_reference_name(thing_as_string)
+    assoc_class = eval(thing_as_string)
 
-      if assoc_class.respond_to?("name")
-        display_column = "name"
-      elsif assoc_class.respond_to?("to_label")
-        display_column = "to_label"
-      elsif assoc_class.respond_to?("full_name")
-        display_column = "full_name"
-      elsif assoc_class.respond_to?("display_name")
-        display_column = "display_name"
-      elsif assoc_class.respond_to?("email")
-        display_column = "email"
-      else
-        raise("this should have been caught by the checker in the initializer")
-        # puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
-      end
-      display_column
+    if assoc_class.respond_to?("name")
+      display_column = "name"
+    elsif assoc_class.respond_to?("to_label")
+      display_column = "to_label"
+    elsif assoc_class.respond_to?("full_name")
+      display_column = "full_name"
+    elsif assoc_class.respond_to?("display_name")
+      display_column = "display_name"
+    elsif assoc_class.respond_to?("email")
+      display_column = "email"
+    else
+      raise("this should have been caught by the checker in the initializer")
+      # puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
     end
-
-
-    def text_area_output(col, field_length, col_identifier )
-      lines = field_length % 40
-      if lines > 5
-        lines = 5
-      end
-
-      "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = f.text_area :#{col.to_s}, class: 'form-control', cols: 40, rows: '#{lines}'
-    %label.form-text
-      #{col.to_s.humanize}\n"
-    end
-
-
-
-
+    display_column
   end
 
-
   class ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
-    hook_for :form_builder, :as => :scaffold
+     hook_for :form_builder, :as => :scaffold
 
     source_root File.expand_path('templates', __dir__)
     attr_accessor :path, :singular, :plural, :singular_class, :nest_with
-
-
-    include GeneratorHelper
-
 
     class_option :singular, type: :string, default: nil
     class_option :plural, type: :string, default: nil
@@ -188,6 +165,8 @@ module HotGlue
         end
       end
 
+      @reference_name = HotGlue.derrive_reference_name(singular_class)
+
       identify_object_owner
       setup_fields
     end
@@ -301,7 +280,6 @@ module HotGlue
 
     def copy_controller_and_spec_files
       @default_colspan = @columns.size
-
       unless @specs_only
         template "controller.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
         if @namespace

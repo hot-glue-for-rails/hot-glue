@@ -1,11 +1,11 @@
 PATH
   remote: .
   specs:
-    hot-glue (0.2.0)
+    hot-glue (0.2.2)
       ffaker (~> 2.16)
       haml-rails (~> 2.0)
       kaminari (~> 1.2)
-      rails (~> 6.0)
+      rails (> 5.1, <= 7.0.0)
       sass-rails
       turbo-rails (~> 0.5)
 

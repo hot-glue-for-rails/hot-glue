@@ -98,7 +98,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       visit <%= path_helper_plural %>
       find("a.edit-<%= singular %>-button[href='/<%= namespace_with_slash %><%= plural %>/#{<%= singular %>1.id}/edit']").click
 
-      expect(page).to have_content("Editing #{<%= singular %>1.<%= derrive_reference_name(singular_class) %>}")
+      expect(page).to have_content("Editing #{<%= singular %>.<%= "abc" %>}")
 <%=
     @columns.map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type

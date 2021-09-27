@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary     = "A gem build scaffolding."
   spec.description = "Simple, plug & play Rails scaffold building companion for Turbo-Rails and Hotwire"
   spec.authors     = ["Jason Fleetwood-Boldt"]
-  spec.email       = 'tech@datatravels.com'
+  spec.email       = 'code@jasonfb.net'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
@@ -29,8 +29,8 @@ Gem::Specification.new do |spec|
     files
   end
 
-  spec.add_dependency "rails",  '~> 6.0'
-  spec.homepage    = 'https://blog.jasonfleetwoodboldt.com/hot-glue/'
+  spec.add_runtime_dependency "rails",  '> 5.1', '<= 7.0.0'
+  spec.homepage    = 'https://jasonfleetwoodboldt.com/hot-glue/'
   spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/hot-glue",
                        "documentation_uri" => "https://www.instagram.com/jfbcodes/",
                        "homepage_uri" => 'https://jasonfleetwoodboldt.com/hot-glue/'}
@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency('haml-rails', '~> 2.0')
   spec.add_runtime_dependency('turbo-rails', '~> 0.5')
   spec.add_runtime_dependency "sass-rails"
-
+  
   spec.add_dependency 'ffaker', "~> 2.16"
 
   spec.post_install_message = <<~MSG

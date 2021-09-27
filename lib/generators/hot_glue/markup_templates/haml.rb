@@ -1,6 +1,19 @@
 module  HotGlue
   class HamlTemplate < TemplateBase
 
+    def text_area_output(col, field_length, col_identifier )
+      lines = field_length % 40
+      if lines > 5
+        lines = 5
+      end
+
+      "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+    = f.text_area :#{col.to_s}, class: 'form-control', cols: 40, rows: '#{lines}'
+    %label.form-text
+      #{col.to_s.humanize}\n"
+    end
+
+
     attr_accessor :singular
 
     def field_output(col, type = nil, width, col_identifier )

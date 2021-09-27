@@ -1,6 +1,7 @@
 module  HotGlue
   class ErbTemplate < TemplateBase
 
+    # include GeneratorHelper
     attr_accessor :singular
 
     def field_output(col, type = nil, width, col_identifier )
@@ -56,8 +57,7 @@ module  HotGlue
                 exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
                 exit
               end
-              display_column = derrive_reference_name(assoc.class_name)
-
+              display_column = HotGlue.derrive_reference_name(assoc.class_name)
 
               "<div class='#{col_identifier} form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}>
 <%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
@@ -156,8 +156,7 @@ module  HotGlue
               raise(HotGlue::Error,exit_message)
             end
 
-            display_column =  derrive_reference_name(assoc.class_name)
-
+            display_column =  HotGlue.derrive_reference_name(assoc.class_name)
 
             "<div class='#{col_identifer}'>
   <%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>
