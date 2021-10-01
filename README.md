@@ -48,14 +48,19 @@ Instantly get a simple CRUD interface
 
 - Install Turbo `rails turbo:install` (?)
 
-- Add `gem 'hot-glue'` to your Gemfile & `bundle install`
-  `rails generate hot_glue:install --markup=erb`
+- Add `gem 'hot-glue'` to your Gemfile
+- `bundle install`
+- `rails generate hot_glue:install --markup=erb` for ERB
+- or `rails generate hot_glue:install --markup=haml` for HAML
 
 - Add to your `application.html.erb`
 ```
   <%= render partial: 'layouts/flash_notices' %>
 ```
-
+- Or for Haml add to your `application.haml`
+```
+    = render partial: 'layouts/flash_notices' 
+```
 
 ## TO INSTALL (RAILS 6)
 
@@ -114,10 +119,10 @@ FOR HAML:
     ```
 
 ## Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY*)
-    - Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
+Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
       - use twbs/bootstrap-rubygem gem
       - see README for bootstrap-rubygem to install
-    - Bootstrap with Webpack for FOR RAILS 7 :
+Bootstrap with Webpack for FOR RAILS 7 :
           
 - add to Gemfile
 - gem 'bootstrap', '~> 5.1.0'
