@@ -9,7 +9,7 @@ branches:
     - main
 
 
-script: "rspec"
+script: "rake spec"
 
 rvm:
   - 2.7.2

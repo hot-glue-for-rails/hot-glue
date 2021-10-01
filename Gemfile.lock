@@ -88,6 +88,7 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
+    diff-lcs (1.4.4)
     erubi (1.10.0)
     erubis (2.7.0)
     ffaker (2.19.0)
@@ -179,6 +180,23 @@ GEM
     responders (3.0.1)
       actionpack (>= 5.0)
       railties (>= 5.0)
+    rspec-core (3.10.1)
+      rspec-support (~> 3.10.0)
+    rspec-expectations (3.10.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.10.0)
+    rspec-mocks (3.10.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.10.0)
+    rspec-rails (5.0.2)
+      actionpack (>= 5.2)
+      activesupport (>= 5.2)
+      railties (>= 5.2)
+      rspec-core (~> 3.10)
+      rspec-expectations (~> 3.10)
+      rspec-mocks (~> 3.10)
+      rspec-support (~> 3.10)
+    rspec-support (3.10.2)
     ruby_parser (3.17.0)
       sexp_processor (~> 4.15, >= 4.15.1)
     sass-rails (6.0.0)
@@ -225,5 +243,8 @@ DEPENDENCIES
   hot-glue!
   rails (= 6.1)
   rails-controller-testing
+  rspec-rails
   sqlite3
 
+BUNDLED WITH
+   2.1.4
