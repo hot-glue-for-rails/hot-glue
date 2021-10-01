@@ -1,7 +1,7 @@
 <%= all_line_fields %>
 <div class="col">
   <% if destroy_action %>
-    <\%= link_to "Delete <i class='fa fa-1x fa-remove'></i>".html_safe, <%= path_helper_singular %>(<%= path_helper_args %>), method: :delete, data: {confirm: 'Are you sure?'},  disable_with: "Loading...", class: "delete-<%= singular %>-button btn btn-primary " %>
+    <\%= button_to "Delete <i class='fa fa-1x fa-remove'></i>".html_safe, <%= path_helper_singular %>(<%= path_helper_args %>), method: :delete, data: <%= delete_confirmation_syntax  %>,  disable_with: "Loading...", class: "delete-<%= singular %>-button btn btn-primary " %>
   <% end %>
   &nbsp;
   <\%= link_to "Edit <i class='fa fa-1x fa-list-alt'></i>".html_safe, edit_<%= path_helper_singular %>(<%= path_helper_args %>), <% if @big_edit %>'data-turbo' => 'false', <% end %>disable_with: "Loading...", class: "edit-<%= singular %>-button btn btn-primary " %>

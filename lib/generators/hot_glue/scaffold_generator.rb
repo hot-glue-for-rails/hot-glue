@@ -55,6 +55,7 @@ module HotGlue
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
     class_option :markup, type: :string, default: "erb"
+     class_option :stimulus_syntax, type: :boolean, default: nil
 
 
 
@@ -78,6 +79,14 @@ module HotGlue
 
       if @specs_only && @no_specs
         raise(HotGlue::Error, "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry.")
+      end
+
+      if @stimulus_syntax.nil?
+        if Rails.version.split(".")[0].to_i >= 7
+          @stimulus_syntax = true
+        else
+          @stimulus_syntax = false
+        end
       end
 
       if options['markup'] == "erb"
@@ -645,9 +654,19 @@ module HotGlue
      end
    end
 
-    def paginate
-      @template_builder.paginate(plural: plural)
+   def paginate
+     @template_builder.paginate(plural: plural)
+   end
+
+  def delete_confirmation_syntax
+    if !@stimulus_syntax
+     "{confirm: 'Are you sure?'}"
+    else
+     "{controller: 'confirmable', 'confirm-message': \"Are you sure you want to delete \#{ @#{@singular}.#{ display_class } } \", 'action': 'confirmation#confirm'}"
     end
+  end
+
+
   private # thor does something fancy like sending the class all of its own methods during some strange run sequence
     # does not like public methods
 
@@ -655,7 +674,6 @@ module HotGlue
       [name, file_format].compact.join(".")
     end
   end
-
 end
 
 
