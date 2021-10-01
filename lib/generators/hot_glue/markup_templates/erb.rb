@@ -36,10 +36,11 @@ module  HotGlue
 
         if show_only.include?(col)
 
-          "#{col_identifier}{class: \"form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s}) %> \"}
-    = @#{singular}.#{col.to_s}
-    %label.form-text
-      #{col.to_s.humanize}\n"
+          "<div class=\"#{col_identifier} form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col}) %>\">" +
+          "<%= @#{singular}.#{col.to_s} %>" +
+            "<label class='form-text'>#{col.to_s.humanize}</label>" +
+          "</div>"
+
         else
 
 
@@ -168,9 +169,8 @@ module  HotGlue
           end
         when :float
           width = (limit && limit < 40) ? limit : (40)
-          "#{col_identifer}
-  = #{singular}.#{col}"
-
+          "<div class='#{col_identifer}'>
+<%= #{singular}.#{col}%></div>"
         when :string
           width = (limit && limit < 40) ? limit : (40)
           "<div class='#{col_identifer}'>
