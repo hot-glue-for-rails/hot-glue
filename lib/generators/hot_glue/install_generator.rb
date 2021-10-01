@@ -18,6 +18,11 @@ module HotGlue
         copy_file "erb/_flash_notices.erb", "#{'spec/dummy/' if Rails.env.test?}app/views/layouts/_flash_notices.erb"
 
       end
+
+      if Rails.version.split(".")[0].to_i >= 7
+        copy_file "confirmable.js", "#{'spec/dummy/' if Rails.env.test?}app/javascript/controllers/confirmable.js"
+
+      end
     end
   end
 end
