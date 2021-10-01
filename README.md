@@ -25,7 +25,7 @@ Hot Glue generates functionality that's quick and dirty. It let's you be crafty.
 * Automatically reads your ActiveRecord models and relationships (make them before building your scaffolding!)
 * Create-read-update-delete (CRUD) with pagination (one day: sorting & searching)
 * Excellent tool for prototyping and hackathons, but a knowledge of Rails is needed. 
-* Nest your routes model-by-model for built-in poor man's authentication. (Customers have_many :invoices; Invoices have_many :line_items; etc)
+* Nest your routes model-by-model for built-in poor man's access control. (Customers have_many :invoices; Invoices have_many :line_items; etc)
 * Plays nicely with Devise, but you can implement your own current_user object instead.
 * Kaminari for pagination.
 * Create specs automatically along with the controllers.
@@ -244,7 +244,7 @@ Then, finally the @charge will be loaded
 
 `@charge = @line.charges.find(params[:id])`
 
-It's called "poor man's auth" because if a user attempts to hack the URL by passing ids for objects they don't own--- which Rails makes relatively easy with its default URL pattern-- they will hit ActiveRecord not found errors (the objects they don't own won't be found in the associated relationship).
+It's called "poor man's access control" because if a user attempts to hack the URL by passing ids for objects they don't own--- which Rails makes relatively easy with its default URL pattern-- they will hit ActiveRecord not found errors (the objects they don't own won't be found in the associated relationship).
 
 It works, but it isn't granular. As well, it isn't appropriate for a large app with any level of intricacy to access control (that is, having roles).
 
@@ -257,7 +257,7 @@ By default, it will be assumed you have a `current_user` for your user authentic
 
 The poor man's auth presumes that object graphs have only one natural way to traverse them (that is, one primary way to traverse them), and that all relationships infer that a set of things or their descendants are granted access to me for reading, writing, updating, and deleting.
 
-Of course this is a sloppy way to do authentication, and can easily leave open endpoints your real users shouldn't have access to.
+Of course this is a sloppy way to do access control, and can easily leave open endpoints your real users shouldn't have access to.
 
 When you display anything built with the scaffolding, we assume the `current_user` will have `has_many` association that matches the pluralized name of the scaffold. In the case of nesting, we will automatically find the nested objects first, then continue down the nest chain to find the target object. In this way, we know that all object are 'anchored' to the logged-in user.
 
@@ -438,7 +438,7 @@ Omits delete action.
 
 ### `--big-edit`
 
-If you do not want inline editing of your list items but instead to fall back to old fashioned new page behavior for your edit views, use `--big-edit`.
+If you do not want inline editing of your list items but instead to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
 
 
 ## Automatic Base Controller
