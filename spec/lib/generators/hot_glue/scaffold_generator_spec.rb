@@ -115,22 +115,22 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "GOOD RESPONSES" do
     describe "with no parameters" do
-      it "should create all the haml files" do
+      it "should create all the erb files" do
         begin
           response = Rails::Generators.invoke("hot_glue:scaffold",
                                               ["Def"])
         rescue StandardError => e
           raise("error building in spec #{e}")
         end
-        expect(File.exist?("spec/dummy/app/views/defs/edit.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/index.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/new.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_form.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_new_form.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_line.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_list.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_new_button.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_show.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/edit.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/index.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/new.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_form.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_new_form.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_line.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_list.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_new_button.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/_show.erb")).to be(true)
       end
 
 
@@ -141,10 +141,10 @@ describe HotGlue::ScaffoldGenerator do
         rescue StandardError => e
           raise("error building in spec #{e}")
         end
-        expect(File.exist?("spec/dummy/app/views/defs/create.turbo_stream.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/destroy.turbo_stream.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/edit.turbo_stream.haml")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/update.turbo_stream.haml")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/create.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/destroy.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/edit.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/defs/update.turbo_stream.erb")).to be(true)
       end
 
 
@@ -170,20 +170,20 @@ describe HotGlue::ScaffoldGenerator do
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
-      expect(File.exist?("spec/dummy/app/views/hello/defs/edit.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/index.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/new.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_form.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_new_form.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_line.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_list.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_new_button.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_show.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/edit.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/index.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/new.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_form.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_new_form.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_line.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_list.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_new_button.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/_show.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/controllers/hello/defs_controller.rb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/create.turbo_stream.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/destroy.turbo_stream.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/edit.turbo_stream.haml")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/update.turbo_stream.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/create.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/destroy.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/edit.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/defs/update.turbo_stream.erb")).to be(true)
       expect(File.exist?("spec/dummy/spec/system/hello/defs_behavior_spec.rb")).to be(true)
     end
   end
@@ -243,7 +243,7 @@ describe HotGlue::ScaffoldGenerator do
       end
 
       expect(
-        File.read("spec/dummy/app/views/defs/_list.haml") =~ /paginate defs/
+        File.read("spec/dummy/app/views/defs/_list.erb") =~ /paginate defs/
       ).to be(nil)
     end
   end
@@ -256,10 +256,10 @@ describe HotGlue::ScaffoldGenerator do
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
-      expect(File.exist?("spec/dummy/app/views/defs/new.haml")).to be(false)
-      expect(File.exist?("spec/dummy/app/views/defs/_new_form.haml")).to be(false)
-      expect(File.exist?("spec/dummy/app/views/defs/_new_button.haml")).to be(false)
-      expect(File.exist?("spec/dummy/app/viewsdefs/create.turbo_stream.haml")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/defs/new.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/defs/_new_form.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/defs/_new_button.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/viewsdefs/create.turbo_stream.erb")).to be(false)
     end
   end
 
@@ -272,7 +272,7 @@ describe HotGlue::ScaffoldGenerator do
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
-      expect(File.exist?("spec/dummy/app/views/defs/destroy.turbo_stream.haml")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/defs/destroy.turbo_stream.erb")).to be(false)
     end
   end
 
@@ -286,7 +286,7 @@ describe HotGlue::ScaffoldGenerator do
       end
 
       expect(
-        File.read("spec/dummy/app/views/defs/_show.haml") =~ /edit_def_path\(def\), 'data-turbo' => 'false',/
+        File.read("spec/dummy/app/views/defs/_show.erb") =~ /edit_def_path\(def\), 'data-turbo' => 'false',/
       ).to_not be(nil)
     end
   end
@@ -301,7 +301,7 @@ describe HotGlue::ScaffoldGenerator do
       end
 
       expect(
-        File.read("spec/dummy/app/views/defs/_form.haml") =~ /f\.text_field :name/
+        File.read("spec/dummy/app/views/defs/_form.erb") =~ /f\.text_field :name/
       ).to be(nil)
 
     end

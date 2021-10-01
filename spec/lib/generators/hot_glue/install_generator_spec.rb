@@ -18,7 +18,7 @@ describe HotGlue::InstallGenerator do
     it "with missing object name should give error" do
 
       response = Rails::Generators.invoke("hot_glue:install")
-      expect(File.exist?("spec/dummy/app/views/layouts/_flash_notices.haml")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/layouts/_flash_notices.erb")).to be(true)
     end
   end
 end
