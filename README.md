@@ -1,6 +1,6 @@
 
 Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of the admin-interface style scaffolding systems of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold)). 
-![JFB Icon- animated](https://user-images.githubusercontent.com/59002/135549003-2bba0a0d-9f90-417b-bd7a-4dbd12409f50.GIF)
+
 
 Using Turbo-Rails and Hotwire you get a lightning-fast out-of-the-box CRUD building experience. Every page displays only a list view: new and edit operations happen as 'edit-in-place', so the user never leaves the page. 
 
