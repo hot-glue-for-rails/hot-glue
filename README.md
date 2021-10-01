@@ -46,7 +46,15 @@ Instantly get a simple CRUD interface
 
 ## TO INSTALL (RAILS 7)
 
-- TBD
+- Install Turbo `rails turbo:install` (?)
+
+- Add `gem 'hot-glue'` to your Gemfile & `bundle install`
+  `rails generate hot_glue:install --markup=erb`
+
+- Add to your `application.html.erb`
+```
+  <%= render partial: 'layouts/flash_notices' %>
+```
 
 
 ## TO INSTALL (RAILS 6)
@@ -59,14 +67,27 @@ Instantly get a simple CRUD interface
   
 - Add `gem 'hot-glue'` to your Gemfile & `bundle install`
   
-- Run the hot-glue installation with `rails generate hot_glue:install`
+- in `javascript/packs/application.js` remove this line:
+`import Turbolinks from "turbolinks"`
+
+- in the same file (`javascript/packs/application.js`) add this line:
+`import { Turbo } from "@hotwired/turbo-rails"`
+
+- Run the hot-glue install generator 
+
+FOR ERB:
+`rails generate hot_glue:install --markup=erb`
+
+FOR HAML:
+`rails generate hot_glue:install --markup=haml`
 
 - Add to your `application.html.erb`
 ```
   <%= render partial: 'layouts/flash_notices' %>
 ```
 
-- Rspec setup
+
+## Rspec setup
   - add `gem 'rspec-rails'` to your gemfile inside :development and :test
   - add `gem 'factory_bot_rails'` to your gemfile inside :development and :test
   - run `rails generate rspec:install`
@@ -92,12 +113,27 @@ Instantly get a simple CRUD interface
     end
     ```
 
-- Install Bootstrap
-    - Bootstrap with Sprockets (Rails 5 or 7 default — Rails 6 custom)
+## Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY*)
+    - Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
       - use twbs/bootstrap-rubygem gem
       - see README for bootstrap-rubygem to install
-      
-Bootstrap with Webpack RAILS 6 ONLY:
+    - Bootstrap with Webpack for FOR RAILS 7 :
+          
+- add to Gemfile
+- gem 'bootstrap', '~> 5.1.0'
+
+
+- completely delete the file `app/assets/application.css`
+- create new file where it was `app/assets/application.scss` with this contents (do not keep the contents of the old application.css file):
+
+``` 
+// Custom bootstrap variables must be set or imported *before* bootstrap.
+@import "bootstrap";
+```
+
+* You do not need jQuery for HotGlue to work *
+
+### Bootstrap with Webpack RAILS 6 ONLY:
 - change `stylesheet_link_tag` to `stylesheet_pack_tag` in your application layout
   - run `yarn add bootstrap`
   - create a new file at `app/javascript/require_bootstrap.scss` with this content
@@ -110,16 +146,13 @@ Bootstrap with Webpack RAILS 6 ONLY:
     import 'require_bootstrap'
     ```
   
-Bootstrap with Webpack for FOR RAILS 7 :
- -- See this BLOG POST
-https://jasonfleetwoodboldt.com/stepping-up-rails/rails-7-with-webpacker-and-bootstrap/
 
 
 
-- Install Devise or implement your own authentication
+## Install Devise or implement your own authentication
   (or only use --gd mode, see below)
 
-- font-awesome
+## install font-awesome. I recommend https://github.com/tomkra/font_awesome5_rails or https://github.com/FortAwesome/font-awesome-sass
 
 
 ### First Argument
@@ -311,19 +344,28 @@ IMPORTANT: By default, all fields that begin with an underscore (`_`) are automa
 
 I would recommend this for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
 
-### `--god` or `--gd`
+### `stimulus_syntax` (default is false for Rails <=6; true for Rails 7)
 
-Use this flag to create controllers with no root authentication. You can still use an auth_identifier, which can be useful for a meta-leval authentication to the controller.
-
-For example, FOR ADMIN CONTROLLERS ONLY, supply a auth_identifier and use `--god` flag. 
-
-In Gd mode, the objects are loaded directly from the base class (these controllers have full access)
+Your delete buttons will look like so:
 ```
-def load_thing
-    @thing = Thing.find(params[:id])
-end
+    <%= button_to "Delete <i class='fa fa-1x fa-remove'></i>".html_safe, 
+        thing_path(branch), method: :delete, 
+        data: {
+            'controller: 'confirmable', 
+            'confirm-message': 'Are you sure you want to delete Thing?', 
+            'action': 'confirmation#confirm'
+        },  
+        disable_with: "Loading...", class: "delete-branch-button btn btn-primary " %>
+
 
 ```
+
+Your install script will output an additional stimulus controller:
+
+```
+
+```
+
 
 
 ### `--markup` (default: 'erb')
@@ -333,6 +375,21 @@ ERB is default. For HAML, `--markup=haml`.
 
 ## FLAGS (Options with no values)
 These options (flags) also uses `--` syntax but do not take any values. Everything is assumed (default) to be false unless specified.
+
+### `--god` or `--gd`
+
+Use this flag to create controllers with no root authentication. You can still use an auth_identifier, which can be useful for a meta-leval authentication to the controller.
+
+For example, FOR ADMIN CONTROLLERS ONLY, supply a auth_identifier and use `--god` flag.
+
+In Gd mode, the objects are loaded directly from the base class (these controllers have full access)
+```
+def load_thing
+    @thing = Thing.find(params[:id])
+end
+
+```
+
 
 ### `--specs-only`
 
@@ -366,6 +423,8 @@ If you do not want inline editing of your list items but instead to fall back to
 
 
 # VERSION HISTORY
+#### 2021-09-30 - v0.2.3 - fixes ERB output for show-only fields; fixes flash_notices for erb or haml; adds @stimulus_syntax flag for delete confirmations with stimulus
+
 #### 2021-09-27  - v0.2.2 - Fixes some issues with related fields; unlocks Rails 7 in Gemspec file
 
 #### 2021-09-20  - v0.2.1 - Fixes nesting behavior when using gd option
