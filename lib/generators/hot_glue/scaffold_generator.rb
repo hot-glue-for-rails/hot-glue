@@ -286,6 +286,8 @@ module HotGlue
       nil
     end
 
+
+
     def copy_controller_and_spec_files
       @default_colspan = @columns.size
       unless @specs_only
@@ -662,7 +664,7 @@ module HotGlue
     if !@stimulus_syntax
      "{confirm: 'Are you sure?'}"
     else
-     "{controller: 'confirmable', 'confirm-message': \"Are you sure you want to delete \#{ @#{@singular}.#{ display_class } } \", 'action': 'confirmation#confirm'}"
+     "{controller: 'confirmable', 'confirm-message': \"Are you sure you want to delete \#{ #{@singular}.#{ display_class } } \", 'action': 'confirmation#confirm'}"
     end
   end
 
