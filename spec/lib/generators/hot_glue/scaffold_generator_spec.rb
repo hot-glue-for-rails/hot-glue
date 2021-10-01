@@ -27,8 +27,9 @@ describe HotGlue::ScaffoldGenerator do
     FileUtils.rm("spec/dummy/app/controllers/defs_controller.rb") if File.exists?("spec/dummy/app/controllers/defs_controller.rb")
     FileUtils.rm("spec/dummy/app/controllers/hello/defs_controller.rb") if File.exists?("spec/dummy/app/controllers/hello/defs_controller.rb")
     FileUtils.rm_rf('spec/dummy/spec/')
-    FileUtils.rm_rf('spec/dummy/spec/views/hello')
-    FileUtils.rm_rf('spec/dummy/spec/views/xyzs')
+    FileUtils.rm_rf('spec/dummy/app/views/hello/defs')
+    FileUtils.rm_rf('spec/dummy/app/views/xyzs')
+    FileUtils.rm_rf('spec/dummy/app/views/ghis')
 
     remove_dir_with_namespace('spec/dummy/app/views/hello')
     remove_dir_with_namespace('spec/dummy/app/controllers/hello')
