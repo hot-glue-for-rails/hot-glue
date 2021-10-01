@@ -1,4 +1,3 @@
-require 'byebug'
 
 begin
   require 'bundler/setup'
@@ -11,7 +10,7 @@ begin
   RSpec::Core::RakeTask.new(:spec)
   task :default => :spec
 rescue LoadError
-  puts '... unable to load rspec/core/rake_task'
+  puts 'FAILED: unable to load rspec/core/rake_task in Rakefile'
 
 
 end
