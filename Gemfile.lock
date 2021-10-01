@@ -227,5 +227,3 @@ DEPENDENCIES
   rails-controller-testing
   sqlite3
 
-BUNDLED WITH
-   2.2.19
