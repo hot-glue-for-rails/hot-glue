@@ -68,7 +68,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       load_all_<%= plural %>
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to <%= plural %>_path }
+        format.html { redirect_to <%= path_helper_plural %> }
       end
     else
       flash[:alert] = "Oops, your <%= singular_name %> could not be created."
@@ -113,7 +113,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     load_all_<%= plural %>
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_to <%= plural %>_path }
+      format.html { redirect_to <%= path_helper_plural %> }
     end
   end<% end %>
 
