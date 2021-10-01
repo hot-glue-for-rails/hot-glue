@@ -5,7 +5,13 @@
 Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of the admin-interface style scaffolding systems of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold)). 
 
 
-Using Turbo-Rails and Hotwire you get a lightning-fast out-of-the-box CRUD building experience. Every page displays only a list view: new and edit operations happen as 'edit-in-place', so the user never leaves the page. 
+Using Turbo-Rails and Hotwire (default in Rails 7) you get a lightning-fast out-of-the-box CRUD building experience. 
+
+Every page displays only a list view: new and edit operations happen as 'edit-in-place', so the user never leaves the page. 
+
+Because all page navigation is Turbo's responsibilty, everything plugs & plays nicely into a Turbo-backed Rails app. 
+
+Alternatively, you can use this tool to create a Turbo-backed *section* of your Rails app-- like an admin interface -- while still treating the rest of the Rails app as an API or building out other features by hand. 
 
 It will read your relationships and field types to generate your code for you, leaving you with a 'sourdough starter' to work from. If you modify the generated code, you're on your own if you want to preserve your changes and also re-generate scaffold after adding fields. 
 
@@ -353,9 +359,18 @@ IMPORTANT: By default, all fields that begin with an underscore (`_`) are automa
 
 I would recommend this for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
 
-### `stimulus_syntax` (default is false for Rails <=6; true for Rails 7)
+### `--stimulus_syntax=true` or `--stimulus_syntax=false`
+(for Rails <=6, default is false. For Rails 7, default is true.)
 
-Your delete buttons will look like so:
+Stimulus is only used for the delete button's confirmation dialog. 
+
+If you don't have stimulus syntax enabled, your delete buttons have this. This will confirm the delete with a simple alert if you have UJS enabled. 
+
+```
+{confirm: 'Are you sure?'}
+```
+
+If you do have Stimulus syntax enabled, your delete buttons will look like so:
 ```
     <%= button_to "Delete <i class='fa fa-1x fa-remove'></i>".html_safe, 
         thing_path(branch), method: :delete, 
@@ -365,8 +380,6 @@ Your delete buttons will look like so:
             'action': 'confirmation#confirm'
         },  
         disable_with: "Loading...", class: "delete-branch-button btn btn-primary " %>
-
-
 ```
 
 Your install script will output an additional stimulus controller:
@@ -427,6 +440,12 @@ Omits delete action.
 
 If you do not want inline editing of your list items but instead to fall back to old fashioned new page behavior for your edit views, use `--big-edit`.
 
+
+## Automatic Base Controller
+
+HotGlue will copy a file named base_controller.rb to the same folder where it tries to create any controller, unless such a file exists there already.
+
+Obviously, the created controller will always have this base controller as its subclass. In this way, you are encouraged to implement functionality common to the *namespace* (shared between the controllers in the namespace), using this technique.
 
 
 
