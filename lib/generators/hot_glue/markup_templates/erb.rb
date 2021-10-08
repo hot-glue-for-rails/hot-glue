@@ -19,7 +19,6 @@ module  HotGlue
 
 
     def all_form_fields(*args)
-
       columns = args[0][:columns]
       show_only = args[0][:show_only]
       singular_class = args[0][:singular_class]
@@ -113,7 +112,14 @@ module  HotGlue
               "  <%= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '') %>\n" +
               "  <%= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1') %>\n" +
             "</div>"
+          when :enum
+            enum_name ="enum_name"
+            "<div class='#{col_identifier} form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s}) %>' >
+<%= f.collection_select(:#{col.to_s},  enum_to_collection_select( #{singular_class}.defined_enums['#{col.to_s}']), :key, :value, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
+<label class='small form-text text-muted'>#{col.to_s.humanize}</label></div>"
+
           end
+
         end
       }.join("\n")
       return res
@@ -214,6 +220,14 @@ module  HotGlue
     YES
   <% else %>
     NO
+  <% end %>
+</div>
+"        when :enum
+                                                                                                         "<div class='#{col_identifer}'>
+  <% if #{singular}.#{col}.nil? %>
+      <span class='alert-danger'>MISSING</span>
+  <% else %>
+    <%=  #{singular}.#{col} %>
   <% end %>
 </div>
 "
