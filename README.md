@@ -447,10 +447,30 @@ HotGlue will copy a file named base_controller.rb to the same folder where it tr
 
 Obviously, the created controller will always have this base controller as its subclass. In this way, you are encouraged to implement functionality common to the *namespace* (shared between the controllers in the namespace), using this technique.
 
+## Field Types Supported
+
+- Integers that don't end with `_id`, they will be displayed as text fields.
+- Integers that do end with `_id` will be treated automatically as associations. You should have a Rails association defined. (Hot Glue will warn you if it can't find one.)
+- String*
+- Text*
+- Float*
+- Datetime
+- Date (TOOD: implement this)
+- Time (TOOD: implement this)
+- Boolean 
+- Enum - will be magically displayed as a value list populated from the enum list defined on your model. see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
+    
+* shows in a size-aware container, i.e. in a bigger box if the field allows for more content
 
 
 
 # VERSION HISTORY
+
+#### 2021-10-07 - v0.2.4 - removes erroneous icons display in delete buttos (these don't work inside of button_to); 
+                            - adds support for ENUM types direclty on your field types
+                            - you  must use activerecord-pgenum
+                            - see my blog post at https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
+
 #### 2021-09-30 - v0.2.3 - fixes ERB output for show-only fields; fixes flash_notices for erb or haml; adds @stimulus_syntax flag for delete confirmations with stimulus
 
 #### 2021-09-27  - v0.2.2 - Fixes some issues with related fields; unlocks Rails 7 in Gemspec file
