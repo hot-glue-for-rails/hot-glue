@@ -54,10 +54,12 @@ module HotGlue
         else
           server_timezone
         end
-      elsif defined?(controller) == "method"
-        # controller.try(:current_timezone)
-      elsif self.class.ancestors.include?(ApplicationController)
-        self.try(:current_timezone)
+      elsif true
+        server_timezone
+      # elsif defined?(controller) == "method"
+      #   # controller.try(:current_timezone)
+      # elsif self.class.ancestors.include?(ApplicationController)
+      #   self.try(:current_timezone)
       else
         raise "no method current_user is available; please implement/override the method current_timezone IN YOUR CONTROLLER"
       end

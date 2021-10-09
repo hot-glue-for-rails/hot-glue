@@ -4,7 +4,41 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   include HotGlue::ControllerHelper
   <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
 
-  let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %><% if (eval(@singular_class).instance_methods.include?(display_class.to_s))  %>, <%= display_class %>: FFaker::Name.name  <% end %> )}
+  <% item1_addOns = ""
+   if (eval(@singular_class).instance_methods.include?(display_class.to_s))
+    item1_addOns << "#{display_class}: FFaker::Name.name  "
+   end
+
+item1_addOns << ", " + @columns.map { |col|
+  type = eval("#{singular_class}.columns_hash['#{col}']").type
+  case type
+  when :string
+    "#{col}: FFaker::Movie.title"
+  when :text
+    "#{col}:  FFaker::Lorem.paragraphs(10).join("  ")"
+
+  when :float
+    "#{col}: rand(1)*10000"
+  when :boolean
+    "#{col}: !!rand(2).floor"
+  when :time
+    "#{col}: Time.current + rand(5000).seconds"
+  when :date
+    "#{col}: Date.current + rand(50).days"
+  when :datetime
+    "#{col}: DateTime.current + rand(1000).seconds"
+  when :integer
+    if col.to_s.ends_with?("_id")
+      # shoould the assoication be on here
+    else
+     "#{col}: rand(100)"
+    end
+  end
+
+}.compact.join(", \n      ")
+  %>
+
+  let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )}
   let!(:<%= singular %>2) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
   let!(:<%= singular %>3) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
 
@@ -20,19 +54,12 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   describe "index" do
     it "should show me the list" do
       visit <%= path_helper_plural %>
-
 <%=
 @columns.map { |col|
   type = eval("#{singular_class}.columns_hash['#{col}']").type
-  # limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-  # sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
-  #
-
   case type
   when :datetime
-
     "      " + ["expect(page).to have_content(#{singular}#{1}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(current_timezone)  )"].join("\n      ")
-
   when :integer
     if !col.ends_with?("_id")
       "      " + ["expect(page).to have_content(#{singular}#{1}.#{col})"].join("\n      ")
@@ -40,9 +67,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   end
 
 }.join("\n")
-     
       %>
-
     end
   end
 
@@ -55,17 +80,24 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
 <%=
   @columns.map { |col|
     type = eval("#{singular_class}.columns_hash['#{col}']").type
-    # limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-    # sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
-    #
-
     case type
     when :datetime
+      "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
+      '      ' + "find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+
     when :integer
-      "      " + 'find("input#' + singular + '_' + col.to_s + '").fill_in(with: rand(10))'
+
+      if col.to_s.ends_with?("_id")
+        # shoould the assoication be on here
+      else
+        "      new_#{col} = rand(10) \n" +
+        "      find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+
+      end
+
     else
       "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
-      '      ' + 'find("input#' + singular + '_' + col.to_s + '").fill_in(with: new_' + col.to_s + ')'
+      "      find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
     end
 
   }.join("\n")
@@ -80,7 +112,13 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
 
     case type
     when :datetime
+       "expect(page).to have_content(new_#{col})"
     when :integer
+      if col.to_s.ends_with?("_id")
+        # shoould the assoication be on here
+      else
+         "expect(page).to have_content(new_#{col})"
+      end
     else
       "expect(page).to have_content(new_#{col})"
     end
