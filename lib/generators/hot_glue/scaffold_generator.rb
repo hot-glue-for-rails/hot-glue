@@ -106,7 +106,7 @@ module HotGlue
       @singular = args.first.tableize.singularize # should be in form hello_world
       @plural = options['plural'] || @singular + "s" # supply to override; leave blank to use default
       @auth = options['auth'] || "current_user"
-      @auth_identifier = options['auth_identifier'] || (!@auth.nil? && @auth.gsub("current_", "")) || nil
+      @auth_identifier = options['auth_identifier'] || (! @god && @auth.gsub("current_", "")) || nil
 
 
       @nest = (!options['nest'].empty? && options['nest']) || nil

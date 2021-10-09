@@ -8,14 +8,7 @@
       <\%= render(partial: "#{controller.namespace}errors", locals: {resource: @<%= singular%> }) %>
     <\% end %>
 
-    <h2>Editing</h2>
-    <% if eval("@" + singular).try(:to_label) %>
-    <%="@" + singular%>.to_label
-    <%  elsif eval("@" + singular).try(:name)  %>
-   <%="@" + singular%>.name %>
-    <% else %>
-    (no name)
-      <% end %>
+    <h2>Editing <\%= @<%= @singular %>.<%= display_class %> %></h2>
     <\%= form_with model: <%= "@" + singular%>, url: <%= path_helper_singular %>(<%= path_arity %>) do |f| %>
     <\%=  render partial: "form",  locals: {:<%=  singular  %> => <%= "@" + singular%>, f: f} %>
     <\% end %>

@@ -2,17 +2,20 @@ require 'rails_helper'
 
 describe "interaction for <%= controller_class_name %>", type: :feature do
   include HotGlue::ControllerHelper
-  <% unless @auth.nil? %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
+  <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
 
-  let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
+  let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %><% if (eval(@singular_class).instance_methods.include?(display_class.to_s))  %>, <%= display_class %>: FFaker::Name.name  <% end %> )}
   let!(:<%= singular %>2) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
   let!(:<%= singular %>3) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
 
   <%= objest_nest_factory_setup %>
 
+
+  <% unless @god %>
   before(:each) do
     login_as(<%= @auth %>)
   end
+  <% end %>
 
   describe "index" do
     it "should show me the list" do
@@ -27,11 +30,13 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
 
   case type
   when :datetime
-    "      " + ["expect(page).to have_content(#{singular}#{rand(3)+1}.#{col}.in_time_zone(#{ @auth }.timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(#{ @auth }.timezone)  )"].join("\n      ")
 
-  else
-    "      " + ["expect(page).to have_content(#{singular}#{rand(3)+1}.#{col})"].join("\n      ")
+    "      " + ["expect(page).to have_content(#{singular}#{1}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(current_timezone)  )"].join("\n      ")
 
+  when :integer
+    if !col.ends_with?("_id")
+      "      " + ["expect(page).to have_content(#{singular}#{1}.#{col})"].join("\n      ")
+    end
   end
 
 }.join("\n")
@@ -98,7 +103,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       visit <%= path_helper_plural %>
       find("a.edit-<%= singular %>-button[href='/<%= namespace_with_slash %><%= plural %>/#{<%= singular %>1.id}/edit']").click
 
-      expect(page).to have_content("Editing #{<%= singular %>.<%= "abc" %>}")
+      expect(page).to have_content("Editing #{<%= singular %>1.<%= @display_class  %> || "(no name)"}")
 <%=
     @columns.map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
@@ -107,9 +112,9 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       when :datetime
       when :integer
       else
-        "      " + "new_#{col.to_s} = Faker::Name.new \n" +
+        "      " + "new_#{col.to_s} = FFaker::Name.name \n" +
 
-        '      find("input[name=\'' + singular + '[' + col.to_s + ']\'").fill_in(with: new_' + col.to_s + ')'
+        '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
 
       end
     }.join("\n")
@@ -137,10 +142,12 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   describe "destroy" do
     it "should destroy" do
       visit <%= path_helper_plural %>
-      accept_alert do
-        find("a.delete-<%= singular %>-button[href='<%= namespace_with_dash %>/<%= plural %>/#{<%= singular %>1.id}']").click
-      end
-      expect(page).to_not have_content(<%= singular %>1.email)
+      #accept_alert do
+      # find("form[action='<%= namespace_with_dash %>/<%= plural %>/#{<%= singular %>1.id}'] > button.delete-<%= singular %>-button").click
+      #end
+      find("form[action='<%= namespace_with_dash %>/<%= plural %>/#{<%= singular %>1.id}'] > button.delete-<%= singular %>-button").click
+
+      expect(page).to_not have_content(<%= singular %>1.<%= @display_class %>)
       expect(<%= singular_class %>.where(id: <%= singular %>1.id).count).to eq(0)
     end
   end

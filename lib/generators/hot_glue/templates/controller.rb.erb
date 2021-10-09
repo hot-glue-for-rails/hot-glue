@@ -1,5 +1,5 @@
 class <%= controller_class_name %> < <%= controller_descends_from %>
-<% unless @auth_identifier == '' || @auth.nil? %>before_action :authenticate_<%= @auth_identifier %>!<% end %>
+<% unless @auth_identifier == '' || @god %>before_action :authenticate_<%= @auth_identifier %>!<% end %>
 
   <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
     this_scope =   nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "#{nest_chain.last}.#{arg}s"
@@ -49,7 +49,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     end
   end
 
-<% if create_action %>  def new <% if !@auth.nil? %>
+<% if create_action %>  def new <% if ! @god %>
     @<%= singular_name %> = <%= class_name  %>.new(<%= @object_owner_sym %>: <%= @object_owner_eval %>)
    <% else %>
     @<%= singular_name %> = <%= class_name  %>.new

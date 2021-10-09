@@ -105,6 +105,11 @@ FOR HAML:
 ## Rspec setup
   - add `gem 'rspec-rails'` to your gemfile inside :development and :test
   - add `gem 'factory_bot_rails'` to your gemfile inside :development and :test
+  - more info:
+      https://github.com/thoughtbot/factory_bot/blob/master/GETTING_STARTED.md#rspec
+
+  - add `gem 'ffaker'` to your Gemfile inside the  :development and :test groups
+  - 
   - run `rails generate rspec:install`
   - configure Rspec to work with Factory Bot inside of `rails_helper.rb`
     ```
@@ -113,8 +118,29 @@ FOR HAML:
         config.include FactoryBot::Syntax::Methods
     end
     ```  
-  more info:
-  https://github.com/thoughtbot/factory_bot/blob/master/GETTING_STARTED.md#rspec
+    
+  - add to rails_helper.rb (inside the existing Rspec.configure block)
+  -  ````
+config.include FactoryBot::Syntax::Methods
+````
+  - also add to rails_helper.rb (outside of the Rspec.configure block)
+    ```
+    Capybara.register_driver :headless_chrome_desktop do |app|
+      options = Selenium::WebDriver::Chrome::Options.new
+      options.add_argument('--headless')
+      options.add_argument('--disable-gpu')
+      options.add_argument('--window-size=1280,1200')
+    
+      driver = Capybara::Selenium::Driver.new(app,
+                                              browser: :chrome,
+                                              options: options)
+    
+      driver
+    end
+    Capybara.default_driver = :headless_chrome_desktop
+    
+    ```
+    
 
   - for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
     ```
