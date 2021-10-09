@@ -11,6 +11,20 @@ module  HotGlue
       "</div>"
     end
 
+
+    def text_area_output(col, field_length, col_identifier )
+      lines = field_length % 40
+      if lines > 5
+        lines = 5
+      end
+
+      "<div class=\"#{col_identifier} form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\">"
+      "<%= f.text_area :#{col.to_s}, class: 'form-control', cols: 40, rows: '#{lines}' %>" +
+        "<label class='form-text'>#{col.to_s.humanize}</label>"+
+        "</div>"
+
+    end
+
     def list_column_headings(*args)
       columns = args[0][:columns]
 
