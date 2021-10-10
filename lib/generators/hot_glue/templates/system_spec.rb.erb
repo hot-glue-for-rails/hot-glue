@@ -3,13 +3,24 @@ require 'rails_helper'
 describe "interaction for <%= controller_class_name %>", type: :feature do
   include HotGlue::ControllerHelper
   <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
-
+    <%= @columns.map { |col|
+      type = eval("#{singular_class}.columns_hash['#{col}']").type
+      case type
+      when :integer
+        if col.to_s.ends_with?("_id")
+          assoc = "#{col.to_s.gsub('_id','')}"
+          "let!(:#{assoc}1) {create(:#{assoc}, name: FFaker::Name.name)}"
+        end
+      else
+      end
+    }.compact.join("\n")
+          %>
   <% item1_addOns = ""
    if (eval(@singular_class).instance_methods.include?(display_class.to_s))
-    item1_addOns << "#{display_class}: FFaker::Name.name  "
+    item1_addOns << "#{display_class}: FFaker::Name.name"
    end
 
-item1_addOns << ", " + @columns.map { |col|
+  item1_addOns << ", " + @columns.map { |col|
   type = eval("#{singular_class}.columns_hash['#{col}']").type
   case type
   when :string
@@ -88,13 +99,17 @@ item1_addOns << ", " + @columns.map { |col|
     when :integer
 
       if col.to_s.ends_with?("_id")
-        # shoould the assoication be on here
+        assoc = col.to_s.gsub('_id','')
+        "      #{col}_selector = find(\"[name='#{singular}[#{col}]']\").click \n" +
+        "      #{col}_selector.first('option', text: #{assoc}1.name).select_option"
       else
         "      new_#{col} = rand(10) \n" +
         "      find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
 
       end
-
+    when :boolean
+      "     new_#{col} = rand(2).floor \n" +
+      "     find(\"[name='#{singular}[#{col}]'][value='\#{new_" + col.to_s + "}']\").choose"
     else
       "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
       "      find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
@@ -112,15 +127,18 @@ item1_addOns << ", " + @columns.map { |col|
 
     case type
     when :datetime
-       "expect(page).to have_content(new_#{col})"
+         "      expect(page).to have_content(new_#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y')  + \" @ \" +
+      new_#{col}.in_time_zone(current_timezone).strftime('%l').strip + \":\" +
+      new_#{col}.in_time_zone(current_timezone).strftime('%M %p').strip + \" \" +
+      timezonize(current_timezone))"
     when :integer
       if col.to_s.ends_with?("_id")
         # shoould the assoication be on here
       else
-         "expect(page).to have_content(new_#{col})"
+         "      expect(page).to have_content(new_#{col})"
       end
     else
-      "expect(page).to have_content(new_#{col})"
+      "      expect(page).to have_content(new_#{col})"
     end
 
   }.join("\n")
@@ -145,13 +163,45 @@ item1_addOns << ", " + @columns.map { |col|
 <%=
     @columns.map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
+      limit = eval("#{singular_class}.columns_hash['#{col}']").limit
 
       case type
       when :datetime
       when :integer
+        if !col.to_s.ends_with?("_id")
+            "     new_#{col} = rand(10000).floor \n" +
+            "     find(\"[name='#{singular}[#{col}]']\").fill_in(with: new_#{col.to_s})"
+        end
+      when :text
+        if limit <= 256
+            "      " + "new_#{col.to_s} = FFaker::Name.name \n" +
+            '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
+        else
+            "      " + "new_#{col.to_s} = FFaker::Lorem.paragraphs(3).join \n" +
+            '      find("textarea[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
+        end
+      when :string
+        if limit <= 256
+            "      " + "new_#{col.to_s} = FFaker::Name.name \n" +
+            '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
+        else
+            "      " + "new_#{col.to_s} = FFaker::Lorem.paragraphs(1).join \n" +
+            '      find("textarea[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
+        end
+      when :boolean
+          "     new_#{col} = rand(2).floor \n" +
+          "     find(\"[name='#{singular}[#{col}]'][value='\#{new_#{col}}']\").choose"
+      when :float
+        "     new_#{col} = rand(1)*5000 \n" +
+        "     find(\"[name='#{singular}[#{col}]']\").fill_in(with: new_#{col.to_s })"
+      when :date
+        "     new_#{col} = Date.current + rand(100).days \n" +
+        "     find(\"[name='#{singular}[#{col}]']\").fill_in(with: new_#{col.to_s })"
+      when :time
+        "     new_#{col} = Time.current + rand(144).hours \n" +
+        "     find(\"[name='#{singular}[#{col}]']\").fill_in(with: new_#{col.to_s })"
       else
         "      " + "new_#{col.to_s} = FFaker::Name.name \n" +
-
         '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
 
       end
@@ -166,11 +216,19 @@ item1_addOns << ", " + @columns.map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
       case type
       when :datetime
-      when :integer
+        # TODO: implement me
+      when :time
+        # TODO: implement me
+      when :date
+        # TODO: implement me
+      when :boolean
+        # TODO: implement me
       else
+        unless type==:integer && col.to_s.ends_with?("_id")
         '        expect(page).to have_content(new_' + col.to_s + ')'
+        end
       end
-    }.join("\n")
+    }.compact.join("\n")
     %>
 
       end
