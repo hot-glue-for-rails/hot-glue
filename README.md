@@ -492,6 +492,12 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
+#### 2021-10-09 - v-0.2.5 - this version is all about developer happyness:
+                            - significant fixes for the behavioral (system) specs. they now create new & update interactions
+                            for (almost) all field types
+                            - the install generator now checks your layouts/application.html.erb for `render partial: 'layouts/flash_messages' ` and adds it if it isn't there already
+                            - the install generator also checks your spec/rails_helper for `config.include FactoryBot::Syntax::Methods` and adds it at the top of the Rspec configure block if it isn't there
+
 #### 2021-10-07 - v0.2.4 - removes erroneous icons display in delete buttos (these don't work inside of button_to); 
                             - adds support for ENUM types direclty on your field types
                             - you  must use activerecord-pgenum
