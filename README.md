@@ -56,13 +56,6 @@ Instantly get a simple CRUD interface
 
 ## TO INSTALL (RAILS 7)
 
-- Install Turbo `rails turbo:install` (?)
-
-- Add `gem 'hot-glue'` to your Gemfile
-- `bundle install`
-- `rails generate hot_glue:install --markup=erb` for ERB
-- or `rails generate hot_glue:install --markup=haml` for HAML
-
 - Add to your `application.html.erb`
 ```
   <%= render partial: 'layouts/flash_notices' %>
@@ -72,58 +65,67 @@ Instantly get a simple CRUD interface
     = render partial: 'layouts/flash_notices' 
 ```
 
-## TO INSTALL (RAILS 6)
-
-- Add `gem 'turbo-rails'` to your Gemfile & `bundle install`
-  
+## TURBO-RAILS SETUP (SKIP FOR RAILS 7)
+- Add `gem 'turbo-rails'` to your Gemfile & `bundle install` 
 - Then install it with `rails turbo:install`
-
 - The Turbo install has switched your action cable settings from 'async' to Redis, so be sure to start a redis server
-  
+
+
+
+## ADD HOT-GLUE GEM
 - Add `gem 'hot-glue'` to your Gemfile & `bundle install`
-  
-- in `javascript/packs/application.js` remove this line:
-`import Turbolinks from "turbolinks"`
 
-- in the same file (`javascript/packs/application.js`) add this line:
-`import { Turbo } from "@hotwired/turbo-rails"`
+## ADD RSPEC, FACTORY-BOT, AND FFAKER
+- add `gem 'rspec-rails'` to your gemfile inside :development and :test
+- add `gem 'factory_bot_rails'` to your gemfile inside :development and :test
+- add `gem 'ffaker'` to your Gemfile inside the  :development and :test groups
 
-- Run the hot-glue install generator 
+## RUN THE RSPEC INSTALLER
+- run `rails generate rspec:install`
 
-FOR ERB:
+## RUN HOT-GLUE INSTALL
+### FOR ERB:
 `rails generate hot_glue:install --markup=erb`
 
-FOR HAML:
+### FOR HAML:
 `rails generate hot_glue:install --markup=haml`
 
-- Add to your `application.html.erb`
+## Modify `application.html.erb` (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
+Note: if you have some kind of non-standard application layout, like one at a different file
+or if you have modified your opening <body> tag, this may not have been automatically applied by the installer.
+
+- This was added to your `application.html.erb`
 ```
   <%= render partial: 'layouts/flash_notices' %>
 ```
 
+## Modify `rails_helper.rb` (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
+## Rspec setup for Factorybot
+Note: if you have some kind of non-standard rails_helper.rb, like without using the standard ` do |config|` syntax after your `RSpec.configure` 
+this may not have been automatically applied by the installer.
 
-## Rspec setup
-  - add `gem 'rspec-rails'` to your gemfile inside :development and :test
-  - add `gem 'factory_bot_rails'` to your gemfile inside :development and :test
-  - more info:
-      https://github.com/thoughtbot/factory_bot/blob/master/GETTING_STARTED.md#rspec
+- configure Rspec to work with Factory Bot inside of `rails_helper.rb`
+  ```
+  RSpec.configure do |config|
+      // ... more rspec configuration (not shown)
+      config.include FactoryBot::Syntax::Methods
+  end
+  ```  
 
-  - add `gem 'ffaker'` to your Gemfile inside the  :development and :test groups
-  - 
-  - run `rails generate rspec:install`
-  - configure Rspec to work with Factory Bot inside of `rails_helper.rb`
-    ```
-    RSpec.configure do |config|
-        // ... more rspec configuration (not shown)
-        config.include FactoryBot::Syntax::Methods
-    end
-    ```  
-    
+
+## (FOR RAILS 6 SWITCHING TO HOTWIRE ONLY)
+- in `javascript/packs/application.js` remove this line:
+`import Turbolinks from "turbolinks"`
+- in the same file (`javascript/packs/application.js`) add this line:
+`import { Turbo } from "@hotwired/turbo-rails"`
+
+  
+## RSPEC SELENIUM SETUP (OPTIONAL)    
   - add to rails_helper.rb (inside the existing Rspec.configure block)
   -  ````
 config.include FactoryBot::Syntax::Methods
 ````
-  - also add to rails_helper.rb (outside of the Rspec.configure block)
+  -  add to rails_helper.rb (outside of the Rspec.configure block)
     ```
     Capybara.register_driver :headless_chrome_desktop do |app|
       options = Selenium::WebDriver::Chrome::Options.new
@@ -141,6 +143,7 @@ config.include FactoryBot::Syntax::Methods
     
     ```
     
+## Add User Authentication if you are using Access Control
 
   - for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
     ```
@@ -154,12 +157,18 @@ config.include FactoryBot::Syntax::Methods
     end
     ```
 
-## Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY*)
+## Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY)
+
 Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
-      - use twbs/bootstrap-rubygem gem
-      - see README for bootstrap-rubygem to install
-Bootstrap with Webpack for FOR RAILS 7 :
-          
+- add `gem 'bootstrap-rubygem' to your gemfile
+- replace `application.css` with a new file (delete old contents) `application.scss`
+```
+import @bootstrap;
+```
+- see README at github.com/twbs/bootstrap-rubygem to install
+
+
+## Bootstrap with Webpack for FOR RAILS 7 ONLY :    
 - add to Gemfile
 - gem 'bootstrap', '~> 5.1.0'
 
@@ -174,7 +183,7 @@ Bootstrap with Webpack for FOR RAILS 7 :
 
 * You do not need jQuery for HotGlue to work *
 
-### Bootstrap with Webpack RAILS 6 ONLY:
+## Bootstrap with Webpack RAILS 6 ONLY:
 - change `stylesheet_link_tag` to `stylesheet_pack_tag` in your application layout
   - run `yarn add bootstrap`
   - create a new file at `app/javascript/require_bootstrap.scss` with this content
@@ -186,14 +195,21 @@ Bootstrap with Webpack for FOR RAILS 7 :
     ```
     import 'require_bootstrap'
     ```
+
+## RAILS 6 ONLY : Install Deviseor implement your own authentication
+  Add to your Gemfile `gem 'devise'`
   
-
-
-
-## Install Devise or implement your own authentication
   (or only use --gd mode, see below)
+  
+## RAILS 7: Devise is not yet supported on Rails 7
 
-## install font-awesome. I recommend https://github.com/tomkra/font_awesome5_rails or https://github.com/FortAwesome/font-awesome-sass
+
+## install font-awesome
+
+I recommend https://github.com/tomkra/font_awesome5_rails 
+or https://github.com/FortAwesome/font-awesome-sass
+
+
 
 
 ### First Argument
@@ -492,7 +508,7 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
-#### 2021-10-09 - v-0.2.5 - this version is all about developer happyness:
+#### 2021-10-10 - v-0.2.5 - this version is all about developer happyness:
                             - significant fixes for the behavioral (system) specs. they now create new & update interactions
                             for (almost) all field types
                             - the install generator now checks your layouts/application.html.erb for `render partial: 'layouts/flash_messages' ` and adds it if it isn't there already
