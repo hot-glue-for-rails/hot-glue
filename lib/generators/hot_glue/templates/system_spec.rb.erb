@@ -157,12 +157,13 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
             "     find(\"[name='#{singular}[#{col}]']\").fill_in(with: new_#{col.to_s})"
         end
       when :text
-        if limit <= 256
-            "      " + "new_#{col.to_s} = FFaker::Name.name \n" +
-            '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
-        else
+        if sql_type == "text"
             "      " + "new_#{col.to_s} = FFaker::Lorem.paragraphs(3).join \n" +
             '      find("textarea[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
+
+        else # unreachable?
+            "      " + "new_#{col.to_s} = FFaker::Name.name \n" +
+            '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
         end
       when :string
         if sql_type == "varchar"
@@ -170,7 +171,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
             '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
         else
             "      " + "new_#{col.to_s} = FFaker::Lorem.paragraphs(1).join \n" +
-            '      find("textarea[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
+            '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
         end
       when :boolean
           "     new_#{col} = rand(2).floor \n" +

@@ -84,19 +84,17 @@ module  HotGlue
 
             end
           when :string
-            limit ||= 256
-            if limit <= 256
-              field_output(col, nil, limit, col_identifier)
+            if sql_type == "varchar" || sql_type == "character varying"
+              field_output(col, nil, limit || 40, col_identifier)
             else
-              text_area_output(col, limit, col_identifier)
+              text_area_output(col, 65536, col_identifier)
             end
 
           when :text
-            limit ||= 256
-            if limit <= 256
+            if sql_type == "varchar"
               field_output(col, nil, limit, col_identifier)
             else
-              text_area_output(col, limit, col_identifier)
+              text_area_output(col, 65536, col_identifier)
             end
           when :float
             limit ||= 256
