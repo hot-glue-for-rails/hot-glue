@@ -159,7 +159,7 @@ By default, the installer should have added this option to your `rails_helper.rb
 Capybara.default_driver = :selenium_chrome_headless 
 ```
 
-Alternatively, can define your own driver like so: 
+Alternatively, can define your own driver like so:
 
   ```
   Capybara.register_driver :my_headless_chrome_desktop do |app|
@@ -179,18 +179,21 @@ Alternatively, can define your own driver like so:
   ```
     
 ## Add User Authentication if you are using Access Control
+(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
 
   - for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
-    ```
-    def login_as(account)
-      visit '/accounts/sign_in'
-      within("#new_account") do
-      fill_in 'Email', with: account.email
-      fill_in 'Password', with: 'password'
-      end
-      click_button 'Log in'
-    end
-    ```
+  - in the default code, the devise login would be for an object called account and lives at the route `/accounts/sign_in`
+  - modify the generated code (it was installed by the installed) for your devise login
+     ```
+     def login_as(account)
+       visit '/accounts/sign_in'
+       within("#new_account") do
+       fill_in 'Email', with: account.email
+       fill_in 'Password', with: 'password'
+       end
+       click_button 'Log in'
+     end
+     ```
 
 ## Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY)
 
