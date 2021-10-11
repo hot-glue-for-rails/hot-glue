@@ -120,9 +120,9 @@ or if you have modified your opening <body> tag, this may not have been automati
   <%= render partial: 'layouts/flash_notices' %>
 ```
 
-## Modify `rails_helper.rb` (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
-## Rspec setup for Factorybot
-Note: if you have some kind of non-standard rails_helper.rb, like without using the standard ` do |config|` syntax after your `RSpec.configure` 
+## Modify `rails_helper.rb` 
+(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
+Note: if you have some kind of non-standard rails_helper.rb, like one that does not use the standard ` do |config|` syntax after your `RSpec.configure` 
 this may not have been automatically applied by the installer.
 
 - configure Rspec to work with Factory Bot inside of `rails_helper.rb`
@@ -134,10 +134,35 @@ this may not have been automatically applied by the installer.
   ```  
 
 
-## RSPEC SELENIUM SETUP (OPTIONAL)    
-- add to rails_helper.rb (outside of the Rspec.configure block)
+## CAPYBARA: SWITCH FROM RACK-TEST TO HEADLESS CHROME
+(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
+
+- By default Capybara is installed with :rack_test as its driver.
+- This does not support Javascript, and the code from Hot Glue IS NOT fallback compatible-- it will not work on non-Javascript browsers.
+- From the [Capybara docs](https://github.com/teamcapybara/capybara#drivers):
+```
+By default, Capybara uses the :rack_test driver, which is fast but limited: it does not support JavaScript
+```
+
+- To fix this, you must switch to a Javascript-supporting Capybara driver. You can choose one of:
+- 
+```
+Capybara.default_driver = :selenium 
+```
+
+```
+Capybara.default_driver = :selenium_chrome 
+```
+By default, the installer should have added this option to your `rails_helper.rb` file:
+
+```
+Capybara.default_driver = :selenium_chrome_headless 
+```
+
+Alternatively, can define your own driver like so: 
+
   ```
-  Capybara.register_driver :headless_chrome_desktop do |app|
+  Capybara.register_driver :my_headless_chrome_desktop do |app|
     options = Selenium::WebDriver::Chrome::Options.new
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
@@ -149,9 +174,9 @@ this may not have been automatically applied by the installer.
     
     driver
   end
-  Capybara.default_driver = :headless_chrome_desktop
+  Capybara.default_driver = :my_headless_chrome_desktop
     
-    ```
+  ```
     
 ## Add User Authentication if you are using Access Control
 

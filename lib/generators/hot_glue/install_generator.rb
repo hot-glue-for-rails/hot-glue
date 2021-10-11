@@ -38,7 +38,13 @@ module HotGlue
 
       end
 
+
       rails_helper_contents = File.read("spec/rails_helper.rb")
+      if !rails_helper_contents.include?("Capybara.default_driver =")
+        rails_helper_contents << "\nCapybara.default_driver = :selenium_chrome_headless "
+        puts "  HOTGLUE --> added to spec/rails_helper.rb: `Capybara.default_driver = :selenium_chrome_headless`  "
+      end
+
       if !rails_helper_contents.include?("include FactoryBot::Syntax::Methods")
         rails_helper_contents.gsub!("RSpec.configure do |config|", "RSpec.configure do |config| \n
   config.include FactoryBot::Syntax::Methods
