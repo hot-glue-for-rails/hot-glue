@@ -54,31 +54,25 @@ Instantly get a simple CRUD interface
 
 ![hot-glue-4](https://user-images.githubusercontent.com/59002/116405517-c2b2e300-a7fd-11eb-8423-d43e3afc9fa6.gif)
 
-## TO INSTALL (RAILS 7)
 
-- Add to your `application.html.erb`
+## ADD HOTWIRE
 ```
-  <%= render partial: 'layouts/flash_notices' %>
+yarn add @hotwired/turbo-rails
 ```
-- Or for Haml add to your `application.haml`
-```
-    = render partial: 'layouts/flash_notices' 
-```
-
-## TURBO-RAILS SETUP (SKIP FOR RAILS 7)
-- Add `gem 'turbo-rails'` to your Gemfile & `bundle install` 
-- Then install it with `rails turbo:install`
-- The Turbo install has switched your action cable settings from 'async' to Redis, so be sure to start a redis server
-
-
+or `npm install @hotwired/turbo-rails`
 
 ## ADD HOT-GLUE GEM
 - Add `gem 'hot-glue'` to your Gemfile & `bundle install`
 
 ## ADD RSPEC, FACTORY-BOT, AND FFAKER
-- add `gem 'rspec-rails'` to your gemfile inside :development and :test
-- add `gem 'factory_bot_rails'` to your gemfile inside :development and :test
-- add `gem 'ffaker'` to your Gemfile inside the  :development and :test groups
+
+add these 3 gems to your gemfile inside :development and :test groups
+```
+gem 'rspec-rails'
+gem 'factory_bot_rails'
+gem 'ffaker'
+```
+
 
 ## RUN THE RSPEC INSTALLER
 - run `rails generate rspec:install`
@@ -90,7 +84,34 @@ Instantly get a simple CRUD interface
 ### FOR HAML:
 `rails generate hot_glue:install --markup=haml`
 
-## Modify `application.html.erb` (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
+
+## FOR RAILS 6 ONLY: SWITCH FROM TurblLinks to Turbo-Rails  (SKIP THIS STEP FOR RAILS 7)
+(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
+- Add `gem 'turbo-rails'` to your Gemfile & `bundle install`
+- Then install it with `rails turbo:install`
+- The Turbo install has switched your action cable settings from 'async' to Redis, so be sure to start a redis server
+- in `app/javascript/packs/application.js` remove this line
+```
+import Turbolinks from "turbolinks"
+```
+and replace it with
+```
+import { Turbo } from "@hotwired/turbo-rails"
+```
+
+
+Also replace
+``` 
+Turbolinks.start()
+```
+with:
+```
+Turbo.start()
+```
+
+
+## Modify `application.html.erb` 
+(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
 Note: if you have some kind of non-standard application layout, like one at a different file
 or if you have modified your opening <body> tag, this may not have been automatically applied by the installer.
 
@@ -113,33 +134,22 @@ this may not have been automatically applied by the installer.
   ```  
 
 
-## (FOR RAILS 6 SWITCHING TO HOTWIRE ONLY)
-- in `javascript/packs/application.js` remove this line:
-`import Turbolinks from "turbolinks"`
-- in the same file (`javascript/packs/application.js`) add this line:
-`import { Turbo } from "@hotwired/turbo-rails"`
-
-  
 ## RSPEC SELENIUM SETUP (OPTIONAL)    
-  - add to rails_helper.rb (inside the existing Rspec.configure block)
-  -  ````
-config.include FactoryBot::Syntax::Methods
-````
-  -  add to rails_helper.rb (outside of the Rspec.configure block)
-    ```
-    Capybara.register_driver :headless_chrome_desktop do |app|
-      options = Selenium::WebDriver::Chrome::Options.new
-      options.add_argument('--headless')
-      options.add_argument('--disable-gpu')
-      options.add_argument('--window-size=1280,1200')
+- add to rails_helper.rb (outside of the Rspec.configure block)
+  ```
+  Capybara.register_driver :headless_chrome_desktop do |app|
+    options = Selenium::WebDriver::Chrome::Options.new
+    options.add_argument('--headless')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--window-size=1280,1200')
     
-      driver = Capybara::Selenium::Driver.new(app,
-                                              browser: :chrome,
-                                              options: options)
+    driver = Capybara::Selenium::Driver.new(app,
+                                            browser: :chrome,
+                                            options: options)
     
-      driver
-    end
-    Capybara.default_driver = :headless_chrome_desktop
+    driver
+  end
+  Capybara.default_driver = :headless_chrome_desktop
     
     ```
     
@@ -160,10 +170,10 @@ config.include FactoryBot::Syntax::Methods
 ## Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY)
 
 Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
-- add `gem 'bootstrap-rubygem' to your gemfile
+- add `gem 'bootstrap-rubygem'` to your gemfile
 - replace `application.css` with a new file (delete old contents) `application.scss`
 ```
-import @bootstrap;
+@import "bootstrap";
 ```
 - see README at github.com/twbs/bootstrap-rubygem to install
 
@@ -171,11 +181,8 @@ import @bootstrap;
 ## Bootstrap with Webpack for FOR RAILS 7 ONLY :    
 - add to Gemfile
 - gem 'bootstrap', '~> 5.1.0'
-
-
 - completely delete the file `app/assets/application.css`
 - create new file where it was `app/assets/application.scss` with this contents (do not keep the contents of the old application.css file):
-
 ``` 
 // Custom bootstrap variables must be set or imported *before* bootstrap.
 @import "bootstrap";
@@ -196,11 +203,36 @@ import @bootstrap;
     import 'require_bootstrap'
     ```
 
-## RAILS 6 ONLY : Install Deviseor implement your own authentication
+## RAILS 6 ONLY : Install Devise or implement your own authentication
+(or only use --gd mode, see below)
+
   Add to your Gemfile `gem 'devise'`
-  
-  (or only use --gd mode, see below)
-  
+
+```
+rails generate devise:install
+```
+
+IMPORTNAT: Follow the instructions the Devise installer gives you, *Except Step 3*, you can skip this step:
+```
+ 3. Ensure you have flash messages in app/views/layouts/application.html.erb.
+     For example:
+
+       <p class="notice"><%= notice %></p>
+       <p class="alert"><%= alert %></p>
+
+```
+
+
+You can also skip Devise Step 4, which is optional: 
+``` 
+  4. You can copy Devise views (for customization) to your app by running:
+
+       rails g devise:views
+       
+     * Not required *
+```
+
+
 ## RAILS 7: Devise is not yet supported on Rails 7
 
 
@@ -208,6 +240,13 @@ import @bootstrap;
 
 I recommend https://github.com/tomkra/font_awesome5_rails 
 or https://github.com/FortAwesome/font-awesome-sass
+
+
+
+## For Enum support, I recommend activerecord-pgenum
+
+Instructions for Rails are here:
+https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
 
 
 

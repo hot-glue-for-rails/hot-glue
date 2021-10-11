@@ -7,6 +7,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   before_action :<%= arg %>
     <% } %><% end %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
+  after_action -> { flash.discard }, if: -> { request.format.symbol ==  :turbo_stream }
+
   helper :hot_glue
   include HotGlue::ControllerHelper
 
