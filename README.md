@@ -575,7 +575,10 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
-#### 2021-10-10 - v-0.2.5 - this version is all about developer happyness:
+#### 2021-10-11 - v0.2.6 - many additional automatic fixes for default Rails installation 6 or 7 for the generate hot_glue:install command
+
+
+#### 2021-10-10 - v0.2.5 - this version is all about developer happyness:
                             - significant fixes for the behavioral (system) specs. they now create new & update interactions
                             for (almost) all field types
                             - the install generator now checks your layouts/application.html.erb for `render partial: 'layouts/flash_messages' ` and adds it if it isn't there already
