@@ -97,6 +97,12 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
         "      find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
 
       end
+
+    when :enum
+        "      list_of_#{col.to_s} = #{singular_class}.defined_enums['#{col.to_s}'].keys \n" +
+        "      " + "new_#{col.to_s} = list_of_#{col.to_s}[rand(list_of_#{col.to_s}.length)].to_s \n" +
+        '      find("select[name=\'' + singular + '[' + col.to_s + ']\']  option[value=\'#{new_' + col.to_s + '}\']").select_option'
+
     when :boolean
       "     new_#{col} = rand(2).floor \n" +
       "     find(\"[name='#{singular}[#{col}]'][value='\#{new_" + col.to_s + "}']\").choose"
@@ -185,6 +191,11 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       when :time
         "     new_#{col} = Time.current + rand(144).hours \n" +
         "     find(\"[name='#{singular}[#{col}]']\").fill_in(with: new_#{col.to_s })"
+      when :enum
+        "      list_of_#{col.to_s} = #{singular_class}.defined_enums['#{col.to_s}'].keys \n" +
+        "      " + "new_#{col.to_s} = list_of_#{col.to_s}[rand(list_of_#{col.to_s}.length)].to_s \n" +
+        '      find("select[name=\'' + singular + '[' + col.to_s + ']\']  option[value=\'#{new_' + col.to_s + '}\']").select_option'
+
       else
         "      " + "new_#{col.to_s} = FFaker::Name.name \n" +
         '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
@@ -223,10 +234,10 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   describe "destroy" do
     it "should destroy" do
       visit <%= path_helper_plural %>
-      #accept_alert do
-      # find("form[action='<%= namespace_with_dash %>/<%= plural %>/#{<%= singular %>1.id}'] > button.delete-<%= singular %>-button").click
-      #end
-      find("form[action='<%= namespace_with_dash %>/<%= plural %>/#{<%= singular %>1.id}'] > button.delete-<%= singular %>-button").click
+      accept_alert do
+        find("form[action='<%= namespace_with_dash %>/<%= plural %>/#{<%= singular %>1.id}'] > input.delete-<%= singular %>-button").click
+      end
+#      find("form[action='<%= namespace_with_dash %>/<%= plural %>/#{<%= singular %>1.id}'] > input.delete-<%= singular %>-button").click
 
       expect(page).to_not have_content(<%= singular %>1.<%= @display_class %>)
       expect(<%= singular_class %>.where(id: <%= singular %>1.id).count).to eq(0)
