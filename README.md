@@ -575,6 +575,8 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
+#### 2021-10-12 - v0.2.7 - Adds spec coverage support for enums
+
 #### 2021-10-11 - v0.2.6 - many additional automatic fixes for default Rails installation 6 or 7 for the generate hot_glue:install command
 
 
@@ -622,6 +624,17 @@ Obviously, the created controller will always have this base controller as its s
 #### 2021-02-24 - v0.0.1 - first proof of concept release -- basic CRUD works 
 
 #### 2021-02-23 - v0.0.0 - Port of my prior work from github.com/jasonfb/common_core_js
+
+# PROBLEMS
+
+Here are some defeciencies to note
+
+- [ ] the ERB output has a necessary gsub that makes it so that every file always kicks the "Overwrite?" even when it has not changed. Unfortunately because of the meta programming involved in the ERB, I do not see a way around this although I would like to eventually fix it or match the AR generator internals to fix this problem. 
+
+- [ ] the system_spec that is generated (system/___behavior_spec.rb) works most of the time but obviously you must run it to confirm it passes correclty. still working out bugs in this area for special cases.
+
+---> Note that the specs use FFaker data and random numbers, so if you have model-level validations and out-of-bounds choices are made, your specs might fail *intermittently*.
+---> I know I hate intermittent failing specs, and if I had any in my app I would surely refactor them out. I'm not sure how I feel about *randomized* data-- or this much randomized data-- in specs. It's kind of fun but it also is tempting fate somewhat, and hopefully encouraging/forcing you to refactor them to be meaningful to your models and model-level validations. 
 
 
 
