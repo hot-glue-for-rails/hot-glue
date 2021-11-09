@@ -54,38 +54,16 @@ Instantly get a simple CRUD interface
 
 ![hot-glue-4](https://user-images.githubusercontent.com/59002/116405517-c2b2e300-a7fd-11eb-8423-d43e3afc9fa6.gif)
 
+# THE SETUP
 
-## ADD HOTWIRE
+## 1. (RAILS 6 ONLY— SKIP FOR RAILS 7) ADD HOTWIRE
 ```
 yarn add @hotwired/turbo-rails
 ```
 or `npm install @hotwired/turbo-rails`
 
-## ADD HOT-GLUE GEM
-- Add `gem 'hot-glue'` to your Gemfile & `bundle install`
 
-## ADD RSPEC, FACTORY-BOT, AND FFAKER
-
-add these 3 gems to your gemfile inside :development and :test groups
-```
-gem 'rspec-rails'
-gem 'factory_bot_rails'
-gem 'ffaker'
-```
-
-
-## RUN THE RSPEC INSTALLER
-- run `rails generate rspec:install`
-
-## RUN HOT-GLUE INSTALL
-### FOR ERB:
-`rails generate hot_glue:install --markup=erb`
-
-### FOR HAML:
-`rails generate hot_glue:install --markup=haml`
-
-
-## FOR RAILS 6 ONLY: SWITCH FROM TurblLinks to Turbo-Rails  (SKIP THIS STEP FOR RAILS 7)
+## 2. (RAILS 6 ONLY— SKIP FOR RAILS 7) SWITCH FROM TurblLinks to Turbo-Rails  (SKIP THIS STEP FOR RAILS 7)
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
 - Add `gem 'turbo-rails'` to your Gemfile & `bundle install`
 - Then install it with `rails turbo:install`
@@ -110,7 +88,34 @@ Turbo.start()
 ```
 
 
-## Modify `application.html.erb` 
+## 3. ADD HOT-GLUE GEM
+- Add `gem 'hot-glue'` to your Gemfile & `bundle install`
+
+## 4. ADD RSPEC, FACTORY-BOT, AND FFAKER
+
+add these 3 gems to your gemfile inside :development and :test groups
+```
+gem 'rspec-rails'
+gem 'factory_bot_rails'
+gem 'ffaker'
+```
+
+
+## 4. RUN THE RSPEC INSTALLER
+- run `rails generate rspec:install`
+
+## 5(A). RUN HOT-GLUE INSTALL
+### FOR ERB:
+`rails generate hot_glue:install --markup=erb`
+
+### FOR HAML:
+`rails generate hot_glue:install --markup=haml`
+
+
+
+
+
+## 5(B). Modify `application.html.erb` 
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
 Note: if you have some kind of non-standard application layout, like one at a different file
 or if you have modified your opening <body> tag, this may not have been automatically applied by the installer.
@@ -120,7 +125,7 @@ or if you have modified your opening <body> tag, this may not have been automati
   <%= render partial: 'layouts/flash_notices' %>
 ```
 
-## Modify `rails_helper.rb` 
+## 5(C). Modify `rails_helper.rb` 
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
 Note: if you have some kind of non-standard rails_helper.rb, like one that does not use the standard ` do |config|` syntax after your `RSpec.configure` 
 this may not have been automatically applied by the installer.
@@ -134,7 +139,7 @@ this may not have been automatically applied by the installer.
   ```  
 
 
-## CAPYBARA: SWITCH FROM RACK-TEST TO HEADLESS CHROME
+## 5(D) CAPYBARA: SWITCH FROM RACK-TEST TO HEADLESS CHROME
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
 
 - By default Capybara is installed with :rack_test as its driver.
@@ -178,24 +183,9 @@ Alternatively, can define your own driver like so:
     
   ```
     
-## Add User Authentication if you are using Access Control
-(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
 
-  - for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
-  - in the default code, the devise login would be for an object called account and lives at the route `/accounts/sign_in`
-  - modify the generated code (it was installed by the installed) for your devise login
-     ```
-     def login_as(account)
-       visit '/accounts/sign_in'
-       within("#new_account") do
-       fill_in 'Email', with: account.email
-       fill_in 'Password', with: 'password'
-       end
-       click_button 'Log in'
-     end
-     ```
 
-## Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY)
+## 6. Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY)
 
 Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
 - add `gem 'bootstrap-rubygem'` to your gemfile
@@ -206,7 +196,7 @@ Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
 - see README at github.com/twbs/bootstrap-rubygem to install
 
 
-## Bootstrap with Webpack for FOR RAILS 7 ONLY :    
+### 6(A) Bootstrap with Webpack for FOR RAILS 7 ONLY :    
 - add to Gemfile
 - gem 'bootstrap', '~> 5.1.0'
 - completely delete the file `app/assets/application.css`
@@ -218,7 +208,7 @@ Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
 
 * You do not need jQuery for HotGlue to work *
 
-## Bootstrap with Webpack RAILS 6 ONLY:
+### 6(B) Bootstrap with Webpack RAILS 6 ONLY:
 - change `stylesheet_link_tag` to `stylesheet_pack_tag` in your application layout
   - run `yarn add bootstrap`
   - create a new file at `app/javascript/require_bootstrap.scss` with this content
@@ -231,16 +221,33 @@ Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
     import 'require_bootstrap'
     ```
 
-## RAILS 6 ONLY : Install Devise or implement your own authentication
+
+## 7. install font-awesome
+
+I recommend https://github.com/tomkra/font_awesome5_rails
+or https://github.com/FortAwesome/font-awesome-sass
+
+
+
+## 8. For Enum support, I recommend activerecord-pgenum
+
+Instructions for Rails are here:
+https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
+
+
+
+## 9. Devise
 (or only use --gd mode, see below)
 
   Add to your Gemfile `gem 'devise'`
+
+
 
 ```
 rails generate devise:install
 ```
 
-IMPORTNAT: Follow the instructions the Devise installer gives you, *Except Step 3*, you can skip this step:
+IMPORTANT: Follow the instructions the Devise installer gives you, *Except Step 3*, you can skip this step:
 ```
  3. Ensure you have flash messages in app/views/layouts/application.html.erb.
      For example:
@@ -251,7 +258,7 @@ IMPORTNAT: Follow the instructions the Devise installer gives you, *Except Step 
 ```
 
 
-You can also skip Devise Step 4, which is optional: 
+You can also skip Devise installer Step 4, which is optional: 
 ``` 
   4. You can copy Devise views (for customization) to your app by running:
 
@@ -261,20 +268,26 @@ You can also skip Devise Step 4, which is optional:
 ```
 
 
+## Devise & Capybara - Add User Authentication if you are using Access Control
+(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
+
+- for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
+- in the default code, the devise login would be for an object called account and lives at the route `/accounts/sign_in`
+- modify the generated code (it was installed by the installed) for your devise login
+   ```
+   def login_as(account)
+     visit '/accounts/sign_in'
+     within("#new_account") do
+     fill_in 'Email', with: account.email
+     fill_in 'Password', with: 'password'
+     end
+     click_button 'Log in'
+   end
+   ```
+
+
 ## RAILS 7: Devise is not yet supported on Rails 7
 
-
-## install font-awesome
-
-I recommend https://github.com/tomkra/font_awesome5_rails 
-or https://github.com/FortAwesome/font-awesome-sass
-
-
-
-## For Enum support, I recommend activerecord-pgenum
-
-Instructions for Rails are here:
-https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
 
 
 
