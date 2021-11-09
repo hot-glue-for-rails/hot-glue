@@ -182,21 +182,10 @@ Alternatively, can define your own driver like so:
   Capybara.default_driver = :my_headless_chrome_desktop
     
   ```
-    
 
 
-## 6. Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY)
-
-Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
-- add `gem 'bootstrap-rubygem'` to your gemfile
-- replace `application.css` with a new file (delete old contents) `application.scss`
-```
-@import "bootstrap";
-```
-- see README at github.com/twbs/bootstrap-rubygem to install
-
-
-### 6(A) Bootstrap with Webpack for FOR RAILS 7 ONLY :    
+### 6(A) Bootstrap with Webpack:    
+DO EIETHER 6(A) OR 6(B)
 - add to Gemfile
 - gem 'bootstrap', '~> 5.1.0'
 - completely delete the file `app/assets/application.css`
@@ -208,7 +197,7 @@ Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
 
 * You do not need jQuery for HotGlue to work *
 
-### 6(B) Bootstrap with Webpack RAILS 6 ONLY:
+### Hook your Bootstrap into your global application scss
 - change `stylesheet_link_tag` to `stylesheet_pack_tag` in your application layout
   - run `yarn add bootstrap`
   - create a new file at `app/javascript/require_bootstrap.scss` with this content
@@ -220,6 +209,20 @@ Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
     ```
     import 'require_bootstrap'
     ```
+
+
+## 6(B) Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY)
+DO EIETHER 6(A) OR 6(B)
+
+Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
+- add `gem 'bootstrap-rubygem'` to your gemfile
+- replace `application.css` with a new file (delete old contents) `application.scss`
+```
+@import "bootstrap";
+```
+- see README at github.com/twbs/bootstrap-rubygem to install
+
+
 
 
 ## 7. install font-awesome
