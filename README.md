@@ -268,7 +268,7 @@ You can also skip Devise installer Step 4, which is optional:
 ```
 
 
-## Devise & Capybara - Add User Authentication if you are using Access Control
+## 9(B) Devise & Capybara - Add User Authentication if you are using Access Control
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
 
 - for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
@@ -286,13 +286,14 @@ You can also skip Devise installer Step 4, which is optional:
    ```
 
 
-## RAILS 7: Devise is not yet supported on Rails 7
+## RAILS 7: Devise is not yet supported on Rails 7 unless you use the master branch of devise
 
 
 
+# HOT GLUE DOCS
 
 
-### First Argument
+## First Argument
 (no double slash)
 
 TitleCase class name of the thing you want to build a scaffoling for.
