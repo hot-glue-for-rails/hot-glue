@@ -48,16 +48,16 @@ Gem::Specification.new do |spec|
     
     rails generate hot_glue:scaffold Thing
 
-        * Build plug-and-play scaffolding mixing generated ERB or HAML with the power of Hotwire and Turbo-Rails
-        * Automatically Reads Your Models (make them before building your scaffolding!)
-        * Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination (coming soon: searching & sorting)
-        * Great for prototyping, but you should learn Rails fundamentals first.
-        * 'Packaged' with Devise, Kaminari, Rspec, FontAwesome
-        * Create specs automatically along with the generated controllers.
-        * Nest your routes model-by-model for built-in poor man's authentication.
-        * Throw the scaffolding away when your app is ready to graduate to its next phase.
-
-    see README for complete instructions.
+      * Build plug-and-play scaffolding mixing generated ERB or HAML with the power of Hotwire and Turbo-Rails
+      * Everything edits-in-place (unless you use --big-edit, then it won't)
+      * Automatically Reads Your Models (make them before building your scaffolding!)
+      * Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination (coming soon: searching & sorting)
+      * Great for prototyping, but you should learn Rails fundamentals first.
+      * 'Packaged' with Devise, Kaminari, Rspec, FontAwesome
+      * Create system specs  automatically along with the generated code.
+      * Nest your routes model-by-model for built-in poor man's authentication.
+      * Throw the scaffolding away when your app is ready to graduate to its next phase.
+      * docs at https://github.com/jasonfb/hot-glue
     ---------------------------------------------
   MSG
 end

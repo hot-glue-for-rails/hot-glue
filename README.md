@@ -19,17 +19,15 @@ By default, it generates code that gives users full control over objects they 'o
 
 Hot Glue generates functionality that's quick and dirty. It let's you be crafty. As with a real hot glue gun, use with caution. 
 
-* Build plug-and-play scaffolding for any CRUD on any object
-* mixes HAML and turbo_stream responses
-* Everything edits-in-place (unless you use --big-edit, then it won't)  
-* Automatically reads your ActiveRecord models and relationships (make them before building your scaffolding!)
-* Create-read-update-delete (CRUD) with pagination (one day: sorting & searching)
-* Excellent tool for prototyping and hackathons, but a knowledge of Rails is needed. 
-* Nest your routes model-by-model for built-in poor man's access control. (Customers have_many :invoices; Invoices have_many :line_items; etc)
-* Plays nicely with Devise, but you can implement your own current_user object instead.
-* Kaminari for pagination.
-* Create specs automatically along with the controllers.
-* Throw the scaffolding away when your app is ready to graduate to its next phase (or don't if you like it).
+* Build plug-and-play scaffolding mixing generated ERB or HAML with the power of Hotwire and Turbo-Rails
+* Everything edits-in-place (unless you use --big-edit, then it won't)
+* Automatically Reads Your Models (make them before building your scaffolding!)
+* Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination (coming soon: searching & sorting)
+* Great for prototyping, but you should learn Rails fundamentals first.
+* 'Packaged' with Devise, Kaminari, Rspec, FontAwesome
+* Create system specs  automatically along with the generated code.
+* Nest your routes model-by-model for built-in poor man's authentication.
+* Throw the scaffolding away when your app is ready to graduate to its next phase.
 
 ## QUICK START
 
