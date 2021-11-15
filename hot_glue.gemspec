@@ -36,9 +36,9 @@ Gem::Specification.new do |spec|
                        "homepage_uri" => 'https://github.com/jasonfb/hot-glue'}
 
   spec.add_runtime_dependency('kaminari', '~> 1.2')
-  spec.add_runtime_dependency('haml-rails', '~> 2.0')
+  # spec.add_runtime_dependency('haml-rails', '~> 2.0')
   spec.add_runtime_dependency('turbo-rails', '~> 0.5')
-  spec.add_runtime_dependency "sass-rails"
+  spec.add_runtime_dependency('sass-rails')
 
   spec.add_dependency 'ffaker', "~> 2.16"
 
@@ -48,11 +48,11 @@ Gem::Specification.new do |spec|
     
     rails generate hot_glue:scaffold Thing
 
-        * Build plug-and-play scaffolding mixing HAML with the power of Hotwire and Turbo-Rails
+        * Build plug-and-play scaffolding mixing generated ERB or HAML with the power of Hotwire and Turbo-Rails
         * Automatically Reads Your Models (make them before building your scaffolding!)
-        * Excellent for CRUD, lists with pagination (coming soon: searching & sorting)
-        * Great for prototyping.
-        * Plays nicely with Devise, Kaminari, Haml-Rails, Rspec, FontAwesome
+        * Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination (coming soon: searching & sorting)
+        * Great for prototyping, but you should learn Rails fundamentals first.
+        * 'Packaged' with Devise, Kaminari, Rspec, FontAwesome
         * Create specs automatically along with the generated controllers.
         * Nest your routes model-by-model for built-in poor man's authentication.
         * Throw the scaffolding away when your app is ready to graduate to its next phase.
