@@ -31,7 +31,7 @@ module HotGlue
   end
 
   class ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
-     hook_for :form_builder, :as => :scaffold
+    hook_for :form_builder, :as => :scaffold
 
     source_root File.expand_path('templates', __dir__)
     attr_accessor :path, :singular, :plural, :singular_class, :nest_with
@@ -55,7 +55,8 @@ module HotGlue
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
     class_option :markup, type: :string, default: "erb"
-     class_option :stimulus_syntax, type: :boolean, default: nil
+    class_option :stimulus_syntax, type: :boolean, default: nil
+    class_option :downnest, type: :string, default: nil
 
 
 
@@ -114,6 +115,7 @@ module HotGlue
 
       @singular_class = @singular.titleize.gsub(" ", "")
       @exclude_fields = []
+
       @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
 
       if !options['include'].empty?
@@ -137,6 +139,9 @@ module HotGlue
       @no_create = options['no_create'] || false
       @no_paginate = options['no_paginate'] || false
       @big_edit = options['big_edit']
+
+      @downnest_relationship = options['downnest'] || false
+
 
       if @god
         @auth = nil
@@ -172,6 +177,8 @@ module HotGlue
           @object_owner_eval = ""
         end
       end
+
+
 
       @reference_name = HotGlue.derrive_reference_name(singular_class)
 
@@ -384,7 +391,7 @@ module HotGlue
 
     def path_helper_args
       if @nested_args.any?
-        [(@nested_args).collect{|a| "@#{a}"} , singular].join(",")
+        [(@nested_args).collect{|a| "#{a}"} , singular].join(",")
       else
         singular
       end
@@ -430,7 +437,7 @@ module HotGlue
     end
 
     def nested_assignments
-      @nested_args.map{|a| "#{a}: @#{a}"}.join(", ") #metaprgramming into Ruby hash
+      @nested_args.map{|a| "#{a}: #{a}"}.join(", ") #metaprgramming into Ruby hash
     end
 
     def nested_assignments_with_leading_comma

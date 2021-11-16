@@ -1,7 +1,12 @@
 <%= all_line_fields %>
 <div class="col">
 
-  &nbsp;
+  <% if @downnest_relationship %>
+  <\%= render partial: "dashboard/<%= @downnest_relationship %>/list", locals: {
+      <%= @singular %>: <%= @singular %>,
+      <%= @downnest_relationship %>: <%= @singular %>.<%= @downnest_relationship %>} %>
+  <% end %>
+
   <% if destroy_action %>
     <\%= form_with url: <%= path_helper_singular %>(<%= path_helper_args %>), method: :delete do |f| %>
       <\%= f.submit "Delete".html_safe, data: <%= delete_confirmation_syntax  %>, class: "delete-<%= singular %>-button btn btn-primary " %>

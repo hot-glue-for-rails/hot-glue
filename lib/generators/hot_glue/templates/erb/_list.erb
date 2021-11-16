@@ -1,5 +1,5 @@
 <\%= turbo_frame_tag "<%= plural %>-list" do %>
-  <div class="container-fluid "><%= singular %>-table
+  <div class="container-fluid "><%= singular.gsub("_", " ").upcase %>
     <div class="row">
       <%= list_column_headings %>
       <div class='col buttons-col'></div>

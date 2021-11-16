@@ -565,6 +565,13 @@ Omits delete action.
 If you do not want inline editing of your list items but instead to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
 
 
+### `--downnest`
+
+Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object. 
+You will need to build scaffolding with the same name for the related object as well. 
+On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line. 
+
+
 ## Automatic Base Controller
 
 HotGlue will copy a file named base_controller.rb to the same folder where it tries to create any controller, unless such a file exists there already.
@@ -583,12 +590,15 @@ Obviously, the created controller will always have this base controller as its s
 - Time (TOOD: implement this)
 - Boolean 
 - Enum - will be magically displayed as a value list populated from the enum list defined on your model. see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
-    
+
 * shows in a size-aware container, i.e. in a bigger box if the field allows for more content
 
 
 
 # VERSION HISTORY
+
+#### 2021-11-15  - v0.2.8 - Downnesting
+        
 
 #### 2021-10-12 - v0.2.7 - Adds spec coverage support for enums
 
