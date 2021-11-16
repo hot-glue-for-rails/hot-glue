@@ -1,10 +1,9 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-12">
-      <%  unless @no_create %><\%= render partial: "new_button" %><% end %>
       <div class="clearfix"></div>
       <\%= render partial: '<%= list_path_partial %>',
-              locals: {<%=  plural %>: @<%= plural %>} \%>
+              locals: {<%= plural %>: @<%= plural %><%= nest_assignments_operator(true, true) if @nestable %> } \%>
     </div>
   </div>
 </div>

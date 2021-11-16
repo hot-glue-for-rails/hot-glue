@@ -1,5 +1,5 @@
 <\%= turbo_stream.replace "<%= singular%>__#{@<%= singular %>.id}" do %>
-  <\%= render partial: 'line', locals: {<%= singular %>: @<%= singular %> <%= nested_assignments_with_leading_comma %> } %>
+  <\%= render partial: 'line', locals: {<%= singular %>: @<%= singular %> <%= nest_assignments_operator(true,true) %> } %>
 <\% end %>
 
 <\%= turbo_stream.replace "flash_notices" do %>

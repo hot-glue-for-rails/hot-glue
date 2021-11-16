@@ -72,7 +72,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     end
   end
 
-  describe "new & create" do
+<% unless @no_create %>  describe "new & create" do
     it "should create a new <%= singular.titlecase %>" do
       visit <%= path_helper_plural %>
       click_link "New <%= singular.titlecase %>"
@@ -141,7 +141,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   %>
 
     end
-  end
+  end<% end %>
 
 
   describe "edit & update" do
@@ -231,7 +231,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     end
   end
 
-  describe "destroy" do
+<% unless @no_delete %>  describe "destroy" do
     it "should destroy" do
       visit <%= path_helper_plural %>
       accept_alert do
@@ -242,6 +242,6 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       expect(page).to_not have_content(<%= singular %>1.<%= @display_class %>)
       expect(<%= singular_class %>.where(id: <%= singular %>1.id).count).to eq(0)
     end
-  end
+  end<% end %>
 end
 

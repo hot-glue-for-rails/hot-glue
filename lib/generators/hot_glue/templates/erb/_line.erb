@@ -1,7 +1,7 @@
 
 <\%= turbo_frame_tag "<%= singular %>__#{ <%= singular %>.id }" do  %>
   <div class='row' data-id='<\%= <%= singular  %>.id %>' data-edit='false'>
-    <\%= render partial: '<%=  show_path_partial %>', locals: { <%= singular %>: <%= singular %> <%= nested_assignments_with_leading_comma %> } %>
+    <\%= render partial: '<%=  show_path_partial %>', locals: { <%= singular %>: <%= singular %><%= nest_assignments_operator(false, true) if @nestable %> } %>
   </div>
 <\% end %>
 

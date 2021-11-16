@@ -51,22 +51,15 @@ module HotGlue
     class_option :no_specs, type: :boolean, default: false
     class_option :no_delete, type: :boolean, default: false
     class_option :no_create, type: :boolean, default: false
+    class_option :no_edit, type: :boolean, default: false
     class_option :no_paginate, type: :boolean, default: false
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
     class_option :markup, type: :string, default: "erb"
     class_option :stimulus_syntax, type: :boolean, default: nil
     class_option :downnest, type: :string, default: nil
-
-
-
-    # def erb_replace_ampersands
-    #   if @template_builder.is_a?(HotGlue::ErbTemplate)
-    #     @output_buffer.gsub!('\%', '%')
-    #   end
-    # end
-
-
+    class_option :nestable, type: :boolean, default: false
+    class_option :magic_buttons, type: :string, default: nil
 
     def initialize(*meta_args)
       super
@@ -140,6 +133,9 @@ module HotGlue
       @no_paginate = options['no_paginate'] || false
       @big_edit = options['big_edit']
 
+      @no_edit = options['no_edit'] || false
+
+
       @downnest_relationship = options['downnest'] || false
 
 
@@ -161,8 +157,16 @@ module HotGlue
         end
       end
 
-                                 # the @object_owner will always be object that will 'own' the object
-                                 # for new and create
+
+      @magic_buttons = []
+      if options['magic_buttons']
+        @magic_buttons = options['magic_buttons'].split(',')
+      end
+
+      @build_update_action = !@no_edit || !@magic_buttons.empty?
+      # if the magic buttons are present, build the update action anyway
+
+      @nestable = options['nestable'] || false
 
       if @auth && ! @self_auth && @nested_args.none?
         @object_owner_sym = @auth.gsub("current_", "").to_sym
@@ -390,7 +394,7 @@ module HotGlue
     end
 
     def path_helper_args
-      if @nested_args.any?
+      if @nested_args.any? && @nestable
         [(@nested_args).collect{|a| "#{a}"} , singular].join(",")
       else
         singular
@@ -398,16 +402,24 @@ module HotGlue
     end
 
     def path_helper_singular
-      "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
+      if @nestable
+        "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
+      else
+        "#{@namespace+"_" if @namespace}#{singular}_path"
+      end
     end
 
     def path_helper_plural
-      "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{plural}_path"
+      if ! @nestable
+        "#{@namespace+"_" if @namespace}#{plural}_path"
+      else
+        "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{plural}_path"
+      end
     end
 
     def path_arity
       res = ""
-      if @nested_args.any?
+      if @nested_args.any? && @nestable
         res << nested_objects_arity + ", "
       end
       res << "@" + singular
@@ -426,11 +438,10 @@ module HotGlue
     end
 
     def new_path_name
-
       base =   "new_#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_") if @nested_args.any?}#{singular}_path"
       if @nested_args.any?
         base += "(" + @nested_args.collect { |arg|
-          "@#{arg}.id"
+          "#{arg}.id"
         }.join(", ") + ")"
       end
       base
@@ -440,12 +451,21 @@ module HotGlue
       @nested_args.map{|a| "#{a}: #{a}"}.join(", ") #metaprgramming into Ruby hash
     end
 
-    def nested_assignments_with_leading_comma
+    def nested_assignments_top_level # this is by accessing the instance variable-- only use at top level
+      @nested_args.map{|a| "#{a}: @#{a}"}.join(", ") #metaprgramming into Ruby hash
+    end
+
+
+    def nest_assignments_operator(top_level = false, leading_comma = false)
       if @nested_args.any?
-        ", #{nested_assignments}"
+        "#{', ' if leading_comma}#{top_level ? nested_assignments_top_level : nested_assignments }"
       else
         ""
       end
+    end
+
+    def nested_assignments_with_leading_comma
+      nest_assignments_operator(false, true)
     end
 
     def nested_objects_arity
@@ -499,6 +519,15 @@ module HotGlue
       !Gem::Specification.sort_by{ |g| [g.name.downcase, g.version] }.group_by{ |g| g.name }['devise']
     end
 
+
+    def magic_button_output
+      @template_builder.magic_button_output(
+        path_helper_singular: path_helper_singular,
+        path_helper_args: path_helper_args,
+        singular: singular,
+        magic_buttons: @magic_buttons
+      )
+    end
     # def erb_replace_ampersands!(filename = nil)
     #
     #   return if filename.nil?
@@ -661,24 +690,35 @@ module HotGlue
      else
        ""
      end
-   end
-
-   def paginate
-     @template_builder.paginate(plural: plural)
-   end
-
-  def delete_confirmation_syntax
-    if !@stimulus_syntax
-     "{confirm: 'Are you sure?'}"
-    else
-     "{controller: 'confirmable', 'confirm-message': \"Are you sure you want to delete \#{ #{@singular}.#{ display_class } } \", 'action': 'confirmation#confirm'}"
     end
-  end
+
+    def paginate
+     @template_builder.paginate(plural: plural)
+    end
+
+    def delete_confirmation_syntax
+      if !@stimulus_syntax
+       "{confirm: 'Are you sure?'}"
+      else
+       "{controller: 'confirmable', 'confirm-message': \"Are you sure you want to delete \#{ #{@singular}.#{ display_class } } \", 'action': 'confirmation#confirm'}"
+      end
+    end
 
 
-  private # thor does something fancy like sending the class all of its own methods during some strange run sequence
+    def controller_magic_button_update_actions
+      @magic_buttons.collect{ |magic_button|
+        "    @#{singular}.#{magic_button}! if #{singular}_params[:#{magic_button}]"
+        }.join("\n")
+    end
+
+    def controller_update_params_tap_away_magic_buttons
+      @magic_buttons.collect{ |magic_button|
+        ".tap{ |ary| ary.delete('#{magic_button}') }"
+      }.join("")
+    end
+
+    private # thor does something fancy like sending the class all of its own methods during some strange run sequence
     # does not like public methods
-
     def cc_filename_with_extensions(name, file_format = format)
       [name, file_format].compact.join(".")
     end

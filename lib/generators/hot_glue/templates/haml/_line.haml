@@ -1,6 +1,6 @@
 = turbo_frame_tag "<%= singular %>__#{<%= singular %>.id}" do
   .row{'data-id': <%= singular %>.id, 'data-edit': 'false'}
-    = render partial: "<%= show_path_partial %>", locals: {<%= singular %>: <%= singular %>}
+    = render partial: "<%= show_path_partial %>", locals: {<%= singular %>: <%= singular %> <%= nest_assignments_operator(false, true) %>}
 
 
 

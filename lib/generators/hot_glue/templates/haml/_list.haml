@@ -1,11 +1,15 @@
 = turbo_frame_tag "<%= plural %>-list" do
   .container-fluid.<%= singular %>-table
     .row
+      .col-md-12
+        <%= '= render partial: "' + (@namespace+"/" if @namespace) +  plural + '/new_button", locals: {'  + nested_assignments + '}'  unless @no_create %>
+
+    .row
 <%= list_column_headings %>
       .col
     %div
       - if <%= plural %>.empty?
         None
       - <%= plural %>.each do |<%= singular %>|
-        = render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %> <%= nested_assignments_with_leading_comma %> }
+        = render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if @nestable %> }
     <%=  @no_paginate ? "" : paginate %>

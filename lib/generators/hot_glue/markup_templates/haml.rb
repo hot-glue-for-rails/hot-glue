@@ -64,7 +64,7 @@ module  HotGlue
                 exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
                 exit
               end
-              display_column = derrive_reference_name(assoc.class_name)
+              display_column = HotGlue.derrive_reference_name(assoc.class_name)
 
 
               "#{col_identifier}{class: \"form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
@@ -162,7 +162,7 @@ module  HotGlue
             raise(HotGlue::Error,exit_message)
           end
 
-          display_column =  derrive_reference_name(assoc.class_name)
+          display_column =  HotGlue.derrive_reference_name(assoc.class_name)
 
 
           "#{col_identifer}

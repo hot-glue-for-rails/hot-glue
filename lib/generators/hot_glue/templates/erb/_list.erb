@@ -1,5 +1,13 @@
 <\%= turbo_frame_tag "<%= plural %>-list" do %>
-  <div class="container-fluid "><%= singular.gsub("_", " ").upcase %>
+  <div class="container-fluid ">
+    <h4><%= plural.gsub("_", " ").upcase %></h4>
+    <div class="row">
+      <div class="col-md-12">
+        <% unless @no_create %><%= '<%= render partial: "' + (@namespace+"/" if @namespace) +  plural + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><% end %>
+      </div>
+    </div>
+
+
     <div class="row">
       <%= list_column_headings %>
       <div class='col buttons-col'></div>
@@ -11,7 +19,7 @@
         </div>
       <\% end %>
       <\% <%= plural %>.each do |<%= singular %>| %>
-        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %> <%= nested_assignments_with_leading_comma %> } %>
+        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if  @nestable %> } %>
       <\% end %>
 
     <%=  @no_paginate ? "" : paginate %>

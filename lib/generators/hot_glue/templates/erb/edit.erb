@@ -5,17 +5,14 @@
   <div class="cell editable" style="position: relative;">
 
     <\% if @<%= singular %>.errors.any? %>
-      <\%= render(partial: "#{controller.namespace}errors", locals: {resource: @<%= singular%> }) %>
+      <\%= render(partial: "#{controller.namespace}errors", locals: {resource: @<%= singular %> }) %>
     <\% end %>
 
     <h2>Editing <\%= @<%= @singular %>.<%= display_class %> %></h2>
     <\%= form_with model: <%= "@" + singular%>, url: <%= path_helper_singular %>(<%= path_arity %>) do |f| %>
     <\%=  render partial: "form",  locals: {:<%=  singular  %> => <%= "@" + singular%>, f: f} %>
     <\% end %>
-    <i class='fa fa-times-circle fa-2x'
-       data-name='close-<%=  singular  %>__<\% <%= "@" + singular %>.id %> }'
-       data-row-id=<%= "@" + singular %>.id,
-       data-role='close-button'></i>
+
   </div>
 
 <\% end %>

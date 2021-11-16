@@ -1,6 +1,8 @@
 class <%= controller_class_name %> < <%= controller_descends_from %>
-<% unless @auth_identifier == '' || @god %>before_action :authenticate_<%= @auth_identifier %>!<% end %>
+  helper :hot_glue
+  include HotGlue::ControllerHelper
 
+  <% unless @auth_identifier == '' || @god %>before_action :authenticate_<%= @auth_identifier %>!<% end %>
   <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
     this_scope =   nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "#{nest_chain.last}.#{arg}s"
       nest_chain << arg %>
@@ -9,14 +11,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
   after_action -> { flash.discard }, if: -> { request.format.symbol ==  :turbo_stream }
 
-  helper :hot_glue
-  include HotGlue::ControllerHelper
-
 <% if no_devise_installed %>
   # TODO: implement current_user or use Devise
 <% end %>
-
-
 
   <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
     if !@god
@@ -79,23 +76,25 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
         format.html
       end
     end
-  end<% end %>
+  end
 
-  def show
+<% end %>  def show
     respond_to do |format|
       format.html
     end
   end
 
-  def edit
+<% unless @no_edit %>  def edit
     respond_to do |format|
       format.turbo_stream
       format.html
     end
   end
 
-  def update
-    if @<%= singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>))
+<% end %><% if @build_update_action %>  def update
+<%= controller_magic_button_update_actions %>
+
+    if @<%= singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>)<%= controller_update_params_tap_away_magic_buttons %>)
       flash[:notice] = "Saved #{@<%= singular %>.<%= display_class %>}"
     else
       flash[:alert] = "<%= singular_name.titlecase %> could not be saved."
@@ -106,7 +105,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     end
   end
 
-<% if destroy_action %>  def destroy
+<% end %><% if destroy_action %>  def destroy
     begin
       @<%=singular_name%>.destroy
     rescue StandardError => e
@@ -117,10 +116,10 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       format.turbo_stream
       format.html { redirect_to <%= path_helper_plural %> }
     end
-  end<% end %>
+  end
 
-  def <%=singular_name%>_params
-    params.require(:<%=singular_name%>).permit( <%= @columns %> )
+<% end %>def <%=singular_name%>_params
+    params.require(:<%=singular_name%>).permit( <%= @columns + @magic_buttons.collect(&:to_sym) %> )
   end
 
   def default_colspan
@@ -128,18 +127,12 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
   def namespace
-    <% if @namespace %>
-      "<%= @namespace %>/"
-    <% else %>
-      ""
-    <% end %>
+    <% if @namespace %>"<%= @namespace %>/" <% else %>""<% end %>
   end
-
 
   def common_scope
     @nested_args
   end
-
 end
 
 

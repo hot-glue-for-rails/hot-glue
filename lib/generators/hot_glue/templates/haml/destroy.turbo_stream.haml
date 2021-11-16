@@ -1,2 +1,2 @@
 = turbo_stream.replace "<%=plural%>-list" do
-  = render partial: "list", locals: {<%=plural%>: @<%=plural%>}
+  = render partial: "list", locals: {<%=plural%>: @<%=plural%> <%= nest_assignments_operator(true, true) %>}

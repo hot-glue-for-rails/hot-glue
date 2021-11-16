@@ -569,6 +569,18 @@ Automatically create subviews down your object tree. This should be the name of 
 You will need to build scaffolding with the same name for the related object as well. 
 On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line. 
 
+If you are creating a controller that will be downnested by ANOTHER controller, use `--child` flag
+
+
+### `--nestable` (default: false)
+
+When creating a controller that you will use a another controllers downnest (that is, you will display related records-- like a portal-- from the parent within each row of the parent's list view), set nestable to true.
+
+If the cooresponding Rails route contains nesting and this controller is downnested by someone else, you'll want to set nestable to true.
+
+If the cooresponding Rails route is not nested (but the object itself may be nested), and the controller sits a the root of the namespace, set nestable to false. 
+
+
 
 ## Automatic Base Controller
 

@@ -1,13 +1,13 @@
 <\% if @<%= singular %>.errors.none? %>
   <\%= turbo_stream.replace "<%= plural %>-list" do %>
-  <\%= render partial: "list", locals: {<%= plural %>: @<%= plural %>} %>
+  <\%= render partial: "list", locals: {<%= plural %>: @<%= plural %> <%= nest_assignments_operator(true, true) %>} %>
   <\% end %>
   <\% end %>
   <\%= turbo_stream.replace "<%= singular %>-new" do %>
   <\% if @<%= singular %>.errors.none? %>
-  <\%= render partial: "new_button" %>
+  <\%= render partial: "new_button", locals: {<%= nest_assignments_operator(true, false) %>} %>
   <\% else %>
-  <\%= render partial: "new_form", locals: {<%= singular %>: @<%= singular %>} %>
+  <\%= render partial: "new_form", locals: {<%= singular %>: @<%= singular %> <%= nest_assignments_operator(true, true) %> } %>
   <\% end %>
   <\% end %>
   <\%= turbo_stream.replace "flash_notices" do %>

@@ -1,17 +1,24 @@
 <%= all_line_fields %>
-<div class="col">
 
-  <% if @downnest_relationship %>
+<% if @downnest_relationship %>
+  <div class="col">
   <\%= render partial: "dashboard/<%= @downnest_relationship %>/list", locals: {
-      <%= @singular %>: <%= @singular %>,
-      <%= @downnest_relationship %>: <%= @singular %>.<%= @downnest_relationship %>} %>
-  <% end %>
+  <%= @singular %>: <%= @singular %>,
+  <%= @downnest_relationship %>: <%= @singular %>.<%= @downnest_relationship %>} %>
+  </div>
+<% end %>
 
+<div class="col">
   <% if destroy_action %>
     <\%= form_with url: <%= path_helper_singular %>(<%= path_helper_args %>), method: :delete do |f| %>
       <\%= f.submit "Delete".html_safe, data: <%= delete_confirmation_syntax  %>, class: "delete-<%= singular %>-button btn btn-primary " %>
     <\% end %>
   <% end %>
 
+
+  <%= magic_button_output %>
+
+  <% unless @no_edit %>
   <\%= link_to "Edit <i class='fa fa-1x fa-list-alt'></i>".html_safe, edit_<%= path_helper_singular %>(<%= path_helper_args %>), <% if @big_edit %>'data-turbo' => 'false', <% end %>disable_with: "Loading...", class: "edit-<%= singular %>-button btn btn-primary " %>
+  <% end %>
 </div>

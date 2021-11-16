@@ -12,6 +12,20 @@ module  HotGlue
     end
 
 
+    def magic_button_output(*args)
+      path_helper_singular = args[0][:path_helper_singular]
+      path_helper_args = args[0][:path_helper_args]
+      singular = args[0][:singular]
+      magic_buttons = args[0][:magic_buttons]
+
+      magic_buttons.collect{ |button_name|
+        "<%= form_with model: #{singular}, url: #{path_helper_singular}(#{path_helper_args}) do |f| %>
+      <%= f.hidden_field :#{button_name}, value: \"#{button_name}\" %>
+    <%= f.submit '#{button_name.titleize}'.html_safe, data: {confirm: 'Are you sure you want to #{button_name} this #{singular}?'}, class: '#{singular}-button btn btn-primary ' %>
+    <% end %>"
+      }.join("\n")
+    end
+
     def text_area_output(col, field_length, col_identifier )
       lines = field_length % 40
       if lines > 5
@@ -247,6 +261,7 @@ module  HotGlue
       }.join("\n")
     end
   end
+
 
 
 
