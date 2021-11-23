@@ -559,23 +559,22 @@ Omits delete action.
 If you do not want inline editing of your list items but instead to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
 
 
+
+
 ### `--downnest`
+(2021-11-23 - WIP)
 
 Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object. 
 You will need to build scaffolding with the same name for the related object as well. 
 On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line. 
 
-If you are creating a controller that will be downnested by ANOTHER controller, use `--child` flag
-
-
 ### `--nestable` (default: false)
-
+(2021-11-23 - WIP)
 When creating a controller that you will use a another controllers downnest (that is, you will display related records-- like a portal-- from the parent within each row of the parent's list view), set nestable to true.
 
 If the cooresponding Rails route contains nesting and this controller is downnested by someone else, you'll want to set nestable to true.
 
-If the cooresponding Rails route is not nested (but the object itself may be nested), and the controller sits a the root of the namespace, set nestable to false. 
-
+If the cooresponding Rails route is not nested and the controller sits a the root of the namespace, set nestable to false.
 
 
 ## Automatic Base Controller
@@ -603,7 +602,7 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
-#### ???? (unreleased)      - v? - Downnesting
+#### (unreleased)    - Downnesting
                      - Adds spec coverage support for enums
 
 #### 2021-10-11 - v0.2.6 - many additional automatic fixes for default Rails installation 6 or 7 for the generate hot_glue:install command
