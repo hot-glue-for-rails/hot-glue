@@ -206,7 +206,8 @@ DO EIETHER 6(A) OR 6(B)
     ```
 
 
-## 6(B) Install Bootstrap using Sprockets (IMPORTANT: YOU DO NOT NEED JQUERY)
+## 6(B) Install Bootstrap using Sprockets
+(IMPORTANT: YOU DO NOT NEED JQUERY)
 DO EIETHER 6(A) OR 6(B)
 
 Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
