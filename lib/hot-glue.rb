@@ -1,7 +1,6 @@
 require "hotglue/engine"
-
 require 'kaminari'
-require 'haml-rails'
+
 
 module HotGlue
 
