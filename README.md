@@ -148,14 +148,11 @@ By default, Capybara uses the :rack_test driver, which is fast but limited: it d
 ```
 
 - To fix this, you must switch to a Javascript-supporting Capybara driver. You can choose one of:
-- 
-```
-Capybara.default_driver = :selenium 
-```
 
-```
-Capybara.default_driver = :selenium_chrome 
-```
+`Capybara.default_driver = :selenium`
+`Capybara.default_driver = :selenium_chrome`
+`Capybara.default_driver = :selenium_chrome_headless`
+
 By default, the installer should have added this option to your `rails_helper.rb` file:
 
 ```
@@ -185,7 +182,7 @@ Alternatively, can define your own driver like so:
 ### 6(A) Bootstrap with Webpack:    
 DO EIETHER 6(A) OR 6(B)
 - add to Gemfile
-- gem 'bootstrap', '~> 5.1.0'
+- `gem 'bootstrap', '~> 5.1.3'`
 - completely delete the file `app/assets/application.css`
 - create new file where it was `app/assets/application.scss` with this contents (do not keep the contents of the old application.css file):
 ``` 
@@ -230,7 +227,7 @@ or https://github.com/FortAwesome/font-awesome-sass
 
 
 
-## 8. For Enum support, I recommend activerecord-pgenum
+## 8. For Enum support, I recommend activerecord-pg_enum
 
 Instructions for Rails are here:
 https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
