@@ -558,6 +558,13 @@ Omits delete action.
 
 If you do not want inline editing of your list items but instead to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
 
+### `--display-list-after-update` (default: false)
+
+After an update-in-place normally only the edit view is swapped out for the show view of the record you just edited.
+
+Sometimes you might want to redisplay the entire list after you make an update (for example, if your action removes that record from the result set).
+
+To do this, use flag `--display_list_after_update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list. 
 
 
 
