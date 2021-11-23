@@ -659,11 +659,14 @@ Here are some defeciencies to note
 
 - [ ] the ERB output has a necessary gsub that makes it so that every file always kicks the "Overwrite?" even when it has not changed. Unfortunately because of the meta programming involved in the ERB, I do not see a way around this although I would like to eventually fix it or match the AR generator internals to fix this problem. 
 
-- [ ] the system_spec that is generated (system/___behavior_spec.rb) works most of the time but obviously you must run it to confirm it passes correclty. still working out bugs in this area for special cases.
+- [ ] the system_spec that is generated (system/*_spec.rb) works most of the time but obviously you must run it to confirm it passes correclty. still working out bugs in this area for special cases.
 
----> Note that the specs use FFaker data and random numbers, so if you have model-level validations and out-of-bounds choices are made, your specs might fail *intermittently*.
+
+
+- [ ] Note that the specs use FFaker data and random numbers, so if you have model-level validations and out-of-bounds choices are made, your specs might fail *intermittently*.
 ---> I know I hate intermittent failing specs, and if I had any in my app I would surely refactor them out. I'm not sure how I feel about *randomized* data-- or this much randomized data-- in specs. It's kind of fun but it also is tempting fate somewhat, and hopefully encouraging/forcing you to refactor them to be meaningful to your models and model-level validations. 
 
+- [ ] The specs themselves and some generated code is particularly ugly-- especially, formated inconsistently. Sorry about this, will clean this up soon. It is there to encourage you to read the generated code and lint or rubocop it before you check it in. I know the indentation is off and very ugly. 
 
 
 # HOW THIS GEM IS TESTED

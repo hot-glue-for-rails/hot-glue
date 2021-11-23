@@ -1,6 +1,9 @@
-<\%= turbo_stream.replace "<%= singular%>__#{@<%= singular %>.id}" do %>
+<% if !@display_list_after_update %><\%= turbo_stream.replace "<%= singular%>__#{@<%= singular %>.id}" do %>
   <\%= render partial: 'line', locals: {<%= singular %>: @<%= singular %> <%= nest_assignments_operator(true,true) %> } %>
+<\% end %><% else %><\%= turbo_stream.replace "<%= plural %>-list" do %>
+  <\%= render partial: '<%= list_path_partial %>', locals: {<%= plural %>: @<%= plural %><%= nest_assignments_operator(true, true) if @nestable %> } \%>
 <\% end %>
+<% end %>
 
 <\%= turbo_stream.replace "flash_notices" do %>
   <\%= render partial: "layouts/flash_notices" %>

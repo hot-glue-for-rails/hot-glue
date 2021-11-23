@@ -60,6 +60,7 @@ module HotGlue
     class_option :downnest, type: :string, default: nil
     class_option :nestable, type: :boolean, default: false
     class_option :magic_buttons, type: :string, default: nil
+    class_option :display_list_after_update, type: :boolean, default: false
 
     def initialize(*meta_args)
       super
@@ -134,6 +135,7 @@ module HotGlue
       @big_edit = options['big_edit']
 
       @no_edit = options['no_edit'] || false
+      @display_list_after_update = options['display_list_after_update'] || false
 
 
       @downnest_relationship = options['downnest'] || false
