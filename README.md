@@ -54,14 +54,16 @@ Instantly get a simple CRUD interface
 
 # THE SETUP
 
-## 1. (RAILS 6 ONLY— SKIP FOR RAILS 7) ADD HOTWIRE
+## 1. ADD HOTWIRE
+(RAILS 6 ONLY— SKIP THIS STEP FOR RAILS 7)
 ```
 yarn add @hotwired/turbo-rails
 ```
 or `npm install @hotwired/turbo-rails`
 
 
-## 2. (RAILS 6 ONLY— SKIP FOR RAILS 7) SWITCH FROM TurblLinks to Turbo-Rails  (SKIP THIS STEP FOR RAILS 7)
+## 2. SWITCH FROM TurblLinks to Turbo-Rails 
+(RAILS 6 ONLY— SKIP THIS STEP FOR RAILS 7)
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
 - Add `gem 'turbo-rails'` to your Gemfile & `bundle install`
 - Then install it with `rails turbo:install`
@@ -98,8 +100,6 @@ gem 'factory_bot_rails'
 gem 'ffaker'
 ```
 
-
-## 4. RUN THE RSPEC INSTALLER
 - run `rails generate rspec:install`
 
 ## 5(A). RUN HOT-GLUE INSTALL
