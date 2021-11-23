@@ -448,6 +448,7 @@ module HotGlue
     end
 
     def nested_assignments
+      return "" if @nested_args.none?
       @nested_args.map{|a| "#{a}: #{a}"}.join(", ") #metaprgramming into Ruby hash
     end
 

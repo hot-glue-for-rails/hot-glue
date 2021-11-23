@@ -31,11 +31,7 @@ Hot Glue generates functionality that's quick and dirty. It let's you be crafty.
 
 ## QUICK START
 
-It's really easy to get started by following along with this blog post that creates three simple tables (User, Event, and Format).
-
-Feel free to build your own tables when you get to the sections for building the 'Event' scaffold:
-
-https://jasonfleetwoodboldt.com/hot-glue
+If you like tutorials, try https://jasonfleetwoodboldt.com/hot-glue
 
 ## HOW EASY?
 
@@ -607,10 +603,8 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
-#### 2021-11-15  - v0.2.8 - Downnesting
-        
-
-#### 2021-10-12 - v0.2.7 - Adds spec coverage support for enums
+#### ???? (unreleased)      - v? - Downnesting
+                     - Adds spec coverage support for enums
 
 #### 2021-10-11 - v0.2.6 - many additional automatic fixes for default Rails installation 6 or 7 for the generate hot_glue:install command
 
