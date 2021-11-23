@@ -591,10 +591,10 @@ Obviously, the created controller will always have this base controller as its s
 - Text*
 - Float*
 - Datetime
-- Date (TOOD: implement this)
-- Time (TOOD: implement this)
+- Date
+- Time
 - Boolean 
-- Enum - will be magically displayed as a value list populated from the enum list defined on your model. see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
+- Enum - will display as a value list populated from the enum list defined on your model. see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
 
 * shows in a size-aware container, i.e. in a bigger box if the field allows for more content
 
