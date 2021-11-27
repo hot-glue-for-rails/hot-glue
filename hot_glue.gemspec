@@ -32,11 +32,10 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "rails",  '> 5.1', '<= 7.0.0'
   spec.homepage    = 'https://jasonfleetwoodboldt.com/hot-glue/'
   spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/hot-glue",
-                       "documentation_uri" => "https://jasonfleetwoodboldt.com/hot-glue/",
-                       "homepage_uri" => 'https://github.com/jasonfb/hot-glue'}
+                       "documentation_uri" => "https://jfb.teachable.com/p/hot-glue-in-depth-tutorial",
+                       "homepage_uri" => 'https://jasonfleetwoodboldt.com/hot-glue/'}
 
   spec.add_runtime_dependency('kaminari', '~> 1.2')
-  # spec.add_runtime_dependency('haml-rails', '~> 2.0')
   spec.add_runtime_dependency('turbo-rails', '> 0.5')
   spec.add_runtime_dependency('sass-rails')
 
@@ -58,6 +57,7 @@ Gem::Specification.new do |spec|
       * Nest your routes model-by-model for built-in poor man's authentication.
       * Throw the scaffolding away when your app is ready to graduate to its next phase.
       * docs at https://github.com/jasonfb/hot-glue
+      * get the tutorial at https://jfb.teachable.com/p/hot-glue-in-depth-tutorial
     ---------------------------------------------
   MSG
 end

@@ -264,6 +264,9 @@ You can also skip Devise installer Step 4, which is optional:
      * Not required *
 ```
 
+## IMPORTANT: Out of the box, Devise is not compatible with Turbo Rails. You must perform the specific fixes described here:
+https://jasonfleetwoodboldt.com/hot-glue/devise-turbo-rails-fix
+
 
 ## 9(B) Devise & Capybara - Add User Authentication if you are using Access Control
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
@@ -282,8 +285,6 @@ You can also skip Devise installer Step 4, which is optional:
    end
    ```
 
-## IMPORTANT: Out of the box, Devise is not compatible with Turbo Rails. You must perform the specific fixes described here:
-https://jasonfleetwoodboldt.com/hot-glue/#devise-turbo-rails-fix
 
 ## RAILS 7: Devise is not yet supported on Rails 7 unless you use the master branch of devise
 
