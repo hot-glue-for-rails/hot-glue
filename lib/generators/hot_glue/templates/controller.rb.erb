@@ -92,9 +92,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
 <% end %><% if @build_update_action %>  def update
-<%= controller_magic_button_update_actions %>
-
-    if @<%= singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>)<%= controller_update_params_tap_away_magic_buttons %>)
+<%= controller_magic_button_update_actions %>    if @<%= singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>)<%= controller_update_params_tap_away_magic_buttons %>)
       flash[:notice] = "Saved #{@<%= singular %>.<%= display_class %>}"
     else
       flash[:alert] = "<%= singular_name.titlecase %> could not be saved."
@@ -117,9 +115,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       format.turbo_stream
       format.html { redirect_to <%= path_helper_plural %> }
     end
-  end
+  end<% end %>
 
-<% end %>def <%=singular_name%>_params
+  def <%=singular_name%>_params
     params.require(:<%=singular_name%>).permit( <%= @columns + @magic_buttons.collect(&:to_sym) %> )
   end
 
@@ -129,10 +127,6 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   def namespace
     <% if @namespace %>"<%= @namespace %>/" <% else %>""<% end %>
-  end
-
-  def common_scope
-    @nested_args
   end
 end
 
