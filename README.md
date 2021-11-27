@@ -611,8 +611,11 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
-#### (unreleased)    - Downnesting
+#### 2021-11-27 - v0.2.9E   — EXPERIMENTAL 
+                     - Downnesting
                      - Adds spec coverage support for enums
+                     - Several more fixes; this is preparation for forthcoming release.
+                     - Some parts still experimental. Use with caution. 
 
 #### 2021-10-11 - v0.2.6 - many additional automatic fixes for default Rails installation 6 or 7 for the generate hot_glue:install command
 
