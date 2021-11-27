@@ -85,11 +85,13 @@ Turbo.start()
 
 
 ## 3. ADD HOT-GLUE GEM
-- Add `gem 'hot-glue'` to your Gemfile & `bundle install`
+- Add `gem 'hot-glue', '~> 0.2.6'` to your Gemfile & `bundle install`
+
+(TODO: figure out why bundler seems to install the yanked version 0.0.0 if you don't specify the hot glue version)
 
 ## 4. ADD RSPEC, FACTORY-BOT, AND FFAKER
 
-add these 3 gems to your gemfile inside :development and :test groups
+add these 3 gems to your gemfile **inside a group for both :development and :test*. Do not add these gems to only the :test group or else your will have problems with the generators.
 ```
 gem 'rspec-rails'
 gem 'factory_bot_rails'
