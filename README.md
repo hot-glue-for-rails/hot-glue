@@ -17,7 +17,7 @@ It will read your relationships and field types to generate your code for you, l
 
 By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields. 
 
-Hot Glue generates functionality that's quick and dirty. It let's you be crafty. As with a real hot glue gun, use with caution. 
+Hot Glue generates functionality that's quick and dirty. It lets you be crafty. As with a real hot glue gun, use with caution. 
 
 * Build plug-and-play scaffolding mixing generated ERB or HAML with the power of Hotwire and Turbo-Rails
 * Everything edits-in-place (unless you use --big-edit, then it won't)
@@ -31,7 +31,7 @@ Hot Glue generates functionality that's quick and dirty. It let's you be crafty.
 
 ## QUICK START
 
-If you like tutorials, try https://jasonfleetwoodboldt.com/hot-glue
+If you like tutorials, try https://jfbcodes.com/hot-glue-tutorial
 
 ## HOW EASY?
 

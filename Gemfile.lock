@@ -1,12 +1,12 @@
 PATH
   remote: .
   specs:
-    hot-glue (0.2.7)
+    hot-glue (0.2.9E)
       ffaker (~> 2.16)
       kaminari (~> 1.2)
       rails (> 5.1, <= 7.0.0)
       sass-rails
-      turbo-rails (~> 0.5)
+      turbo-rails (> 0.5)
 
 GEM
   remote: https://rubygems.org/
@@ -201,7 +201,7 @@ GEM
     sqlite3 (1.4.2)
     thor (1.1.0)
     tilt (2.0.10)
-    turbo-rails (0.8.1)
+    turbo-rails (7.1.1)
       rails (>= 6.0.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)

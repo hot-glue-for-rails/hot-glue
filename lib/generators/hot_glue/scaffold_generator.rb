@@ -215,8 +215,8 @@ module HotGlue
               if !@auth_check.method("#{arg}s")
                 exit_message= "*** Oops:  your nesting chain does not have a assocation for #{arg}s on #{@auth_check}  something is wrong."
               end
-              byebug
-              puts ""
+              # byebug
+              # puts ""
             end
           end
 
