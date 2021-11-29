@@ -11,5 +11,5 @@
       - if <%= plural %>.empty?
         None
       - <%= plural %>.each do |<%= singular %>|
-        = render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if @nestable %> }
+        = render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if @nest %> }
     <%=  @no_paginate ? "" : paginate %>

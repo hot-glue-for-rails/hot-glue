@@ -209,12 +209,12 @@ DO EIETHER 6(A) OR 6(B)
 DO EIETHER 6(A) OR 6(B)
 
 Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
-- add `gem 'bootstrap-rubygem'` to your gemfile
+- add `gem 'bootstrap', '~> 5.1.3'` to your gemfile
 - replace `application.css` with a new file (delete old contents) `application.scss`
 ```
 @import "bootstrap";
 ```
-- see README at github.com/twbs/bootstrap-rubygem to install
+- see README at https://github.com/twbs/bootstrap-rubygem to install
 
 
 
@@ -265,7 +265,7 @@ You can also skip Devise installer Step 4, which is optional:
 ```
 
 ## IMPORTANT: Out of the box, Devise is not compatible with Turbo Rails. You must perform the specific fixes described here:
-https://jasonfleetwoodboldt.com/hot-glue/devise-turbo-rails-fix
+https://jasonfleetwoodboldt.com/hot-glue#devise-turbo-rails-fix
 
 
 ## 9(B) Devise & Capybara - Add User Authentication if you are using Access Control

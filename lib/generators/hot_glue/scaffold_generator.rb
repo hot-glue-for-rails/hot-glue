@@ -72,9 +72,14 @@ module HotGlue
         raise(HotGlue::Error, message)
       end
 
-      if @specs_only && @no_specs
+      if !options['spec_only'].nil? && !options['no_spec'].nil?
         raise(HotGlue::Error, "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry.")
       end
+
+      if !options['exclude'].empty? && !options['include'].empty?
+        raise(HotGlue::Error, "*** Oops: You seem to have specified both --include and --exclude. Please use one or the other. Aborting.")
+      end
+
 
       if @stimulus_syntax.nil?
         if Rails.version.split(".")[0].to_i >= 7
@@ -158,6 +163,7 @@ module HotGlue
           @nested_args_plural[a] = a + "s"
         end
       end
+      @nestable = @nested_args.any?
 
 
       @magic_buttons = []
@@ -168,7 +174,7 @@ module HotGlue
       @build_update_action = !@no_edit || !@magic_buttons.empty?
       # if the magic buttons are present, build the update action anyway
 
-      @nestable = options['nestable'] || false
+      # @nestable = options['nestable'] || false
 
       if @auth && ! @self_auth && @nested_args.none?
         @object_owner_sym = @auth.gsub("current_", "").to_sym
@@ -396,7 +402,7 @@ module HotGlue
     end
 
     def path_helper_args
-      if @nested_args.any? && @nestable
+      if @nested_args.any? && @nest
         [(@nested_args).collect{|a| "#{a}"} , singular].join(",")
       else
         singular
@@ -404,7 +410,7 @@ module HotGlue
     end
 
     def path_helper_singular
-      if @nestable
+      if @nest
         "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
       else
         "#{@namespace+"_" if @namespace}#{singular}_path"
@@ -412,7 +418,7 @@ module HotGlue
     end
 
     def path_helper_plural
-      if ! @nestable
+      if ! @nest
         "#{@namespace+"_" if @namespace}#{plural}_path"
       else
         "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{plural}_path"
@@ -421,7 +427,7 @@ module HotGlue
 
     def path_arity
       res = ""
-      if @nested_args.any? && @nestable
+      if @nested_args.any? && @nest
         res << nested_objects_arity + ", "
       end
       res << "@" + singular

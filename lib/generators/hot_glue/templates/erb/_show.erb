@@ -2,7 +2,7 @@
 
 <% if @downnest_relationship %>
   <div class="col">
-  <\%= render partial: "dashboard/<%= @downnest_relationship %>/list", locals: {
+  <\%= render partial: "<%= namespace_with_trailing_dash %><%= @downnest_relationship %>/list", locals: {
   <%= @singular %>: <%= @singular %><%= nest_assignments_operator(false, true) %>,
   <%= @downnest_relationship %>: <%= @singular %>.<%= @downnest_relationship %>} %>
   </div>
