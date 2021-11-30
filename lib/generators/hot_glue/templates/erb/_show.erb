@@ -5,12 +5,11 @@
   <% @downnest_children.each do |downnest| %>
   <div class="<%= @col_identifier %> scaffold-downnest" style="flex-basis: <%= each_downnest_width %>%" >
   <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest %>/list", locals: {
-    nested_for: "#{nested_for + "__" if nested_for}<%= @singular %>-#{<%= @singular %>.id}",
+    nested_for: "<% if @nested_args.any? %>#{nested_for + "__" if nested_for}<% end %><%= @singular %>-#{<%= @singular %>.id}",
     <%= @singular %>: <%= @singular %><%= nest_assignments_operator(false, true) %>,
     <%= downnest %>: <%= @singular %>.<%= downnest %>} %>
   </div>
   <% end %>
-
 <% end %>
 
 <div class="<%= @col_identifier %> scaffold-line-buttons" style="flex-basis: 150px;">

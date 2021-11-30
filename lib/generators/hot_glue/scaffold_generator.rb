@@ -358,13 +358,18 @@ module HotGlue
     end
 
     def list_column_headings
+      if @nested_args.any?
+        column_width = each_col * @columns.count
 
+        "<div class='#{@col_identifier}'  style='flex-basis: #{column_width}%'>"
+      else
+        @template_builder.list_column_headings(
+          column_width: each_col,
+          columns: @columns,
+          col_identifier: @col_identifier
+        )
+      end
 
-      @template_builder.list_column_headings(
-        column_width: column_width,
-        columns: @columns,
-        col_identifier: @col_identifier
-      )
 
     end
 
@@ -689,6 +694,10 @@ module HotGlue
     end
 
     def each_col
+      (col_width/@columns.count).to_i
+    end
+
+    def col_width
       downnest_size = case (@downnest_children.count)
 
                       when 0
@@ -700,8 +709,7 @@ module HotGlue
                         downnest_size = 60
 
                       end
-      total_width = 100 - downnest_size - 5
-      (total_width/@columns.count).to_i
+      100 - downnest_size - 5
     end
 
     def all_line_fields

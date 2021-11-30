@@ -1,6 +1,6 @@
 <\%= turbo_frame_tag "<%= plural %>-list" <%= nested_for_turbo_id_list_constructor %>  do %>
   <div class="<%= @container_name %> scaffold-list">
-    <h4><%= plural.gsub("_", " ").upcase %></h4>
+    <% unless @nested_args.any? %><h4><%= plural.gsub("_", " ").upcase %></h4><% end %>
 
     <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  plural + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><% end %>
 
@@ -9,7 +9,7 @@
       <% if @downnest_children.any? %>
         <% each_downnest_width = @downnest_children.count == 1 ? 40 : (60/@downnest_children.count).floor %>
       <% @downnest_children.each do |downnest| %>
-        <div class="col scaffold-col-heading" style="flex-basis: #{each_downnest_width}%">
+        <div class="col scaffold-col-heading" style="flex-basis: <%= each_downnest_width %>%;">
           <h4>
             <%=  downnest.titleize  %>
           </h4>
@@ -21,14 +21,15 @@
     </div>
 
       <\% if <%= plural %>.empty? %>
-        <div>
-            None
-        </div>
+    <div>
+        None
+    </div>
       <\% end %>
       <\% <%= plural %>.each do |<%= singular %>| %>
         <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if  @nestable %><%= ", nested_for: nested_for" if @nestable %> } %>
       <\% end %>
 
     <%=  @no_paginate ? "" : paginate %>
+    </div>
   </div>
 <\% end %>
