@@ -37,8 +37,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
 
   def load_all_<%= plural %>
-    <% if !@self_auth %>@<%= plural_name %> = <%= object_scope.gsub("@",'') %><% if model_has_strings? %>.where(<%=class_name %>.arel_table[:email].matches("%#{@__general_string}%"))<% end %>.page(params[:page])
-    <% else %>@<%= plural_name %> = [<%= auth_object %>]<% end %>
+    @<%= plural_name %> = <%= object_scope.gsub("@",'') %>.page(params[:page])
   end
 
   def index

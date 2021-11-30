@@ -1,9 +1,12 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="clearfix"></div>
-      <\%= render partial: '<%= list_path_partial %>',
-              locals: {<%= plural %>: @<%= plural %><%= nest_assignments_operator(true, true) if @nestable %> } \%>
-    </div>
-  </div>
+<div class="<%= @container_name %>">
+  <% if @layout == "bootstrap" %><div class="row"> <div class="col-md-12">
+  <% else %>
+    <div class=' scaffold-index-<%= plural %>'>
+  <% end %>
+
+  <div class="clearfix"></div>
+  <\%= render partial: '<%= list_path_partial %>',
+  locals: {<%= plural %>: @<%= plural %><%= nested_for_assignments_constructor %><%= nest_assignments_operator(true, true) if @nestable %> } \%>
+
+  <% if @layout == "bootstrap" %></div></div><% else  %></div><% end %>
 </div>

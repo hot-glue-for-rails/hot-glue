@@ -100,15 +100,41 @@ gem 'ffaker'
 
 - run `rails generate rspec:install`
 
+
+5. - replace `application.css` with a new file (delete old contents) `application.scss` 
+
+- — THIS FILE CAN BE EMPTY
+
 ## 5(A). RUN HOT-GLUE INSTALL
+Here you will set up and install Hot Glue for the first time. It will install a config file that will save two preferences: layout (hotglue or bootstrap) and markup (erb or haml or slim).
+
+Once you run the installer, the installer will save what you set it to in `config/hot_glue.yml`. Newly generated scaffolds will use these two settings, but you can modify them just by modifying the config file (you don't need to re-run the installer)
+
+If you do NOT specify `--layout`, then `hotglue` will be assumed. 
+
+If you do use the Hot Glue layout, you should ALSO install a theme.
+
+
+
+
 ### FOR ERB:
-`rails generate hot_glue:install --markup=erb`
+`rails generate hot_glue:install --markup=erb --layout=bootstrap`
 
 ### FOR HAML:
-`rails generate hot_glue:install --markup=haml`
+`rails generate hot_glue:install --markup=erb --layout=hotglue --theme=like_mountain_view`
 
 
+the themes are:
+• like_mountain_view (Google)
+• like_los_gatos (Netflix)
+• like_bootstrap (bootstrap 4 copy)
 
+WIP
+• lined_notebook (Jason's them inspired by an old fashioned lined notebook)
+• dark_knight (Jason's theme inspired by white-on-black look)
+• like_cupertino (Apple-inspired theme)
+
+The themes are just SCSS files installed into app/assets/stylesheets. You can tweak or modify or remove them afer they get installed.
 
 
 ## 5(B). Modify `application.html.erb` 
@@ -177,45 +203,22 @@ Alternatively, can define your own driver like so:
   ```
 
 
-### 6(A) Bootstrap with Webpack:    
-DO EIETHER 6(A) OR 6(B)
-- add to Gemfile
-- `gem 'bootstrap', '~> 5.1.3'`
-- completely delete the file `app/assets/application.css`
-- create new file where it was `app/assets/application.scss` with this contents (do not keep the contents of the old application.css file):
-``` 
-// Custom bootstrap variables must be set or imported *before* bootstrap.
-@import "bootstrap";
-```
+## 6 — THEMING OR USE BOOTSTRAP
 
-* You do not need jQuery for HotGlue to work *
+BOOTSTRAP NO LONGER NEEDED. IF you are using layout=bootstrap, you must install Bootstrap here.
+However, please note that the scaffold build with different market up for boostrap, so you cannot switch between the Bootstrap and Hotglue layouts without rebuilding the scaffold.
 
-### Hook your Bootstrap into your global application scss
-- change `stylesheet_link_tag` to `stylesheet_pack_tag` in your application layout
-  - run `yarn add bootstrap`
-  - create a new file at `app/javascript/require_bootstrap.scss` with this content
-    ```
-    @import "~bootstrap/scss/bootstrap.scss";
-    ```
-    
-  - add to `app/javascript/packs/application.js` 
-    ```
-    import 'require_bootstrap'
-    ```
+(On the other hand, if you build within the Hotglue layout, all of the Hotglue theme file CAN be swapped out without rebuilding the scaffood.)
 
+You probably already picked at Theme in Step 5, but to re-install a new theme, try:
 
-## 6(B) Install Bootstrap using Sprockets
-(IMPORTANT: YOU DO NOT NEED JQUERY)
-DO EIETHER 6(A) OR 6(B)
+`rails generate hot_glue:install --markup=erb --layout=hotglue --theme=like_mountain_view`
 
-Bootstrap with Sprockets for Rails 5 or 7 default — Rails 6 custom
-- add `gem 'bootstrap', '~> 5.1.3'` to your gemfile
-- replace `application.css` with a new file (delete old contents) `application.scss`
-```
-@import "bootstrap";
-```
-- see README at https://github.com/twbs/bootstrap-rubygem to install
+Remember, if you already installed a theme you'll have an existing one in your `app/assets/stylesheets/application.scss` so be sure to remove the old one.
 
+Note: My Hotglue themes use Flexbox to make everything fall into columns nicely. However, they are not *mobile responsive*. They do stretch and shrink with the browser's window, but unlike Bootstrap, they do not stack when the viewport gets smaller.
+
+Bootstrap, on the other hand, does a better job of stacking for mobile responsive viewports, but does not have the fancy layout features that are built into the HotGlue themes. In particular, Bootstrap's 12-column grid were challenging to work within and my HotGlue themes abandon the 12-column grid in favor of a full flexbox implementation. This implementation has the advantage of being "column-aware" (it knows what you're building and tries to piece it together nicely), but it is doesn't stack nicely on mobile the way Bootstrap does.
 
 
 

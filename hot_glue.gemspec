@@ -46,11 +46,18 @@ Gem::Specification.new do |spec|
   spec.post_install_message = <<~MSG
     ---------------------------------------------
     Welcome to Hot Glue - A Scaffold Building Companion for Hotwire + Turbo-Rails
-    
-    To purchase a license, please see https://heliosdev.shop/hot-glue-license
-    Hobbyists and individuals can buy the tutorial here: https://jfbcodes.com/hot-glue-tutorial
-    Or just check out my merch shop instead: https://shop.heliosdev.shop/?utm_source=hot_glue_installer
-    
+  
+    To support this project, please choose the level right for you: 
+
+    $0 - Hobbyist/Individual/Non-profit (requires social justice pledge)
+    $5 and up - Get some merch at https://shop.heliosdev.shop
+    $60 - Buy the Hot Glue In-Depth Tutorial (available on Teachable)
+    $250 - License for Professional/Entrepreneur/Early-stage startup (INCLUDES 1 SUPPORT INCIDENT)
+    $1000 - License for Late stage startup/Medium-sized business (INCLUDES 1 YEAR SUPPORT PLAN, UNLIMITED INCIDENTS)
+    $5000 - License for Enterprise-sided business/Government entities (INCLUDES 1 YEAR SUPPORT PLAN, UNLIMITED INCIDENTS)
+
+    please see https://heliosdev.shop/hot-glue-license
+
     ---------------------------------------------
   MSG
 end

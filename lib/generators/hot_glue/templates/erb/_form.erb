@@ -1,7 +1,7 @@
 <div class="row">
   <%= all_form_fields %>
 
-  <div class="col">
+  <div class="<% @layout == "hotglue" ? 'scaffold-cell' : 'col' %>">
     <\%= link_to "Cancel", <%= path_helper_plural %>,  {class: "btn btn-secondary"} %>
     <\%= f.submit "Save", class: "btn btn-primary pull-right" %>
   </div>

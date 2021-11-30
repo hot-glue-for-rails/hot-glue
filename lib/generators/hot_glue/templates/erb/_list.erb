@@ -1,16 +1,18 @@
-<\%= turbo_frame_tag "<%= plural %>-list" do %>
-  <div class="container-fluid ">
+<\%= turbo_frame_tag "<%= plural %>-list" <%= nested_for_turbo_id_list_constructor %>  do %>
+  <div class="<%= @container_name %> scaffold-list">
     <h4><%= plural.gsub("_", " ").upcase %></h4>
-    <div class="row">
-      <div class="col-md-12">
-        <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  plural + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><% end %>
-      </div>
-    </div>
 
+    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  plural + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><% end %>
 
-    <div class="row">
+    <div class="row scaffold-row">
       <%= list_column_headings %>
-      <div class='col buttons-col'></div>
+      <% if @downnest_relationship %> <div class="col scaffold-col-heading" style="flex-basis: 45%">
+      <h4>
+        <%=  @downnest_relationship.titleize  %>
+      </h4>
+      </div> <% end %>
+
+      <div class='col scaffold-col-heading scaffold-col-heading-buttons' style="flex-basis: 150px"></div>
     </div>
 
       <\% if <%= plural %>.empty? %>

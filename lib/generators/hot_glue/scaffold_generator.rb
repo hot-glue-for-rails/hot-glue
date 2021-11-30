@@ -55,12 +55,15 @@ module HotGlue
     class_option :no_paginate, type: :boolean, default: false
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
-    class_option :markup, type: :string, default: "erb"
     class_option :stimulus_syntax, type: :boolean, default: nil
     class_option :downnest, type: :string, default: nil
     class_option :nestable, type: :boolean, default: false
     class_option :magic_buttons, type: :string, default: nil
     class_option :display_list_after_update, type: :boolean, default: false
+
+    class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
+    class_option :layout, type: :string, default: nil # deprecated -- use in app config instead
+
 
     def initialize(*meta_args)
       super
@@ -80,7 +83,6 @@ module HotGlue
         raise(HotGlue::Error, "*** Oops: You seem to have specified both --include and --exclude. Please use one or the other. Aborting.")
       end
 
-
       if @stimulus_syntax.nil?
         if Rails.version.split(".")[0].to_i >= 7
           @stimulus_syntax = true
@@ -89,17 +91,34 @@ module HotGlue
         end
       end
 
-      if options['markup'] == "erb"
+      if !options['markup'].nil?
+        raise "Using --markup flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
+      end
+
+      if !options['markup'].nil?
+        raise "Using --layout flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
+      end
+
+      yaml_from_config = YAML.load(File.read("config/hot_glue.yml"))
+      @markup =  yaml_from_config[:markup]
+
+      if  @markup == "erb"
         @template_builder = HotGlue::ErbTemplate.new
-      elsif options['markup'] == "slim"
+      elsif  @markup == "slim"
         puts "SLIM IS NOT IMPLEMENTED; please see https://github.com/jasonfb/hot-glue/issues/3"
         abort
         @template_builder = HotGlue::SlimTemplate.new
 
-      elsif options['markup'] == "haml"
+      elsif  @markup == "haml"
         @template_builder = HotGlue::HamlTemplate.new
       end
-      @markup =  options['markup']
+
+
+      @layout = yaml_from_config[:layout]
+
+      if !['hotglue', 'bootstrap'].include? @layout
+        raise "Invalid option #{@layout} in Hot glue config (config/hot_glue.yml). You must pass either hotglue (default) or bootstrap to config"
+      end
 
 
       args = meta_args[0]
@@ -142,6 +161,10 @@ module HotGlue
       @no_edit = options['no_edit'] || false
       @display_list_after_update = options['display_list_after_update'] || false
 
+
+
+      @col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col"
+      @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
 
       @downnest_relationship = options['downnest'] || false
 
@@ -329,7 +352,13 @@ module HotGlue
     end
 
     def list_column_headings
-      @template_builder.list_column_headings(columns: @columns)
+
+
+      @template_builder.list_column_headings(
+        column_width: column_width,
+        columns: @columns,
+        col_identifier: @col_identifier
+      )
 
     end
 
@@ -467,7 +496,7 @@ module HotGlue
 
     def nest_assignments_operator(top_level = false, leading_comma = false)
       if @nested_args.any?
-        "#{', ' if leading_comma}#{top_level ? nested_assignments_top_level : nested_assignments }"
+        "#{', ' + "\n     " if leading_comma}#{top_level ? nested_assignments_top_level : nested_assignments }"
       else
         ""
       end
@@ -493,7 +522,12 @@ module HotGlue
           "@" + @nested_args.last + ".#{plural}"
         end
       else
-        @singular_class
+        if @nested_args.none?
+          @singular_class
+        else
+          "@" + @nested_args.last + ".#{plural}"
+        end
+
       end
     end
 
@@ -559,8 +593,10 @@ module HotGlue
         formats.each do |format|
           source_filename = cc_filename_with_extensions("#{@markup}/#{view}", "#{@markup}")
           dest_filename = cc_filename_with_extensions("#{view}", "#{@markup}")
+
+
           dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
-                                    controller_file_path, dest_filename)
+                                    plural, dest_filename)
 
 
           template source_filename, dest_filepath
@@ -574,7 +610,7 @@ module HotGlue
           source_filename = cc_filename_with_extensions( "#{@markup}/#{view}.turbo_stream.#{@markup}")
           dest_filename = cc_filename_with_extensions("#{view}", "turbo_stream.#{@markup}")
           dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
-                                    controller_file_path, dest_filename)
+                                    plural, dest_filename)
 
 
           template source_filename, dest_filepath
@@ -632,16 +668,33 @@ module HotGlue
     end
 
     def all_form_fields
+
       @template_builder.all_form_fields(
         columns: @columns,
         show_only: @show_only,
         singular_class: singular_class,
-        singular: singular
+        singular: singular,
+        col_identifier:  @col_identifier
       )
     end
 
+    def column_width
+      @each_col ||= each_col
+    end
+
+    def each_col
+      if !@downnest_relationship
+        total_width = 85
+      else
+        total_width = 45
+      end
+      (total_width/@columns.count).to_i
+    end
+
     def all_line_fields
+
       @template_builder.all_line_fields(
+        perc_width: column_width,
         columns: @columns,
         show_only: @show_only,
         singular_class: singular_class,
@@ -725,6 +778,36 @@ module HotGlue
         ".tap{ |ary| ary.delete('#{magic_button}') }"
       }.join("")
     end
+
+
+    def nested_for_turbo_id_list_constructor
+      if @nested_args.none?
+        ""
+      else
+        "+ ('__' + nested_for)"
+      end
+    end
+
+    def nested_for_turbo_nested_constructor(top_level = true)
+      instance_symbol = "@" if top_level
+      instance_symbol = "" if !top_level
+      if @nested_args.none?
+        ""
+      else
+        "__" + @nested_args.collect{|a| "#{a}-" + '#{' + instance_symbol + a + '.id}'}.join("__")
+      end
+    end
+
+    def nested_for_assignments_constructor(top_level = true)
+      instance_symbol = "@" if top_level
+      instance_symbol = "" if !top_level
+      if @nested_args.none?
+        ""
+      else
+        ", \n    nested_for: \"" + @nested_args.collect{|a| "#{a}-" + '#{' + instance_symbol + a + ".id}"}.join("__") + "\""
+      end
+    end
+
 
     private # thor does something fancy like sending the class all of its own methods during some strange run sequence
     # does not like public methods

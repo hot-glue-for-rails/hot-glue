@@ -5,7 +5,7 @@ module  HotGlue
     attr_accessor :singular
 
     def field_output(col, type = nil, width, col_identifier )
-      "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
+      "<div class='#{col_identifier} form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
       "  <%= f.text_field :#{col.to_s}, value: @#{@singular}.#{col.to_s}, size: #{width}, class: 'form-control', type: '#{type}' %>\n "+
       "  <label class='form-text' >#{col.to_s.humanize}</label>\n" +
       "</div>"
@@ -41,8 +41,10 @@ module  HotGlue
 
     def list_column_headings(*args)
       columns = args[0][:columns]
+      column_width = args[0][:column_width]
+      col_identifier = args[0][:col_identifier]
 
-      columns.map(&:to_s).map{|col_name| "<div class='col'>#{col_name.humanize}</div>"}.join("\n")
+      columns.map(&:to_s).map{|col_name| "<div class='#{col_identifier}'  style='flex-basis: #{column_width}%'>#{col_name.humanize}</div>"}.join("\n")
     end
 
 
@@ -50,13 +52,15 @@ module  HotGlue
       columns = args[0][:columns]
       show_only = args[0][:show_only]
       singular_class = args[0][:singular_class]
+      col_identifier = args[0][:col_identifier]
+
 
       # TODO: CLEAN ME
       @singular = args[0][:singular]
       singular = @singular
 
 
-      col_identifier = "col"
+
       col_spaces_prepend = "    "
 
       res = columns.map { |col|
@@ -166,11 +170,18 @@ module  HotGlue
       show_only = args[0][:show_only]
       singular_class = args[0][:singular_class]
       singular = args[0][:singular]
+      perc_width = args[0][:perc_width]
 
       columns_count = columns.count + 1
-      perc_width = (100/columns_count).floor
+      perc_width = (perc_width).floor
 
-      col_identifer = "col"
+      if @layout == "boostrap"
+        col_identifer = "col"
+
+      else
+        col_identifer = "scaffold-cell"
+
+      end
       columns.map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         limit = eval("#{singular_class}.columns_hash['#{col}']").limit
@@ -193,30 +204,30 @@ module  HotGlue
 
             display_column =  HotGlue.derrive_reference_name(assoc.class_name)
 
-            "<div class='#{col_identifer}'>
+            "<div class='#{col_identifer}' style='flex-basis: #{perc_width}%'>
   <%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>
 </div>"
 
           else
-            "<div class='#{col_identifer}'>
+            "<div class='#{col_identifer}'  style='flex-basis: #{perc_width}%'>
   <%= #{singular}.#{col}%></div>"
           end
         when :float
           width = (limit && limit < 40) ? limit : (40)
-          "<div class='#{col_identifer}'>
+          "<div class='#{col_identifer}'  style='flex-basis: #{perc_width}%'>
 <%= #{singular}.#{col}%></div>"
         when :string
           width = (limit && limit < 40) ? limit : (40)
-          "<div class='#{col_identifer}'>
+          "<div class='#{col_identifer}'  style='flex-basis: #{perc_width}%'>
   <%= #{singular}.#{col} %>
 </div>"
         when :text
-          "<div class='#{col_identifer}'>
+          "<div class='#{col_identifer}'  style='flex-basis: #{perc_width}%'>
   <%= #{singular}.#{col} %>
 </div>"
         when :datetime
 
-          "<div class='#{col_identifer}'>
+          "<div class='#{col_identifer}'  style='flex-basis: #{perc_width}%'>
   <% unless #{singular}.#{col}.nil? %>
 <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
 <% else %>
@@ -224,7 +235,7 @@ module  HotGlue
 <% end %>
 </div>"
         when :date
-          "<div class='#{col_identifer}'>
+          "<div class='#{col_identifer}'  style='flex-basis: #{perc_width}%'>
   <% unless #{singular}.#{col}.nil? %>
     <%= #{singular}.#{col} %>
   <% else %>
@@ -232,7 +243,7 @@ module  HotGlue
   <% end %>
 </div>"
         when :time
-          "<div class='#{col_identifer}'>
+          "<div class='#{col_identifer}'  style='flex-basis: #{perc_width}%'>
   <% unless #{singular}.#{col}.nil? %>
     <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone) %>
    <% else %>
@@ -241,7 +252,7 @@ module  HotGlue
 </div>
 "
         when :boolean
-          "<div class='#{col_identifer}'>
+          "<div class='#{col_identifer}'  style='flex-basis: #{perc_width}%'>
   <% if #{singular}.#{col}.nil? %>
       <span class='alert-danger'>MISSING</span>
   <% elsif #{singular}.#{col} %>

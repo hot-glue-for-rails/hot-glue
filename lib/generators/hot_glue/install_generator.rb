@@ -5,12 +5,25 @@ module HotGlue
   class InstallGenerator < Rails::Generators::Base
     hook_for :form_builder, :as => :scaffold
     class_option :markup, type: :string, default: "erb"
+    class_option :theme, type: :string, default: nil
+    class_option :layout, type: :string, default: "hotglue"
 
     source_root File.expand_path('templates', __dir__)
 
-
     def initialize(*args) #:nodoc:
       super
+      @layout = options['layout'] || "hotglue"
+      @theme =  options['theme']
+
+      if @layout == "hotglue" && options['theme'].nil?
+        raise "You have selected to install Hot Glue without a theme. You can either use the --layout=bootstrap to install NO HOT GLUE THEME, or to use a Hot Glue theme please choose: like_boostrap, like_menlo_park, like_cupertino, like_mountain_view, dark_knight"
+      end
+
+      if @layout == 'boostrap'
+        puts "IMPORTANT: You have selected to install Hot Glue with Bootstrap layout (legacy). Be sure to always use ``--layout=bootstrap` when building your scaffold. No Hot Glue theme will be installed at this time.` "
+      end
+
+
       @markup = options['markup']
       if @markup == "haml"
         copy_file "haml/_flash_notices.haml", "#{'spec/dummy/' if Rails.env.test?}app/views/layouts/_flash_notices.haml"
@@ -67,6 +80,33 @@ module HotGlue
 ")
         File.write("app/views/layouts/application.html.erb", application_layout_contents)
         puts "  HOTGLUE --> added to app/views/layouts/application.html.erb: `<%= render partial: 'layouts/flash_notices' %>`  "
+      end
+
+
+      if @layout == "hotglue"
+        theme_location = "themes/hotglue_scaffold_#{@theme}.scss"
+        theme_file = "hotglue_scaffold_#{@theme}.scss"
+
+        copy_file theme_location, "#{'spec/dummy/' if Rails.env.test?}app/assets/stylesheets/#{theme_file}"
+
+        application_scss = File.read("app/assets/stylesheets/application.scss")
+
+        if !application_scss.include?("@import '#{theme_file}';")
+        application_scss << ( "\n @import '#{theme_file}'; ")
+          File.write("app/assets/stylesheets/application.scss", application_scss)
+          puts "  HOTGLUE --> added to app/assets/stylesheets/application.scss: @import '#{theme_file}' "
+        else
+          puts "  HOTGLUE --> already found theme in app/assets/stylesheets/application.scss: @import '#{theme_file}' "
+        end
+      end
+
+
+
+      if !File.exists?("config/hot_glue.yml")
+
+        yaml = {layout: @layout, markup: @markup}.to_yaml
+        File.write("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml", yaml)
+
       end
 
 
