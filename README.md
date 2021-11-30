@@ -106,23 +106,23 @@ gem 'ffaker'
 - — THIS FILE CAN BE EMPTY
 
 ## 5(A). RUN HOT-GLUE INSTALL
+
+### `--layout` flag
 Here you will set up and install Hot Glue for the first time. It will install a config file that will save two preferences: layout (hotglue or bootstrap) and markup (erb or haml or slim).
 
 Once you run the installer, the installer will save what you set it to in `config/hot_glue.yml`. Newly generated scaffolds will use these two settings, but you can modify them just by modifying the config file (you don't need to re-run the installer)
 
-If you do NOT specify `--layout`, then `hotglue` will be assumed. 
-
-If you do use the Hot Glue layout, you should ALSO install a theme.
+If you do NOT specify `--layout=bootstrap`, then `hotglue` will be assumed. When constructing scaffold with bootstrap layout (at this time Hot Glue peeks into config/hot_glue.yml to see what you've set there), your views come out with divs that have classes like .container-fluid, .row, and .col. You'll need to install Bootstrap separately, any way you like, but jQuery is not required as Hot Glue does not rely on jQuery-dependant Bootstrap features.
 
 
+If instead you install Hot Glue (or switch the setting) using the default layout mode (`--layout=hotglue`), 
+your scaffolding will be built using no-Bootstrap syntax: It has its own syntax with classes like 
+`.scaffold-container`, 
+`.scaffold-list`,
+`.scaffold-row`, and 
+`.scaffold-cell`
 
-
-### FOR ERB:
-`rails generate hot_glue:install --markup=erb --layout=bootstrap`
-
-### FOR HAML:
-`rails generate hot_glue:install --markup=erb --layout=hotglue --theme=like_mountain_view`
-
+During the installation, if your `--layout` flag is left unspecified or set to `hotglue` you must also pass `--theme` flag.
 
 the themes are:
 • like_mountain_view (Google)
@@ -135,6 +135,16 @@ WIP
 • like_cupertino (Apple-inspired theme)
 
 The themes are just SCSS files installed into app/assets/stylesheets. You can tweak or modify or remove them afer they get installed.
+
+
+### `--markup` flag
+
+### example installing ERB using Bootstrap layout:
+`rails generate hot_glue:install --markup=erb --layout=bootstrap`
+
+### Example installing HAML using Hot Glue layout and the 'like_mountain_view' (Gmail-inspired) theme:
+`rails generate hot_glue:install --markup=erb --layout=hotglue --theme=like_mountain_view`
+
 
 
 ## 5(B). Modify `application.html.erb` 
