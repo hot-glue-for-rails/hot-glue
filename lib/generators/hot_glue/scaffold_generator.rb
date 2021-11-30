@@ -166,7 +166,13 @@ module HotGlue
       @col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col"
       @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
 
-      @downnest_relationship = options['downnest'] || false
+      @downnest = options['downnest'] || false
+
+      @downnest_children = []
+
+      if @downnest
+        @downnest_children = @downnest.split(",")
+      end
 
 
       if @god
@@ -683,11 +689,18 @@ module HotGlue
     end
 
     def each_col
-      if !@downnest_relationship
-        total_width = 85
-      else
-        total_width = 45
-      end
+      downnest_size = case (@downnest_children.count)
+
+                      when 0
+                        downnest_size = 0
+                      when 1
+                        downnest_size = 40
+
+                      else
+                        downnest_size = 60
+
+                      end
+      total_width = 100 - downnest_size - 5
       (total_width/@columns.count).to_i
     end
 

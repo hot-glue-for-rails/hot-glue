@@ -6,11 +6,16 @@
 
     <div class="row scaffold-row">
       <%= list_column_headings %>
-      <% if @downnest_relationship %> <div class="col scaffold-col-heading" style="flex-basis: 45%">
-      <h4>
-        <%=  @downnest_relationship.titleize  %>
-      </h4>
-      </div> <% end %>
+      <% if @downnest_children.any? %>
+        <% each_downnest_width = @downnest_children.count == 1 ? 40 : (60/@downnest_children.count).floor %>
+      <% @downnest_children.each do |downnest| %>
+        <div class="col scaffold-col-heading" style="flex-basis: #{each_downnest_width}%">
+          <h4>
+            <%=  downnest.titleize  %>
+          </h4>
+        </div>
+      <% end %>
+      <% end %>
 
       <div class='col scaffold-col-heading scaffold-col-heading-buttons' style="flex-basis: 150px"></div>
     </div>
@@ -21,7 +26,7 @@
         </div>
       <\% end %>
       <\% <%= plural %>.each do |<%= singular %>| %>
-        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if  @nestable %> } %>
+        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if  @nestable %><%= ", nested_for: nested_for" if @nestable %> } %>
       <\% end %>
 
     <%=  @no_paginate ? "" : paginate %>

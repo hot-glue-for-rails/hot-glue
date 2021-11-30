@@ -115,10 +115,7 @@ module  HotGlue
               text_area_output(col, 65536, col_identifier)
             end
           when :float
-            limit ||= 256
-            field_output(col, nil, limit, col_identifier)
-
-
+            field_output(col, nil, 5, col_identifier)
           when :datetime
 
 

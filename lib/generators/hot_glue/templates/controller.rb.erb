@@ -15,17 +15,37 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   # TODO: implement current_user or use Devise
 <% end %>
 
-  <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
-    if !@god
-      this_scope = nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "#{nest_chain.last}.#{arg}s"
-    else
-      this_scope = eval(class_name + ".reflect_on_association(:#{arg})").class_name
-    end
+  <% if @nested_args.any? %>
+  def <%= @nested_args[0] %>
+    <% if @god
+    next_object = nil
+     collect_objects = @nested_args.reverse.collect {|x|
+         if eval("#{next_object || class_name}.reflect_on_association(:#{x})").nil?
+           raise "***** Unable to find the association `#{x}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{x}` to the #{next_object || class_name} object?"
+         end
+         next_object = eval("#{next_object || class_name}.reflect_on_association(:#{x})").class_name
+     }
+     root_object = collect_objects.last
+     else
+       root_object = @auth + "." + @nested_args[0] + "s"
+     end
+
+     %>
+    <% if !@god %> @<%= @nested_args[0] %> ||= <%= root_object %>.find(params[:<%=  @nested_args[0]  %>_id])
+    <% else %> @<%= @nested_args[0] %> ||= <%= root_object %>.find(params[:<%=  @nested_args[0]  %>_id]) <% end %>
+  end
+  <% end %>
+
+  <% if any_nested? %><% nest_chain = [@nested_args[0]]; this_scope = @nested_args[0] + 's'; %> <%   @nested_args[1..-1].each { |arg|
+    this_scope =  "#{nest_chain.last}.#{arg}s"
     nest_chain << arg
     %>
   def <%= arg %>
     @<%= arg %> ||= <%= this_scope %>.find(params[:<%= arg %>_id])
-  end<% } %><% end %>
+  end<% } %>
+
+  <% end %>
+
 
 <% if !@self_auth %>
   def load_<%= singular_name %>
