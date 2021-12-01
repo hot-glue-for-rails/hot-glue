@@ -272,8 +272,20 @@ You can also skip Devise installer Step 4, which is optional:
      * Not required *
 ```
 
-## IMPORTANT: Out of the box, Devise is not compatible with Turbo Rails. You must perform the specific fixes described here:
-https://jasonfleetwoodboldt.com/hot-glue#devise-turbo-rails-fix
+## IMPORTANT: Devise currently has serious compatibility issues with Turbo Rails. In particular, your log-in screens do not work out of the box. Follow the next step to fix them.
+
+Manually port the Devise views into your app with
+
+`rails generate devise:views`
+
+Edit `devise/registrations/new`, `devise/sessions/new`, `devise/passwords/new` and `devise/confirmations/new` modifying all four templates like so:
+
+form_for(resource, as: resource_name, url: session_path(resource_name) ) do |f|
+change it to
+
+form_for(resource, as: resource_name, **html: {'data-turbo' => "false"},** url: session_path(resource_name) ) do |f|
+This tells Devise to fall back to non-Turbo interaction for the log-in and registration. For the rest of the app, we will use Turbo Rails interactions.
+
 
 
 ## 9(B) Devise & Capybara - Add User Authentication if you are using Access Control
