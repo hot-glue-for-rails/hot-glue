@@ -2,22 +2,22 @@
 [![Build Status](https://app.travis-ci.com/jasonfb/hot-glue.svg?branch=main)](https://travis-ci.com/jasonfb/hot-glue)
 
 
-Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of the admin-interface style scaffolding systems of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold)). 
+Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of the admin-interface style scaffolding systems of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold)).
 
 
-Using Turbo-Rails and Hotwire (default in Rails 7) you get a lightning-fast out-of-the-box CRUD building experience. 
+Using Turbo-Rails and Hotwire (default in Rails 7) you get a lightning-fast out-of-the-box CRUD building experience.
 
-Every page displays only a list view: new and edit operations happen as 'edit-in-place', so the user never leaves the page. 
+Every page displays only a list view: new and edit operations happen as 'edit-in-place', so the user never leaves the page.
 
-Because all page navigation is Turbo's responsibilty, everything plugs & plays nicely into a Turbo-backed Rails app. 
+Because all page navigation is Turbo's responsibilty, everything plugs & plays nicely into a Turbo-backed Rails app.
 
-Alternatively, you can use this tool to create a Turbo-backed *section* of your Rails app-- like an admin interface -- while still treating the rest of the Rails app as an API or building out other features by hand. 
+Alternatively, you can use this tool to create a Turbo-backed *section* of your Rails app-- like an admin interface -- while still treating the rest of the Rails app as an API or building out other features by hand.
 
-It will read your relationships and field types to generate your code for you, leaving you with a 'sourdough starter' to work from. If you modify the generated code, you're on your own if you want to preserve your changes and also re-generate scaffold after adding fields. 
+It will read your relationships and field types to generate your code for you, leaving you with a 'sourdough starter' to work from. If you modify the generated code, you're on your own if you want to preserve your changes and also re-generate scaffold after adding fields.
 
-By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields. 
+By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields.
 
-Hot Glue generates functionality that's quick and dirty. It lets you be crafty. As with a real hot glue gun, use with caution. 
+Hot Glue generates functionality that's quick and dirty. It lets you be crafty. As with a real hot glue gun, use with caution.
 
 * Build plug-and-play scaffolding mixing generated ERB or HAML with the power of Hotwire and Turbo-Rails
 * Everything edits-in-place (unless you use --big-edit, then it won't)
@@ -58,7 +58,7 @@ yarn add @hotwired/turbo-rails
 or `npm install @hotwired/turbo-rails`
 
 
-## 2. SWITCH FROM TurblLinks to Turbo-Rails 
+## 2. SWITCH FROM TurblLinks to Turbo-Rails
 (RAILS 6 ONLY— SKIP THIS STEP FOR RAILS 7)
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
 - Add `gem 'turbo-rails'` to your Gemfile & `bundle install`
@@ -101,7 +101,7 @@ gem 'ffaker'
 - run `rails generate rspec:install`
 
 
-5. - replace `application.css` with a new file (delete old contents) `application.scss` 
+5. - replace `application.css` with a new file (delete old contents) `application.scss`
 
 THIS FILE CAN BE EMPTY, BUT WILL BE USED BY THEME INSTALLER
 
@@ -119,11 +119,11 @@ Once you run the installer, the installer will save what you set it to in `confi
 If you do NOT specify `--layout=bootstrap`, then `hotglue` will be assumed. When constructing scaffold with bootstrap layout (at this time Hot Glue peeks into config/hot_glue.yml to see what you've set there), your views come out with divs that have classes like .container-fluid, .row, and .col. You'll need to install Bootstrap separately, any way you like, but jQuery is not required as Hot Glue does not rely on jQuery-dependant Bootstrap features.
 
 
-If instead you install Hot Glue (or switch the setting) using the default layout mode (`--layout=hotglue`), 
-your scaffolding will be built using no-Bootstrap syntax: It has its own syntax with classes like 
-`.scaffold-container`, 
+If instead you install Hot Glue (or switch the setting) using the default layout mode (`--layout=hotglue`),
+your scaffolding will be built using no-Bootstrap syntax: It has its own syntax with classes like
+`.scaffold-container`,
 `.scaffold-list`,
-`.scaffold-row`, and 
+`.scaffold-row`, and
 `.scaffold-cell`
 
 During the installation, if your `--layout` flag is left unspecified or set to `hotglue` you must also pass `--theme` flag.
@@ -150,7 +150,7 @@ The themes are just SCSS files installed into app/assets/stylesheets. You can tw
 default is `erb`
 
 
-## 6(A) RUN HOT-GLUE INSTALL: 
+## 6(A) RUN HOT-GLUE INSTALL:
 ### example installing ERB using Bootstrap layout:
 `rails generate hot_glue:install --markup=erb --layout=bootstrap`
 
@@ -161,7 +161,7 @@ default is `erb`
 
 
 
-6(B). Modify `application.html.erb` 
+6(B). Modify `application.html.erb`
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
 Note: if you have some kind of non-standard application layout, like one at a different file
 or if you have modified your opening <body> tag, this may not have been automatically applied by the installer.
@@ -171,9 +171,9 @@ or if you have modified your opening <body> tag, this may not have been automati
   <%= render partial: 'layouts/flash_notices' %>
 ```
 
-## 6(C). Modify `rails_helper.rb` 
+## 6(C). Modify `rails_helper.rb`
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
-Note: if you have some kind of non-standard rails_helper.rb, like one that does not use the standard ` do |config|` syntax after your `RSpec.configure` 
+Note: if you have some kind of non-standard rails_helper.rb, like one that does not use the standard ` do |config|` syntax after your `RSpec.configure`
 this may not have been automatically applied by the installer.
 
 - configure Rspec to work with Factory Bot inside of `rails_helper.rb`
@@ -244,7 +244,7 @@ https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-ra
 ## 9. Devise
 (or only use --gd mode, see below)
 
-  Add to your Gemfile `gem 'devise'`
+Add to your Gemfile `gem 'devise'`
 
 
 
@@ -263,7 +263,7 @@ IMPORTANT: Follow the instructions the Devise installer gives you, *Except Step 
 ```
 
 
-You can also skip Devise installer Step 4, which is optional: 
+You can also skip Devise installer Step 4, which is optional:
 ``` 
   4. You can copy Devise views (for customization) to your app by running:
 
@@ -307,7 +307,7 @@ https://jasonfleetwoodboldt.com/hot-glue#devise-turbo-rails-fix
 TitleCase class name of the thing you want to build a scaffoling for.
 
 
-## Options With Arguments 
+## Options With Arguments
 
 All options two dashes (--) and these take an `=` and a value
 
@@ -476,7 +476,7 @@ If you specify an exclude list, those and the default excluded list will be excl
 ### `--include=`
 (separate field names by COMMA)
 
-You may not specify both include and exclude. If you specify an include list, it will be treated as a whitelist: no fields will be included unless specified on the include list. 
+You may not specify both include and exclude. If you specify an include list, it will be treated as a whitelist: no fields will be included unless specified on the include list.
 
 `rails generate hot_glue:scaffold Account --include=first_name,last_name,company_name,created_at,kyc_verified_at`
 
@@ -493,9 +493,9 @@ I would recommend this for fields you want globally non-editable by users in you
 ### `--stimulus_syntax=true` or `--stimulus_syntax=false`
 (for Rails <=6, default is false. For Rails 7, default is true.)
 
-Stimulus is only used for the delete button's confirmation dialog. 
+Stimulus is only used for the delete button's confirmation dialog.
 
-If you don't have stimulus syntax enabled, your delete buttons have this. This will confirm the delete with a simple alert if you have UJS enabled. 
+If you don't have stimulus syntax enabled, your delete buttons have this. This will confirm the delete with a simple alert if you have UJS enabled.
 
 ```
 {confirm: 'Are you sure?'}
@@ -523,7 +523,7 @@ Your install script will output an additional stimulus controller:
 
 ### `--markup` (default: 'erb')
 
-ERB is default. For HAML, `--markup=haml`. 
+ERB is default. For HAML, `--markup=haml`.
 
 
 ## FLAGS (Options with no values)
@@ -561,11 +561,11 @@ Omits pagination. (All list views have pagination by default.)
 
 ### `--no-create`
 
-Omits create action. 
+Omits create action.
 
 ### `--no-delete`
 
-Omits delete action. 
+Omits delete action.
 
 ### `--big-edit`
 
@@ -577,19 +577,18 @@ After an update-in-place normally only the edit view is swapped out for the show
 
 Sometimes you might want to redisplay the entire list after you make an update (for example, if your action removes that record from the result set).
 
-To do this, use flag `--display_list_after_update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list. 
+To do this, use flag `--display_list_after_update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
 
 
 
 ### `--downnest`
-(2021-11-23 - WIP)
 
-Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object. 
-You will need to build scaffolding with the same name for the related object as well. 
-On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line. 
+
+Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object.
+You will need to build scaffolding with the same name for the related object as well.
+On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line.
 
 ### `--nestable` (default: false)
-(2021-11-23 - WIP)
 When creating a controller that you will use a another controllers downnest (that is, you will display related records-- like a portal-- from the parent within each row of the parent's list view), set nestable to true.
 
 If the cooresponding Rails route contains nesting and this controller is downnested by someone else, you'll want to set nestable to true.
@@ -613,7 +612,7 @@ Obviously, the created controller will always have this base controller as its s
 - Datetime
 - Date
 - Time
-- Boolean 
+- Boolean
 - Enum - will display as a value list populated from the enum list defined on your model. see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
 
 * shows in a size-aware container, i.e. in a bigger box if the field allows for more content
@@ -622,7 +621,7 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
-#### 2021-11-27 - v0.2.9E   — EXPERIMENTAL 
+#### 2021-11-27 - v0.2.9E   — EXPERIMENTAL
                      - Downnesting
                      - Adds spec coverage support for enums
                      - Several more fixes; this is preparation for forthcoming release.
@@ -637,7 +636,7 @@ Obviously, the created controller will always have this base controller as its s
                             - the install generator now checks your layouts/application.html.erb for `render partial: 'layouts/flash_messages' ` and adds it if it isn't there already
                             - the install generator also checks your spec/rails_helper for `config.include FactoryBot::Syntax::Methods` and adds it at the top of the Rspec configure block if it isn't there
 
-#### 2021-10-07 - v0.2.4 - removes erroneous icons display in delete buttos (these don't work inside of button_to); 
+#### 2021-10-07 - v0.2.4 - removes erroneous icons display in delete buttos (these don't work inside of button_to);
                             - adds support for ENUM types direclty on your field types
                             - you  must use activerecord-pgenum
                             - see my blog post at https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
@@ -666,30 +665,13 @@ Obviously, the created controller will always have this base controller as its s
 
 #### 2021-03-01 - v0.0.5 - Validation magic; refactors the options to the correct Rails::Generators syntax
 
-#### (yanked)   - v0.0.4
-
 #### 2021-02-27 - v0.0.3 - several fixes for namespaces; adds pagination; adds exclude list to fields
 
 #### 2021-02-25 - v0.0.2 - bootstrapy
 
-#### 2021-02-24 - v0.0.1 - first proof of concept release -- basic CRUD works 
-
-#### 2021-02-23 - v0.0.0 - Port of my prior work from github.com/jasonfb/common_core_js
-
-# PROBLEMS
-
-Here are some defeciencies to note
-
-- [ ] the ERB output has a necessary gsub that makes it so that every file always kicks the "Overwrite?" even when it has not changed. Unfortunately because of the meta programming involved in the ERB, I do not see a way around this although I would like to eventually fix it or match the AR generator internals to fix this problem. 
-
-- [ ] the system_spec that is generated (system/*_spec.rb) works most of the time but obviously you must run it to confirm it passes correclty. still working out bugs in this area for special cases.
+#### 2021-02-24 - v0.0.1 - first proof of concept release -- basic CRUD works
 
 
-
-- [ ] Note that the specs use FFaker data and random numbers, so if you have model-level validations and out-of-bounds choices are made, your specs might fail *intermittently*.
----> I know I hate intermittent failing specs, and if I had any in my app I would surely refactor them out. I'm not sure how I feel about *randomized* data-- or this much randomized data-- in specs. It's kind of fun but it also is tempting fate somewhat, and hopefully encouraging/forcing you to refactor them to be meaningful to your models and model-level validations. 
-
-- [ ] The specs themselves and some generated code is particularly ugly-- especially, formated inconsistently. Sorry about this, will clean this up soon. It is there to encourage you to read the generated code and lint or rubocop it before you check it in. I know the indentation is off and very ugly. 
 
 
 # HOW THIS GEM IS TESTED
