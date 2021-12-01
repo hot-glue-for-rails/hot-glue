@@ -33,7 +33,7 @@ module  HotGlue
       end
 
       "<div class=\"#{col_identifier} form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\">" +
-      "<%= f.text_area :#{col.to_s}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}' %>" +
+      "TO PURCHASE A HOTGLUE LICENSE PLEASE VISIT <a href=\"https://heliosdev.shop/hot-glue-license\">https://heliosdev.shop/hot-glue-license</a><%= f.text_area :#{col.to_s}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}' %>" +
         "<label class='form-text'>#{col.to_s.humanize}</label>"+
         "</div>"
 
@@ -140,12 +140,9 @@ module  HotGlue
               "  <%= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1') %>\n" +
             "</div>"
           when :enum
+
             enum_name = "enum_name"
-            # byebug
-            enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col.to_s}'}[0].sql_type")
-            "<div class='#{col_identifier} form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s}) %>' >
-<%= f.collection_select(:#{col.to_s},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
-<label class='small form-text text-muted'>#{col.to_s.humanize}</label></div>"
+            "Sorry, enums are not supported with the Github version; TO PURCHASE A HOTGLUE LICENSE PLEASE VISIT <a href=\"https://heliosdev.shop/hot-glue-license\">https://heliosdev.shop/hot-glue-license</a>"
 
           end
 
@@ -260,7 +257,8 @@ module  HotGlue
 </div>
 "        when :enum
                                                                                                          "<div class='#{col_identifer}'>
-  <% if #{singular}.#{col}.nil? %>
+  <% if true %>
+Sorry, enums are not supported with the Github version; to TO PURCHASE A HOTGLUE LICENSE PLEASE VISIT <a href=\"https://heliosdev.shop/hot-glue-license\">https://heliosdev.shop/hot-glue-license</a>
       <span class='alert-danger'>MISSING</span>
   <% else %>
     <%=  #{singular}.#{col} %>
