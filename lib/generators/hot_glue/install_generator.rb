@@ -28,17 +28,13 @@ module HotGlue
 
 
       print "(To purchase a license, please see https://heliosdev.shop/hot-glue-license) \n Please enter your license key: "
-      resp1 = STDIN.gets
+      license_activation_key = STDIN.gets
 
       print "Please enter the EMAIL you used to purchase this license: "
-      resp2 = STDIN.gets
-
+      license_email = STDIN.gets
       app_name = Rails.application.class.module_parent_name
-
-      license_should_be = Digest::SHA1.hexdigest("HotGlueLicense--#{app_name}--#{resp1}")
-
-
-      if (license_should_be != resp1)
+      license_should_be = Digest::SHA1.hexdigest("HotGlueLicense--#{app_name}--#{license_email}")
+      if (license_should_be != license_activation_key)
         puts "Ooops... it seems that Hot Glue license is not valid. Please check 1) the email address you used for this license, 2) The app name you used to purchase this license, and 3) the activation key itself."
         exit
       end
@@ -123,7 +119,10 @@ module HotGlue
 
       if !File.exists?("config/hot_glue.yml")
 
-        yaml = {layout: @layout, markup: @markup}.to_yaml
+        yaml = {layout: @layout,
+                markup: @markup,
+                license_activation_key: license_activation_key,
+                license_email: license_email}.to_yaml
         File.write("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml", yaml)
 
       end
