@@ -23,6 +23,25 @@ module HotGlue
         puts "IMPORTANT: You have selected to install Hot Glue with Bootstrap layout (legacy). Be sure to always use ``--layout=bootstrap` when building your scaffold. No Hot Glue theme will be installed at this time.` "
       end
 
+      ### INTERACTIVE LICENSING
+      #
+
+
+      print "(To purchase a license, please see https://heliosdev.shop/hot-glue-license) \n Please enter your license key: "
+      resp1 = STDIN.gets
+
+      print "Please enter the EMAIL you used to purchase this license: "
+      resp2 = STDIN.gets
+
+      app_name = Rails.application.class.module_parent_name
+
+      license_should_be = Digest::SHA1.hexdigest("HotGlueLicense--#{app_name}--#{resp1}")
+
+
+      if (license_should_be != resp1)
+        puts "Ooops... it seems that Hot Glue license is not valid. Please check 1) the email address you used for this license, 2) The app name you used to purchase this license, and 3) the activation key itself."
+        exit
+      end
 
       @markup = options['markup']
       if @markup == "haml"

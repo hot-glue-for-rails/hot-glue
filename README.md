@@ -85,9 +85,9 @@ Turbo.start()
 
 
 ## 3. ADD HOT-GLUE GEM
-- Add `gem 'hot-glue', '~> 0.2.6'` to your Gemfile & `bundle install`
+- Add `gem 'hot-glue'` to your Gemfile & `bundle install`
 
-(TODO: figure out why bundler seems to install the yanked version 0.0.0 if you don't specify the hot glue version)
+Purchase a license at https://heliosdev.shop/hot-glue-license
 
 ## 4. ADD RSPEC, FACTORY-BOT, AND FFAKER
 
@@ -103,7 +103,7 @@ gem 'ffaker'
 
 5. - replace `application.css` with a new file (delete old contents) `application.scss` 
 
-- — THIS FILE CAN BE EMPTY
+THIS FILE CAN BE EMPTY, BUT WILL BE USED BY THEME INSTALLER
 
 
 
