@@ -105,7 +105,11 @@ gem 'ffaker'
 
 - — THIS FILE CAN BE EMPTY
 
-## 5(A). RUN HOT-GLUE INSTALL
+
+
+
+## 5. PICK A THEME & DECIDE IF YOU WANT TO USE BOOTSTRAP LAYOUT OR HOTGLUE LAYOUT
+
 
 ### `--layout` flag
 Here you will set up and install Hot Glue for the first time. It will install a config file that will save two preferences: layout (hotglue or bootstrap) and markup (erb or haml or slim).
@@ -128,17 +132,25 @@ the themes are:
 • like_mountain_view (Google)
 • like_los_gatos (Netflix)
 • like_bootstrap (bootstrap 4 copy)
+• dark_knight (_The Dark Night_ (2008) inspired)
+• like_cupertino (modern Apple-UX inspired)
+• gradeschool (spiral bound/lined notebook inspired)
 
-WIP
-• lined_notebook (Jason's them inspired by an old fashioned lined notebook)
-• dark_knight (Jason's theme inspired by white-on-black look)
-• like_cupertino (Apple-inspired theme)
+
+BOOTSTRAP NO LONGER NEEDED. IF you are using layout=bootstrap, you must install Bootstrap here.
+However, please note that the scaffold build with different market up for boostrap, so you cannot switch between the Bootstrap and Hotglue layouts without rebuilding the scaffold.
+
+(On the other hand, if you build within the Hotglue layout, all of the Hotglue theme file CAN be swapped out without rebuilding the scaffood.)
 
 The themes are just SCSS files installed into app/assets/stylesheets. You can tweak or modify or remove them afer they get installed.
 
 
 ### `--markup` flag
 
+default is `erb`
+
+
+## 6(A) RUN HOT-GLUE INSTALL: 
 ### example installing ERB using Bootstrap layout:
 `rails generate hot_glue:install --markup=erb --layout=bootstrap`
 
@@ -147,7 +159,9 @@ The themes are just SCSS files installed into app/assets/stylesheets. You can tw
 
 
 
-## 5(B). Modify `application.html.erb` 
+
+
+6(B). Modify `application.html.erb` 
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
 Note: if you have some kind of non-standard application layout, like one at a different file
 or if you have modified your opening <body> tag, this may not have been automatically applied by the installer.
@@ -157,7 +171,7 @@ or if you have modified your opening <body> tag, this may not have been automati
   <%= render partial: 'layouts/flash_notices' %>
 ```
 
-## 5(C). Modify `rails_helper.rb` 
+## 6(C). Modify `rails_helper.rb` 
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
 Note: if you have some kind of non-standard rails_helper.rb, like one that does not use the standard ` do |config|` syntax after your `RSpec.configure` 
 this may not have been automatically applied by the installer.
@@ -171,7 +185,7 @@ this may not have been automatically applied by the installer.
   ```  
 
 
-## 5(D) CAPYBARA: SWITCH FROM RACK-TEST TO HEADLESS CHROME
+## 6(D) CAPYBARA: SWITCH FROM RACK-TEST TO HEADLESS CHROME
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
 
 - By default Capybara is installed with :rack_test as its driver.
@@ -211,25 +225,6 @@ Alternatively, can define your own driver like so:
   Capybara.default_driver = :my_headless_chrome_desktop
     
   ```
-
-
-## 6 — THEMING OR USE BOOTSTRAP
-
-BOOTSTRAP NO LONGER NEEDED. IF you are using layout=bootstrap, you must install Bootstrap here.
-However, please note that the scaffold build with different market up for boostrap, so you cannot switch between the Bootstrap and Hotglue layouts without rebuilding the scaffold.
-
-(On the other hand, if you build within the Hotglue layout, all of the Hotglue theme file CAN be swapped out without rebuilding the scaffood.)
-
-You probably already picked at Theme in Step 5, but to re-install a new theme, try:
-
-`rails generate hot_glue:install --markup=erb --layout=hotglue --theme=like_mountain_view`
-
-Remember, if you already installed a theme you'll have an existing one in your `app/assets/stylesheets/application.scss` so be sure to remove the old one.
-
-Note: My Hotglue themes use Flexbox to make everything fall into columns nicely. However, they are not *mobile responsive*. They do stretch and shrink with the browser's window, but unlike Bootstrap, they do not stack when the viewport gets smaller.
-
-Bootstrap, on the other hand, does a better job of stacking for mobile responsive viewports, but does not have the fancy layout features that are built into the HotGlue themes. In particular, Bootstrap's 12-column grid were challenging to work within and my HotGlue themes abandon the 12-column grid in favor of a full flexbox implementation. This implementation has the advantage of being "column-aware" (it knows what you're building and tries to piece it together nicely), but it is doesn't stack nicely on mobile the way Bootstrap does.
-
 
 
 ## 7. install font-awesome

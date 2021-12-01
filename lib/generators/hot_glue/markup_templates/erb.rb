@@ -6,7 +6,7 @@ module  HotGlue
 
     def field_output(col, type = nil, width, col_identifier )
       "<div class='#{col_identifier} form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
-      "  <%= f.text_field :#{col.to_s}, value: @#{@singular}.#{col.to_s}, size: #{width}, class: 'form-control', type: '#{type}' %>\n "+
+      "  <%= f.text_field :#{col.to_s}, value: @#{@singular}.#{col.to_s}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}' %>\n "+
       "  <label class='form-text' >#{col.to_s.humanize}</label>\n" +
       "</div>"
     end
@@ -33,7 +33,7 @@ module  HotGlue
       end
 
       "<div class=\"#{col_identifier} form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\">" +
-      "<%= f.text_area :#{col.to_s}, class: 'form-control', cols: 40, rows: '#{lines}' %>" +
+      "<%= f.text_area :#{col.to_s}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}' %>" +
         "<label class='form-text'>#{col.to_s.humanize}</label>"+
         "</div>"
 

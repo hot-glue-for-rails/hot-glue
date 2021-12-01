@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.metadata    = {
     "source_code_uri" => "https://github.com/jasonfb/hot-glue",
                        "tutorial" => "https://jfbcodes.com/hot-glue-tutorial",
-                       "buy_license" => 'https://jfbcodes.com/hot-glue-tutorial/',
+                       "buy_license" => 'https://heliosdev.shop/hot-glue-licens',
                        "get_merch" => 'https://shop.heliosdev.shop/?utm_source=rubygems&utm_campaign=hot_glue_gem_metadata'
   }
   spec.add_runtime_dependency('kaminari', '~> 1.2')
@@ -47,17 +47,7 @@ Gem::Specification.new do |spec|
     ---------------------------------------------
     Welcome to Hot Glue - A Scaffold Building Companion for Hotwire + Turbo-Rails
   
-    To support this project, please choose the level right for you: 
-
-    $0 - Hobbyist/Individual/Non-profit (requires social justice pledge)
-    $5 and up - Get some merch at https://shop.heliosdev.shop
-    $60 - Buy the Hot Glue In-Depth Tutorial (available on Teachable)
-    $250 - License for Professional/Entrepreneur/Early-stage startup (INCLUDES 1 SUPPORT INCIDENT)
-    $1000 - License for Late stage startup/Medium-sized business (INCLUDES 1 YEAR SUPPORT PLAN, UNLIMITED INCIDENTS)
-    $5000 - License for Enterprise-sided business/Government entities (INCLUDES 1 YEAR SUPPORT PLAN, UNLIMITED INCIDENTS)
-
-    please see https://heliosdev.shop/hot-glue-license
-
+    To purchase a license, please visit https://heliosdev.shop/hot-glue-licens
     ---------------------------------------------
   MSG
 end
