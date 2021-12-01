@@ -284,10 +284,13 @@ form_for(resource, as: resource_name, url: session_path(resource_name) ) do |f|
 
 
 
-change all 4 templates like so:
+add the data-turbo false option in the html key:
 
 
 form_for(resource, as: resource_name, **html: {'data-turbo' => "false"},** url: session_path(resource_name) ) do |f|
+
+
+
 This tells Devise to fall back to non-Turbo interaction for the log-in and registration. For the rest of the app, we will use Turbo Rails interactions.
 
 
