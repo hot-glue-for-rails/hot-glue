@@ -61,7 +61,8 @@ module HotGlue
       # elsif self.class.ancestors.include?(ApplicationController)
       #   self.try(:current_timezone)
       else
-        raise "no method current_user is available; please implement/override the method current_timezone IN YOUR CONTROLLER"
+        puts "no method current_user is available; please implement/override the method current_timezone IN YOUR CONTROLLER"
+        exit
       end
     end
 

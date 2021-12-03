@@ -72,15 +72,18 @@ module HotGlue
         @the_object = eval(class_name)
       rescue StandardError => e
         message = "*** Oops: It looks like there is no object for #{class_name}. Please define the object + database table first."
-        raise(HotGlue::Error, message)
+        puts message
+        exit
+        # raise(HotGlue::Error, message)
       end
 
       if !options['spec_only'].nil? && !options['no_spec'].nil?
-        raise(HotGlue::Error, "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry.")
+        puts "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry."
       end
 
       if !options['exclude'].empty? && !options['include'].empty?
-        raise(HotGlue::Error, "*** Oops: You seem to have specified both --include and --exclude. Please use one or the other. Aborting.")
+        puts "*** Oops: You seem to have specified both --include and --exclude. Please use one or the other. Aborting."
+        exit
       end
 
       if @stimulus_syntax.nil?
@@ -92,11 +95,13 @@ module HotGlue
       end
 
       if !options['markup'].nil?
-        raise "Using --markup flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
+        puts "Using --markup flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
+        exit
       end
 
       if !options['markup'].nil?
-        raise "Using --layout flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
+        puts "Using --layout flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
+        exit
       end
 
       yaml_from_config = YAML.load(File.read("config/hot_glue.yml"))
@@ -241,21 +246,19 @@ module HotGlue
 
         else
           if @god
-
-            exit_message= "*** Oops:  god mode could not find the association(?). something is wrong."
+            exit_message= "*** Oops: Gd mode could not find the association(#{@object_owner_sym}). Something is wrong."
           else
             @auth_check = "current_user"
             @nested_args.each do |arg|
 
               if !@auth_check.method("#{arg}s")
-                exit_message= "*** Oops:  your nesting chain does not have a assocation for #{arg}s on #{@auth_check}  something is wrong."
+                exit_message = "*** Oops:  your nesting chain does not have a association for #{arg}s on #{@auth_check}  something is wrong."
               end
-              # byebug
-              # puts ""
             end
           end
+          puts exit_message
+          exit
 
-          raise(HotGlue::Error, exit_message)
         end
       end
     end
@@ -297,14 +300,18 @@ module HotGlue
               eval(assoc.class_name)
             rescue NameError => e
               exit_message = "*** Oops: The model #{singular_class} is missing an association for #{assoc_name} or the model doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; your model #{singular_class.titlecase} should have_many :#{assoc_name}s.  To make a controller that can read all records, specify with --god."
-              raise(HotGlue::Error, exit_message)
+              puts exit_message
+              exit
+              # raise(HotGlue::Error, exit_message)
 
             end
 
 
             if assoc.nil?
-              exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-              raise(HotGlue::Error,exit_message)
+              exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+              puts exit_message
+              exit
+              # raise(HotGlue::Error,exit_message)
             end
 
             assoc_class = eval(assoc.class_name)
@@ -317,7 +324,7 @@ module HotGlue
             }.any?
               # do nothing here
             else
-              exit_message= "*** Oops: Missing a label for #{assoc.class_name.upcase}. Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name.upcase} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+              exit_message = "*** Oops: Missing a label for #{assoc.class_name.upcase}. Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name.upcase} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
               raise(HotGlue::Error,exit_message)
             end
           end
@@ -333,8 +340,6 @@ module HotGlue
     def format
       nil
     end
-
-
 
     def copy_controller_and_spec_files
       @default_colspan = @columns.size

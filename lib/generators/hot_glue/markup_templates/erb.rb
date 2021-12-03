@@ -196,7 +196,9 @@ module  HotGlue
 
             if assoc.nil?
               exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-              raise(HotGlue::Error,exit_message)
+              puts exit_message
+              exit
+              # raise(HotGlue::Error,exit_message)
             end
 
             display_column =  HotGlue.derrive_reference_name(assoc.class_name)
