@@ -544,6 +544,14 @@ Your install script will output an additional stimulus controller:
 
 ERB is default. For HAML, `--markup=haml`.
 
+### `--downnest`
+
+Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object.
+You will need to build scaffolding with the same name for the related object as well.
+On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line.
+
+
+
 
 ## FLAGS (Options with no values)
 These options (flags) also uses `--` syntax but do not take any values. Everything is assumed (default) to be false unless specified.
@@ -600,19 +608,6 @@ To do this, use flag `--display_list_after_update`. The update will behave like 
 
 
 
-### `--downnest`
-
-
-Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object.
-You will need to build scaffolding with the same name for the related object as well.
-On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line.
-
-### `--nestable` (default: false)
-When creating a controller that you will use a another controllers downnest (that is, you will display related records-- like a portal-- from the parent within each row of the parent's list view), set nestable to true.
-
-If the cooresponding Rails route contains nesting and this controller is downnested by someone else, you'll want to set nestable to true.
-
-If the cooresponding Rails route is not nested and the controller sits a the root of the namespace, set nestable to false.
 
 
 ## Automatic Base Controller

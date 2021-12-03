@@ -1,3 +1,3 @@
 module HotGlue
-  VERSION = '0.2.9E'
+  VERSION = '0.3.5'
 end
