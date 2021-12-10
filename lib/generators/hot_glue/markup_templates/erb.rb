@@ -261,7 +261,7 @@ module  HotGlue
   <% end %>
 </div>
 "        when :enum
-                                                                                                         "<div class='#{col_identifer}'>
+"<div class='#{col_identifer}'  style='flex-basis: #{perc_width}%'>
   <% if #{singular}.#{col}.nil? %>
       <span class='alert-danger'>MISSING</span>
   <% else %>

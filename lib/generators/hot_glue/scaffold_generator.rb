@@ -796,7 +796,7 @@ module HotGlue
     def controller_magic_button_update_actions
       @magic_buttons.collect{ |magic_button|
         "    @#{singular}.#{magic_button}! if #{singular}_params[:#{magic_button}]"
-        }.join("\n")
+        }.join("\n") + "\n"
     end
 
     def controller_update_params_tap_away_magic_buttons
