@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
     ---------------------------------------------
     Welcome to Hot Glue - A Scaffold Building Companion for Hotwire + Turbo-Rails
   
-    To purchase a license, please visit https://heliosdev.shop/hot-glue-licens
+    To purchase a license, please visit https://heliosdev.shop/hot-glue-license
     ---------------------------------------------
   MSG
 end
