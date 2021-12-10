@@ -724,7 +724,8 @@ module HotGlue
         columns: @columns,
         show_only: @show_only,
         singular_class: singular_class,
-        singular: singular
+        singular: singular,
+        layout: @layout
       )
     end
 
