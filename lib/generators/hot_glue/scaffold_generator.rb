@@ -52,6 +52,7 @@ module HotGlue
     class_option :no_delete, type: :boolean, default: false
     class_option :no_create, type: :boolean, default: false
     class_option :no_edit, type: :boolean, default: false
+    class_option :no_list, type: :boolean, default: false
     class_option :no_paginate, type: :boolean, default: false
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
@@ -164,6 +165,8 @@ module HotGlue
       @big_edit = options['big_edit']
 
       @no_edit = options['no_edit'] || false
+      @no_list = options['no_list'] || false
+
       @display_list_after_update = options['display_list_after_update'] || false
 
 
@@ -796,16 +799,18 @@ module HotGlue
 
     def controller_magic_button_update_actions
       @magic_buttons.collect{ |magic_button|
-        "    begin
-      if #{singular}_params[:#{magic_button}]
+        "    if #{singular}_params[:#{magic_button}]
+      begin
         res = @#{singular}.#{magic_button}!
         res = \"#{magic_button.titleize}ed.\" if res === true
         flash[:notice] = (flash[:notice] || \"\") <<  (res ? res + \" \" : \"\")
+      rescue ActiveRecord::RecordInvalid => e
+        @#{singular}.errors.add(:base, e.message)
+        flash[:alert] = (flash[:alert] || \"\") << 'There was ane error #{magic_button}ing your #{@singular}: '
       end
-    rescue ActiveRecord::RecordInvalid => e
-      @#{singular}.errors.add(:base, e.message)
-      flash[:alert] = (flash[:alert] || \"\") << 'There was ane error #{magic_button}ing your #{@singular}: '
-    end" }.join("\n") + "\n"
+    end"
+
+     }.join("\n") + "\n"
     end
 
     def controller_update_params_tap_away_magic_buttons

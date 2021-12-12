@@ -42,6 +42,9 @@ module HotGlue
         exit
       end
 
+
+
+
       @markup = options['markup']
       if @markup == "haml"
         copy_file "haml/_flash_notices.haml", "#{'spec/dummy/' if Rails.env.test?}app/views/layouts/_flash_notices.haml"

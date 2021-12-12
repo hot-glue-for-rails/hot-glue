@@ -21,7 +21,7 @@ module  HotGlue
       magic_buttons.collect{ |button_name|
         "<%= form_with model: #{singular}, url: #{path_helper_singular}(#{path_helper_args}) do |f| %>
       <%= f.hidden_field :#{button_name}, value: \"#{button_name}\" %>
-    <%= f.submit '#{button_name.titleize}'.html_safe, disabled: (schedule.respond_to?(:#{button_name}able?) && ! schedule.#{button_name}able? ), data: {confirm: 'Are you sure you want to #{button_name} this #{singular}?'}, class: '#{singular}-button btn btn-primary ' %>
+    <%= f.submit '#{button_name.titleize}'.html_safe, disabled: (#{singular}.respond_to?(:#{button_name}able?) && ! #{singular}.#{button_name}able? ), data: {confirm: 'Are you sure you want to #{button_name} this #{singular}?'}, class: '#{singular}-button btn btn-primary ' %>
     <% end %>"
       }.join("\n")
     end
