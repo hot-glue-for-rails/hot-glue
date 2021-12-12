@@ -84,10 +84,22 @@ Turbo.start()
 ```
 
 
-## 3. ADD HOT-GLUE GEM
-- Add `gem 'hot-glue'` to your Gemfile & `bundle install`
+## 3. INSTALL WEBPACKER
+** For webpacker, you must be using Node version ^12.13.0 || ^14.15.0 || >=16 **
 
-Purchase a license at https://heliosdev.shop/hot-glue-license
+I recommend Node Version Manager (NVM) to switch between nodes. You will not be able to get through the following command with a Node version that does not match above. 
+
+Check your node version with `node -v`
+
+
+
+```
+`yarn add @rails/webpacker`
+```
+
+
+rails webpacker:install
+
 
 ## 4. ADD RSPEC, FACTORY-BOT, AND FFAKER
 
@@ -108,9 +120,15 @@ THIS FILE CAN BE EMPTY, BUT WILL BE USED BY THEME INSTALLER
 
 
 
-## 5. PICK A THEME & DECIDE IF YOU WANT TO USE BOOTSTRAP LAYOUT OR HOTGLUE LAYOUT
+## 5. ADD HOT GLUE GEM & PICK A THEME
 
+PICK A THEME & DECIDE IF YOU WANT TO USE BOOTSTRAP LAYOUT OR HOTGLUE LAYOUT
 
+Add `gem 'hot-glue'` to your Gemfile & `bundle install`
+
+Purchase a license at https://heliosdev.shop/hot-glue-license
+
+During in installation, you MUST supply a `--layout` flag.
 ### `--layout` flag
 Here you will set up and install Hot Glue for the first time. It will install a config file that will save two preferences: layout (hotglue or bootstrap) and markup (erb or haml or slim).
 
@@ -138,11 +156,29 @@ the themes are:
 
 
 BOOTSTRAP NO LONGER NEEDED. IF you are using layout=bootstrap, you must install Bootstrap here.
-However, please note that the scaffold build with different market up for boostrap, so you cannot switch between the Bootstrap and Hotglue layouts without rebuilding the scaffold.
 
-(On the other hand, if you build within the Hotglue layout, all of the Hotglue theme file CAN be swapped out without rebuilding the scaffood.)
+For Bootstrap with Webpacker, see my blog post https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap-with-sprockets/
 
-The themes are just SCSS files installed into app/assets/stylesheets. You can tweak or modify or remove them afer they get installed.
+For Bootstrap with Sprockets (recommended by Rails team), see https://github.com/twbs/bootstrap-rubygem
+
+If going the the Bootstrap with Sprockets route, note the gem is
+```
+gem 'bootstrap', '~> 5.1.3'
+```
+
+Then, all you need to do is add to `app/assets/stylesheets/application.scss`
+
+```
+@import "bootstrap";
+```
+
+
+
+Please note that the scaffold is ** built with different market up for boostrap**, so you cannot switch between the Bootstrap and Hotglue layouts without rebuilding the scaffold.
+
+(On the other hand, if you build within the Hotglue layout, all of the Hotglue theme files CAN be swapped out without rebuilding the scaffold.)
+
+The themes are just SCSS files installed into app/assets/stylesheets. You can tweak or modify or remove them after they get installed.
 
 
 ### `--markup` flag
@@ -539,12 +575,29 @@ Your install script will output an additional stimulus controller:
 ```
 
 
+### `--magic-buttons` (Version 0.4.0 only)
+If you pass a list of magic buttons (separated by commas), they will appear in the button area on your list.
 
-### `--markup` (default: 'erb')
+It will be assumed there will be cooresponding bang methods on your models.
 
-ERB is default. For HAML, `--markup=haml`.
+The band methods can respond in one of four ways:
 
-### `--downnest`
+• With true, in which case a generic success message will be shown in the flash notice (“Approved” or “Rejected” in this case)
+
+• With false, in which case a generic error message will be shown in the flash alert (“Could not approve…”)
+
+• With a string, which will be assumed to be a “success” case, and will be passed to the front-end in the alert notice.
+
+• Raise an ActiveRecord exception
+
+This means you can be a somewhat lazy about your bang methods, but keep in mind the truth operator compares boolean true NOT any object is truth. So your return object must either be actually true (boolean), or an object that is string or string-like (responds to .to_s). Want to just say it didn’t work? Return false. Want to just say it was OK? Return true. Want to say it was successful but provide a more detailed response? Return a string.
+
+Finally, you can raise an ActiveRecord error which will also get passed to the user, but in the flash alert area
+
+For more information see Example 5 in the Tutorial
+
+
+### `--downnest`  (Version 0.3.8 and above only)
 
 Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object.
 You will need to build scaffolding with the same name for the related object as well.
@@ -585,6 +638,9 @@ Produces all the files except the spec file.
 
 Omits pagination. (All list views have pagination by default.)
 
+### `--no-list`
+
+Omits list action. Only makes sense to use this if you are create a view where you only want the create button you want to navigate to the update screen alternative ways.
 
 ### `--no-create`
 
@@ -634,6 +690,12 @@ Obviously, the created controller will always have this base controller as its s
 
 
 # VERSION HISTORY
+
+#### 2021-12-12 - v0.3.9 - Magic Buttons
+
+
+#### 2021-12-11 - v0.3.5 - Downnesting 
+
 
 #### 2021-11-27 - v0.2.9E   — EXPERIMENTAL
                      - Downnesting
