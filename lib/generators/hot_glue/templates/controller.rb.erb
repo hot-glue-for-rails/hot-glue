@@ -112,9 +112,10 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
 <% end %><% if @build_update_action %>  def update
 <%= controller_magic_button_update_actions %>    if @<%= singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>)<%= controller_update_params_tap_away_magic_buttons %>)
-      flash[:notice] = "Saved #{@<%= singular %>.<%= display_class %>}"
+      flash[:notice] = (flash[:notice] || "") << "Saved #{@<%= singular %>.<%= display_class %>}"
     else
-      flash[:alert] = "<%= singular_name.titlecase %> could not be saved."
+      flash[:alert] = (flash[:alert] || "") << "<%= singular_name.titlecase %> could not be saved."
+
     end
 <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
     respond_to do |format|

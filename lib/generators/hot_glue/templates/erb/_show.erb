@@ -4,8 +4,9 @@
   <% each_downnest_width = @downnest_children.count == 1 ? 33 : (53/@downnest_children.count).floor %>
 
   <% @downnest_children.each do |downnest| %>
-<% downnest_style =  @layout == "hotglue" ? 'style="flex-basis: ' +  each_downnest_width + '%"' : "" %>
-  <div class="<%= @col_identifier %> scaffold-downnest" <%= downnest_style  %> >
+
+    <% downnest_style =  @layout == "hotglue" ? 'style="flex-basis: ' +  each_downnest_width + '%"' : "" %>
+  <div class="<%= @col_identifier %><%= ' col-md-3' if @layout == "bootstrap" %> scaffold-downnest" <%= downnest_style  %> >
   <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest %>/list", locals: {
     nested_for: "<% if @nested_args.any? %>#{nested_for + "__" if nested_for}<% end %><%= @singular %>-#{<%= @singular %>.id}",
     <%= @singular %>: <%= @singular %><%= nest_assignments_operator(false, true) %>,
@@ -14,11 +15,11 @@
   <% end %>
 <% end %>
 
-<% button_style = @layout == "hotglue" ? 'style="flex-basis: ' +  (100 - (column_width * @columns.count)).floor +  '%;' : "" %>
-<div class="<%= @col_identifier %> scaffold-line-buttons" <%= button_style %>>
+<% button_style = @layout == "hotglue" ? 'style="flex-basis: ' +  (100 - (column_width * @columns.count)).floor.to_s +  '%;"' : "" %>
+<div class="<%= @col_identifier %> scaffold-line-buttons <%= ' col-md-2' if @layout == "bootstrap" %>" <%= button_style %>>
   <% if destroy_action %>
     <\%= form_with url: <%= path_helper_singular %>(<%= path_helper_args %>), html: {style: "display: inline-block;"}, method: :delete do |f| %>
-      <\%= f.submit "Delete".html_safe, data: <%= delete_confirmation_syntax  %>, class: "delete-<%= singular %>-button btn btn-primary btn-sm" %>
+      <\%= f.submit "Delete".html_safe,  data: <%= delete_confirmation_syntax  %>, class: "delete-<%= singular %>-button btn btn-primary btn-sm" %>
     <\% end %>
   <% end %>
 

@@ -796,8 +796,16 @@ module HotGlue
 
     def controller_magic_button_update_actions
       @magic_buttons.collect{ |magic_button|
-        "    @#{singular}.#{magic_button}! if #{singular}_params[:#{magic_button}]"
-        }.join("\n") + "\n"
+        "    begin
+      if #{singular}_params[:#{magic_button}]
+        res = @#{singular}.#{magic_button}!
+        res = \"#{magic_button.titleize}ed.\" if res === true
+        flash[:notice] = (flash[:notice] || \"\") <<  (res ? res + \" \" : \"\")
+      end
+    rescue ActiveRecord::RecordInvalid => e
+      @#{singular}.errors.add(:base, e.message)
+      flash[:alert] = (flash[:alert] || \"\") << 'There was ane error #{magic_button}ing your #{@singular}: '
+    end" }.join("\n") + "\n"
     end
 
     def controller_update_params_tap_away_magic_buttons

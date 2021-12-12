@@ -4,12 +4,15 @@
 
     <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  plural + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><% end %>
 
+
     <div class="row scaffold-row">
       <%= list_column_headings %>
       <% if @downnest_children.any? %>
         <% each_downnest_width = @downnest_children.count == 1 ? 40 : (60/@downnest_children.count).floor %>
-      <% @downnest_children.each do |downnest| %>
-        <div class="col scaffold-col-heading" style="flex-basis: <%= each_downnest_width %>%;">
+        <% downnest_column_style = @layout == "hotglue" ? 'style="flex-basis: ' + each_downnest_width +  '%;' : "" %>
+
+        <% @downnest_children.each do |downnest| %>
+        <div class="<%= @col_identifer %> scaffold-col-heading<%= ' col-md-3' if @layout=="bootstrap" %>" <%= downnest_column_style %>>
           <h4>
             <%=  downnest.titleize  %>
           </h4>
@@ -17,7 +20,11 @@
       <% end %>
       <% end %>
 
-      <div class='col scaffold-col-heading scaffold-col-heading-buttons' style="flex-basis: 150px"></div>
+      <% button_column_style = @layout == "hotglue" ? 'style="flex-basis: 150px' : ""  %>
+
+      <div class='<%= @col_identifer %> scaffold-col-heading scaffold-col-heading-buttons<%= ' col-md-2' if @layout=="bootstrap" %>' <%= button_column_style %>>
+
+      </div>
     </div>
 
       <\% if <%= plural %>.empty? %>

@@ -21,7 +21,7 @@ module  HotGlue
       magic_buttons.collect{ |button_name|
         "<%= form_with model: #{singular}, url: #{path_helper_singular}(#{path_helper_args}) do |f| %>
       <%= f.hidden_field :#{button_name}, value: \"#{button_name}\" %>
-    <%= f.submit '#{button_name.titleize}'.html_safe, data: {confirm: 'Are you sure you want to #{button_name} this #{singular}?'}, class: '#{singular}-button btn btn-primary ' %>
+    <%= f.submit '#{button_name.titleize}'.html_safe, disabled: (schedule.respond_to?(:#{button_name}able?) && ! schedule.#{button_name}able? ), data: {confirm: 'Are you sure you want to #{button_name} this #{singular}?'}, class: '#{singular}-button btn btn-primary ' %>
     <% end %>"
       }.join("\n")
     end
@@ -43,8 +43,12 @@ module  HotGlue
       columns = args[0][:columns]
       column_width = args[0][:column_width]
       col_identifier = args[0][:col_identifier]
-
-      columns.map(&:to_s).map{|col_name| "<div class='#{col_identifier}'  style='flex-basis: #{column_width}%'>#{col_name.humanize}</div>"}.join("\n")
+      if @layout == "hotglue"
+        col_style = " style='flex-basis: #{column_width}%'"
+      else
+        col_style = ""
+      end
+      columns.map(&:to_s).map{|col_name| "<div class='#{col_identifier}'" + col_style +">#{col_name.humanize}</div>"}.join("\n")
     end
 
 

@@ -1,3 +1,5 @@
 <\%= turbo_frame_tag "<%= singular %>-new" do %>
-  <\%= link_to "New <%= singular.titlecase %>",  <%= new_path_name %>, disable_with: "Loading...", class: "new-<%= singular %>-button btn btn-primary pull-right" %>
+  <div>
+    <\%= link_to "New <%= singular.titlecase %>",  <%= new_path_name %>, disable_with: "Loading...", class: "new-<%= singular %>-button btn btn-primary pull-right <%= 'btn-sm' if @nested_args.any? %> " %>
+  </div>
 <\% end %>
