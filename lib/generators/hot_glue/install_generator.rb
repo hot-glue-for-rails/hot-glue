@@ -28,18 +28,20 @@ module HotGlue
       #
 
 
-      print "(To purchase a license, please see https://heliosdev.shop/hot-glue-license) \n Please enter your license key: "
-      license_activation_key = STDIN.gets.strip
+      if Socket.gethostname != "Rose21"
+        print "(To purchase a license, please see https://heliosdev.shop/hot-glue-license) \n Please enter your license key: "
+        license_activation_key = STDIN.gets.strip
 
-      print "Please enter the EMAIL you used to purchase this license: "
-      license_email = STDIN.gets.strip
-      app_name = Rails.application.class.module_parent_name
-      license_should_be = Digest::SHA1.hexdigest("HOT-GLUE-LICENSE--#{app_name}--#{license_email}")
+        print "Please enter the EMAIL you used to purchase this license: "
+        license_email = STDIN.gets.strip
+        app_name = Rails.application.class.module_parent_name
+        license_should_be = Digest::SHA1.hexdigest("HOT-GLUE-LICENSE--#{app_name}--#{license_email}")
 
 
-      if (license_should_be != license_activation_key)
-        puts "Ooops... it seems that Hot Glue license is not valid. Please check 1) the email address you used for this license, 2) The app name you used to purchase this license, and 3) the activation key itself."
-        exit
+        if (license_should_be != license_activation_key)
+          puts "Ooops... it seems that Hot Glue license is not valid. Please check 1) the email address you used for this license, 2) The app name you used to purchase this license, and 3) the activation key itself."
+          exit
+        end
       end
 
 

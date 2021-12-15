@@ -233,6 +233,11 @@ module HotGlue
 
       identify_object_owner
       setup_fields
+
+
+      if @nested_args.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
+        @menu_file_exists = true
+      end
     end
 
     def identify_object_owner
@@ -359,7 +364,20 @@ module HotGlue
       end
 
       unless @no_specs
-        template "system_spec.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
+        dest_file = File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
+        existing_file = File.open(dest_file)
+        existing_content = existing_file.read
+        if existing_content =~ /\#HOTGLUE-SAVESTART/
+          if  existing_content !~ /\#HOTGLUE-END/
+            raise "Your file at #{dest_file} contains a #HOTGLUE-SAVESTART marker without #HOTGLUE-END"
+          end
+          @existing_content =  existing_content[(existing_content =~ /\#HOTGLUE-SAVESTART/) .. (existing_content =~ /\#HOTGLUE-END/)-1]
+          @existing_content << "#HOTGLUE-END"
+
+        end
+        existing_file.rewind
+
+        template "system_spec.rb.erb", dest_file
       end
 
       template "#{@markup}/_errors.#{@markup}", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.#{@markup}")
@@ -702,7 +720,8 @@ module HotGlue
     end
 
     def each_col
-      (col_width/@columns.count).to_i
+      return col_width if @columns.count == 0
+      (col_width/(@columns.count)).to_i
     end
 
     def col_width

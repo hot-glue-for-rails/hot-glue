@@ -38,7 +38,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   <% if any_nested? %><% nest_chain = [@nested_args[0]]; this_scope = @nested_args[0] + 's'; %> <%   @nested_args[1..-1].each { |arg|
     this_scope =  "#{nest_chain.last}.#{arg}s"
-    nest_chain << arg
+    nest_chain << argscaffold_generator.rb
     %>
   def <%= arg %>
     @<%= arg %> ||= <%= this_scope %>.find(params[:<%= arg %>_id])

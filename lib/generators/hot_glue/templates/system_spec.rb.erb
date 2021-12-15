@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe "interaction for <%= controller_class_name %>", type: :feature do
   include HotGlue::ControllerHelper
+  <%= @existing_content %>
   <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
     <%= @columns.map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
@@ -24,14 +25,14 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   type = eval("#{singular_class}.columns_hash['#{col}']").type
   case type
   when :string
-    "#{col}: FFaker::Movie.title"
+    (col.to_s.include?('email') ? "#{col}: FFaker::Internet.email" : "#{col}: FFaker::Movie.title")
   when :text
     "#{col}:  FFaker::Lorem.paragraphs(10).join("  ")"
 
   when :float
     "#{col}: rand(1)*10000"
   when :boolean
-    "#{col}: !!rand(2).floor"
+    "#{col}: !!rand(2).flomor"
   when :time
     "#{col}: Time.current + rand(5000).seconds"
   when :date
@@ -65,6 +66,8 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     if !col.ends_with?("_id")
       "      " + ["expect(page).to have_content(#{singular}#{1}.#{col})"].join("\n      ")
     end
+  else
+        "      " + ["expect(page).to have_content(#{singular}#{1}.#{col})"].join("\n      ")
   end
 
 }.join("\n")
@@ -83,8 +86,8 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     type = eval("#{singular_class}.columns_hash['#{col}']").type
     case type
     when :datetime
-      "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
-      '      ' + "find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+      # "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
+      # '      ' + "find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
 
     when :integer
 
@@ -106,9 +109,15 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     when :boolean
       "     new_#{col} = rand(2).floor \n" +
       "     find(\"[name='#{singular}[#{col}]'][value='\#{new_" + col.to_s + "}']\").choose"
-    else
+    when :string
+     if col.to_s.include?("email")
       "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
       "      find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+
+      else
+      "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
+      "      find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+      end
     end
 
   }.join("\n")
@@ -116,17 +125,16 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
         %>
       click_button "Save"
       expect(page).to have_content("Successfully created")
-
-      <%=
+<%= "      " +
   @columns.map { |col|
     type = eval("#{singular_class}.columns_hash['#{col}']").type
 
     case type
     when :datetime
-         "      expect(page).to have_content(new_#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y')  + \" @ \" +
-      new_#{col}.in_time_zone(current_timezone).strftime('%l').strip + \":\" +
-      new_#{col}.in_time_zone(current_timezone).strftime('%M %p').strip + \" \" +
-      timezonize(current_timezone))"
+      #    "      expect(page).to have_content(new_#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y')  + \" @ \" +
+      # new_#{col}.in_time_zone(current_timezone).strftime('%l').strip + \":\" +
+      # new_#{col}.in_time_zone(current_timezone).strftime('%M %p').strip + \" \" +
+      # timezonize(current_timezone))"
     when :integer
       if col.to_s.ends_with?("_id")
         # shoould the assoication be on here
@@ -143,7 +151,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     end
   end<% end %>
 
-
+<% unless @no_edit %>
   describe "edit & update" do
     it "should return an editable form" do
       visit <%= path_helper_plural %>
@@ -157,10 +165,12 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       sql_type =  eval("#{singular_class}.columns_hash['#{col}']").sql_type
       case type
       when :datetime
+            "      new_#{col} = DateTime.current + 1.day \n" +
+            "      find(\"[name='#{singular}[#{col}]']\").fill_in(with: new_#{col.to_s})"
       when :integer
         if !col.to_s.ends_with?("_id")
-            "     new_#{col} = rand(10000).floor \n" +
-            "     find(\"[name='#{singular}[#{col}]']\").fill_in(with: new_#{col.to_s})"
+            "      new_#{col} = rand(10000).floor \n" +
+            "      find(\"[name='#{singular}[#{col}]']\").fill_in(with: new_#{col.to_s})"
         end
       when :text
         if sql_type == "text"
@@ -172,12 +182,17 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
             '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
         end
       when :string
-        if sql_type == "varchar"
-            "      " + "new_#{col.to_s} = FFaker::Name.name \n" +
-            '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
+
+        if col.to_s.include?("email")
+          "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
+          "      find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+
+        elsif sql_type == "varchar"
+          "      " + "new_#{col.to_s} = FFaker::Name.name \n" +
+          '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
         else
-            "      " + "new_#{col.to_s} = FFaker::Lorem.paragraphs(1).join \n" +
-            '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
+          "      " + "new_#{col.to_s} = FFaker::Lorem.paragraphs(1).join \n" +
+          '      find("input[name=\'' + singular + '[' + col.to_s + ']\']").fill_in(with: new_' + col.to_s + ')'
         end
       when :boolean
           "     new_#{col} = rand(2).floor \n" +
@@ -205,8 +220,6 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     %>
       click_button "Save"
       within("turbo-frame#<%= singular %>__#{<%= singular %>1.id} ") do
-
-
 <%=
     @columns.map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
@@ -229,7 +242,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
 
       end
     end
-  end
+  end <% end %>
 
 <% unless @no_delete %>  describe "destroy" do
     it "should destroy" do
