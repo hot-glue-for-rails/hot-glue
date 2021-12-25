@@ -171,7 +171,7 @@ module HotGlue
 
 
 
-      @col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col"
+      @col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col-md-2"
       @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
 
       @downnest = options['downnest'] || false
@@ -307,7 +307,7 @@ module HotGlue
             begin
               eval(assoc.class_name)
             rescue NameError => e
-              exit_message = "*** Oops: The model #{singular_class} is missing an association for #{assoc_name} or the model doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; your model #{singular_class.titlecase} should have_many :#{assoc_name}s.  To make a controller that can read all records, specify with --god."
+              exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; your model #{singular_class.titlecase} should belong_to :#{assoc_name}.  To make a controller that can read all records, specify with --god."
               puts exit_message
               exit
               # raise(HotGlue::Error, exit_message)
@@ -365,17 +365,21 @@ module HotGlue
 
       unless @no_specs
         dest_file = File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
-        existing_file = File.open(dest_file)
-        existing_content = existing_file.read
-        if existing_content =~ /\#HOTGLUE-SAVESTART/
-          if  existing_content !~ /\#HOTGLUE-END/
-            raise "Your file at #{dest_file} contains a #HOTGLUE-SAVESTART marker without #HOTGLUE-END"
-          end
-          @existing_content =  existing_content[(existing_content =~ /\#HOTGLUE-SAVESTART/) .. (existing_content =~ /\#HOTGLUE-END/)-1]
-          @existing_content << "#HOTGLUE-END"
+          if  File.exists?(dest_file)
+          existing_file = File.open(dest_file)
+          existing_content = existing_file.read
+          if existing_content =~ /\#HOTGLUE-SAVESTART/
+            if  existing_content !~ /\#HOTGLUE-END/
+              raise "Your file at #{dest_file} contains a #HOTGLUE-SAVESTART marker without #HOTGLUE-END"
+            end
+            @existing_content =  existing_content[(existing_content =~ /\#HOTGLUE-SAVESTART/) .. (existing_content =~ /\#HOTGLUE-END/)-1]
+            @existing_content << "#HOTGLUE-END"
 
+          end
+          existing_file.rewind
+        else
+          @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
         end
-        existing_file.rewind
 
         template "system_spec.rb.erb", dest_file
       end
@@ -386,17 +390,18 @@ module HotGlue
     def list_column_headings
       if @nested_args.any?
         column_width = each_col * @columns.count
-
-        "<div class='#{@col_identifier}'  style='flex-basis: #{column_width}%'>"
       else
-        @template_builder.list_column_headings(
-          column_width: each_col,
-          columns: @columns,
-          col_identifier: @col_identifier
-        )
+
       end
 
 
+      @template_builder.list_column_headings(
+        column_width: each_col,
+        columns: @columns,
+        col_identifier: @col_identifier,
+        layout: @layout,
+        column_width: column_width
+      )
     end
 
     def columns_spec_with_sample_data
