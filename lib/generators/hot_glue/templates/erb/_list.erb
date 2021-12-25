@@ -12,21 +12,20 @@
         <% downnest_column_style = @layout == "hotglue" ? 'style="flex-basis: ' + each_downnest_width +  '%;' : "" %>
 
         <% @downnest_children.each do |downnest| %>
-        <div class="<%= @col_identifer %> scaffold-col-heading<%= ' col-md-3' if @layout=="bootstrap" %>" <%= downnest_column_style %>>
-          <h4>
+        <div class=" scaffold-col-heading<%= ' col-md-3' if @layout=="bootstrap" %>" <%= downnest_column_style %>>
+          <strong>
             <%=  downnest.titleize  %>
-          </h4>
+          </strong>
         </div>
       <% end %>
       <% end %>
 
       <% button_column_style = @layout == "hotglue" ? 'style="flex-basis: 150px' : ""  %>
 
-      <div class='<%= @col_identifer %> scaffold-col-heading scaffold-col-heading-buttons<%= ' col-md-2' if @layout=="bootstrap" %>' <%= button_column_style %>>
+      <div class=' scaffold-col-heading scaffold-col-heading-buttons<%= ' col-md-2' if @layout=="bootstrap" %>' <%= button_column_style %>>
 
       </div>
     </div>
-
       <\% if <%= plural %>.empty? %>
     <div>
         None
@@ -36,8 +35,6 @@
         <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if  @nestable %><%= ", nested_for: nested_for" if @nestable %> } %>
       <\% end %>
     <%=  @no_paginate ? "" : paginate %>
-
-    </div>
-      <% end  %>
+  <% end  %>
   </div>
 <\% end %>

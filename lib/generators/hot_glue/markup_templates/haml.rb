@@ -31,6 +31,7 @@ module  HotGlue
       show_only = args[0][:show_only]
       singular_class = args[0][:singular_class]
 
+
       # TODO: CLEAN ME
       @singular = args[0][:singular]
       singular = @singular
@@ -137,11 +138,15 @@ module  HotGlue
     show_only = args[0][:show_only]
     singular_class = args[0][:singular_class]
     singular = args[0][:singular]
+    layout = args[0][:layout]
 
     columns_count = columns.count + 1
     perc_width = (100/columns_count).floor
-
-    col_identifer = ".col"
+    if @layout == 'bootstrap'
+      col_identifer = ".col-md-2"
+    else
+      col_identifer = ".col"
+    end
     columns.map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
       limit = eval("#{singular_class}.columns_hash['#{col}']").limit

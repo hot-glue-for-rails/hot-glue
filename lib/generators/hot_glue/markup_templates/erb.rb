@@ -43,7 +43,9 @@ module  HotGlue
       columns = args[0][:columns]
       column_width = args[0][:column_width]
       col_identifier = args[0][:col_identifier]
-      if @layout == "hotglue"
+      layout = args[0][:layout]
+
+      if layout == "hotglue"
         col_style = " style='flex-basis: #{column_width}%'"
       else
         col_style = ""
@@ -178,7 +180,7 @@ module  HotGlue
       perc_width = (perc_width).floor
 
       if layout == "bootstrap"
-        col_identifer = "col"
+        col_identifer = "col-md-2"
         style_with_flex_basis = ""
       else
         style_with_flex_basis = " style='flex-basis: #{perc_width}%'"
