@@ -64,8 +64,6 @@ module  HotGlue
       @singular = args[0][:singular]
       singular = @singular
 
-
-
       col_spaces_prepend = "    "
 
 
@@ -74,7 +72,7 @@ module  HotGlue
 
           column.map { |col|
 
-          if show_only.include?(col)
+          field_result = if show_only.include?(col)
             "<%= @#{singular}.#{col.to_s} %>" +
             "<label class='form-text'>#{col.to_s.humanize}</label>"
           else
@@ -83,63 +81,63 @@ module  HotGlue
             sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
 
             case type
-            when :integer
-              # look for a belongs_to on this object
-              if col.to_s.ends_with?("_id")
-                assoc_name = col.to_s.gsub("_id","")
-                assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-                if assoc.nil?
-                  exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-                  exit
+              when :integer
+                # look for a belongs_to on this object
+                if col.to_s.ends_with?("_id")
+                  assoc_name = col.to_s.gsub("_id","")
+                  assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+                  if assoc.nil?
+                    exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+                    exit
+                  end
+                  display_column = HotGlue.derrive_reference_name(assoc.class_name)
+                  "<%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
+  <label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+
+                else
+                  "<%= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number' %>
+  <label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+
                 end
-                display_column = HotGlue.derrive_reference_name(assoc.class_name)
-                "<%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
-<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+              when :string
+                if sql_type == "varchar" || sql_type == "character varying"
+                  field_output(col, nil, limit || 40, col_identifier)
+                else
+                  text_area_output(col, 65536, col_identifier)
+                end
 
-              else
-                "<%= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number' %>
-<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
-
-              end
-            when :string
-              if sql_type == "varchar" || sql_type == "character varying"
-                field_output(col, nil, limit || 40, col_identifier)
-              else
-                text_area_output(col, 65536, col_identifier)
-              end
-
-            when :text
-              if sql_type == "varchar"
-                field_output(col, nil, limit, col_identifier)
-              else
-                text_area_output(col, 65536, col_identifier)
-              end
-            when :float
-              field_output(col, nil, 5, col_identifier)
-            when :datetime
-                "<%= datetime_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
-            when :date
-                "<%= date_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
-            when :time
-             "<%= time_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s},  '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
-            when :boolean
-              " " +
-                "  <span>#{col.to_s.humanize}</span>" +
-                "  <%= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked') %>\n" +
-                "  <%= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0') %>\n" +
-                "  <%= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '') %>\n" +
-                "  <%= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1') %>\n" +
-                ""
-            when :enum
-              enum_name = "enum_name"
-              # byebug
-              enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col.to_s}'}[0].sql_type")
-              "<%= f.collection_select(:#{col.to_s},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
-<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+              when :text
+                if sql_type == "varchar"
+                  field_output(col, nil, limit, col_identifier)
+                else
+                  text_area_output(col, 65536, col_identifier)
+                end
+              when :float
+                field_output(col, nil, 5, col_identifier)
+              when :datetime
+                  "<%= datetime_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+              when :date
+                  "<%= date_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+              when :time
+               "<%= time_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s},  '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+              when :boolean
+                " " +
+                  "  <span>#{col.to_s.humanize}</span>" +
+                  "  <%= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked') %>\n" +
+                  "  <%= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0') %>\n" +
+                  "  <%= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '') %>\n" +
+                  "  <%= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1') %>\n" +
+                  ""
+              when :enum
+                enum_name = "enum_name"
+                # byebug
+                enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col.to_s}'}[0].sql_type")
+                "<%= f.collection_select(:#{col.to_s},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
+  <label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
             end
-
-          end
+                         end
+          "<span class='<%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s}) %>'>" + field_result + "</span>"
           }.join("<br />") + "</div>"
       }.join("\n")
       return result

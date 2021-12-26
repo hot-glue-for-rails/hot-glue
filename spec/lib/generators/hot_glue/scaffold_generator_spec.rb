@@ -346,8 +346,12 @@ describe HotGlue::ScaffoldGenerator do
             response = Rails::Generators.invoke("hot_glue:scaffold",
                                                 ["User","--gd", "--layout=bootstrap"])
             expect(
-              File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class='col-md-1'>Email<\/div>/
+               File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class='col-md-1'>Email<\/div>/
             ).to be_a(Numeric)
+
+            file = File.read("spec/Dummy/app/views/users/_show.erb")
+            expect(file).to eq("<div class='col-md-2'><%= user.email %></div>\n\n\n\n\n<div class=\" scaffold-line-buttons  col-md-2\" >\n  \n\n  \n    <%= form_with url: user_path(user), html: {style: \"display: inline-block;\"}, method: :delete do |f| %>\n      <%= f.submit \"Delete\".html_safe,  data: {confirm: 'Are you sure?'}, class: \"delete-user-button btn btn-primary btn-sm\" %>\n    <% end %>\n  \n\n  \n  <%= link_to \"Edit <i class='fa fa-1x fa-list-alt'></i>\".html_safe, edit_user_path(user), disable_with: \"Loading...\", class: \"edit-user-button btn btn-primary btn-sm\" %>\n  \n</div>\n")
+
             expect(
               File.read("spec/Dummy/app/views/users/_list.erb") =~ /scaffold-col-heading-buttons col-md-2/
             ).to be_a(Numeric)
