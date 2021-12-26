@@ -8,7 +8,7 @@
     <% downnest_object =  eval("#{singular_class}.reflect_on_association(:#{downnest})") %>
     <% downnest_class = downnest_object.class_name %>
     <% downnest_object_name = eval("#{downnest_class}.table_name") %>
-    <% downnest_style =  @layout == "hotglue" ? 'style="flex-basis: ' +  each_downnest_width + '%"' : "" %>
+    <% downnest_style =  @layout == "hotglue" ? 'style="flex-basis: ' +  each_downnest_width.to_s + '%"' : "" %>
   <div class="<%= " col-md-#{@downnest_children_width[i]}" if @layout == "bootstrap" %> scaffold-downnest" <%= downnest_style  %> >
   <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest_object_name %>/list", locals: {
     nested_for: "<% if @nested_args.any? %>#{nested_for + "__" if nested_for}<% end %><%= @singular %>-#{<%= @singular %>.id}",

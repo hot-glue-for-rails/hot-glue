@@ -22,6 +22,7 @@ describe HotGlue::ScaffoldGenerator do
     # TODO: this feels a little ugly but is effective
     remove_dir_with_namespace('spec/Dummy/app/views/')
     remove_dir_with_namespace('spec/Dummy/app/controllers/')
+    FileUtils.rm("spec/Dummy/app/controllers/users_controller.rb") if File.exists?("spec/Dummy/app/controllers/xyzs_controller.rb")
 
     FileUtils.rm("spec/Dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/Dummy/app/controllers/xyzs_controller.rb")
     FileUtils.rm("spec/Dummy/app/controllers/dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/dfgs_controller.rb")
@@ -31,6 +32,8 @@ describe HotGlue::ScaffoldGenerator do
     FileUtils.rm_rf('spec/Dummy/spec/')
     FileUtils.rm_rf('spec/Dummy/app/views/hello/dfgs')
     FileUtils.rm_rf('spec/Dummy/app/views/xyzs')
+    FileUtils.rm_rf('spec/Dummy/app/views/users')
+
     FileUtils.rm_rf('spec/Dummy/app/views/ghis')
     FileUtils.rm_rf('spec/Dummy/app/views/abcs')
     FileUtils.rm_rf('spec/Dummy/app/views/jkls')
@@ -338,20 +341,97 @@ describe HotGlue::ScaffoldGenerator do
         end
 
 
-
-        describe "for bootstrap layout" do
-          it "can build a smart layout if there are many fields" do
-
+        describe "layout without smart layout" do
+          it "builds 1 column for fields and 2 for the buttons" do
+            response = Rails::Generators.invoke("hot_glue:scaffold",
+                                                ["User","--gd", "--layout=bootstrap"])
+            expect(
+              File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class='col-md-1'>Email<\/div>/
+            ).to be_a(Numeric)
+            expect(
+              File.read("spec/Dummy/app/views/users/_list.erb") =~ /scaffold-col-heading-buttons col-md-2/
+            ).to be_a(Numeric)
           end
-        end
-
-        describe "for hotglue layout" do
-
         end
       end
 
+      describe "smart layout" do
+        describe "when building bootstrap" do
+          describe "with no downnested portals" do
+            it "builds 10 column for fields and 2 for the buttons" do
+              response = Rails::Generators.invoke("hot_glue:scaffold",
+                                                  ["User",
+                                                   "--gd",
+                                                   "--smart-layout",
+                                                   "--layout=bootstrap"])
 
 
+
+              # TODO: IMPLEMENT ME
+              # expect(
+              #   File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class='col-md-10'>Email<\/div>/
+              # ).to be_a(Numeric)
+              #
+
+              expect(
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /scaffold-col-heading-buttons col-md-2/
+              ).to be_a(Numeric)
+            end
+          end
+
+          describe "with 1 downnested portal" do
+            it "builds 4 columns for fields, 6 for the downnested portal, and 2 for the buttons" do
+              response = Rails::Generators.invoke("hot_glue:scaffold",
+                                                  ["User",
+                                                   "--gd",
+                                                   "--smart-layout",
+                                                   "--downnest=dfgs", "--layout=bootstrap"])
+              expect(
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class='col-md-2'>Email<\/div>/
+              ).to be_a(Numeric)
+
+              expect(
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-6" >/
+              ).to be_a(Numeric)
+              expect(
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<strong>
+            Dfgs
+          <\/strong>/
+              ).to be_a(Numeric)
+            end
+          end
+
+          describe "with 2 downnested portals" do
+            it "builds 2 columns for fields, 4 for each of the the downnested portals, and 2 for the buttons" do
+              response = Rails::Generators.invoke("hot_glue:scaffold",
+                                                  ["User","--gd",
+                                                   "--smart-layout",
+                                                   "--downnest=dfgs,xyzs", "--layout=bootstrap"])
+              expect(
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4" >/
+              ).to be_a(Numeric)
+              expect(
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<strong>
+            Dfgs
+          <\/strong>/
+              ).to be_a(Numeric)
+
+              expect(
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<strong>
+            Xyzs
+          <\/strong>/
+              ).to be_a(Numeric)
+            end
+          end
+        end
+
+
+        describe "when building with hotglue layout" do
+          # TODO: implement specs
+          #
+          #
+        end
+      end
     end
   end
 

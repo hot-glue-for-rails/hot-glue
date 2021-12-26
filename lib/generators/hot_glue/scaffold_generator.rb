@@ -64,7 +64,7 @@ module HotGlue
     class_option :display_list_after_update, type: :boolean, default: false
     class_option :smart_layout, type: :boolean, default: false
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
-    class_option :layout, type: :string, default: nil # deprecated -- use in app config instead
+    class_option :layout, type: :string, default: nil # if used here it will override what is in the config
 
 
     def initialize(*meta_args)
@@ -125,12 +125,15 @@ module HotGlue
       end
 
 
-      @layout = yaml_from_config[:layout]
+      if !options['layout']
+        @layout = yaml_from_config[:layout]
 
-      if !['hotglue', 'bootstrap'].include? @layout
-        raise "Invalid option #{@layout} in Hot glue config (config/hot_glue.yml). You must pass either hotglue (default) or bootstrap to config"
+        if !['hotglue', 'bootstrap'].include? @layout
+          raise "Invalid option #{@layout} in Hot glue config (config/hot_glue.yml). You must either use --layout= when generating or have a file config/hotglue.yml; specify layout as either 'hotglue' or 'bootstrap'"
+        end
+      else
+        @layout = options['layout']
       end
-
 
       args = meta_args[0]
       @singular = args.first.tableize.singularize # should be in form hello_world
@@ -177,7 +180,6 @@ module HotGlue
       @smart_layout = options['smart_layout']
 
 
-      @col_identifier = @layout == "hotglue" ? "scaffold-cell" : ""
       @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
 
       @downnest = options['downnest'] || false
@@ -475,9 +477,15 @@ module HotGlue
         column_width = 0
       end
 
+      if !@smart_layout
+        col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col-md-1"
+      else
+        col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col-md-2"
+      end
+
       @template_builder.list_column_headings(
         columns: @layout_columns,
-        col_identifier: @col_identifier,
+        col_identifier: col_identifier,
         layout: @layout,
         column_width: column_width
       )

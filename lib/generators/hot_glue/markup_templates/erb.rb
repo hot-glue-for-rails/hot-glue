@@ -47,11 +47,8 @@ module  HotGlue
       end
 
       result = layout_columns.map{ |column|
-        "<div class='#{col_identifier}'" + col_style +">" +
-          column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />") +
-        + "</div>"
+        "<div class='#{col_identifier}'" + col_style + ">" +  column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
       }.join("\n")
-
       return result
     end
 
