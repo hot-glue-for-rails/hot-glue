@@ -56,13 +56,13 @@ module HotGlue
     class_option :no_paginate, type: :boolean, default: false
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
-    class_option :stimulus_syntax, type: :boolean, default: nil
+
+    class_option :stimulus_syntax, type: :boolean, default: nil # TODO: rename to ujs_syntax and default to false
+
     class_option :downnest, type: :string, default: nil
-    class_option :nestable, type: :boolean, default: false
     class_option :magic_buttons, type: :string, default: nil
     class_option :display_list_after_update, type: :boolean, default: false
     class_option :smart_layout, type: :boolean, default: false
-
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # deprecated -- use in app config instead
 
@@ -217,7 +217,6 @@ module HotGlue
       @build_update_action = !@no_edit || !@magic_buttons.empty?
       # if the magic buttons are present, build the update action anyway
 
-      # @nestable = options['nestable'] || false
 
       if @auth && ! @self_auth && @nested_args.none?
         @object_owner_sym = @auth.gsub("current_", "").to_sym
@@ -260,10 +259,9 @@ module HotGlue
           if @god
             exit_message= "*** Oops: Gd mode could not find the association(#{@object_owner_sym}). Something is wrong."
           else
-            @auth_check = "current_user"
+            @auth_check = eval(@auth_identifier.titleize)
             @nested_args.each do |arg|
-
-              if !@auth_check.method("#{arg}s")
+              if ! @auth_check.reflect_on_association("#{arg}s".to_sym)
                 exit_message = "*** Oops:  your nesting chain does not have a association for #{arg}s on #{@auth_check}  something is wrong."
               end
             end
@@ -419,7 +417,7 @@ module HotGlue
 
 
 
-      puts "*** conststructed layout columns #{@layout_columns.inspect}"
+      puts "*** constructed layout columns #{@layout_columns.inspect}"
       return @layout_columns
     end
 
@@ -757,20 +755,35 @@ module HotGlue
     end
 
     def all_views
-      res =  %w(index edit _form _line _list _show _errors)
+      res =  %w(index  _line _list _show _errors)
 
       unless @no_create
         res += %w(new _new_form _new_button)
+      end
+
+      unless @no_edit
+        res << 'edit'
+        res << '_form'
       end
 
       res
     end
 
     def turbo_stream_views
-      res = %w(create  edit update)
+      res = []
       unless @no_delete
         res << 'destroy'
       end
+
+      unless @no_create
+        res << 'create'
+      end
+
+      unless @no_edit
+        res << 'edit'
+        res << 'update'
+      end
+
       res
     end
 

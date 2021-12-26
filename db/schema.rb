@@ -15,12 +15,12 @@ ActiveRecord::Schema.define(version: 2021_03_06_225506) do
   create_table "abcs", force: :cascade do |t|
     t.integer "xxx"
     t.string "yyy"
-    t.integer "def_id"
+    t.integer "dfg_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "defs", force: :cascade do |t|
+  create_table "dfg", force: :cascade do |t|
     t.integer "user_id"
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
@@ -28,7 +28,7 @@ ActiveRecord::Schema.define(version: 2021_03_06_225506) do
   end
 
   create_table "ghis", force: :cascade do |t|
-    t.integer "def_id"
+    t.integer "dfg_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

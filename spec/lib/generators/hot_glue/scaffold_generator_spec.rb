@@ -11,7 +11,7 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   def remove_dir_with_namespace(path)
-    FileUtils.rm_rf(path + "defs/")
+    FileUtils.rm_rf(path + "dfgs/")
   end
 
   def remove_dir(path)
@@ -20,19 +20,20 @@ describe HotGlue::ScaffoldGenerator do
 
   def remove_everything
     # TODO: this feels a little ugly but is effective
-    remove_dir_with_namespace('spec/dummy/app/views/')
-    remove_dir_with_namespace('spec/dummy/app/controllers/')
+    remove_dir_with_namespace('spec/Dummy/app/views/')
+    remove_dir_with_namespace('spec/Dummy/app/controllers/')
 
-    FileUtils.rm("spec/dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/dummy/app/controllers/xyzs_controller.rb")
-    FileUtils.rm("spec/dummy/app/controllers/defs_controller.rb") if File.exists?("spec/dummy/app/controllers/defs_controller.rb")
-    FileUtils.rm("spec/dummy/app/controllers/hello/defs_controller.rb") if File.exists?("spec/dummy/app/controllers/hello/defs_controller.rb")
-    FileUtils.rm_rf('spec/dummy/spec/')
-    FileUtils.rm_rf('spec/dummy/app/views/hello/defs')
-    FileUtils.rm_rf('spec/dummy/app/views/xyzs')
-    FileUtils.rm_rf('spec/dummy/app/views/ghis')
+    FileUtils.rm("spec/Dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/Dummy/app/controllers/xyzs_controller.rb")
+    FileUtils.rm("spec/Dummy/app/controllers/dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/dfgs_controller.rb")
+    FileUtils.rm("spec/Dummy/app/controllers/hello/dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/hello/dfgs_controller.rb")
+    FileUtils.rm_rf('spec/Dummy/spec/')
+    FileUtils.rm_rf('spec/Dummy/app/views/hello/dfgs')
+    FileUtils.rm_rf('spec/Dummy/app/views/xyzs')
+    FileUtils.rm_rf('spec/Dummy/app/views/ghis')
+    FileUtils.rm_rf('spec/Dummy/app/views/abcs')
 
-    remove_dir_with_namespace('spec/dummy/app/views/hello')
-    remove_dir_with_namespace('spec/dummy/app/controllers/hello')
+    remove_dir_with_namespace('spec/Dummy/app/views/hello')
+    remove_dir_with_namespace('spec/Dummy/app/controllers/hello')
   end
 
   describe "with no object for the model specified" do
@@ -67,7 +68,7 @@ describe HotGlue::ScaffoldGenerator do
     it "with both --specs-only and --no-specs" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--specs-only","--no-specs"])
+                                            ["Dfg","--specs-only","--no-specs"])
       rescue StandardError => e
         expect(e.class).to eq(HotGlue::Error)
         expect(e.message).to eq("*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry.")
@@ -79,11 +80,11 @@ describe HotGlue::ScaffoldGenerator do
     it "should create a file specs/system" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--specs-only"])
+                                            ["Dfg","--specs-only"])
       rescue StandardError => e
         expect("error building in spec #{e}")
       end
-      expect(File.exist?("spec/dummy/spec/system/defs_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/Dummy/spec/system/dfgs_behavior_spec.rb")).to be(true)
     end
   end
 
@@ -92,11 +93,11 @@ describe HotGlue::ScaffoldGenerator do
     it "should NOT create a file at specs/system" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--no-specs"])
+                                            ["Dfg","--no-specs"])
       rescue StandardError => e
         expect("error building in spec #{e}")
       end
-      expect(File.exist?("spec/dummy/app/spec/system/defs_spec.rb")).to be(false)
+      expect(File.exist?("spec/Dummy/app/spec/system/dfgs_spec.rb")).to be(false)
     end
   end
 
@@ -117,44 +118,44 @@ describe HotGlue::ScaffoldGenerator do
       it "should create all the erb files" do
         begin
           response = Rails::Generators.invoke("hot_glue:scaffold",
-                                              ["Def"])
+                                              ["Dfg"])
         rescue StandardError => e
           raise("error building in spec #{e}")
         end
-        expect(File.exist?("spec/dummy/app/views/defs/edit.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/index.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/new.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_form.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_new_form.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_line.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_list.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_new_button.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/_show.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/edit.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/index.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/new.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/_form.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/_new_form.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/_line.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/_list.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/_new_button.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/_show.erb")).to be(true)
       end
 
 
       it "should create all of the turbo stream files" do
         begin
           response = Rails::Generators.invoke("hot_glue:scaffold",
-                                              ["Def"])
+                                              ["Dfg"])
         rescue StandardError => e
           raise("error building in spec #{e}")
         end
-        expect(File.exist?("spec/dummy/app/views/defs/create.turbo_stream.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/destroy.turbo_stream.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/edit.turbo_stream.erb")).to be(true)
-        expect(File.exist?("spec/dummy/app/views/defs/update.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/create.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/destroy.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/edit.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/views/dfgs/update.turbo_stream.erb")).to be(true)
       end
 
 
       it "should create the controler" do
         begin
           response = Rails::Generators.invoke("hot_glue:scaffold",
-                                              ["Def"])
+                                              ["Dfg"])
         rescue StandardError => e
           raise("error building in spec #{e}")
         end
-        expect(File.exist?("spec/dummy/app/controllers/defs_controller.rb")).to be(true)
+        expect(File.exist?("spec/Dummy/app/controllers/dfgs_controller.rb")).to be(true)
       end
     end
   end
@@ -165,42 +166,45 @@ describe HotGlue::ScaffoldGenerator do
     it "should create with a namespace" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--namespace=hello"])
+                                            ["Dfg","--namespace=hello"])
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
-      expect(File.exist?("spec/dummy/app/views/hello/defs/edit.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/index.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/new.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_form.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_new_form.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_line.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_list.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_new_button.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/_show.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/controllers/hello/defs_controller.rb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/create.turbo_stream.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/destroy.turbo_stream.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/edit.turbo_stream.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/defs/update.turbo_stream.erb")).to be(true)
-      expect(File.exist?("spec/dummy/spec/system/hello/defs_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/edit.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/index.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/new.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_form.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_new_form.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_line.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_list.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_new_button.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_show.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/controllers/hello/dfgs_controller.rb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/create.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/destroy.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/edit.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/update.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/Dummy/spec/system/hello/dfgs_behavior_spec.rb")).to be(true)
     end
   end
 
 
   describe "--nest" do
     it "should create a file at and specs/system" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Ghi","--nest=def"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Ghi","--nest=dfg"])
+      # begin
+      #
+      # rescue StandardError => e
+      #   raise("error building in spec #{e}")
+      # end
 
-      expect(File.exist?("spec/dummy/app/controllers/ghis_controller.rb")).to be(true)
-      expect(File.exist?("spec/dummy/spec/system/ghis_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/Dummy/app/controllers/ghis_controller.rb")).to be(true)
+      expect(File.exist?("spec/Dummy/spec/system/ghis_behavior_spec.rb")).to be(true)
     end
   end
+
+
 
   describe "authorization and object ownership" do
     describe "--auth" do
@@ -226,23 +230,38 @@ describe HotGlue::ScaffoldGenerator do
       # TODO: implement specs
     end
 
-    describe "--incldue" do
+    describe "--include and --smart-layout" do
       # TODO: implement specs
+
+      describe "for bootstrap layout" do
+
+      end
+
+
+      describe "for hotglue layout" do
+
+      end
+
     end
   end
 
+  # --show-only
+  # --magic-buttons
+  # --downnest
+  # --display-list-after-update
+  # --smart-layout
 
   describe "--no-paginate" do
-    it "should not make the create files" do
+    it "should not create a list with pagination" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--no-paginate"])
+                                            ["Dfg","--no-paginate"])
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
 
       expect(
-        File.read("spec/dummy/app/views/defs/_list.erb") =~ /paginate defs/
+        File.read("spec/Dummy/app/views/dfgs/_list.erb") =~ /paginate dfgs/
       ).to be(nil)
     end
   end
@@ -251,14 +270,31 @@ describe HotGlue::ScaffoldGenerator do
     it "should not make the create files" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--no-create"])
+                                            ["Dfg","--no-create"])
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
-      expect(File.exist?("spec/dummy/app/views/defs/new.erb")).to be(false)
-      expect(File.exist?("spec/dummy/app/views/defs/_new_form.erb")).to be(false)
-      expect(File.exist?("spec/dummy/app/views/defs/_new_button.erb")).to be(false)
-      expect(File.exist?("spec/dummy/app/viewsdefs/create.turbo_stream.erb")).to be(false)
+
+      expect(File.exist?("spec/Dummy/app/views/dfgs/new.erb")).to be(false)
+      expect(File.exist?("spec/Dummy/app/views/dfgs/_new_form.erb")).to be(false)
+      expect(File.exist?("spec/Dummy/app/views/dfgs/_new_button.erb")).to be(false)
+      expect(File.exist?("spec/Dummy/app/views/dfgs/create.turbo_stream.erb")).to be(false)
+    end
+  end
+
+
+  describe "--no-edit" do
+    it "should not make the create files" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--no-edit"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
+
+      expect(File.exist?("spec/Dummy/app/views/dfgs/_form.erb")).to be(false)
+      expect(File.exist?("spec/Dummy/app/views/dfgs/edit.erb")).to be(false)
+      expect(File.exist?("spec/Dummy/app/views/dfgs/update.turbo_stream.erb")).to be(false)
     end
   end
 
@@ -267,11 +303,11 @@ describe HotGlue::ScaffoldGenerator do
     it "should not make the delete turbostream file" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--no-delete"])
+                                            ["Dfg","--no-delete"])
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
-      expect(File.exist?("spec/dummy/app/views/defs/destroy.turbo_stream.erb")).to be(false)
+      expect(File.exist?("spec/Dummy/app/views/dfgs/destroy.turbo_stream.erb")).to be(false)
     end
   end
 
@@ -279,13 +315,13 @@ describe HotGlue::ScaffoldGenerator do
     it "should not make the delete turbostream file" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--big-edit"])
+                                            ["Dfg","--big-edit"])
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
 
       expect(
-        File.read("spec/dummy/app/views/defs/_show.erb") =~ /edit_def_path\(def\), 'data-turbo' => 'false',/
+        File.read("spec/Dummy/app/views/dfgs/_show.erb") =~ /edit_dfg_path\(dfg\), 'data-turbo' => 'false',/
       ).to_not be(nil)
     end
   end
@@ -294,13 +330,13 @@ describe HotGlue::ScaffoldGenerator do
     it "should make the show only fields visible only" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Def","--show-only=name"])
+                                            ["Dfg","--show-only=name"])
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
 
       expect(
-        File.read("spec/dummy/app/views/defs/_form.erb") =~ /f\.text_field :name/
+        File.read("spec/Dummy/app/views/dfgs/_form.erb") =~ /f\.text_field :name/
       ).to be(nil)
 
     end

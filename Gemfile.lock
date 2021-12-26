@@ -128,6 +128,7 @@ GEM
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
     orm_adapter (0.5.0)
+    pg (1.2.3)
     racc (1.5.2)
     rack (2.2.3)
     rack-test (1.1.0)
@@ -200,7 +201,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sqlite3 (1.4.2)
     thor (1.1.0)
     tilt (2.0.10)
     turbo-rails (7.1.1)
@@ -224,10 +224,10 @@ DEPENDENCIES
   devise
   factory_bot
   hot-glue!
+  pg
   rails (= 6.1)
   rails-controller-testing
   rspec-rails
-  sqlite3
 
 BUNDLED WITH
    2.1.4
