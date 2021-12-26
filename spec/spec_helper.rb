@@ -21,7 +21,7 @@ end
 # require rails first
 require "rails/all"
 
-FileUtils.rm_rf("spec/dummy/spec/")
+# FileUtils.rm_rf("spec/Dummy/spec/")
 
 require 'rails/generators'
 # require the gem's core code

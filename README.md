@@ -17,8 +17,10 @@ The DUMMY testing DOES NOT test the actual functionality of the output code (it 
 # DATABASE
 
 `cd spec/dummy`
-`rake db:drop`
-`rake db:create db:migrate`
+`rails db:drop`
+`rails db:create`
+`rails db:migrate`
+`RAILS_ENV=test rails db:migrate`
 
 `cd ../..`
 

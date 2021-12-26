@@ -9,7 +9,6 @@ gem 'byebug'
 gem 'rails', '6.1'
 gem 'devise', require: true
 
-
 # for testing
 gem "rails-controller-testing", group: [:test]
 gem "database_cleaner", group: [:test]

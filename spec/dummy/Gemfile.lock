@@ -47,6 +47,10 @@ GEM
     activerecord (6.1.4.4)
       activemodel (= 6.1.4.4)
       activesupport (= 6.1.4.4)
+    activerecord-pg_enum (1.2.2)
+      activerecord (>= 4.1.0)
+      activesupport
+      pg
     activestorage (6.1.4.4)
       actionpack (= 6.1.4.4)
       activejob (= 6.1.4.4)
@@ -158,6 +162,7 @@ PLATFORMS
   arm64-darwin-20
 
 DEPENDENCIES
+  activerecord-pg_enum
   devise
   pg (~> 1.1)
   puma (~> 5.0)

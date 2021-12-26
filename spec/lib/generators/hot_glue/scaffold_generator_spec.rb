@@ -26,11 +26,14 @@ describe HotGlue::ScaffoldGenerator do
     FileUtils.rm("spec/Dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/Dummy/app/controllers/xyzs_controller.rb")
     FileUtils.rm("spec/Dummy/app/controllers/dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/dfgs_controller.rb")
     FileUtils.rm("spec/Dummy/app/controllers/hello/dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/hello/dfgs_controller.rb")
+    FileUtils.rm("spec/Dummy/app/controllers/jkls_controller.rb") if File.exists?("spec/Dummy/app/controllers/jkls_controller.rb")
+
     FileUtils.rm_rf('spec/Dummy/spec/')
     FileUtils.rm_rf('spec/Dummy/app/views/hello/dfgs')
     FileUtils.rm_rf('spec/Dummy/app/views/xyzs')
     FileUtils.rm_rf('spec/Dummy/app/views/ghis')
     FileUtils.rm_rf('spec/Dummy/app/views/abcs')
+    FileUtils.rm_rf('spec/Dummy/app/views/jkls')
 
     remove_dir_with_namespace('spec/Dummy/app/views/hello')
     remove_dir_with_namespace('spec/Dummy/app/controllers/hello')
@@ -254,29 +257,103 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "choosing which fields to include" do
     describe "--exclude" do
-      # TODO: implement specs
+      it "should allow a list of exlcuded fields" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Jkl","--exclude=long_description,cost"])
+
+        # cost is excluded
+        expect(
+          File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /cost/
+        ).to be(nil)
+        expect(
+          File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /cost/
+        ).to be(nil)
+        expect(
+          File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /cost/
+        ).to be(nil)
+
+        # long description is excluded
+        expect(
+          File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /long_description/
+        ).to be(nil)
+        expect(
+          File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /long_description/
+        ).to be(nil)
+        expect(
+          File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /long_description/
+        ).to be(nil)
+
+        # blurb is not excluded
+        expect(
+          File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /blurb/
+        ).to be_a(Numeric)
+        expect(
+          File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /blurb/
+        ).to be_a(Numeric)
+        expect(
+          File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /blurb/
+        ).to be_a(Numeric)
+      end
     end
 
     describe "--include and --smart-layout" do
-      # TODO: implement specs
 
-      describe "for bootstrap layout" do
+      describe "basic --include usage" do
+        it "should allow a list of whitelisted fields separated by comma fields" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Jkl","--include=long_description,blurb"])
 
+          # cost is excluded
+          expect(
+            File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /cost/
+          ).to be(nil)
+          expect(
+            File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /cost/
+          ).to be(nil)
+          expect(
+            File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /cost/
+          ).to be(nil)
+
+          # long description is included
+          expect(
+            File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /long_description/
+          ).to be_a(Numeric)
+          expect(
+            File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /long_description/
+          ).to be_a(Numeric)
+          expect(
+            File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /long_description/
+          ).to be_a(Numeric)
+
+          # long description is included
+          expect(
+            File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /blurb/
+          ).to be_a(Numeric)
+          expect(
+            File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /blurb/
+          ).to be_a(Numeric)
+          expect(
+            File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /blurb/
+          ).to be_a(Numeric)
+        end
+
+
+
+        describe "for bootstrap layout" do
+          it "can build a smart layout if there are many fields" do
+
+          end
+        end
+
+        describe "for hotglue layout" do
+
+        end
       end
 
 
-      describe "for hotglue layout" do
-
-      end
 
     end
   end
-
-  # --show-only
-  # --magic-buttons
-  # --downnest
-  # --display-list-after-update
-  # --smart-layout
 
   describe "--no-paginate" do
     it "should not create a list with pagination" do
@@ -309,7 +386,6 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-
   describe "--no-edit" do
     it "should not make the create files" do
       begin
@@ -324,7 +400,6 @@ describe HotGlue::ScaffoldGenerator do
       expect(File.exist?("spec/Dummy/app/views/dfgs/update.turbo_stream.erb")).to be(false)
     end
   end
-
 
   describe "--no-delete" do
     it "should not make the delete turbostream file" do
@@ -374,4 +449,11 @@ describe HotGlue::ScaffoldGenerator do
 
     end
   end
+
+  # TODO: add tests for
+  # --magic-buttons
+  # --downnest
+  # --display-list-after-update
+  # --smart-layout
+
 end
