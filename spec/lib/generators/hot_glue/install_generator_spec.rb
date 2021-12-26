@@ -14,13 +14,27 @@ describe HotGlue::InstallGenerator do
   end
 
 
-  describe "ERROR RESPONESES" do
-    it "with missing object name should give error" do
+  describe "with a theme " do
+    it "should install correctly with hotglue layout syntax" do
+      response = Rails::Generators.invoke("hot_glue:install --theme=dark_knight")
 
-      response = Rails::Generators.invoke("hot_glue:install")
-      expect(File.exist?("spec/dummy/app/views/layouts/_flash_notices.erb")).to be(true)
     end
   end
+
+  describe "with bootstrap" do
+    it "should install correclty with bootstrap " do
+      response = Rails::Generators.invoke("hot_glue:install --layout=bootstrap")
+
+
+    end
+  end
+
+  # describe "ERROR RESPONESES" do
+  #   it "with missing object name should give error" do
+  #     response = Rails::Generators.invoke("hot_glue:install --theme=dark_knight")
+  #     expect(File.exist?("spec/dummy/app/views/layouts/_flash_notices.erb")).to be(true)
+  #   end
+  # end
 end
 
 

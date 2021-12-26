@@ -56,7 +56,7 @@ describe HotGlue::ScaffoldGenerator do
         rescue StandardError => e
 
           expect(e.class).to eq(HotGlue::Error)
-          expect(e.message).to eq("*** Oops: The model Abc is missing an association for def or the model doesn't exist. TODO: Please implement a model for Def; your model Abc should have_many :defs.  To make a controller that can read all records, specify with --god.")
+          expect(e.message).to eq("*** Oops: The model Abc is missing an association for :def or the model Def doesn't exist. TODO: Please implement a model for Def; your model Abc should belong_to :def.  To make a controller that can read all records, specify with --god.")
         end
       end
     end
@@ -106,9 +106,8 @@ describe HotGlue::ScaffoldGenerator do
                                           ["Xyz"])
     rescue StandardError => e
       expect(e.class).to eq(HotGlue::Error)
-
       expect(e.message).to eq(
-                             "*** Oops: The model Xyz is missing an association for nothing or the model doesn't exist. TODO: Please implement a model for Nothing; your model Xyz should have_many :nothings.  To make a controller that can read all records, specify with --god."
+                             "*** Oops: The model Xyz is missing an association for :nothing or the model Nothing doesn't exist. TODO: Please implement a model for Nothing; your model Xyz should belong_to :nothing.  To make a controller that can read all records, specify with --god."
                            )
     end
   end

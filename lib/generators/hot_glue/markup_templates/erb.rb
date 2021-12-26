@@ -5,10 +5,8 @@ module  HotGlue
     attr_accessor :singular
 
     def field_output(col, type = nil, width, col_identifier )
-      "<div class='#{col_identifier} form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
       "  <%= f.text_field :#{col.to_s}, value: @#{@singular}.#{col.to_s}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}' %>\n "+
-      "  <label class='form-text' >#{col.to_s.humanize}</label>\n" +
-      "</div>"
+      "  <label class='form-text' >#{col.to_s.humanize}</label>\n"
     end
 
 
@@ -32,15 +30,12 @@ module  HotGlue
         lines = 5
       end
 
-      "<div class=\"#{col_identifier} form-group \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\">" +
       "<%= f.text_area :#{col.to_s}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}' %>" +
-        "<label class='form-text'>#{col.to_s.humanize}</label>"+
-        "</div>"
-
+        "<label class='form-text'>#{col.to_s.humanize}</label>"
     end
 
     def list_column_headings(*args)
-      columns = args[0][:columns]
+      layout_columns = args[0][:columns]
       column_width = args[0][:column_width]
       col_identifier = args[0][:col_identifier]
       layout = args[0][:layout]
@@ -50,12 +45,19 @@ module  HotGlue
       else
         col_style = ""
       end
-      columns.map(&:to_s).map{|col_name| "<div class='#{col_identifier}'" + col_style +">#{col_name.humanize}</div>"}.join("\n")
+
+      result = layout_columns.map{ |column|
+        "<div class='#{col_identifier}'" + col_style +">" +
+          column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />") +
+        + "</div>"
+      }.join("\n")
+
+      return result
     end
 
 
     def all_form_fields(*args)
-      columns = args[0][:columns]
+      layout_columns = args[0][:columns]
       show_only = args[0][:show_only]
       singular_class = args[0][:singular_class]
       col_identifier = args[0][:col_identifier]
@@ -69,95 +71,81 @@ module  HotGlue
 
       col_spaces_prepend = "    "
 
-      res = columns.map { |col|
 
-        if show_only.include?(col)
+      result = layout_columns.map{ |column|
+        "<div class='#{col_identifier}' >" +
 
-          "<div class=\"#{col_identifier} form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col}) %>\">" +
-          "<%= @#{singular}.#{col.to_s} %>" +
-            "<label class='form-text'>#{col.to_s.humanize}</label>" +
-          "</div>"
+          column.map { |col|
 
-        else
+          if show_only.include?(col)
+            "<%= @#{singular}.#{col.to_s} %>" +
+            "<label class='form-text'>#{col.to_s.humanize}</label>"
+          else
+            type = eval("#{singular_class}.columns_hash['#{col}']").type
+            limit = eval("#{singular_class}.columns_hash['#{col}']").limit
+            sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
 
+            case type
+            when :integer
+              # look for a belongs_to on this object
+              if col.to_s.ends_with?("_id")
+                assoc_name = col.to_s.gsub("_id","")
+                assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+                if assoc.nil?
+                  exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+                  exit
+                end
+                display_column = HotGlue.derrive_reference_name(assoc.class_name)
+                "<%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
+<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
-          type = eval("#{singular_class}.columns_hash['#{col}']").type
-          limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-          sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
+              else
+                "<%= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number' %>
+<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
-          case type
-          when :integer
-            # look for a belongs_to on this object
-            if col.to_s.ends_with?("_id")
-              assoc_name = col.to_s.gsub("_id","")
-              assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-              if assoc.nil?
-                exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-                exit
               end
-              display_column = HotGlue.derrive_reference_name(assoc.class_name)
+            when :string
+              if sql_type == "varchar" || sql_type == "character varying"
+                field_output(col, nil, limit || 40, col_identifier)
+              else
+                text_area_output(col, 65536, col_identifier)
+              end
 
-              "<div class='#{col_identifier} form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s}) %>' >
-<%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
-<label class='small form-text text-muted'>#{col.to_s.humanize}</label></div>"
-
-            else
-              "<div class=\"#{col_identifier} form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col}) %> \" >
-<%= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number' %>
-<label class='small form-text text-muted'>#{col.to_s.humanize}</label></div>"
+            when :text
+              if sql_type == "varchar"
+                field_output(col, nil, limit, col_identifier)
+              else
+                text_area_output(col, 65536, col_identifier)
+              end
+            when :float
+              field_output(col, nil, 5, col_identifier)
+            when :datetime
+                "<%= datetime_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+            when :date
+                "<%= date_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+            when :time
+             "<%= time_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s},  '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+            when :boolean
+              " " +
+                "  <span>#{col.to_s.humanize}</span>" +
+                "  <%= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked') %>\n" +
+                "  <%= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0') %>\n" +
+                "  <%= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '') %>\n" +
+                "  <%= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1') %>\n" +
+                ""
+            when :enum
+              enum_name = "enum_name"
+              # byebug
+              enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col.to_s}'}[0].sql_type")
+              "<%= f.collection_select(:#{col.to_s},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
+<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
             end
-          when :string
-            if sql_type == "varchar" || sql_type == "character varying"
-              field_output(col, nil, limit || 40, col_identifier)
-            else
-              text_area_output(col, 65536, col_identifier)
-            end
-
-          when :text
-            if sql_type == "varchar"
-              field_output(col, nil, limit, col_identifier)
-            else
-              text_area_output(col, 65536, col_identifier)
-            end
-          when :float
-            field_output(col, nil, 5, col_identifier)
-          when :datetime
-
-
-            "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
-"<%= datetime_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>" +
-              "</div>"
-          when :date
-            "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
-              "<%= date_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>" +
-              "</div>"
-          when :time
-            "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
-              "<%= time_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s},  '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>" +
-              "</div>"
-
-          when :boolean
-            "<div class='col form-group <%='alert-danger' if @#{singular}.errors.details.keys.include?(:#{col.to_s})%>' > \n" +
-              "  <span>#{col.to_s.humanize}</span>" +
-              "  <%= f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked') %>\n" +
-              "  <%= f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0') %>\n" +
-              "  <%= f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '') %>\n" +
-              "  <%= f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1') %>\n" +
-            "</div>"
-          when :enum
-            enum_name = "enum_name"
-            # byebug
-            enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col.to_s}'}[0].sql_type")
-            "<div class='#{col_identifier} form-group <%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s}) %>' >
-<%= f.collection_select(:#{col.to_s},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
-<label class='small form-text text-muted'>#{col.to_s.humanize}</label></div>"
 
           end
-
-        end
+          }.join("<br />") + "</div>"
       }.join("\n")
-      return res
+      return result
     end
 
 
@@ -169,14 +157,14 @@ module  HotGlue
     end
 
     def all_line_fields(*args)
-      columns = args[0][:columns]
+      layout_columns = args[0][:columns]
       show_only = args[0][:show_only]
       singular_class = args[0][:singular_class]
       singular = args[0][:singular]
       perc_width = args[0][:perc_width]
       layout = args[0][:layout]
 
-      columns_count = columns.count + 1
+      columns_count = layout_columns.count + 1
       perc_width = (perc_width).floor
 
       if layout == "bootstrap"
@@ -187,98 +175,86 @@ module  HotGlue
         col_identifer = "scaffold-cell"
       end
 
-
-      columns.map { |col|
-        type = eval("#{singular_class}.columns_hash['#{col}']").type
-        limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-        sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
-
-        case type
-        when :integer
-          # look for a belongs_to on this object
-          if col.to_s.ends_with?("_id")
-
-            assoc_name = col.to_s.gsub("_id","")
+      result = layout_columns.map{ |column|
+        "<div class='#{col_identifer}'#{style_with_flex_basis}>" +
 
 
-            assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+        column.map { |col|
+          type = eval("#{singular_class}.columns_hash['#{col}']").type
+          limit = eval("#{singular_class}.columns_hash['#{col}']").limit
+          sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
 
-            if assoc.nil?
-              exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-              puts exit_message
-              exit
-              # raise(HotGlue::Error,exit_message)
+          case type
+          when :integer
+            # look for a belongs_to on this object
+            if col.to_s.ends_with?("_id")
+
+              assoc_name = col.to_s.gsub("_id","")
+
+
+              assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+
+              if assoc.nil?
+                exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+                puts exit_message
+                exit
+                # raise(HotGlue::Error,exit_message)
+              end
+
+              display_column =  HotGlue.derrive_reference_name(assoc.class_name)
+
+              "<%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
+
+            else
+              "<%= #{singular}.#{col}%>"
             end
-
-            display_column =  HotGlue.derrive_reference_name(assoc.class_name)
-
-            "<div class='#{col_identifer}'#{style_with_flex_basis}>
-  <%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>
-</div>"
-
-          else
-            "<div class='#{col_identifer}'#{style_with_flex_basis}>
-  <%= #{singular}.#{col}%></div>"
-          end
-        when :float
-          width = (limit && limit < 40) ? limit : (40)
-          "<div class='#{col_identifer}'#{style_with_flex_basis}>
-<%= #{singular}.#{col}%></div>"
-        when :string
-          width = (limit && limit < 40) ? limit : (40)
-          "<div class='#{col_identifer}'#{style_with_flex_basis} >
-  <%= #{singular}.#{col} %>
-</div>"
-        when :text
-          "<div class='#{col_identifer}'#{style_with_flex_basis}>
-  <%= #{singular}.#{col} %>
-</div>"
-        when :datetime
-
-          "<div class='#{col_identifer}'  #{style_with_flex_basis} >
-  <% unless #{singular}.#{col}.nil? %>
-<%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
-<% else %>
-<span class='alert-danger'>MISSING</span>
-<% end %>
-</div>"
-        when :date
-          "<div class='#{col_identifer}'  #{style_with_flex_basis} >
-  <% unless #{singular}.#{col}.nil? %>
-    <%= #{singular}.#{col} %>
+          when :float
+            width = (limit && limit < 40) ? limit : (40)
+            "<%= #{singular}.#{col}%>"
+          when :string
+            width = (limit && limit < 40) ? limit : (40)
+            "<%= #{singular}.#{col} %>"
+          when :text
+            "<%= #{singular}.#{col} %>"
+          when :datetime
+            "<% unless #{singular}.#{col}.nil? %>
+  <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
   <% else %>
   <span class='alert-danger'>MISSING</span>
-  <% end %>
-</div>"
-        when :time
-          "<div class='#{col_identifer}'  #{style_with_flex_basis} >
-  <% unless #{singular}.#{col}.nil? %>
-    <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone) %>
-   <% else %>
-  <span class='alert-danger'>MISSING</span>
-  <% end %>
-</div>
-"
-        when :boolean
-          "<div class='#{col_identifer}'  #{style_with_flex_basis} >
-  <% if #{singular}.#{col}.nil? %>
-      <span class='alert-danger'>MISSING</span>
-  <% elsif #{singular}.#{col} %>
-    YES
-  <% else %>
-    NO
-  <% end %>
-</div>
-"        when :enum
-"<div class='#{col_identifer}'  #{style_with_flex_basis} >
-  <% if #{singular}.#{col}.nil? %>
-      <span class='alert-danger'>MISSING</span>
-  <% else %>
-    <%=  #{singular}.#{col} %>
-  <% end %>
-</div>
-"
-        end #end of switch
+  <% end %>"
+          when :date
+            "<% unless #{singular}.#{col}.nil? %>
+      <%= #{singular}.#{col} %>
+    <% else %>
+    <span class='alert-danger'>MISSING</span>
+    <% end %>"
+          when :time
+            "<% unless #{singular}.#{col}.nil? %>
+      <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone) %>
+     <% else %>
+    <span class='alert-danger'>MISSING</span>
+    <% end %>"
+          when :boolean
+            "
+    <% if #{singular}.#{col}.nil? %>
+        <span class='alert-danger'>MISSING</span>
+    <% elsif #{singular}.#{col} %>
+      YES
+    <% else %>
+      NO
+    <% end %>
+
+  "        when :enum
+  "
+    <% if #{singular}.#{col}.nil? %>
+        <span class='alert-danger'>MISSING</span>
+    <% else %>
+      <%=  #{singular}.#{col} %>
+    <% end %>
+
+  "
+          end #end of switch
+        }.join("<br />") + "</div>"
       }.join("\n")
     end
   end

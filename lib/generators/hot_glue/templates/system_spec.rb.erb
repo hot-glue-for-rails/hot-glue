@@ -32,7 +32,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   when :float
     "#{col}: rand(1)*10000"
   when :boolean
-    "#{col}: !!rand(2).flomor"
+    "#{col}: !!rand(2).floor"
   when :time
     "#{col}: Time.current + rand(5000).seconds"
   when :date

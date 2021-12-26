@@ -14,3 +14,4 @@ gem 'devise', require: true
 gem "rails-controller-testing", group: [:test]
 gem "database_cleaner", group: [:test]
 gem "rspec-rails", group: [:test]
+gem "factory_bot", group: [:test]

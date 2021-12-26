@@ -61,6 +61,7 @@ module HotGlue
     class_option :nestable, type: :boolean, default: false
     class_option :magic_buttons, type: :string, default: nil
     class_option :display_list_after_update, type: :boolean, default: false
+    class_option :smart_layout, type: :boolean, default: false
 
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # deprecated -- use in app config instead
@@ -69,13 +70,13 @@ module HotGlue
     def initialize(*meta_args)
       super
 
+
       begin
         @the_object = eval(class_name)
       rescue StandardError => e
         message = "*** Oops: It looks like there is no object for #{class_name}. Please define the object + database table first."
         puts message
-        exit
-        # raise(HotGlue::Error, message)
+        raise(HotGlue::Error, message)
       end
 
       if !options['spec_only'].nil? && !options['no_spec'].nil?
@@ -83,9 +84,12 @@ module HotGlue
       end
 
       if !options['exclude'].empty? && !options['include'].empty?
-        puts "*** Oops: You seem to have specified both --include and --exclude. Please use one or the other. Aborting."
-        exit
+        exit_message =  "*** Oops: You seem to have specified both --include and --exclude. Please use one or the other. Aborting."
+        puts exit_message
+
+        raise(HotGlue::Error, exit_message)
       end
+
 
       if @stimulus_syntax.nil?
         if Rails.version.split(".")[0].to_i >= 7
@@ -96,13 +100,14 @@ module HotGlue
       end
 
       if !options['markup'].nil?
-        puts "Using --markup flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
-        exit
+        message = "Using --markup flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
+        raise(HotGlue::Error, message)
+
       end
 
       if !options['markup'].nil?
-        puts "Using --layout flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
-        exit
+        message = "Using --layout flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
+        raise(HotGlue::Error, message)
       end
 
       yaml_from_config = YAML.load(File.read("config/hot_glue.yml"))
@@ -111,8 +116,8 @@ module HotGlue
       if  @markup == "erb"
         @template_builder = HotGlue::ErbTemplate.new
       elsif  @markup == "slim"
-        puts "SLIM IS NOT IMPLEMENTED; please see https://github.com/jasonfb/hot-glue/issues/3"
-        abort
+        message =  "SLIM IS NOT IMPLEMENTED; please see https://github.com/jasonfb/hot-glue/issues/3"
+        raise(HotGlue::Error, message)
         @template_builder = HotGlue::SlimTemplate.new
 
       elsif  @markup == "haml"
@@ -144,7 +149,8 @@ module HotGlue
 
       if !options['include'].empty?
         @include_fields = []
-        @include_fields += options['include'].split(",").collect(&:to_sym)
+        # semicolon to denote layout columns; commas separate fields
+        @include_fields += options['include'].gsub(":","").split(",").collect(&:to_sym)
       end
 
 
@@ -168,10 +174,10 @@ module HotGlue
       @no_list = options['no_list'] || false
 
       @display_list_after_update = options['display_list_after_update'] || false
+      @smart_layout = options['smart_layout']
 
 
-
-      @col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col-md-2"
+      @col_identifier = @layout == "hotglue" ? "scaffold-cell" : ""
       @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
 
       @downnest = options['downnest'] || false
@@ -227,13 +233,11 @@ module HotGlue
         end
       end
 
-
-
       @reference_name = HotGlue.derrive_reference_name(singular_class)
 
       identify_object_owner
       setup_fields
-
+      setup_layout_columns
 
       if @nested_args.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
         @menu_file_exists = true
@@ -265,8 +269,7 @@ module HotGlue
             end
           end
           puts exit_message
-          exit
-
+          raise(HotGlue::Error, exit_message)
         end
       end
     end
@@ -309,24 +312,18 @@ module HotGlue
             rescue NameError => e
               exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; your model #{singular_class.titlecase} should belong_to :#{assoc_name}.  To make a controller that can read all records, specify with --god."
               puts exit_message
-              exit
-              # raise(HotGlue::Error, exit_message)
-
+              raise(HotGlue::Error, exit_message)
             end
 
 
             if assoc.nil?
               exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
               puts exit_message
-              exit
-              # raise(HotGlue::Error,exit_message)
+              raise(HotGlue::Error,exit_message)
             end
 
             assoc_class = eval(assoc.class_name)
-
             name_list = [:name, :to_label, :full_name, :display_name, :email]
-
-
             if name_list.collect{ |field|
               assoc_class.column_names.include?(field.to_s) ||  assoc_class.instance_methods.include?(field)
             }.any?
@@ -340,7 +337,93 @@ module HotGlue
       end
     end
 
-    #
+    def setup_layout_columns
+      # smart layout: 2 columns per field; 4 column for EACH downnested portals, 2 column for buttons
+      how_many_downnest = @downnest_children.size
+
+      button_column_size = (!@no_edit && !@no_update) ? 0 : 2
+
+      bootstrap_columns = (12-button_column_size)
+
+      bootstrap_columns = bootstrap_columns - (how_many_downnest*4)
+
+      available_columns = (bootstrap_columns / 2).floor # bascially turns the 12-column grid into a 6-column grid
+
+      if available_columns < 0
+        raise "Cannot build layout with #{how_many_downnest} downnested portals"
+      end
+
+      @layout_columns = []
+      user_input_columns = options['include']
+
+      @downnest_children_width = []
+      @downnest_children.each_with_index{ |child, i| @downnest_children_width[i] = 4}
+
+      if options['include'].nil?
+
+      end
+
+      if @smart_layout
+        # automatic control
+        #
+        if @columns.size > available_columns
+          each_col_can_have = (@columns.size / available_columns).floor
+          @layout_columns = (0..available_columns-1).collect { |x|
+            @columns.slice(0+(x*each_col_can_have),each_col_can_have)
+          }
+        else
+          @layout_columns = (0..available_columns-1).collect { |x|
+            [ @columns[x]]
+          }
+          @layout_columns.reject!{|x| x == [nil]}
+        end
+      elsif !options['include'].include?(":")
+        @layout_columns = @columns.collect{|col| [col]}
+
+      else
+        (0..available_columns-1).each do |int|
+          @layout_columns[int] = []
+        end
+
+        # input control
+        user_layout_columns = options['include'].split(":")
+
+        if user_layout_columns.size > available_columns
+          raise "Your include statement #{options['include']}  has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
+        end
+        user_layout_columns.each_with_index  do |column,i|
+          @layout_columns[i] = column.split(",")
+        end
+
+        if user_layout_columns.size < @layout_columns.size
+          @layout_columns.reject!{|x| x == []}
+        end
+      end
+
+
+      if @layout_columns.size < available_columns
+        available = available_columns - @layout_columns.size
+
+        downnest_child = 0
+        while(available > 0)
+          if (downnest_child <= @downnest_children.size-1)
+            @downnest_children_width[downnest_child] = @downnest_children_width[downnest_child] + 2
+          else
+            # leave as-is
+          end
+          downnest_child = downnest_child + 1
+          available = available - 1
+        end
+        # give some space back to the downnest
+      end
+
+
+
+      puts "*** conststructed layout columns #{@layout_columns.inspect}"
+      return @layout_columns
+    end
+
+
     def formats
       [format]
     end
@@ -391,13 +474,11 @@ module HotGlue
       if @nested_args.any?
         column_width = each_col * @columns.count
       else
-
+        column_width = 0
       end
 
-
       @template_builder.list_column_headings(
-        column_width: each_col,
-        columns: @columns,
+        columns: @layout_columns,
         col_identifier: @col_identifier,
         layout: @layout,
         column_width: column_width
@@ -406,9 +487,6 @@ module HotGlue
 
     def columns_spec_with_sample_data
       @columns.map { |c|
-        if eval("#{singular_class}.columns_hash['#{c}']").nil?
-          byebug
-        end
         type = eval("#{singular_class}.columns_hash['#{c}']").type
         random_data = case type
                       when :integer
@@ -712,7 +790,7 @@ module HotGlue
     def all_form_fields
 
       @template_builder.all_form_fields(
-        columns: @columns,
+        columns: @layout_columns,
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
@@ -748,7 +826,7 @@ module HotGlue
 
       @template_builder.all_line_fields(
         perc_width: column_width,
-        columns: @columns,
+        columns: @layout_columns,
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,

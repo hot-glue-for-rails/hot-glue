@@ -17,7 +17,7 @@ module HotGlue
 
       if @layout == "hotglue" && options['theme'].nil?
         puts "You have selected to install Hot Glue without a theme. You can either use the --layout=bootstrap to install NO HOT GLUE THEME, or to use a Hot Glue theme please choose: like_boostrap, like_menlo_park, like_cupertino, like_mountain_view, dark_knight"
-        exit
+        return
       end
 
       if @layout == 'boostrap'
@@ -40,7 +40,7 @@ module HotGlue
 
         if (license_should_be != license_activation_key)
           puts "Ooops... it seems that Hot Glue license is not valid. Please check 1) the email address you used for this license, 2) The app name you used to purchase this license, and 3) the activation key itself."
-          exit
+          return
         end
       end
 
