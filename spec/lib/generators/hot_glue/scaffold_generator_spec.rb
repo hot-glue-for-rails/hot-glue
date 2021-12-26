@@ -204,19 +204,46 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-
-
   describe "authorization and object ownership" do
-    describe "--auth" do
-      # TODO: implement specs
+    describe "by default assumes current_user is --auth" do
+      it "should generate code protected to current user" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg"])
+        expect(
+          File.read("spec/Dummy/app/controllers/dfgs_controller.rb") =~ /before_action :authenticate_user!/
+        ).to be_a(Numeric)
+      end
+    end
+
+    describe "if passed an --auth flag" do
+      it "should generate code protected to current user" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--auth=cantelope"])
+        expect(
+          File.read("spec/Dummy/app/controllers/dfgs_controller.rb") =~ /before_action :authenticate_cantelope!/
+        ).to be_a(Numeric)
+      end
     end
 
     describe "--auth_identifier" do
-      # TODO: implement specs
+      it "should generate code protected to current user" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--auth_identifier=account"])
+
+        expect(
+          File.read("spec/Dummy/app/controllers/dfgs_controller.rb") =~ /before_action :authenticate_account!/
+        ).to be_a(Numeric)
+      end
     end
 
     describe "--gd" do
-      # TODO: implement specs
+      it "should generate god contorllers" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--gd"])
+        expect(
+          File.read("spec/Dummy/app/controllers/dfgs_controller.rb") =~ /Dfg.find\(params\[:id\]\)/
+        ).to be_a(Numeric)
+      end
     end
   end
 
