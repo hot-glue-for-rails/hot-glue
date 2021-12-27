@@ -24,8 +24,9 @@ require "rails/all"
 # FileUtils.rm_rf("spec/Dummy/spec/")
 
 require 'rails/generators'
+
 # require the gem's core code
-Dir["rails/generators/*.rb"].each do |x|
+Dir["rails/generators/**/*.rb"].each do |x|
   puts "requiring #{x}"
   require(x)
 end
