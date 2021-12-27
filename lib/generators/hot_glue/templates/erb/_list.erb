@@ -12,7 +12,7 @@
         <% downnest_column_style = @layout == "hotglue" ? 'style="flex-basis: ' + each_downnest_width.to_s +  '%;' : "" %>
 
         <% @downnest_children.each_with_index do |downnest,i| %>
-        <div class=" scaffold-col-heading<%= " col-sm-#{@downnest_children_width[i]}" if @layout=="bootstrap" %>" <%= downnest_column_style %>>
+        <div class=" scaffold-col-heading<%= " col-sm-#{ @layout_object[:portals][downnest][:size] }" if @layout=="bootstrap" %>" <%= downnest_column_style %>>
           <strong>
             <%=  downnest.titleize  %>
           </strong>

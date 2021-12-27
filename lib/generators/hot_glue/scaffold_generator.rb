@@ -6,6 +6,8 @@ require_relative './markup_templates/erb'
 require_relative './markup_templates/haml'
 require_relative './markup_templates/slim'
 
+require_relative './layout/builder'
+
 module HotGlue
   class Error < StandardError
   end
@@ -233,120 +235,23 @@ module HotGlue
           @object_owner_eval = ""
         end
       end
+
       @reference_name = HotGlue.derrive_reference_name(singular_class)
 
       identify_object_owner
       setup_fields
 
-
-      setup_layout_columns
-
-      builder = HotGlue::Layout::Builder.new({downnest_children: @downnest_children,
+      builder = HotGlue::Layout::Builder.new({
+                                     include_setting: options['include'],
+                                     downnest_children: @downnest_children,
                                     no_edit: @no_edit,
-                                    no_update: @no_update,
-                                    columns: @coluns,
+                                    no_delete: @no_delete,
+                                    columns: @columns,
                                     smart_layout: @smart_layout
                                    })
-
-
-      *builder_response = builder.construct
-
-      @layout_object = builder_response[0]
-
-
-      if @nested_args.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
-        @menu_file_exists = true
-      end
+      @layout_object = builder.construct
+      @menu_file_exists = true if @nested_args.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
     end
-
-    def setup_layout_columns
-      # smart layout: 2 columns per field; 4 column for EACH downnested portals, 2 column for buttons
-      how_many_downnest = @downnest_children.size
-
-      button_column_size = (!@no_edit && !@no_update) ? 0 : 2
-
-      bootstrap_columns = (12-button_column_size)
-
-      bootstrap_columns = bootstrap_columns - (how_many_downnest*4)
-
-      available_columns = (bootstrap_columns / 2).floor # bascially turns the 12-column grid into a 6-column grid
-
-      if available_columns < 0
-        raise "Cannot build layout with #{how_many_downnest} downnested portals"
-      end
-
-      @layout_columns = []
-      user_input_columns = options['include']
-
-      @downnest_children_width = []
-      @downnest_children.each_with_index{ |child, i| @downnest_children_width[i] = 4}
-
-      if options['include'].nil?
-
-      end
-
-      if @smart_layout
-        # automatic control
-        #
-        if @columns.size > available_columns
-          each_col_can_have = (@columns.size / available_columns).floor
-          @layout_columns = (0..available_columns-1).collect { |x|
-            @columns.slice(0+(x*each_col_can_have),each_col_can_have)
-          }
-        else
-          @layout_columns = (0..available_columns-1).collect { |x|
-            [ @columns[x]]
-          }
-          @layout_columns.reject!{|x| x == [nil]}
-        end
-      elsif !options['include'].include?(":")
-        @layout_columns = @columns.collect{|col| [col]}
-
-      else
-        (0..available_columns-1).each do |int|
-          @layout_columns[int] = []
-        end
-
-        # input control
-        user_layout_columns = options['include'].split(":")
-
-        if user_layout_columns.size > available_columns
-          raise "Your include statement #{options['include']}  has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
-        end
-        user_layout_columns.each_with_index  do |column,i|
-          @layout_columns[i] = column.split(",")
-        end
-
-        if user_layout_columns.size < @layout_columns.size
-          @layout_columns.reject!{|x| x == []}
-        end
-      end
-
-
-      if @layout_columns.size < available_columns
-        available = available_columns - @layout_columns.size
-
-        downnest_child = 0
-        while(available > 0)
-          if (downnest_child <= @downnest_children.size-1)
-            @downnest_children_width[downnest_child] = @downnest_children_width[downnest_child] + 2
-          else
-            # leave as-is
-          end
-          downnest_child = downnest_child + 1
-          available = available - 1
-        end
-        # give some space back to the downnest
-      end
-
-
-
-      puts "*** constructed layout columns #{@layout_columns.inspect}"
-      return @layout_columns
-    end
-
-
-
 
     def identify_object_owner
       auth_assoc = @auth && @auth.gsub("current_","")
@@ -500,7 +405,7 @@ module HotGlue
       end
 
       @template_builder.list_column_headings(
-        columns: @layout_columns,
+        columns: @layout_object[:columns][:container],
         col_identifier: col_identifier,
         layout: @layout,
         column_width: column_width
@@ -713,21 +618,6 @@ module HotGlue
         magic_buttons: @magic_buttons
       )
     end
-    # def erb_replace_ampersands!(filename = nil)
-    #
-    #   return if filename.nil?
-    #   file = File.open(filename, "r")
-    #   contents = file.read
-    #   file.close
-    #
-    #   file = File.open(filename, "w")
-    #   file.write( contents.gsub('\%', '%'))
-    #   file.close
-    # end
-
-
-
-
 
     def copy_view_files
       return if @specs_only
@@ -827,7 +717,7 @@ module HotGlue
     def all_form_fields
 
       @template_builder.all_form_fields(
-        columns: @layout_columns,
+        columns: @layout_object[:columns][:container],
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
@@ -863,7 +753,7 @@ module HotGlue
 
       @template_builder.all_line_fields(
         perc_width: column_width,
-        columns: @layout_columns,
+        columns:  @layout_object[:columns][:container],
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
