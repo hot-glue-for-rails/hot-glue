@@ -50,58 +50,10 @@ Instantly get a simple CRUD interface
 
 # Getting Started
 
-## 1. ADD HOTWIRE
-(RAILS 6 ONLY— SKIP THIS STEP FOR RAILS 7)
-```
-yarn add @hotwired/turbo-rails
-```
-or `npm install @hotwired/turbo-rails`
+_If you are on Rails 6, skip to section Rails 6 Setup and complete those steps FIRST._
 
 
-## 2. SWITCH FROM TurblLinks to Turbo-Rails
-(RAILS 6 ONLY— SKIP THIS STEP FOR RAILS 7)
-(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
-- Add `gem 'turbo-rails'` to your Gemfile & `bundle install`
-- Then install it with `rails turbo:install`
-- The Turbo install has switched your action cable settings from 'async' to Redis, so be sure to start a redis server
-- in `app/javascript/packs/application.js` remove this line
-```
-import Turbolinks from "turbolinks"
-```
-and replace it with
-```
-import { Turbo } from "@hotwired/turbo-rails"
-```
-
-
-Also replace
-``` 
-Turbolinks.start()
-```
-with:
-```
-Turbo.start()
-```
-
-
-## 3. INSTALL WEBPACKER
-** For webpacker, you must be using Node version ^12.13.0 || ^14.15.0 || >=16 **
-
-I recommend Node Version Manager (NVM) to switch between nodes. You will not be able to get through the following command with a Node version that does not match above. 
-
-Check your node version with `node -v`
-
-
-
-```
-`yarn add @rails/webpacker`
-```
-
-
-rails webpacker:install
-
-
-## 4. ADD RSPEC, FACTORY-BOT, AND FFAKER
+## 1. ADD RSPEC, FACTORY-BOT, AND FFAKER
 
 add these 3 gems to your gemfile **inside a group for both :development and :test*. Do not add these gems to only the :test group or else your will have problems with the generators.
 ```
@@ -112,15 +64,11 @@ gem 'ffaker'
 
 - run `rails generate rspec:install`
 
-
-5. - replace `application.css` with a new file (delete old contents) `application.scss`
+- replace `application.css` with a new file (delete old contents) `application.scss`
 
 THIS FILE CAN BE EMPTY, BUT WILL BE USED BY THEME INSTALLER
 
-
-
-
-## 5. ADD HOT GLUE GEM & PICK A THEME
+## 2. ADD HOT GLUE GEM & PICK A THEME
 
 PICK A THEME & DECIDE IF YOU WANT TO USE BOOTSTRAP LAYOUT OR HOTGLUE LAYOUT
 
@@ -155,7 +103,7 @@ the themes are:
 • gradeschool (spiral bound/lined notebook inspired)
 
 
-BOOTSTRAP NO LONGER NEEDED. IF you are using layout=bootstrap, you must install Bootstrap here.
+BOOTSTRAP IS NO LONGER NEEDED. IF you are using layout=bootstrap, you must install Bootstrap here.
 
 For Bootstrap with Webpacker, see my blog post https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap-with-sprockets/
 
@@ -172,8 +120,6 @@ Then, all you need to do is add to `app/assets/stylesheets/application.scss`
 @import "bootstrap";
 ```
 
-
-
 Please note that the scaffold is ** built with different market up for boostrap**, so you cannot switch between the Bootstrap and Hotglue layouts without rebuilding the scaffold.
 
 (On the other hand, if you build within the Hotglue layout, all of the Hotglue theme files CAN be swapped out without rebuilding the scaffold.)
@@ -186,7 +132,7 @@ The themes are just SCSS files installed into app/assets/stylesheets. You can tw
 default is `erb`
 
 
-## 6(A) RUN HOT-GLUE INSTALL:
+## 3. RUN HOT-GLUE INSTALL:
 ### example installing ERB using Bootstrap layout:
 `rails generate hot_glue:install --markup=erb --layout=bootstrap`
 
@@ -194,10 +140,7 @@ default is `erb`
 `rails generate hot_glue:install --markup=erb --layout=hotglue --theme=like_mountain_view`
 
 
-
-
-
-6(B). Modify `application.html.erb`
+##  3(B). Modify `application.html.erb`
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
 Note: if you have some kind of non-standard application layout, like one at a different file
 or if you have modified your opening <body> tag, this may not have been automatically applied by the installer.
@@ -207,7 +150,7 @@ or if you have modified your opening <body> tag, this may not have been automati
   <%= render partial: 'layouts/flash_notices' %>
 ```
 
-## 6(C). Modify `rails_helper.rb`
+## 3(C). Modify `rails_helper.rb`
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
 Note: if you have some kind of non-standard rails_helper.rb, like one that does not use the standard ` do |config|` syntax after your `RSpec.configure`
 this may not have been automatically applied by the installer.
@@ -221,7 +164,7 @@ this may not have been automatically applied by the installer.
   ```  
 
 
-## 6(D) CAPYBARA: SWITCH FROM RACK-TEST TO HEADLESS CHROME
+## 3(D) CAPYBARA: SWITCH FROM RACK-TEST TO HEADLESS CHROME
 (THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
 
 - By default Capybara is installed with :rack_test as its driver.
@@ -263,26 +206,41 @@ Alternatively, can define your own driver like so:
   ```
 
 
-## 7. install font-awesome
+(THIS WAS ALSO AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
 
-I recommend https://github.com/tomkra/font_awesome5_rails
-or https://github.com/FortAwesome/font-awesome-sass
+- for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
+- in the default code, the devise login would be for an object called account and lives at the route `/accounts/sign_in`
+- modify the generated code (it was installed by the installed) for your devise login
+   ```
+   def login_as(account)
+     visit '/accounts/sign_in'
+     within("#new_account") do
+     fill_in 'Email', with: account.email
+     fill_in 'Password', with: 'password'
+     end
+     click_button 'Log in'
+   end
+   ```
 
 
+## 4. install font-awesome (optional)
 
-## 8. For Enum support, I recommend activerecord-pg_enum
+I recommend 
+https://github.com/tomkra/font_awesome5_rails
+or 
+https://github.com/FortAwesome/font-awesome-sass
 
-Instructions for Rails are here:
-https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
 
+## 5. Devise
 
-
-## 9. Devise
 (or only use --gd mode, see below)
 
-Add to your Gemfile `gem 'devise'`
+Add to your Gemfile 
 
+As of 2021-12-28 Devise for Rails 7 is still not released so you must use main branch, like so:
+`gem 'devise', branch: 'main', git: 'https://github.com/heartcombo/devise.git'`
 
+If on Rails 6, be sure to see Legacy Step #5 (below)
 
 ```
 rails generate devise:install
@@ -308,6 +266,68 @@ You can also skip Devise installer Step 4, which is optional:
      * Not required *
 ```
 
+
+## RAILS 6 OR PRIOR ONLY : LEGACY SETUP
+
+## Legacy Step #1. ADD HOTWIRE
+(RAILS 6 ONLY— SKIP THIS STEP FOR RAILS 7)
+```
+yarn add @hotwired/turbo-rails
+```
+or `npm install @hotwired/turbo-rails`
+
+
+## Legacy Step #2. SWITCH FROM TurblLinks to Turbo-Rails
+(RAILS 6 ONLY — SKIP FOR RAILS 7)
+(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
+- Add `gem 'turbo-rails'` to your Gemfile & `bundle install`
+- Then install it with `rails turbo:install`
+- The Turbo install has switched your action cable settings from 'async' to Redis, so be sure to start a redis server
+- in `app/javascript/packs/application.js` remove this line
+```
+import Turbolinks from "turbolinks"
+```
+and replace it with
+```
+import { Turbo } from "@hotwired/turbo-rails"
+```
+
+
+Also replace
+``` 
+Turbolinks.start()
+```
+with:
+```
+Turbo.start()
+```
+
+
+## Legacy Step #3. INSTALL WEBPACKER
+(_SKIP FOR RAILS 7_ unless you want to use Webpacker with Rails 7)
+
+** For webpacker, you must be using Node version ^12.13.0 || ^14.15.0 || >=16 **
+
+I recommend Node Version Manager (NVM) to switch between nodes. You will not be able to get through the following command with a Node version that does not match above.
+
+Check your node version with `node -v`
+
+```
+`yarn add @rails/webpacker`
+```
+
+
+rails webpacker:install
+
+## Legacy Step #4: ENUM Support 
+For Enum support, I recommend activerecord-pg_enum
+Instructions for Rails 6 are here:
+https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
+
+_This functionality is now built-in to Rails 7._
+
+
+## Legacy Step #5-- Fix Devise if adding Turbo To Your Project 
 ## IMPORTANT: Devise currently has serious compatibility issues with Turbo Rails. In particular, your log-in screens do not work out of the box. Follow the next step to fix them.
 
 Manually port the Devise views into your app with
@@ -331,25 +351,10 @@ This tells Devise to fall back to non-Turbo interaction for the log-in and regis
 
 
 
-## 9(B) Devise & Capybara - Add User Authentication if you are using Access Control
-(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
-
-- for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
-- in the default code, the devise login would be for an object called account and lives at the route `/accounts/sign_in`
-- modify the generated code (it was installed by the installed) for your devise login
-   ```
-   def login_as(account)
-     visit '/accounts/sign_in'
-     within("#new_account") do
-     fill_in 'Email', with: account.email
-     fill_in 'Password', with: 'password'
-     end
-     click_button 'Log in'
-   end
-   ```
 
 
-## RAILS 7: Devise is not yet supported on Rails 7 unless you use the master branch of devise
+
+
 
 
 
@@ -749,19 +754,4 @@ Obviously, the created controller will always have this base controller as its s
 
 
 
-
-# HOW THIS GEM IS TESTED
-
-SETUP:
-• Run bundle install
-• if you can't get through see https://stackoverflow.com/questions/68050807/gem-install-mimemagic-v-0-3-10-fails-to-install-on-big-sur/68170982#68170982
-
-
-The dummy sandbox is found at `spec/dummy`
-
-The dummy sandbox lives as mostly checked- into the repository, **except** the folders where the generated code goes (`spec/dummy/app/views/`, `spec/dummy/app/controllers/`, `spec/dummy/specs/` are excluded from Git)
-
-When you run the **internal specs**, which you can do **at the root of this repo** using the command `rspec`, a set of specs will run to assert the generators are erroring when they are supposed to and producing code when they are supposed to.
-
-The DUMMY testing DOES NOT test the actual functionality of the output code (it just tests the functionality of the generation process).
 

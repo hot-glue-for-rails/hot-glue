@@ -1,4 +1,3 @@
-<\%= turbo_frame_tag "<%= plural %>-list" <%= nested_for_turbo_id_list_constructor %>  do %>
   <div class="<%= @container_name %> scaffold-list">
     <% unless @nested_args.any? %><h4><%= plural.gsub("_", " ").upcase %></h4><% end %>
 
