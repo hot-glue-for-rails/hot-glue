@@ -31,8 +31,9 @@ Hot Glue generates functionality that's quick and dirty. It lets you be crafty. 
 
 ## QUICK START
 
-Hot Glue Tutorial — Now avaiale on ![Teachable](https://jfbcodes.com/hot-glue-tutorial)
-![Get Course](https://user-images.githubusercontent.com/59002/147704724-44da6c18-7fa8-4e5b-b820-3b07db553150.png)
+# Hot Glue Tutorial — Now avaiale on ![Teachable](https://user-images.githubusercontent.com/59002/147704724-44da6c18-7fa8-4e5b-b820-3b07db553150.png)
+ only $60 USD 
+![GET THE COURSE](https://jfbcodes.com/hot-glue-tutorial)
 
 
 
