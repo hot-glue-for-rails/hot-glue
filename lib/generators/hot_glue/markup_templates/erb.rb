@@ -137,7 +137,7 @@ module  HotGlue
 
             end
                          end
-          "<span class='<%= 'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s}) %>'>" + field_result + "</span>"
+          "<span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{col.to_s}) %>'  #{ 'style="display: inherit;"'}  >" + field_result + "</span>"
           }.join("<br />") + "</div>"
       }.join("\n")
       return result

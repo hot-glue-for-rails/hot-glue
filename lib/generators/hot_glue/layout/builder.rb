@@ -32,7 +32,8 @@ module HotGlue
 
         # smart layout: 2 columns per field; 4 column for EACH downnested portals, 2 column for buttons
         how_many_downnest = downnest_children.size
-        button_column_size = (!no_edit && !no_delete) ? 0 : 2
+        button_column_size = (no_edit && no_delete) ? 0 : 2
+
         bootstrap_columns = (12-button_column_size)
         bootstrap_columns = bootstrap_columns - (how_many_downnest*4)
         available_columns = (bootstrap_columns / 2).floor # bascially turns the 12-column grid into a 6-column grid
@@ -51,12 +52,15 @@ module HotGlue
         if smart_layout
           # automatic control
           #
+
           if columns.size > available_columns
             each_col_can_have = (columns.size.to_f / available_columns.to_f).round
             # byebug
             layout_object[:columns][:container] = (0..available_columns-1).collect { |x|
               columns.slice(0+(x*each_col_can_have),each_col_can_have)
             }
+            layout_object[:columns][:container].last.append *columns.slice(0+(available_columns*each_col_can_have),each_col_can_have)
+
           else
             layout_object[:columns][:container] = (0..available_columns-1).collect { |x|
               [ columns[x]]

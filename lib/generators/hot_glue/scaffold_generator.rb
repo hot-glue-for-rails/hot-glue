@@ -716,13 +716,19 @@ module HotGlue
     end
 
     def all_form_fields
+      # TODO: DRY THIS
+      if !@smart_layout
+        col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col-md-1"
+      else
+        col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col-md-2"
+      end
 
       @template_builder.all_form_fields(
         columns: @layout_object[:columns][:container],
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
-        col_identifier:  @col_identifier
+        col_identifier:  col_identifier
       )
     end
 

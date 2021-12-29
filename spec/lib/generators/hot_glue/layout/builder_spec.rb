@@ -24,7 +24,7 @@ describe HotGlue::Layout::Builder do
 
         end
 
-        it "should make 6 columns if given 11 fields" do
+        it "should make 5 2-columns if given 11 fields" do
           x = HotGlue::Layout::Builder.new({:include_setting=>"",
                                             :downnest_children=>[],
                                             :no_edit=>false,
@@ -40,8 +40,7 @@ describe HotGlue::Layout::Builder do
                                               [:blurb, :long_description],
                                               [:cost, :how_many_printed],
                                               [:approved_at, :release_on],
-                                              [:time_of_day, :selected],
-                                              [:genre] ]
+                                              [:time_of_day, :selected, :genre]]
                                             }, :portals=>{}, :buttons=>{:size=>""}})
 
           #
