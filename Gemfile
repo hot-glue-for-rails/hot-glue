@@ -6,7 +6,7 @@ gemspec
 # not required for your app
 gem 'pg'
 gem 'byebug'
-gem 'rails', '6.1'
+gem 'rails'
 gem 'devise', require: true
 
 # for testing

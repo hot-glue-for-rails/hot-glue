@@ -4,9 +4,8 @@ PATH
     hot-glue (0.4.1)
       ffaker (~> 2.16)
       kaminari (~> 1.2)
-      rails (> 5.1, <= 7.0.0)
+      rails (> 5.1, <= 7)
       sass-rails
-      turbo-rails (> 0.5)
 
 GEM
   remote: https://rubygems.org/
@@ -203,8 +202,6 @@ GEM
       sprockets (>= 3.0.0)
     thor (1.1.0)
     tilt (2.0.10)
-    turbo-rails (7.1.1)
-      rails (>= 6.0.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     warden (1.2.9)
@@ -225,7 +222,7 @@ DEPENDENCIES
   factory_bot
   hot-glue!
   pg
-  rails (= 6.1)
+  rails
   rails-controller-testing
   rspec-rails
 

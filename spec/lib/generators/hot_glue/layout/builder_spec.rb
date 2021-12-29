@@ -24,8 +24,27 @@ describe HotGlue::Layout::Builder do
 
         end
 
-        it "should make 13 columns if given 13 fields" do
+        it "should make 6 columns if given 11 fields" do
+          x = HotGlue::Layout::Builder.new({:include_setting=>"",
+                                            :downnest_children=>[],
+                                            :no_edit=>false,
+                                            :no_delete=>false,
+                                            :columns=>[:name, :author_id, :blurb, :long_description, :cost, :how_many_printed, :approved_at, :release_on, :time_of_day, :selected, :genre],
+                                            :smart_layout=>true})
+          result = x.construct
 
+
+          expect(result).to eq({:columns=>{:size_each=>nil,
+                                           :container=>
+                                             [[:name, :author_id],
+                                              [:blurb, :long_description],
+                                              [:cost, :how_many_printed],
+                                              [:approved_at, :release_on],
+                                              [:time_of_day, :selected],
+                                              [:genre] ]
+                                            }, :portals=>{}, :buttons=>{:size=>""}})
+
+          #
         end
       end
 

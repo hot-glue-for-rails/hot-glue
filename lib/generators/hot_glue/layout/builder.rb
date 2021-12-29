@@ -52,7 +52,8 @@ module HotGlue
           # automatic control
           #
           if columns.size > available_columns
-            each_col_can_have = (columns.size / available_columns).floor
+            each_col_can_have = (columns.size.to_f / available_columns.to_f).round
+            # byebug
             layout_object[:columns][:container] = (0..available_columns-1).collect { |x|
               columns.slice(0+(x*each_col_can_have),each_col_can_have)
             }

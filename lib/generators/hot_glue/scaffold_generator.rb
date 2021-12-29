@@ -242,14 +242,15 @@ module HotGlue
       setup_fields
 
       builder = HotGlue::Layout::Builder.new({
-                                     include_setting: options['include'],
-                                     downnest_children: @downnest_children,
-                                    no_edit: @no_edit,
-                                    no_delete: @no_delete,
-                                    columns: @columns,
-                                    smart_layout: @smart_layout
-                                   })
+                                              include_setting: options['include'],
+                                              downnest_children: @downnest_children,
+                                              no_edit: @no_edit,
+                                              no_delete: @no_delete,
+                                              columns: @columns,
+                                              smart_layout: @smart_layout
+                                            })
       @layout_object = builder.construct
+
       @menu_file_exists = true if @nested_args.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
     end
 
