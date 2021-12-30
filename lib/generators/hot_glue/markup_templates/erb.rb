@@ -130,15 +130,21 @@ module  HotGlue
                   ""
               when :enum
                 enum_name = "enum_name"
-                # byebug
+
                 enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col.to_s}'}[0].sql_type")
                 "<%= f.collection_select(:#{col.to_s},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
   <label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
-            end
-                         end
-          "<span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{col.to_s}) %>'  #{ 'style="display: inherit;"'}  >" + field_result + "</span>"
-          }.join("<br />") + "</div>"
+              end
+           end
+
+          if (type == :integer) && col.to_s.ends_with?("_id")
+            field_error_name = col.to_s.gsub("_id","")
+          else
+            field_error_name = col.to_s
+          end
+           "<span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{ 'style="display: inherit;"'}  >" + field_result + "</span>"
+          }.join("<br />\n") + "</div>"
       }.join("\n")
       return result
     end
@@ -240,11 +246,13 @@ module  HotGlue
     <% end %>
 
   "        when :enum
-  "
+             enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col.to_s}'}[0].sql_type")
+
+                       "
     <% if #{singular}.#{col}.nil? %>
         <span class='alert-danger'>MISSING</span>
     <% else %>
-      <%=  #{singular}.#{col} %>
+      <%=  #{singular_class}.defined_enums['#{enum_type}'][#{singular}.#{col}] %>
     <% end %>
 
   "

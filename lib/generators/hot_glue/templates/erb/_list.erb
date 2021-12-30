@@ -2,10 +2,10 @@
   <div class="<%= @container_name %> scaffold-list">
     <% unless @no_list || @nested_args.any? %><h4><%= plural.gsub("_", " ").upcase %></h4><% end %>
 
-    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  plural + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><% end %>
+    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  plural + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><br /><% end %>
 
     <% unless @no_list  %>
-    <div class="row scaffold-row">
+    <div class="row scaffold-heading-row">
       <%= list_column_headings %>
       <% if @downnest_children.any? %>
         <% each_downnest_width = @downnest_children.count == 1 ? 40 : (60/@downnest_children.count).floor %>
