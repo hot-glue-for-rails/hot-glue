@@ -38,7 +38,6 @@ Gem::Specification.new do |spec|
                        "get_merch" => 'https://shop.heliosdev.shop/?utm_source=rubygems&utm_campaign=hot_glue_gem_metadata'
   }
   spec.add_runtime_dependency('kaminari', '~> 1.2')
-  # spec.add_runtime_dependency('turbo-rails', '> 0.5')
   spec.add_runtime_dependency('sass-rails')
 
   spec.add_dependency 'ffaker', "~> 2.16"
