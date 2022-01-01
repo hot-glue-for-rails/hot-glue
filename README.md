@@ -31,10 +31,12 @@ Hot Glue generates functionality that's quick and dirty. It lets you be crafty. 
 
 # Hot Glue Tutorial — 
 
-![Teachable-225x225](https://user-images.githubusercontent.com/59002/147857335-a919e095-e6de-4718-8513-736d1f283a0b.png)
-Now avaiale on [Teachable](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/)
+|   |   Now avaiale on [Teachable](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/) |
+| ------------- | ------------- |
+| ![Teachable-225x225](https://user-images.githubusercontent.com/59002/147857335-a919e095-e6de-4718-8513-736d1f283a0b.png)  | Content Cell  |
 
-## [GET THE COURSE](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/) **only $60 USD!**
+
+## [GET THE COURSE TODAY (includes Hot Glue License)](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/) **only $60 USD!**
 
 
 
