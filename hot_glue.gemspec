@@ -30,13 +30,8 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_runtime_dependency "rails",  '> 5.1', '<= 7'
-  spec.homepage    = 'https://jasonfleetwoodboldt.com/hot-glue/'
-  spec.metadata    = {
-    "source_code_uri" => "https://github.com/jasonfb/hot-glue",
-                       "tutorial" => "https://jfbcodes.com/hot-glue-tutorial",
-                       "buy_license" => 'https://heliosdev.shop/hot-glue-licens',
-                       "get_merch" => 'https://shop.heliosdev.shop/?utm_source=rubygems&utm_campaign=hot_glue_gem_metadata'
-  }
+  spec.homepage    = 'https://jfb.teachable.com/p/hot-glue-in-depth-tutorial?utm_source=rubygems.org&utm_campaign=rubygems_link'
+  spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/hot-glue" }
   spec.add_runtime_dependency('kaminari', '~> 1.2')
   spec.add_runtime_dependency('sass-rails')
 
@@ -45,8 +40,7 @@ Gem::Specification.new do |spec|
   spec.post_install_message = <<~MSG
     ---------------------------------------------
     Welcome to Hot Glue - A Scaffold Building Companion for Hotwire + Turbo-Rails
-  
-    To purchase a license, please visit https://heliosdev.shop/hot-glue-license
+    For license options visit https://heliosdev.shop/hot-glue-license
     ---------------------------------------------
   MSG
 end
