@@ -30,11 +30,11 @@ Hot Glue generates functionality that's quick and dirty. It lets you be crafty. 
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
 # Hot Glue Tutorial 
-## [GET THE COURSE TODAY (includes Hot Glue License)](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/) **only $60 USD!**
+## [GET THE COURSE TODAY (includes Hot Glue License)](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
 
 |   |  |  
 | ------------- | ------------- |
-| ![Teachable-225x225](https://user-images.githubusercontent.com/59002/147857335-a919e095-e6de-4718-8513-736d1f283a0b.png)  | Now avaiale on [Teachable](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/)  |
+| ![Teachable-225x225](https://user-images.githubusercontent.com/59002/147857335-a919e095-e6de-4718-8513-736d1f283a0b.png)  | Now avaiale on [Teachable](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page)  |
 
 
 
