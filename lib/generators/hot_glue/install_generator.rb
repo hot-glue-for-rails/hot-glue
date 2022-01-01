@@ -43,7 +43,9 @@ module HotGlue
         resp = JSON.parse(stream.read)
 
         if resp['status'] == 'success'
-          # we good
+          if resp['redirect']
+            HotGlue::Helpers.open_page(resp['redirect'])
+          end
           puts "\n" + "    * " + resp['response'] + " * \n\n"
         else
           puts "\n" + "    * " + resp['response'] + " * \n\n"
@@ -53,7 +55,6 @@ module HotGlue
           print "https://jfb.teachable.com/p/hot-glue-in-depth-tutorial \n"
           print "https://shop.heliosdev.shop/ \n"
           print "All purchases come with a Hot Glue lifetime license for individuals and hobbyists\n"
-
           return
         end
       else
@@ -67,11 +68,11 @@ module HotGlue
         if choice == "1"
           HotGlue::Helpers.open_page("https://heliosdev.shop/hot-glue-license?utm_campaing=hotglue-installer")
         elsif choice == "2"
-          HotGlue::Helpers.open_page("https://jfb.teachable.com/p/hot-glue-in-depth-tutorial?utm_campaing=hotglue-installer")
+          HotGlue::Helpers.open_page("https://jfb.teachable.com/p/hot-glue-in-depth-tutorial?utm_source=hotglue-installer")
           print "All purchases come with a Hot Glue lifetime license for individuals and hobbyists\n"
 
         else
-          HotGlue::Helpers.open_page("https://shop.heliosdev.shop/?utm_campaing=hotglue-installer")
+          HotGlue::Helpers.open_page("https://shop.heliosdev.shop/?utm_source=hotglue-installer")
           print "Be sure to ALSO check out the HOT GLUE TUTORIAL here: \n"
           print "https://jfb.teachable.com/p/hot-glue-in-depth-tutorial \n"
           print "All purchases come with a Hot Glue lifetime license for individuals and hobbyists\n"
