@@ -1,4 +1,5 @@
 require 'rails/generators/erb/scaffold/scaffold_generator'
+require_relative './helpers'
 require 'ffaker'
 
 module HotGlue
@@ -9,6 +10,8 @@ module HotGlue
     class_option :layout, type: :string, default: "hotglue"
 
     source_root File.expand_path('templates', __dir__)
+
+
 
     def initialize(*args) #:nodoc:
       super
@@ -25,27 +28,56 @@ module HotGlue
       end
 
       ### INTERACTIVE LICENSING
-      #
 
 
-      if Socket.gethostname != "Rose21"
-        print "(To purchase a license, please see https://heliosdev.shop/hot-glue-license) \n Please enter your license key: "
-        license_activation_key = STDIN.gets.strip
+      print "Do you have a license key (y/N)? "
+      do_you_have_a_license = STDIN.gets.strip || "Y"
 
-        print "Please enter the EMAIL you used to purchase this license: "
+      if do_you_have_a_license.downcase == "y"
+        print "Please enter the EMAIL you used to purchase a Hot Glue license, \nTeachable tutorial, or Helios Merch Shop product: "
         license_email = STDIN.gets.strip
-        app_name = Rails.application.class.module_parent_name
-        license_should_be = Digest::SHA1.hexdigest("HOT-GLUE-LICENSE--#{app_name}--#{license_email}")
+        require 'open-uri'
 
+        # ask HeliosDev.shop if this email is good
+        stream = URI.open("https://heliosdev.shop/check_licenses/hot-glue-license?email=#{license_email}")
+        resp = JSON.parse(stream.read)
 
-        if (license_should_be != license_activation_key)
-          puts "Ooops... it seems that Hot Glue license is not valid. Please check 1) the email address you used for this license, 2) The app name you used to purchase this license, and 3) the activation key itself."
+        if resp['status'] == 'success'
+          # we good
+          puts "\n" + "    * " + resp['response'] + " * \n\n"
+        else
+          puts "\n" + "    * " + resp['response'] + " * \n\n"
+
+          print "You can get a license in one of the follow ways: \n"
+          print "https://heliosdev.shop/hot-glue-license \n"
+          print "https://jfb.teachable.com/p/hot-glue-in-depth-tutorial \n"
+          print "https://shop.heliosdev.shop/ \n"
+          print "All purchases come with a Hot Glue lifetime license for individuals and hobbyists\n"
+
           return
         end
+      else
+        print "Please pick an option to get a Hot Glue license: \n"
+        print "1) Professional/Business with support (see heliosdev.shop/hot-glue-license for prices)  \n"
+        print "2) Individual/hobbyist: Get the tutorial on Teachable ($60) \n"
+        print "3) Individual/hobbyist: Get some merchandise ($5 and up) \n"
+        print "Please type 1, 2, or 3: "
+        choice = STDIN.gets.strip
+
+        if choice == "1"
+          HotGlue::Helpers.open_page("https://heliosdev.shop/hot-glue-license?utm_campaing=hotglue-installer")
+        elsif choice == "2"
+          HotGlue::Helpers.open_page("https://jfb.teachable.com/p/hot-glue-in-depth-tutorial?utm_campaing=hotglue-installer")
+          print "All purchases come with a Hot Glue lifetime license for individuals and hobbyists\n"
+
+        else
+          HotGlue::Helpers.open_page("https://shop.heliosdev.shop/?utm_campaing=hotglue-installer")
+          print "Be sure to ALSO check out the HOT GLUE TUTORIAL here: \n"
+          print "https://jfb.teachable.com/p/hot-glue-in-depth-tutorial \n"
+          print "All purchases come with a Hot Glue lifetime license for individuals and hobbyists\n"
+        end
+        return
       end
-
-
-
 
       @markup = options['markup']
       if @markup == "haml"
@@ -146,10 +178,8 @@ module HotGlue
       begin
 
         if !File.exists?("config/hot_glue.yml")
-
           yaml = {layout: @layout,
                   markup: @markup,
-                  license_activation_key: license_activation_key,
                   license_email: license_email}.to_yaml
           File.write("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml", yaml)
 

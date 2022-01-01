@@ -370,7 +370,8 @@ module HotGlue
 
       unless @no_specs
         dest_file = File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
-          if  File.exists?(dest_file)
+
+        if  File.exists?(dest_file)
           existing_file = File.open(dest_file)
           existing_content = existing_file.read
           if existing_content =~ /\#HOTGLUE-SAVESTART/
