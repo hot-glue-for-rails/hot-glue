@@ -711,15 +711,15 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
+#### 2022-01-01 - v0.4.3 and 0.4.4 - adding fully email based license; no activation codes required
 
-#### 2022-12-30 - v0.4.2
+#### 2022-12-30 - v0.4.2 -- Smart layouts introduced
 
 #### 2021-12-15 - v0.4.1
 
 #### 2021-12-12 - v0.4.0
 
 #### 2021-12-12 - v0.3.9 - Magic Buttons
-
 
 #### 2021-12-11 - v0.3.5 - Downnesting
 
