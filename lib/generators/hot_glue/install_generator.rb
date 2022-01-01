@@ -31,7 +31,7 @@ module HotGlue
 
 
       print "Do you have a license key (y/N)? "
-      do_you_have_a_license = STDIN.gets.strip || "Y"
+      do_you_have_a_license = STDIN.gets.strip || "N"
 
       if do_you_have_a_license.downcase == "y"
         print "Please enter the EMAIL you used to purchase a Hot Glue license, \nTeachable tutorial, or Helios Merch Shop product: "
@@ -73,7 +73,7 @@ module HotGlue
 
         else
           HotGlue::Helpers.open_page("https://shop.heliosdev.shop/?utm_source=hotglue-installer")
-          print "Be sure to ALSO check out the HOT GLUE TUTORIAL here: \n"
+          print "ALSO check out the HOT GLUE TUTORIAL here: \n"
           print "https://jfb.teachable.com/p/hot-glue-in-depth-tutorial \n"
           print "All purchases come with a Hot Glue lifetime license for individuals and hobbyists\n"
         end
