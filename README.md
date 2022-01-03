@@ -594,12 +594,12 @@ If you do have Stimulus syntax enabled, your delete buttons will look like so:
 
 
 
-### `--magic-buttons` (Version 0.4.0 only)
+### `--magic-buttons` 
 If you pass a list of magic buttons (separated by commas), they will appear in the button area on your list.
 
-It will be assumed there will be cooresponding bang methods on your models.
+It will be assumed there will be corresponding bang methods on your models.
 
-The band methods can respond in one of four ways:
+The bang (`!`) methods can respond in one of four ways:
 
 • With true, in which case a generic success message will be shown in the flash notice (“Approved” or “Rejected” in this case)
 
