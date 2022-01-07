@@ -3,13 +3,14 @@
 module HotGlue
   module Layout
     class Builder
-      attr_reader :include_setting, :downnest_children, :no_edit, :no_delete, :columns, :smart_layout
+      attr_reader :include_setting, :downnest_children, :buttons_width, :columns, :smart_layout
 
       def initialize(params)
         @include_setting = params[:include_setting]
         @downnest_children = params[:downnest_children]
-        @no_edit = params[:no_edit]
-        @no_delete = params[:no_delete]
+        @buttons_width = params[:buttons_width]
+
+        @no_buttons = @buttons_width == 0
         @columns = params[:columns]
         @smart_layout = params[:smart_layout]
       end
@@ -23,7 +24,7 @@ module HotGlue
           portals:  {
 
           },
-          buttons: { size: ''}
+          buttons: { size: @buttons_width}
         }
 
         downnest_children.each do |child|
@@ -32,9 +33,8 @@ module HotGlue
 
         # smart layout: 2 columns per field; 4 column for EACH downnested portals, 2 column for buttons
         how_many_downnest = downnest_children.size
-        button_column_size = (no_edit && no_delete) ? 0 : 2
 
-        bootstrap_columns = (12-button_column_size)
+        bootstrap_columns = (12-@buttons_width )
         bootstrap_columns = bootstrap_columns - (how_many_downnest*4)
         available_columns = (bootstrap_columns / 2).floor # bascially turns the 12-column grid into a 6-column grid
 
@@ -55,7 +55,7 @@ module HotGlue
 
           if columns.size > available_columns
             each_col_can_have = (columns.size.to_f / available_columns.to_f).round
-            # byebug
+
             layout_object[:columns][:container] = (0..available_columns-1).collect { |x|
               columns.slice(0+(x*each_col_can_have),each_col_can_have)
             }
@@ -71,6 +71,7 @@ module HotGlue
           layout_object[:columns][:container] = columns.collect{|col| [col]}
 
         else
+
           (0..available_columns-1).each do |int|
             layout_object[:columns][:container][int] = []
           end

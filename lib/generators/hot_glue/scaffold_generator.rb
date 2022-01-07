@@ -63,6 +63,8 @@ module HotGlue
 
     class_option :downnest, type: :string, default: nil
     class_option :magic_buttons, type: :string, default: nil
+    class_option :small_buttons, type: :boolean, default: nil
+
     class_option :display_list_after_update, type: :boolean, default: false
     class_option :smart_layout, type: :boolean, default: false
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
@@ -218,6 +220,9 @@ module HotGlue
         @magic_buttons = options['magic_buttons'].split(',')
       end
 
+
+      @small_buttons = options['small_buttons'] || false
+
       @build_update_action = !@no_edit || !@magic_buttons.empty?
       # if the magic buttons are present, build the update action anyway
 
@@ -241,11 +246,12 @@ module HotGlue
       identify_object_owner
       setup_fields
 
+      buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
+
       builder = HotGlue::Layout::Builder.new({
                                               include_setting: options['include'],
                                               downnest_children: @downnest_children,
-                                              no_edit: @no_edit,
-                                              no_delete: @no_delete,
+                                              buttons_width: buttons_width,
                                               columns: @columns,
                                               smart_layout: @smart_layout
                                             })
@@ -617,7 +623,8 @@ module HotGlue
         path_helper_singular: path_helper_singular,
         path_helper_args: path_helper_args,
         singular: singular,
-        magic_buttons: @magic_buttons
+        magic_buttons: @magic_buttons,
+        small_buttons: @small_buttons
       )
     end
 
@@ -825,13 +832,13 @@ module HotGlue
      @template_builder.paginate(plural: plural)
     end
 
-    def delete_confirmation_syntax
-      if !@stimulus_syntax
-       "{confirm: 'Are you sure?'}"
-      else
-       "{controller: 'confirmable', 'confirm-message': \"Are you sure you want to delete \#{ #{@singular}.#{ display_class } } \", 'action': 'confirmation#confirm'}"
-      end
-    end
+    # def delete_confirmation_syntax
+    #   if !@stimulus_syntax
+    #    "{confirm: 'Are you sure?'}"
+    #   else
+    #    "{controller: 'confirmable', 'confirm-message': \"Are you sure you want to delete \#{ #{@singular}.#{ display_class } } \", 'action': 'confirmation#confirm'}"
+    #   end
+    # end
 
 
     def controller_magic_button_update_actions

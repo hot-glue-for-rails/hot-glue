@@ -19,12 +19,12 @@
 <% end %>
 
 <% button_style = @layout == "hotglue" ? 'style="flex-basis: ' +  (100 - (column_width * @columns.count)).floor.to_s +  '%;"' : "" %>
-<div class="<%= @col_identifier %> scaffold-line-buttons <%= ' col-md-2' if @layout == "bootstrap" %>" <%= button_style %>>
+<div class="<%= @col_identifier %> scaffold-line-buttons <%= " col-md-#{ @layout_object[:buttons][:size] }" if @layout == "bootstrap" %>" <%= button_style %>>
   <%= magic_button_output %>
 
   <% if destroy_action %>
-    <\%= form_with url: <%= path_helper_singular %>(<%= path_helper_args %>), html: {style: "display: inline-block;"}, method: :delete do |f| %>
-      <\%= f.submit "Delete".html_safe,  data: <%= delete_confirmation_syntax  %>, class: "delete-<%= singular %>-button btn btn-primary btn-sm" %>
+    <\%= form_with url: <%= path_helper_singular %>(<%= path_helper_args %>), html: {data: {'turbo-confirm': "Are you sure you want to delete #{ <%= @singular + "." + display_class %> }?"}, style: "display: inline-block;"}, method: :delete do |f| %>
+      <\%= f.submit "Delete".html_safe,  class: "delete-<%= singular %>-button btn btn-primary btn-sm" %>
     <\% end %>
   <% end %>
 
