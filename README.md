@@ -711,6 +711,8 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
+#### 2022-01-11 - v0.4.5 - buttons on smarty layouts take up 1 bootstrap column each; fixes confirmation alert for delete buttons
+
 #### 2022-01-01 - v0.4.3 and 0.4.4 - adding fully email based license; no activation codes required
 
 #### 2022-12-30 - v0.4.2 -- Smart layouts introduced
