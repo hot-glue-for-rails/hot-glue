@@ -586,16 +586,12 @@ If you are Turbo (Rails 7 or Rails 6 with proactive Turbo-Rails install), your d
 
 If you specify the flag, you preference will be used. If you leave the flag off, Hot Glue will detect the presence of Turbo-Rails in your app. 
 
+**WARNING**: If you created a new Rails app since October 2021 and you have the yanked turbo-rails Gems on your local machine, 
+you will have some bugs with the delete buttons and also not be on the latest version of turbo-rails.
 
-```
-{confirm: 'Are you sure?'}
-```
-
-If you do have Stimulus syntax enabled, your delete buttons will look like so:
-```
-    ## TODO: fix this
-```
-
+Make sure to uninstall the yanked 7.1.0 and 7.1.1 from your machine with `gem uninstall turbo-rails`
+and also fix any Rails apps created since October 2021 by fixing the Gemfile. Details here:
+https://stackoverflow.com/questions/70671324/new-rails-7-turbo-app-doesnt-show-the-data-turbo-confirm-alert-messages-dont-f
 
 
 ### `--magic-buttons` 
