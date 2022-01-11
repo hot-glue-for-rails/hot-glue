@@ -576,12 +576,16 @@ IMPORTANT: By default, all fields that begin with an underscore (`_`) are automa
 
 I would recommend this for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
 
-### `--stimulus_syntax=true` or `--stimulus_syntax=false`
-(for Rails <=6, default is false. For Rails 7, default is true.)
+### `--ujs_syntax=true` (Default is set automatically based on whether you have turbo-rails installed)
 
-Stimulus is only used for the delete button's confirmation dialog.
+If you are pre-Turbo (UJS), your delete buttons will come out like this:
+`data: {'confirm': 'Are you sure you want to delete....?'}`
 
-If you don't have stimulus syntax enabled, your delete buttons have this. This will confirm the delete with a simple alert if you have UJS enabled.
+If you are Turbo (Rails 7 or Rails 6 with proactive Turbo-Rails install), your delete button will be:
+`data: {'turbo-confirm': 'Are you sure you want to delete....?'}`
+
+If you specify the flag, you preference will be used. If you leave the flag off, Hot Glue will detect the presence of Turbo-Rails in your app. 
+
 
 ```
 {confirm: 'Are you sure?'}

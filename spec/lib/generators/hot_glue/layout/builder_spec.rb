@@ -27,8 +27,7 @@ describe HotGlue::Layout::Builder do
         it "should make 5 2-columns if given 11 fields" do
           x = HotGlue::Layout::Builder.new({:include_setting=>"",
                                             :downnest_children=>[],
-                                            :no_edit=>false,
-                                            :no_delete=>false,
+                                            :buttons_width=>2,
                                             :columns=>[:name, :author_id, :blurb, :long_description, :cost, :how_many_printed, :approved_at, :release_on, :time_of_day, :selected, :genre],
                                             :smart_layout=>true})
           result = x.construct
@@ -41,7 +40,7 @@ describe HotGlue::Layout::Builder do
                                               [:cost, :how_many_printed],
                                               [:approved_at, :release_on],
                                               [:time_of_day, :selected, :genre]]
-                                            }, :portals=>{}, :buttons=>{:size=>""}})
+                                            }, :portals=>{}, :buttons=>{:size=>2}})
 
           #
         end
@@ -78,8 +77,7 @@ describe HotGlue::Layout::Builder do
         it "should concat the two fields and give 2 more columns back to the downnest" do
           x = HotGlue::Layout::Builder.new({:include_setting=>"api_key,api_id:",
                                             :downnest_children=>["get_emails_rules"],
-                                            :no_edit=>false,
-                                            :no_delete=>false,
+                                            :buttons_width => 2,
                                             :columns=>[:api_key, :api_id],
                                             :smart_layout=>true})
           result = x.construct

@@ -59,7 +59,7 @@ module HotGlue
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
 
-    class_option :stimulus_syntax, type: :boolean, default: nil # TODO: rename to ujs_syntax and default to false
+    class_option :ujs_syntax, type: :boolean, default: nil
 
     class_option :downnest, type: :string, default: nil
     class_option :magic_buttons, type: :string, default: nil
@@ -241,6 +241,12 @@ module HotGlue
         end
       end
 
+
+      @ujs_syntax = options['ujs_syntax']
+      if !@ujs_syntax
+        @ujs_syntax = !defined?(Turbo::Engine)
+        puts "You did not specify ujs_syntax and so I default it to #{@ujs_syntax}"
+      end
       @reference_name = HotGlue.derrive_reference_name(singular_class)
 
       identify_object_owner

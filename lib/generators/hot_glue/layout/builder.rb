@@ -8,6 +8,7 @@ module HotGlue
       def initialize(params)
         @include_setting = params[:include_setting]
         @downnest_children = params[:downnest_children]
+
         @buttons_width = params[:buttons_width]
 
         @no_buttons = @buttons_width == 0
