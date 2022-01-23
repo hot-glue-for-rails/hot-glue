@@ -26,12 +26,17 @@ describe HotGlue::ScaffoldGenerator do
 
     FileUtils.rm("spec/Dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/Dummy/app/controllers/xyzs_controller.rb")
     FileUtils.rm("spec/Dummy/app/controllers/dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/dfgs_controller.rb")
+
+    FileUtils.rm("spec/Dummy/app/controllers/all_dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/dfgs_controller.rb")
+
     FileUtils.rm("spec/Dummy/app/controllers/hello/dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/hello/dfgs_controller.rb")
     FileUtils.rm("spec/Dummy/app/controllers/jkls_controller.rb") if File.exists?("spec/Dummy/app/controllers/jkls_controller.rb")
 
     FileUtils.rm_rf('spec/Dummy/spec/')
     FileUtils.rm_rf('spec/Dummy/app/views/hello/dfgs')
     FileUtils.rm_rf('spec/Dummy/app/views/xyzs')
+    FileUtils.rm_rf('spec/Dummy/app/views/all_dfgs')
+
     FileUtils.rm_rf('spec/Dummy/app/views/users')
 
     FileUtils.rm_rf('spec/Dummy/app/views/ghis')
@@ -252,6 +257,27 @@ describe HotGlue::ScaffoldGenerator do
       end
     end
   end
+
+  describe "alt controller names" do
+    it "should generate god contorllers" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--gd", "--alt-controller-name=AllDfgs"])
+      expect(
+        File.read("spec/Dummy/app/controllers/all_dfgs_controller.rb") =~ /Dfg.find\(params\[:id\]\)/
+      ).to be_a(Numeric)
+
+
+      expect(
+        File.read("spec/Dummy/app/views/all_dfgs/index.erb") =~ /partial: 'all_dfgs\/list',/
+      ).to be_a(Numeric)
+
+      expect(
+        File.read("spec/Dummy/app/views/all_dfgs/_list.erb") =~ /render partial: "all_dfgs\/new_button",/
+      ).to be_a(Numeric)
+    end
+
+  end
+
 
   describe "--plural" do
     # TODO: implement specs
