@@ -69,7 +69,7 @@ module HotGlue
     class_option :smart_layout, type: :boolean, default: false
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # if used here it will override what is in the config
-
+    class_option :no_list_labels, type: :boolean, default: false
 
     def initialize(*meta_args)
       super
@@ -165,7 +165,7 @@ module HotGlue
       if !options['show_only'].empty?
         @show_only += options['show_only'].split(",").collect(&:to_sym)
       end
-
+      byebug
 
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs_only'] || false
@@ -179,7 +179,7 @@ module HotGlue
 
       @no_edit = options['no_edit'] || false
       @no_list = options['no_list'] || false
-
+      @no_list_labels = options['no_list_labels'] || false
       @display_list_after_update = options['display_list_after_update'] || false
       @smart_layout = options['smart_layout']
 
@@ -273,23 +273,33 @@ module HotGlue
         auth_assoc_field = auth_assoc + "_id" unless @god
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
 
+
         if assoc
           @ownership_field = assoc.name.to_s + "_id"
         elsif !@nest
           exit_message = "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
 
         else
+          exit_message = "*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym} \n
+maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n
+(If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.
+Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag)
+
+To make a controller that can read all records, specify with --god."
+
           if @god
-            exit_message= "*** Oops: Gd mode could not find the association(#{@object_owner_sym}). Something is wrong."
+            exit_message << "does #{singular_class} have a relOops: Gd mode could not find the association(#{@object_owner_sym}). Something is wrong."
           else
+
             @auth_check = eval(@auth_identifier.titleize)
             @nested_args.each do |arg|
+
               if ! @auth_check.reflect_on_association("#{arg}s".to_sym)
-                exit_message = "*** Oops:  your nesting chain does not have a association for #{arg}s on #{@auth_check}  something is wrong."
+                exit_message <<  "...  your nesting chain does not have a association for #{arg}s on #{@auth_check}  something is wrong."
               end
             end
           end
-          puts exit_message
+          puts "\n" + exit_message
           raise(HotGlue::Error, exit_message)
         end
       end
@@ -665,6 +675,15 @@ module HotGlue
 
         end
       end
+
+      # menu_file = "app/views#{namespace_with_dash}/menu.erb"
+      #
+      # if File.exists?(menu_file)
+      #   # TODO: can I insert the new menu item into the menu programatically here?
+      #   # not sure how i would acheive this without nokogiri
+      #
+      # end
+
     end
 
     def namespace_with_dash

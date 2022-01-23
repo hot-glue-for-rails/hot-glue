@@ -18,7 +18,7 @@ module  HotGlue
       small_buttons = args[0][:small_buttons]
 
       magic_buttons.collect{ |button_name|
-        "<%= form_with model: #{singular}, url: #{path_helper_singular}(#{path_helper_args}), html: {style: 'display: inline', , data: {turbo-confirm: 'Are you sure you want to #{button_name} this #{singular}?'}} do |f| %>
+        "<%= form_with model: #{singular}, url: #{path_helper_singular}(#{path_helper_args}), html: {style: 'display: inline', data: {\"turbo-confirm\": 'Are you sure you want to #{button_name} this #{singular}?'}} do |f| %>
       <%= f.hidden_field :#{button_name}, value: \"#{button_name}\" %>
     <%= f.submit '#{button_name.titleize}'.html_safe, disabled: (#{singular}.respond_to?(:#{button_name}able?) && ! #{singular}.#{button_name}able? ), class: '#{singular}-button btn btn-primary #{"btn-sm" if small_buttons}' %>
     <% end %>"

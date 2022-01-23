@@ -78,10 +78,10 @@ module HotGlue
           end
 
           # input control
-          user_layout_columns = options['include'].split(":")
+          user_layout_columns = @include_setting .split(":")
 
           if user_layout_columns.size > available_columns
-            raise "Your include statement #{options['include']}  has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
+            raise "Your include statement #{@include_setting }  has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
           end
           user_layout_columns.each_with_index  do |column,i|
             layout_object[:columns][:container][i] = column.split(",")

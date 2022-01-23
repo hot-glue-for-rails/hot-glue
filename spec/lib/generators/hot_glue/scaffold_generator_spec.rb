@@ -537,6 +537,7 @@ describe HotGlue::ScaffoldGenerator do
 
 
 
+
   describe "ujs syntax" do
     it "should make detele with 'confirm': true for ujs_syntax=true" do
       begin

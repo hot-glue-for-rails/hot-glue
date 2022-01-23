@@ -4,28 +4,31 @@
 
     <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  plural + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><br /><% end %>
 
-    <% unless @no_list  %>
-    <div class="row scaffold-heading-row">
-      <%= list_column_headings %>
-      <% if @downnest_children.any? %>
-        <% each_downnest_width = @downnest_children.count == 1 ? 40 : (60/@downnest_children.count).floor %>
-        <% downnest_column_style = @layout == "hotglue" ? 'style="flex-basis: ' + each_downnest_width.to_s +  '%;' : "" %>
+    <% unless @no_list %>
+      <% unless @no_list_labels %>
+        <div class="row scaffold-heading-row">
+          <%= list_column_headings %>
+          <% if @downnest_children.any? %>
+            <% each_downnest_width = @downnest_children.count == 1 ? 40 : (60/@downnest_children.count).floor %>
+            <% downnest_column_style = @layout == "hotglue" ? 'style="flex-basis: ' + each_downnest_width.to_s +  '%;' : "" %>
 
-        <% @downnest_children.each_with_index do |downnest,i| %>
-        <div class=" scaffold-col-heading<%= " col-sm-#{ @layout_object[:portals][downnest][:size] }" if @layout=="bootstrap" %>" <%= downnest_column_style %>>
-          <strong>
-            <%=  downnest.titleize  %>
-          </strong>
+            <% @downnest_children.each_with_index do |downnest,i| %>
+            <div class=" scaffold-col-heading<%= " col-sm-#{ @layout_object[:portals][downnest][:size] }" if @layout=="bootstrap" %>" <%= downnest_column_style %>>
+              <strong>
+                <%=  downnest.titleize  %>
+              </strong>
+            </div>
+          <% end %>
+          <% end %>
+
+          <% button_column_style = @layout == "hotglue" ? 'style="flex-basis: 150px' : ""  %>
+
+          <div class=' scaffold-col-heading scaffold-col-heading-buttons<%= " col-md-#{ @layout_object[:buttons][:size] }" if @layout=="bootstrap" %>' <%= button_column_style %>>
+
+          </div>
         </div>
       <% end %>
-      <% end %>
 
-      <% button_column_style = @layout == "hotglue" ? 'style="flex-basis: 150px' : ""  %>
-
-      <div class=' scaffold-col-heading scaffold-col-heading-buttons<%= " col-md-#{ @layout_object[:buttons][:size] }" if @layout=="bootstrap" %>' <%= button_column_style %>>
-
-      </div>
-    </div>
       <\% if <%= plural %>.empty? %>
     <div>
         None

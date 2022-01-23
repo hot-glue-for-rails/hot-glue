@@ -661,6 +661,11 @@ Omits pagination. (All list views have pagination by default.)
 
 Omits list action. Only makes sense to use this if you are create a view where you only want the create button you want to navigate to the update screen alternative ways.
 
+
+### `--no-list-labels`
+
+Omits list labels. (note that in the form the labels are rendered again anyway)
+
 ### `--no-create`
 
 Omits create action.
