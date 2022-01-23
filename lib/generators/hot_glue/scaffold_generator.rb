@@ -263,6 +263,7 @@ module HotGlue
 
 
       @ujs_syntax = options['ujs_syntax']
+
       if !@ujs_syntax
         @ujs_syntax = !defined?(Turbo::Engine)
         puts "You did not specify ujs_syntax and so I default it to #{@ujs_syntax}"

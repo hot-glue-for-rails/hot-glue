@@ -344,14 +344,12 @@ describe HotGlue::ScaffoldGenerator do
         describe "layout without smart layout" do
           it "builds 1 column for fields and 2 for the buttons" do
             response = Rails::Generators.invoke("hot_glue:scaffold",
-                                                ["User","--gd", "--layout=bootstrap", "--stimulus-stynax=false"])
+                                                ["User","--gd", "--layout=bootstrap"])
             expect(
                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class='col-md-1'>Email<\/div>/
             ).to be_a(Numeric)
 
             file = File.read("spec/Dummy/app/views/users/_show.erb")
-
-            expect(file).to eq("<div class='col-md-2'><%= user.email %></div>\n\n\n\n\n<div class=\" scaffold-line-buttons  col-md-2\" >\n  \n\n  \n    <%= form_with url: user_path(user), html: {style: \"display: inline-block;\"}, method: :delete do |f| %>\n      <%= f.submit \"Delete\".html_safe,  data: {'confirm': 'Are you sure?'}, class: \"delete-user-button btn btn-primary btn-sm\" %>\n    <% end %>\n  \n\n  \n  <%= link_to \"Edit <i class='fa fa-1x fa-list-alt'></i>\".html_safe, edit_user_path(user), disable_with: \"Loading...\", class: \"edit-user-button btn btn-primary btn-sm\" %>\n  \n</div>\n")
 
             expect(
               File.read("spec/Dummy/app/views/users/_list.erb") =~ /scaffold-col-heading-buttons col-md-2/
@@ -399,9 +397,7 @@ describe HotGlue::ScaffoldGenerator do
                 File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-6" >/
               ).to be_a(Numeric)
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<strong>
-            Dfgs
-          <\/strong>/
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /Dfgs/
               ).to be_a(Numeric)
             end
           end
@@ -411,20 +407,19 @@ describe HotGlue::ScaffoldGenerator do
               response = Rails::Generators.invoke("hot_glue:scaffold",
                                                   ["User","--gd",
                                                    "--smart-layout",
-                                                   "--downnest=dfgs,xyzs", "--layout=bootstrap"])
+                                                   "--downnest=dfgs,xyzs",
+                                                   "--layout=bootstrap"])
               expect(
                 File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4" >/
               ).to be_a(Numeric)
+
+
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<strong>
-            Dfgs
-          <\/strong>/
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /Dfgs/
               ).to be_a(Numeric)
 
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<strong>
-            Xyzs
-          <\/strong>/
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /Xyzs/
               ).to be_a(Numeric)
             end
           end
@@ -555,16 +550,21 @@ describe HotGlue::ScaffoldGenerator do
 
 
 
-    it "should make detele with 'turbo-confirm': true for ujs_syntax=false" do
+    it "should make detele with 'confirm': true for ujs_syntax=true" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Abc","--ujs_syntax=false"])
+                                            ["Abc","--ujs_syntax=true"])
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
 
       expect(
-        File.read("spec/Dummy/app/views/abcs/_show.erb") =~ /data: {'turbo-confirm': 'Are you are/
+        File.read("spec/Dummy/app/views/abcs/_show.erb") =~ /data: {'turbo-confirm': 'Are you sure/
+      ).to be(nil)
+
+
+      expect(
+        File.read("spec/Dummy/app/views/abcs/_show.erb") =~ / html: {data: {'confirm': "Are you sure /
       ).to_not be(nil)
     end
 
