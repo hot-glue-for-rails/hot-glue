@@ -70,6 +70,7 @@ module HotGlue
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # if used here it will override what is in the config
     class_option :no_list_labels, type: :boolean, default: false
+    class_option :alt_controller_name, type: :string, default: nil
 
     def initialize(*meta_args)
       super
@@ -140,14 +141,34 @@ module HotGlue
       end
 
       args = meta_args[0]
+
+
       @singular = args.first.tableize.singularize # should be in form hello_world
       @plural = options['plural'] || @singular + "s" # supply to override; leave blank to use default
+      @namespace = options['namespace'] || nil
+
+
+      @alt_controller_name = options['alt_controller_name']
+      use_controller_name = @alt_controller_name || plural.titleize.gsub(" ", "")
+
+      @controller_build_name = (( @namespace.titleize + "::" if @namespace) || "") + use_controller_name + "Controller"
+      @controller_build_folder = use_controller_name.underscore
+
+      if ! @controller_build_folder.ends_with?("s")
+        raise "can't build with controller name #{@controller_build_folder} because it doesn't end with an 's'"
+      end
+
+      if @alt_controller_name
+        @controller_build_folder_singular = @controller_build_folder.gsub(/s$/,'')
+      else
+        @controller_build_folder_singular = singular
+      end
+
       @auth = options['auth'] || "current_user"
       @auth_identifier = options['auth_identifier'] || (! @god && @auth.gsub("current_", "")) || nil
 
 
       @nest = (!options['nest'].empty? && options['nest']) || nil
-      @namespace = options['namespace'] || nil
 
       @singular_class = @singular.titleize.gsub(" ", "")
       @exclude_fields = []
@@ -165,7 +186,6 @@ module HotGlue
       if !options['show_only'].empty?
         @show_only += options['show_only'].split(",").collect(&:to_sym)
       end
-      byebug
 
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs_only'] || false
@@ -184,8 +204,8 @@ module HotGlue
       @smart_layout = options['smart_layout']
 
 
-      @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
 
+      @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
       @downnest = options['downnest'] || false
 
       @downnest_children = []
@@ -379,7 +399,7 @@ To make a controller that can read all records, specify with --god."
     def copy_controller_and_spec_files
       @default_colspan = @columns.size
       unless @specs_only
-        template "controller.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
+        template "controller.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "#{@controller_build_folder}_controller.rb")
         if @namespace
           begin
             eval(controller_descends_from)
@@ -483,10 +503,7 @@ To make a controller that can read all records, specify with --god."
 
 
     def controller_class_name
-      res = ""
-      res << @namespace.titleize + "::" if @namespace
-      res << plural.titleize.gsub(" ", "") + "Controller"
-      res
+      @controller_build_name
     end
 
     def singular_name
@@ -511,15 +528,15 @@ To make a controller that can read all records, specify with --god."
 
     def path_helper_singular
       if @nest
-        "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
+        "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{@controller_build_folder_singular}_path"
       else
-        "#{@namespace+"_" if @namespace}#{singular}_path"
+        "#{@namespace+"_" if @namespace}#{@controller_build_folder_singular}_path"
       end
     end
 
     def path_helper_plural
       if ! @nest
-        "#{@namespace+"_" if @namespace}#{plural}_path"
+        "#{@namespace+"_" if @namespace}#{@controller_build_folder}_path"
       else
         "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{plural}_path"
       end
@@ -534,19 +551,19 @@ To make a controller that can read all records, specify with --god."
     end
 
     def line_path_partial
-      "#{@namespace+"/" if @namespace}#{plural}/line"
+      "#{@namespace+"/" if @namespace}#{@controller_build_folder}/line"
     end
 
     def show_path_partial
-      "#{@namespace+"/" if @namespace}#{plural}/show"
+      "#{@namespace+"/" if @namespace}#{@controller_build_folder}/show"
     end
 
     def list_path_partial
-      "#{@namespace+"/" if @namespace}#{plural}/list"
+      "#{@namespace+"/" if @namespace}#{@controller_build_folder}/list"
     end
 
     def new_path_name
-      base =   "new_#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_") if @nested_args.any?}#{singular}_path"
+      base =   "new_#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_") if @nested_args.any?}#{@controller_build_folder_singular}_path"
       if @nested_args.any?
         base += "(" + @nested_args.collect { |arg|
           "#{arg}.id"
@@ -653,7 +670,7 @@ To make a controller that can read all records, specify with --god."
 
 
           dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
-                                    plural, dest_filename)
+                                    @controller_build_folder, dest_filename)
 
 
           template source_filename, dest_filepath
@@ -667,7 +684,7 @@ To make a controller that can read all records, specify with --god."
           source_filename = cc_filename_with_extensions( "#{@markup}/#{view}.turbo_stream.#{@markup}")
           dest_filename = cc_filename_with_extensions("#{view}", "turbo_stream.#{@markup}")
           dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
-                                    plural, dest_filename)
+                                    @controller_build_folder, dest_filename)
 
 
           template source_filename, dest_filepath

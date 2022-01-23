@@ -623,6 +623,69 @@ You will need to build scaffolding with the same name for the related object as 
 On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line.
 
 
+### `--alt-controller-name`
+
+Normally a controller a has a natural name based on the model (the Thing model produces a `ThingsController`).
+
+Within any given namespace, you can have only one natural controller for that model, of course, because all the controllers exist at the namespace directory even when they are nested.
+
+For example, let's say you have an Admin dashboard with User has_many :invoices
+
+Your routes file will nest your invoices within your users (for whatever namespace you are building)
+
+```
+namespace :admin do
+    resources :users do
+      resources :invoices 
+    end
+end
+```
+
+Therefore, your namespace can typically only view that model in one context. If that context is nested (using `--nest` exists at a nested route), it can only be used in the context of that nest (which probably requires one or more parent objects to be in the nested route of your URL).
+
+You should preserve this naming convention, and stay within those guides so your nested routes work when this object is nested within another object's view. (For the context of that or any namespace.)
+
+Alternative controller names let you specify a controller name that is nameed _something else_ but still edits the given object/table.
+
+In the example above, you'd add another top-level route in the same namespace called "all_X".
+
+For example, 
+
+**config/routes.rb**
+```
+namespace :admin do
+    resources :users do
+      resources :invoices 
+    end
+    resources :all_invoices
+end
+```
+
+Then you'd build normal nested scaffold like so: 
+
+```
+rails generate hot_glue:scaffold User --namespace=admin --gd
+
+rails generate hot_glue:scaffold Invoice --namespace=admin --nest=users --gd
+
+```
+You'd build another Invoices controller like this:
+
+```
+rails generate hot_glue:scaffold Invoice --namespace=admin --alt-controller-name=AllInvoices --gd
+```
+
+Note that all three builds here are in the `admin` namespace (so build controllers at `app/controllers/admin/`) and ALSO use Gd mode. 
+
+If you extend the example conceptually you build things like "UnpaidInvoices" or "RecentInvoices" which would, for example, build contextual views for the admin user. 
+
+The difference between the one kind of Invoices controller and the other is that, in this example, the InvoicesController (the natural one) is always nested to the user. So if you ever want to know about invoices in the context of a user, that's exactly what you use.
+
+The other one, `AllInvoicesController` or `UnpaidInvoicesController` will provide the admin a view of invoices **out of the context** of the user object. 
+
+
+
+
 
 
 ## FLAGS (Options with no values)

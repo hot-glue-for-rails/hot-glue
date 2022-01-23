@@ -2,7 +2,7 @@
   <div class="<%= @container_name %> scaffold-list">
     <% unless @no_list || @nested_args.any? %><h4><%= plural.gsub("_", " ").upcase %></h4><% end %>
 
-    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  plural + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><br /><% end %>
+    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  @controller_build_folder + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><br /><% end %>
 
     <% unless @no_list %>
       <% unless @no_list_labels %>
