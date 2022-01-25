@@ -1,3 +1,5 @@
+# THESE GEMS ARE NOT PART OF YOUR RAILS APP!!!
+
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
