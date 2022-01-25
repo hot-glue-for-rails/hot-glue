@@ -18,4 +18,5 @@ spec/dummy/app/views/
 spec/dummy/app/controllers/
 spec/dummy/specs/
 
-spec/strawman/
+spec/dummy/node_modules/
+spec/dummy/log/

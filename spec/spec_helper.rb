@@ -37,7 +37,7 @@ Dir["./lib/**/*.rb"].each do |x|
 end
 
 
-require_relative "./Dummy/config/application.rb"
+require_relative "./dummy/config/application.rb"
 
 require "rspec/rails"
 

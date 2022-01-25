@@ -20,31 +20,31 @@ describe HotGlue::ScaffoldGenerator do
 
   def remove_everything
     # TODO: this feels a little ugly but is effective
-    remove_dir_with_namespace('spec/Dummy/app/views/')
-    remove_dir_with_namespace('spec/Dummy/app/controllers/')
-    FileUtils.rm("spec/Dummy/app/controllers/users_controller.rb") if File.exists?("spec/Dummy/app/controllers/xyzs_controller.rb")
+    remove_dir_with_namespace('spec/dummy/app/views/')
+    remove_dir_with_namespace('spec/dummy/app/controllers/')
+    FileUtils.rm("spec/dummy/app/controllers/users_controller.rb") if File.exists?("spec/dummy/app/controllers/xyzs_controller.rb")
 
-    FileUtils.rm("spec/Dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/Dummy/app/controllers/xyzs_controller.rb")
-    FileUtils.rm("spec/Dummy/app/controllers/dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/dfgs_controller.rb")
+    FileUtils.rm("spec/dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/dummy/app/controllers/xyzs_controller.rb")
+    FileUtils.rm("spec/dummy/app/controllers/dfgs_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
 
-    FileUtils.rm("spec/Dummy/app/controllers/all_dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/dfgs_controller.rb")
+    FileUtils.rm("spec/dummy/app/controllers/all_dfgs_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
 
-    FileUtils.rm("spec/Dummy/app/controllers/hello/dfgs_controller.rb") if File.exists?("spec/Dummy/app/controllers/hello/dfgs_controller.rb")
-    FileUtils.rm("spec/Dummy/app/controllers/jkls_controller.rb") if File.exists?("spec/Dummy/app/controllers/jkls_controller.rb")
+    FileUtils.rm("spec/dummy/app/controllers/hello/dfgs_controller.rb") if File.exists?("spec/dummy/app/controllers/hello/dfgs_controller.rb")
+    FileUtils.rm("spec/dummy/app/controllers/jkls_controller.rb") if File.exists?("spec/dummy/app/controllers/jkls_controller.rb")
 
-    FileUtils.rm_rf('spec/Dummy/spec/')
-    FileUtils.rm_rf('spec/Dummy/app/views/hello/dfgs')
-    FileUtils.rm_rf('spec/Dummy/app/views/xyzs')
-    FileUtils.rm_rf('spec/Dummy/app/views/all_dfgs')
+    FileUtils.rm_rf('spec/dummy/spec/')
+    FileUtils.rm_rf('spec/dummy/app/views/hello/dfgs')
+    FileUtils.rm_rf('spec/dummy/app/views/xyzs')
+    FileUtils.rm_rf('spec/dummy/app/views/all_dfgs')
 
-    FileUtils.rm_rf('spec/Dummy/app/views/users')
+    FileUtils.rm_rf('spec/dummy/app/views/users')
 
-    FileUtils.rm_rf('spec/Dummy/app/views/ghis')
-    FileUtils.rm_rf('spec/Dummy/app/views/abcs')
-    FileUtils.rm_rf('spec/Dummy/app/views/jkls')
+    FileUtils.rm_rf('spec/dummy/app/views/ghis')
+    FileUtils.rm_rf('spec/dummy/app/views/abcs')
+    FileUtils.rm_rf('spec/dummy/app/views/jkls')
 
-    remove_dir_with_namespace('spec/Dummy/app/views/hello')
-    remove_dir_with_namespace('spec/Dummy/app/controllers/hello')
+    remove_dir_with_namespace('spec/dummy/app/views/hello')
+    remove_dir_with_namespace('spec/dummy/app/controllers/hello')
   end
 
   describe "with no object for the model specified" do
