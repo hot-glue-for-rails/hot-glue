@@ -70,7 +70,6 @@ module HotGlue
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # if used here it will override what is in the config
     class_option :no_list_labels, type: :boolean, default: false
-    class_option :alt_controller_name, type: :string, default: nil
 
     def initialize(*meta_args)
       super
@@ -148,20 +147,14 @@ module HotGlue
       @namespace = options['namespace'] || nil
 
 
-      @alt_controller_name = options['alt_controller_name']
-      use_controller_name = @alt_controller_name || plural.titleize.gsub(" ", "")
+      use_controller_name =  plural.titleize.gsub(" ", "")
 
       @controller_build_name = (( @namespace.titleize + "::" if @namespace) || "") + use_controller_name + "Controller"
       @controller_build_folder = use_controller_name.underscore
+      @controller_build_folder_singular = singular
 
       if ! @controller_build_folder.ends_with?("s")
         raise "can't build with controller name #{@controller_build_folder} because it doesn't end with an 's'"
-      end
-
-      if @alt_controller_name
-        @controller_build_folder_singular = @controller_build_folder.gsub(/s$/,'')
-      else
-        @controller_build_folder_singular = singular
       end
 
       @auth = options['auth'] || "current_user"
