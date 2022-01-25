@@ -716,6 +716,8 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
+#### 2022-01-25 - v0.4.7 - 
+
 #### 2022-01-11 - v0.4.5 - buttons on smarty layouts take up 1 bootstrap column each; fixes confirmation alert for delete buttons
 
 #### 2022-01-01 - v0.4.3 and 0.4.4 - adding fully email based license; no activation codes required
@@ -793,9 +795,9 @@ SETUP:
 • if you can't get through see https://stackoverflow.com/questions/68050807/gem-install-mimemagic-v-0-3-10-fails-to-install-on-big-sur/68170982#68170982
 
 
-The dummy sandbox is found at `spec/dummy`
+The dummy sandbox is found at `spec/Dummy`
 
-The dummy sandbox lives as mostly checked- into the repository, **except** the folders where the generated code goes (`spec/dummy/app/views/`, `spec/dummy/app/controllers/`, `spec/dummy/specs/` are excluded from Git)
+The dummy sandbox lives as mostly checked- into the repository, **except** the folders where the generated code goes (`spec/Dummy/app/views/`, `spec/Dummy/app/controllers/`, `spec/Dummy/specs/` are excluded from Git)
 
 When you run the **internal specs**, which you can do **at the root of this repo** using the command `rspec`, a set of specs will run to assert the generators are erroring when they are supposed to and producing code when they are supposed to.
 
@@ -804,15 +806,16 @@ The DUMMY testing DOES NOT test the actual functionality of the output code (it 
 
 # DATABASE
 
-`cd spec/dummy`
+`cd spec/Dummy`
 `rails db:drop`
 `rails db:create`
 `rails db:migrate`
 `RAILS_ENV=test rails db:migrate`
 
-`cd ../..`
 
-take note that when running the spec at the root of the repo you are initializing the Dummy app, which will use the 
-SQLite database in spec/dummy/database/
+being able to run `rake spec` at the root of this repo is acheived using
+```
+ln -s  spec/dummy/db/schema.rb db/schema.rb
+```
 
 

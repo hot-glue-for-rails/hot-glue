@@ -4,7 +4,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 gemspec
 
 # not required for your app
-gem 'pg'
+gem 'sqlite3'
 gem 'byebug'
 gem 'rails'
 gem 'devise', require: true

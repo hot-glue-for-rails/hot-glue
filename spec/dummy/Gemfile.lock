@@ -147,6 +147,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
+    sqlite3 (1.4.2)
     thor (1.1.0)
     tilt (2.0.10)
     tzinfo (2.0.4)
@@ -164,10 +165,10 @@ PLATFORMS
 DEPENDENCIES
   activerecord-pg_enum
   devise
-  pg (~> 1.1)
   puma (~> 5.0)
   rails (~> 6.1.4, >= 6.1.4.1)
   sass-rails (>= 6)
+  sqlite3
 
 RUBY VERSION
    ruby 2.7.4p191

@@ -258,26 +258,7 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-  describe "alt controller names" do
-    it "should generate god contorllers" do
-      response = Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Dfg","--gd", "--alt-controller-name=AllDfgs"])
-      expect(
-        File.read("spec/Dummy/app/controllers/all_dfgs_controller.rb") =~ /Dfg.find\(params\[:id\]\)/
-      ).to be_a(Numeric)
-
-
-      expect(
-        File.read("spec/Dummy/app/views/all_dfgs/index.erb") =~ /partial: 'all_dfgs\/list',/
-      ).to be_a(Numeric)
-
-      expect(
-        File.read("spec/Dummy/app/views/all_dfgs/_list.erb") =~ /render partial: "all_dfgs\/new_button",/
-      ).to be_a(Numeric)
-    end
-
-  end
-
+ 
 
   describe "--plural" do
     # TODO: implement specs
