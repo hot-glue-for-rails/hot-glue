@@ -258,7 +258,7 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
- 
+
 
   describe "--plural" do
     # TODO: implement specs
