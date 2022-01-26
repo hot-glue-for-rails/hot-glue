@@ -275,6 +275,10 @@ module HotGlue
       identify_object_owner
       setup_fields
 
+      if  (@columns - @show_only - (@object_owner_sym.empty? ? [] : [@ownership_field.to_sym])).empty?
+        @no_field_form = true
+      end
+
       buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
       builder = HotGlue::Layout::Builder.new({
@@ -781,7 +785,8 @@ To make a controller that can read all records, specify with --god."
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
-        col_identifier:  col_identifier
+        col_identifier:  col_identifier,
+        ownership_field: @ownership_field
       )
     end
 

@@ -59,6 +59,7 @@ module  HotGlue
       show_only = args[0][:show_only]
       singular_class = args[0][:singular_class]
       col_identifier = args[0][:col_identifier]
+      ownership_field  = args[0][:ownership_field]
 
 
       # TODO: CLEAN ME
@@ -88,12 +89,16 @@ module  HotGlue
                   assoc_name = col.to_s.gsub("_id","")
                   assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
                   if assoc.nil?
-                    exit_message= "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+                    exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
                     exit
                   end
+
+                  is_owner = col.to_s == ownership_field
                   display_column = HotGlue.derrive_reference_name(assoc.class_name)
-                  "<%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
-  <label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+
+                  # TODO: add is_owner && check if this nested arg is optional
+                  (is_owner ? "<% unless #{assoc_name} %>" : "") +  "<%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
+  <label class='small form-text text-muted'>#{col.to_s.humanize}</label>" + (is_owner ? "<% end %>" : "")
 
                 else
                   "<%= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number' %>
