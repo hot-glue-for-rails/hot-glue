@@ -78,11 +78,17 @@ _BOOTSTRAP IS NO LONGER NEEDED_, but I recommend it.
 
 IF you are using `--layout=bootstrap` (step 3), you must install Bootstrap here.
 
-Bootstrap with Webpacker is no longer in Rails 7 by default. (For that see ________TBD________)
+Webpacker is no longer in Rails 7. Also, there is a new option for Rails 7 to build Bootstrap using `cssbundling-rails`
 
-For Bootstrap with Sprockets (recommended by Rails team), see https://github.com/twbs/bootstrap-rubygem
 
-If going the the Bootstrap with Sprockets route, note the gem is
+
+
+
+For the old method:
+
+- https://github.com/twbs/bootstrap-rubygem
+
+With the old method, install the gem using:
 ```
 gem 'bootstrap', '~> 5.1.3'
 ```
@@ -242,7 +248,7 @@ https://github.com/FortAwesome/font-awesome-sass
 
 Add to your Gemfile
 
-As of 2021-12-28 Devise for Rails 7 is still not released so you must use main branch, like so:
+As of 2022-01-26 Devise for Rails 7 is still not released so you must use main branch, like so:
 `gem 'devise', branch: 'main', git: 'https://github.com/heartcombo/devise.git'`
 
 If on Rails 6 **or** Rails 7, you must do the steps in **Legacy Step #5** (below).
@@ -251,6 +257,7 @@ If on Rails 6 **or** Rails 7, you must do the steps in **Legacy Step #5** (below
 
 To be clear: You CAN use Devise with Rails 7, but you must still do the Legacy Step #5 described below for your login to work.
 
+You MUST run the installer FIRST or else you will put your app into a non-workable state:
 ```
 rails generate devise:install
 ```
@@ -274,6 +281,18 @@ As described in Legacy Step #5, **you cannot** skip Devise installer Step 4, eve
        
 ```
 Once you copy the files, you must modify the Devise views to disable Turbo as described in Legacy Step #5.
+
+
+Be sure to create primary auth model with:
+
+`rails generate devise User name:string`
+
+Remember, you don't need to tell Devise that your User has an email, an encrypted password, a reset token, and a 'remember me' flag to let the user stay logged in.
+
+Those features come by default with Devise, and you'll find the fields for them in the newly generated migration file. 
+
+In the example above, you are creating all of those fields along with a simple 'name' (string) field for your User table.
+
 
 
 ## LEGACY SETUP FOR RAILS 6

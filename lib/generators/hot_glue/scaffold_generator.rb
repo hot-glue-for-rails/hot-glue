@@ -73,6 +73,7 @@ module HotGlue
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # if used here it will override what is in the config
     class_option :no_list_labels, type: :boolean, default: false
+    class_option :before_list_labels, type: :boolean, default: false
 
     def initialize(*meta_args)
       super
@@ -152,7 +153,7 @@ module HotGlue
 
       use_controller_name =  plural.titleize.gsub(" ", "")
 
-      @controller_build_name = (( @namespace.titleize + "::" if @namespace) || "") + use_controller_name + "Controller"
+      @controller_build_name = (( @namespace.titleize.gsub(" ","") + "::" if @namespace) || "") + use_controller_name + "Controller"
       @controller_build_folder = use_controller_name.underscore
       @controller_build_folder_singular = singular
 
@@ -206,7 +207,6 @@ module HotGlue
       @smart_layout = options['smart_layout']
 
 
-
       @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
       @downnest = options['downnest'] || false
 
@@ -222,8 +222,13 @@ module HotGlue
       end
 
       # when in self auth, the object is the same as the authenticated object
+
       if @auth && auth_identifier == @singular
         @self_auth = true
+      end
+
+      if @self_auth && !@no_create
+        raise "This controller appears to be the same as the authentication object but in this context you cannot build a new/create action; please re-run with --no-create flag"
       end
 
       @nested_args = []
@@ -268,7 +273,6 @@ module HotGlue
 
       if !@ujs_syntax
         @ujs_syntax = !defined?(Turbo::Engine)
-        puts "You did not specify ujs_syntax and so I default it to #{@ujs_syntax}"
       end
       @reference_name = HotGlue.derrive_reference_name(singular_class)
 
@@ -307,26 +311,12 @@ module HotGlue
           exit_message = "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
 
         else
-          exit_message = "*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym} \n
-maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n
-(If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.
-Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag)
 
-To make a controller that can read all records, specify with --god."
-
-          if @god
-            exit_message << "does #{singular_class} have a relOops: Gd mode could not find the association(#{@object_owner_sym}). Something is wrong."
+          if eval(singular_class + ".reflect_on_association(:#{@object_owner_sym.to_s})").nil? && !eval(singular_class + ".reflect_on_association(:#{@object_owner_sym.to_s.singularize})").nil?
+            exit_message = "*** Oops: you tried to nest #{singular_class} within a route for `#{@object_owner_sym}` but I can't find an association for this relationship. Did you mean `#{@object_owner_sym.to_s.singularize}` (singular) instead?"
           else
-
-            @auth_check = eval(@auth_identifier.titleize)
-            @nested_args.each do |arg|
-
-              if ! @auth_check.reflect_on_association("#{arg}s".to_sym)
-                exit_message <<  "...  your nesting chain does not have a association for #{arg}s on #{@auth_check}  something is wrong."
-              end
-            end
+            exit_message = "*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god."
           end
-          puts "\n" + exit_message
           raise(HotGlue::Error, exit_message)
         end
       end
@@ -827,8 +817,8 @@ To make a controller that can read all records, specify with --god."
     end
 
     def controller_descends_from
-      if defined?(@namespace.titlecase + "::BaseController")
-        @namespace.titlecase + "::BaseController"
+      if defined?(@namespace.titlecase.gsub(" ", "") + "::BaseController")
+        @namespace.titlecase.gsub(" ", "") + "::BaseController"
       else
         "ApplicationController"
       end

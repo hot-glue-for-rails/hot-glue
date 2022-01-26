@@ -4,45 +4,51 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   <% unless @auth_identifier == '' || @god %>before_action :authenticate_<%= @auth_identifier %>!<% end %>
   <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
-    this_scope =   nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "#{nest_chain.last}.#{arg}s"
-      nest_chain << arg %>
+
+    if auth_identifier == arg
+      this_scope = auth_object
+    elsif nest_chain.empty?
+      this_scope =  "#{@auth ? auth_object : class_name}.#{arg}s"
+    else
+      this_scope = "#{nest_chain.last}.#{arg}s"
+    end
+
+     nest_chain << arg %>
   before_action :<%= arg %>
     <% } %><% end %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
   after_action -> { flash.discard }, if: -> { request.format.symbol ==  :turbo_stream }
 <% if @nested_args.any? %>
-  def <%= @nested_args[0] %>
-    <% if @god
-    next_object = nil
-     collect_objects = @nested_args.reverse.collect {|x|
-         if eval("#{next_object || class_name}.reflect_on_association(:#{x})").nil?
-           raise "***** Unable to find the association `#{x}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{x}` to the #{next_object || class_name} object?"
-         end
-         next_object = eval("#{next_object || class_name}.reflect_on_association(:#{x})").class_name
-     }
-     root_object = collect_objects.last
+  def <%= @nested_args[0] %><% if @god
+       next_object = nil
+       collect_objects = @nested_args.reverse.collect {|x|
+           if eval("#{next_object || class_name}.reflect_on_association(:#{x})").nil?
+             raise "***** Unable to find the association `#{x}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{x}` to the #{next_object || class_name} object?"
+           end
+           next_object = eval("#{next_object || class_name}.reflect_on_association(:#{x})").class_name
+       }
+       root_object = collect_objects.last
      else
-       root_object = @auth + "." + @nested_args[0] + "s"
+       if @nested_args[0] == @auth_identifier
+         root_object = @auth
+       else
+         root_object = @auth + "." + @nested_args[0] + "s"
+       end
      end
-
-     %>
-    <% if !@god %> @<%= @nested_args[0] %> ||= <%= root_object %>.find(params[:<%=  @nested_args[0]  %>_id])
-    <% else %> @<%= @nested_args[0] %> ||= <%= root_object %>.find(params[:<%=  @nested_args[0]  %>_id]) <% end %>
+ %><% if !@god &&  @nested_args[0] == @auth_identifier %>
+    @<%= @nested_args[0] %> ||= <%= root_object %> <% elsif !@god %>
+    @<%= @nested_args[0] %> ||= <%= root_object %>.find(params[:<%=  @nested_args[0]  %>_id]) <% else %>
+    @<%= @nested_args[0] %> ||= <%= root_object %>.find(params[:<%=  @nested_args[0]  %>_id]) <% end %>
   end
   <% end %>
-
   <% if any_nested? %><% nest_chain = [@nested_args[0]]; this_scope = @nested_args[0] + 's'; %> <%   @nested_args[1..-1].each { |arg|
     this_scope =  "#{nest_chain.last}.#{arg}s"
     nest_chain << arg
     %>
   def <%= arg %>
     @<%= arg %> ||= <%= this_scope %>.find(params[:<%= arg %>_id])
-  end<% } %>
+  end<% } %> <% end %> <% if !@self_auth %>
 
-  <% end %>
-
-
-<% if !@self_auth %>
   def load_<%= singular_name %>
     @<%= singular_name %> = <%= object_scope.gsub("@",'') %>.find(params[:id])
   end
@@ -52,7 +58,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
 
   def load_all_<%= plural %>
+    <% if !@self_auth %>
     @<%= plural_name %> = <%= object_scope.gsub("@",'') %>.page(params[:page])
+    <% else %>
+    @<%= plural_name %> = <%= class_name %>.where(id: <%= auth_object.gsub("@",'') %>.id) # returns iterable even though this <%= singular_name %> is anly allowed access to themselves
+    <% end %>
   end
 
   def index
