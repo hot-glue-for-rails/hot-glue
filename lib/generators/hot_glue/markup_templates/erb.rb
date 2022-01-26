@@ -1,12 +1,20 @@
 module  HotGlue
   class ErbTemplate < TemplateBase
 
+
+
+    def add_spaces_each_line(text, num_spaces)
+      add_spaces = " " * num_spaces
+      text.lines.collect{|line| add_spaces + line}.join("")
+    end
+
+
     # include GeneratorHelper
     attr_accessor :singular
 
     def field_output(col, type = nil, width, col_identifier )
       "  <%= f.text_field :#{col.to_s}, value: @#{@singular}.#{col.to_s}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}' %>\n "+
-      "  <label class='form-text' >#{col.to_s.humanize}</label>\n"
+      "\n"
     end
 
 
@@ -31,8 +39,7 @@ module  HotGlue
         lines = 5
       end
 
-      "<%= f.text_area :#{col.to_s}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}' %>" +
-        "<label class='form-text'>#{col.to_s.humanize}</label>"
+      "<%= f.text_area :#{col.to_s}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}' %>"
     end
 
     def list_column_headings(*args)
@@ -66,17 +73,13 @@ module  HotGlue
       @singular = args[0][:singular]
       singular = @singular
 
-      col_spaces_prepend = "    "
-
-
       result = layout_columns.map{ |column|
-        "<div class='#{col_identifier}' >" +
+        "  <div class='#{col_identifier}' >" +
 
           column.map { |col|
 
           field_result = if show_only.include?(col)
-            "<%= @#{singular}.#{col.to_s} %>" +
-            "<label class='form-text'>#{col.to_s.humanize}</label>"
+            "<%= @#{singular}.#{col.to_s} %>"
           else
             type = eval("#{singular_class}.columns_hash['#{col}']").type
             limit = eval("#{singular_class}.columns_hash['#{col}']").limit
@@ -97,12 +100,10 @@ module  HotGlue
                   display_column = HotGlue.derrive_reference_name(assoc.class_name)
 
                   # TODO: add is_owner && check if this nested arg is optional
-                  (is_owner ? "<% unless #{assoc_name} %>" : "") +  "<%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
-  <label class='small form-text text-muted'>#{col.to_s.humanize}</label>" + (is_owner ? "<% end %>" : "")
+                  (is_owner ? "<% unless #{assoc_name} %>\n" : "") +  "  <%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>\n" + (is_owner ? "<% end %>" : "")
 
                 else
-                  "<%= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number' %>
-  <label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+                  "<%= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number' %>"
 
                 end
               when :string
@@ -136,18 +137,22 @@ module  HotGlue
                   ""
               when :enum
                 enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col.to_s}'}[0].sql_type")
-                "<%= f.collection_select(:#{col.to_s},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>
-  <label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
-              end
-           end
+                "<%= f.collection_select(:#{col.to_s},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>"
+            end
+
+          end
 
           if (type == :integer) && col.to_s.ends_with?("_id")
             field_error_name = col.to_s.gsub("_id","")
           else
             field_error_name = col.to_s
           end
-           "<span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{ 'style="display: inherit;"'}  >" + field_result + "</span>"
-          }.join("<br />\n") + "</div>"
+
+          add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{ 'style="display: inherit;"'}  >\n" +
+            add_spaces_each_line(field_result + "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>", 4) +
+            "\n  </span>\n  <br />", 2)
+
+          }.join("") + "\n  </div>"
       }.join("\n")
       return result
     end
