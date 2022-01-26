@@ -41,7 +41,10 @@ module HotGlue
     class_option :singular, type: :string, default: nil
     class_option :plural, type: :string, default: nil
     class_option :singular_class, type: :string, default: nil
-    class_option :nest, type: :string, default: ""
+    class_option :nest, type: :string, default: nil # DEPRECATED —— DO NOT USE
+    class_option :nested, type: :string, default: ""
+
+
     class_option :namespace, type: :string, default: nil
     class_option :auth, type: :string, default: nil
     class_option :auth_identifier, type: :string, default: nil
@@ -161,7 +164,13 @@ module HotGlue
       @auth_identifier = options['auth_identifier'] || (! @god && @auth.gsub("current_", "")) || nil
 
 
-      @nest = (!options['nest'].empty? && options['nest']) || nil
+
+      if options['nest']
+        raise "STOP: the flag --nest has been replaced with --nested; please re-run using the --nested flag"
+
+      end
+
+      @nested = (!options['nested'].empty? && options['nested']) || nil
 
       @singular_class = @singular.titleize.gsub(" ", "")
       @exclude_fields = []
@@ -218,8 +227,8 @@ module HotGlue
       end
 
       @nested_args = []
-      if !@nest.nil?
-        @nested_args = @nest.split("/")
+      if ! @nested.nil?
+        @nested_args = @nested.split("/")
         @nested_args_plural = {}
         @nested_args.each do |a|
           @nested_args_plural[a] = a + "s"
@@ -290,7 +299,7 @@ module HotGlue
 
         if assoc
           @ownership_field = assoc.name.to_s + "_id"
-        elsif !@nest
+        elsif ! @nested_args.any?
           exit_message = "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
 
         else
@@ -513,7 +522,7 @@ To make a controller that can read all records, specify with --god."
     end
 
     def path_helper_args
-      if @nested_args.any? && @nest
+      if @nested_args.any? && @nested
         [(@nested_args).collect{|a| "#{a}"} , singular].join(",")
       else
         singular
@@ -521,7 +530,7 @@ To make a controller that can read all records, specify with --god."
     end
 
     def path_helper_singular
-      if @nest
+      if @nested
         "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{@controller_build_folder_singular}_path"
       else
         "#{@namespace+"_" if @namespace}#{@controller_build_folder_singular}_path"
@@ -529,7 +538,7 @@ To make a controller that can read all records, specify with --god."
     end
 
     def path_helper_plural
-      if ! @nest
+      if ! @nested
         "#{@namespace+"_" if @namespace}#{@controller_build_folder}_path"
       else
         "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{plural}_path"
@@ -538,7 +547,7 @@ To make a controller that can read all records, specify with --god."
 
     def path_arity
       res = ""
-      if @nested_args.any? && @nest
+      if @nested_args.any? && @nested
         res << nested_objects_arity + ", "
       end
       res << "@" + singular

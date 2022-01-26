@@ -10,12 +10,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <% } %><% end %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
   after_action -> { flash.discard }, if: -> { request.format.symbol ==  :turbo_stream }
-
-<% if no_devise_installed %>
-  # TODO: implement current_user or use Devise
-<% end %>
-
-  <% if @nested_args.any? %>
+<% if @nested_args.any? %>
   def <%= @nested_args[0] %>
     <% if @god
     next_object = nil
@@ -67,10 +62,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     end
   end
 
-<% if create_action %>  def new <% if ! @god %>
+<% if create_action %>  def new
+    <% if ! @god %>
     @<%= singular_name %> = <%= class_name  %>.new(<%= @object_owner_sym %>: <%= @object_owner_eval %>)
    <% else %>
-    @<%= singular_name %> = <%= class_name  %>.new
+    @<%= singular_name %> = <%= class_name  %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)
    <% end %>
     respond_to do |format|
       format.html
@@ -78,8 +74,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
   def create
-    modified_params = modify_date_inputs_on_params(<%=singular_name %>_params.dup<% if !@object_owner_sym.empty? %>.merge!(<%= @object_owner_sym %>: <%= @object_owner_eval %> )<% end %> <%= @auth ? ', ' + @auth : '' %>)
-    @<%=singular_name %> = <%=class_name %>.create(modified_params)
+    modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup<% if ! @object_owner_sym.empty? %>.merge!(<%= @object_owner_sym %>: <%= @object_owner_eval %> )<% end %> <%= @auth ? ', ' + @auth : '' %>)
+    @<%=singular_name %> = <%= class_name %>.create(modified_params)
 
     if @<%= singular_name %>.save
       flash[:notice] = "Successfully created #{@<%= singular %>.<%= display_class %>}"

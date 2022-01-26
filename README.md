@@ -403,17 +403,27 @@ end
 ```
 
 
-### `--nest=`
+### `--nested=`
 
-pass `--nest=` to denote a nested resources
+This object is nested within another tree of objects, and there is a nested route in your routes.rb file
+
+resources :invoices do
+  resource :lines do
+end
 
 
-`rails generate hot_glue:scaffold Line --nest=invoice`
-
-In this example, it is presumed that the current user has_many :invoices, and that invoices have many :lines
+`rails generate hot_glue:scaffold Line --nested=invoice`
 
 
-For multi-level nesting use slashes to separate your levels of nesting. Remember, you should match what you have in your routes.rb file.
+Example #1: Invoice has many  :lines and line belongs_to :invoice
+
+
+For multi-level nesting use slashes to separate your levels of nesting. 
+
+`rails generate hot_glue:scaffold Charge --nested=invoice`
+`rails generate hot_glue:scaffold Charge --nest=invoice/line`
+
+Remember, you should match what you have in your routes.rb file.
 
 ```
 resources :invoices do
@@ -423,13 +433,10 @@ resources :invoices do
 end
 
 ```
-In this example, it is presumed that the current user has_many :invoices, and that invoices have many :lines, and that lines have many :charges
 
+For non-Gd controllers, your auth root will be used as the starting point when loading the objects from the URL if this object is nested.
 
-To generate scaffold:
-`rails generate hot_glue:scaffold Charge --nest=invoice/line`
-
-The order of the nest should match the nested resources you have in your own app.  In particular, you auth root will be used as the starting point when loading the objects from the URL:
+(For Gd controllers the root object will be loaded directly from the ActiveRecord object.)
 
 In the example above, @invoice will be loaded from
 
@@ -443,11 +450,14 @@ Then, finally the @charge will be loaded
 
 `@charge = @line.charges.find(params[:id])`
 
-It's called "poor man's access control" because if a user attempts to hack the URL by passing ids for objects they don't own--- which Rails makes relatively easy with its default URL pattern-- they will hit ActiveRecord not found errors (the objects they don't own won't be found in the associated relationship).
+This is "starfish access control" or "poor man's access control."  It works when the current user has several things they can manage, and by extension can manage children of those things.  
 
-It works, but it isn't granular. As well, it isn't appropriate for a large app with any level of intricacy to access control (that is, having roles).
 
-Your customers can delete their own objects by default (may be a good idea or a bad idea for you). If you don't want that, you should strip out the delete actions off the controllers.
+## Optional Nesting
+
+**God controllers only ** have a special build feature where they can be specified to be optionally nested. 
+
+When build as optionally nested, 
 
 
 ### `--auth=`
