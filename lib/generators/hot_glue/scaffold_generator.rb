@@ -591,7 +591,7 @@ To make a controller that can read all records, specify with --god."
 
     def nest_assignments_operator(top_level = false, leading_comma = false)
       if @nested_args.any?
-        "#{', ' + "\n     " if leading_comma}#{top_level ? nested_assignments_top_level : nested_assignments }"
+        "#{", " if leading_comma}#{top_level ? nested_assignments_top_level : nested_assignments }"
       else
         ""
       end
