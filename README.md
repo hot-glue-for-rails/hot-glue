@@ -466,13 +466,7 @@ Then, finally the @charge will be loaded
 
 This is "starfish access control" or "poor man's access control."  It works when the current user has several things they can manage, and by extension can manage children of those things.  
 
-
-## ~ Optional Nesting~ COMING SOON!
-
-~**God controllers only ** have a special build feature where they can be specified to be optionally nested. ~
-
-**COMING SOON!**
-
+                                                         
 ### `--auth=`
 
 By default, it will be assumed you have a `current_user` for your user authentication. This will be treated as the "authentication root" for the "poor man's auth" explained above.
