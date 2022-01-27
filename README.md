@@ -150,88 +150,7 @@ default is `erb`
 ### Example installing HAML using Hot Glue layout and the 'like_mountain_view' (Gmail-inspired) theme:
 `rails generate hot_glue:install --markup=erb --layout=hotglue --theme=like_mountain_view`
 
-
-##  3(B). Modify `application.html.erb`
-(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
-Note: if you have some kind of non-standard application layout, like one at a different file
-or if you have modified your opening <body> tag, this may not have been automatically applied by the installer.
-
-- This was added to your `application.html.erb`
-```
-  <%= render partial: 'layouts/flash_notices' %>
-```
-
-## 3(C). Modify `rails_helper.rb`
-(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
-Note: if you have some kind of non-standard rails_helper.rb, like one that does not use the standard ` do |config|` syntax after your `RSpec.configure`
-this may not have been automatically applied by the installer.
-
-- configure Rspec to work with Factory Bot inside of `rails_helper.rb`
-  ```
-  RSpec.configure do |config|
-      // ... more rspec configuration (not shown)
-      config.include FactoryBot::Syntax::Methods
-  end
-  ```  
-
-
-## 3(D) CAPYBARA: SWITCH FROM RACK-TEST TO HEADLESS CHROME
-(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
-
-- By default Capybara is installed with :rack_test as its driver.
-- This does not support Javascript, and the code from Hot Glue IS NOT fallback compatible-- it will not work on non-Javascript browsers.
-- From the [Capybara docs](https://github.com/teamcapybara/capybara#drivers):
-```
-By default, Capybara uses the :rack_test driver, which is fast but limited: it does not support JavaScript
-```
-
-- To fix this, you must switch to a Javascript-supporting Capybara driver. You can choose one of:
-
-`Capybara.default_driver = :selenium`
-`Capybara.default_driver = :selenium_chrome`
-`Capybara.default_driver = :selenium_chrome_headless`
-
-By default, the installer should have added this option to your `rails_helper.rb` file:
-
-```
-Capybara.default_driver = :selenium_chrome_headless 
-```
-
-Alternatively, can define your own driver like so:
-
-  ```
-  Capybara.register_driver :my_headless_chrome_desktop do |app|
-    options = Selenium::WebDriver::Chrome::Options.new
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
-    options.add_argument('--window-size=1280,1200')
-    
-    driver = Capybara::Selenium::Driver.new(app,
-                                            browser: :chrome,
-                                            options: options)
-    
-    driver
-  end
-  Capybara.default_driver = :my_headless_chrome_desktop
-    
-  ```
-
-
-(THIS WAS ALSO AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
-
-- for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
-- in the default code, the devise login would be for an object called account and lives at the route `/accounts/sign_in`
-- modify the generated code (it was installed by the installed) for your devise login
-   ```
-   def login_as(account)
-     visit '/accounts/sign_in'
-     within("#new_account") do
-     fill_in 'Email', with: account.email
-     fill_in 'Password', with: 'password'
-     end
-     click_button 'Log in'
-   end
-   ```
+The Hot Glue installer did several things for you in this step. Examine the git diffs or see 'Hot Glue Installer Notes' below.
 
 
 ## 4. install font-awesome (optional)
@@ -248,14 +167,13 @@ https://github.com/FortAwesome/font-awesome-sass
 
 Add to your Gemfile
 
-As of 2022-01-26 Devise for Rails 7 is still not released so you must use main branch, like so:
+As of 2022-01-26 Devise for Rails 7 is still not released so you must use **main branch**, like so:
+
 `gem 'devise', branch: 'main', git: 'https://github.com/heartcombo/devise.git'`
 
-If on Rails 6 **or** Rails 7, you must do the steps in **Legacy Step #5** (below).
+(If you are on Rails 6, you must do ALL of the steps in the Legacy Setup steps. Be sure not to skip **Legacy Step #5** (below))
 
-(If you are on Rails 6, you must do ALL of the steps in the Legacy Setup steps.)
-
-To be clear: You CAN use Devise with Rails 7, but you must still do the Legacy Step #5 described below for your login to work.
+For Rails 7, be sure you are on the main branch of devise above and your logins should work. (The previously necessary step of disabling turbo shown in Legacy Step #5 is no longer needed. )
 
 You MUST run the installer FIRST or else you will put your app into a non-workable state:
 ```
@@ -272,17 +190,6 @@ IMPORTANT: Follow the instructions the Devise installer gives you, *Except Step 
 
 ```
 
-
-As described in Legacy Step #5, **you cannot** skip Devise installer Step 4, even though the installer tells you it is optional:
-``` 
-  4. You can copy Devise views (for customization) to your app by running:
-
-       rails g devise:views
-       
-```
-Once you copy the files, you must modify the Devise views to disable Turbo as described in Legacy Step #5.
-
-
 Be sure to create primary auth model with:
 
 `rails generate devise User name:string`
@@ -291,14 +198,11 @@ Remember, you don't need to tell Devise that your User has an email, an encrypte
 
 Those features come by default with Devise, and you'll find the fields for them in the newly generated migration file. 
 
-In the example above, you are creating all of those fields along with a simple 'name' (string) field for your User table.
+In this example above, you are creating all of those fields along with a simple 'name' (string) field for your User table.
 
 
 
 ## LEGACY SETUP FOR RAILS 6
-
-(Note Legacy Step #5 is necessary for BOTH Rails 6 and Rails 7.)
-
 
 ## Legacy Step #1. ADD HOTWIRE
 (RAILS 6 ONLY— SKIP THIS STEP FOR RAILS 7)
@@ -350,7 +254,7 @@ Check your node version with `node -v`
 
 rails webpacker:install
 
-## Legacy Step #4: ENUM Support
+## Legacy Step #4: Postgresql Enum Support for Rail 6
 For Enum support, I recommend activerecord-pg_enum
 Instructions for Rails 6 are here:
 https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
@@ -358,7 +262,7 @@ https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-ra
 _This functionality is now built-in to Rails 7._
 
 
-## Legacy Step #5-- Fix Devise if adding Turbo To Your Project
+## Legacy Step #5: Fix Devise if adding Turbo To Your Project
 ## IMPORTANT: Devise currently has serious compatibility issues with Turbo Rails. In particular, your log-in screens do not work out of the box. Follow the next step to fix them.
 
 Manually port the Devise views into your app with
@@ -369,24 +273,105 @@ Edit `devise/registrations/new`, `devise/sessions/new`, `devise/passwords/new` a
 
 form_for(resource, as: resource_name, url: session_path(resource_name) ) do |f|
 
-
-
 add the data-turbo false option in the html key:
+```bigquery
 
-
+```
 form_for(resource, as: resource_name, **html: {'data-turbo' => "false"},** url: session_path(resource_name) ) do |f|
-
-
 
 This tells Devise to fall back to non-Turbo interaction for the log-in and registration. For the rest of the app, we will use Turbo Rails interactions.
 
+
+### Hot Glue Installer Notes 
+
+These things were DONE FOR YOUR in Step #3 (above). You don't need to think about them but if you are familiar with Capybara and/or adding Hot Glue to an existing app, you may want to:
+
+##  Hot Glue modified `application.html.erb`
+(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
+Note: if you have some kind of non-standard application layout, like one at a different file
+or if you have modified your opening <body> tag, this may not have been automatically applied by the installer.
+
+- This was added to your `application.html.erb`
+```
+  <%= render partial: 'layouts/flash_notices' %>
+```
+
+## Hot Glue modified `rails_helper.rb`
+(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
+Note: if you have some kind of non-standard rails_helper.rb, like one that does not use the standard ` do |config|` syntax after your `RSpec.configure`
+this may not have been automatically applied by the installer.
+
+- configure Rspec to work with Factory Bot inside of `rails_helper.rb`
+  ```
+  RSpec.configure do |config|
+      // ... more rspec configuration (not shown)
+      config.include FactoryBot::Syntax::Methods
+  end
+  ```  
+
+
+## Hot Glue switched Capybara from RACK-TEST to HEADLESS CHROME
+(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
+
+- By default Capybara is installed with :rack_test as its driver.
+- This does not support Javascript, and the code from Hot Glue IS NOT fallback compatible-- it will not work on non-Javascript browsers.
+- From the [Capybara docs](https://github.com/teamcapybara/capybara#drivers):
+```
+By default, Capybara uses the :rack_test driver, which is fast but limited: it does not support JavaScript
+```
+
+- To fix this, you must switch to a Javascript-supporting Capybara driver. You can choose one of:
+
+`Capybara.default_driver = :selenium`
+`Capybara.default_driver = :selenium_chrome`
+`Capybara.default_driver = :selenium_chrome_headless`
+
+By default, the installer should have added this option to your `rails_helper.rb` file:
+
+```
+Capybara.default_driver = :selenium_chrome_headless 
+```
+
+Alternatively, you can define your own driver like so:
+
+  ```
+  Capybara.register_driver :my_headless_chrome_desktop do |app|
+    options = Selenium::WebDriver::Chrome::Options.new
+    options.add_argument('--headless')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--window-size=1280,1200')
+    
+    driver = Capybara::Selenium::Driver.new(app,
+                                            browser: :chrome,
+                                            options: options)
+    
+    driver
+  end
+  Capybara.default_driver = :my_headless_chrome_desktop
+    
+  ```
+
+## Hot Glue Added a Quick (Old-School) Capybara Login For Devise
+
+- for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
+- in the default code, the devise login would be for an object called account and lives at the route `/accounts/sign_in`
+- modify the generated code (it was installed by the installed) for your devise login
+   ```
+   def login_as(account)
+     visit '/accounts/sign_in'
+     within("#new_account") do
+     fill_in 'Email', with: account.email
+     fill_in 'Password', with: 'password'
+     end
+     click_button 'Log in'
+   end
+   ```
 
 ---
 ---
 
 
 # HOT GLUE DOCS
-
 
 ## First Argument
 (no double slash)
@@ -741,14 +726,22 @@ Obviously, the created controller will always have this base controller as its s
 * shows in a size-aware container, i.e. in a bigger box if the field allows for more content
 
 
-
 # VERSION HISTORY
 
-#### 2022-01-25 - v0.4.7 - 
+#### 2022-01-26 - v0.4.7 `--nest` has been renamed to `--nested`; please use `--nested` moving forward
+                        - `--alt-controller-name` feature from the last release has been removed, I have something better coming soon
+                        - significant improvements to how child portals are handled, including setting the owner (parent) object when creating new records from a child portal
+                        - improvements to how 'self-auth' is handled, i.e., when a controller is built using an authentication identifier (e.g. `current_user`) that is the same as the controller's object
+                        - note that when building a self-auth controller, the list view still behaves as-if it is a list but controller only has access to the auth object (e.g. `current_user`). You would really only need this for the edge case of a user updating their own record, or, as in the example, to use as the starting point for building the child portals.  
+                        - another edge case in here that has been fixed involved creating a 'no field' form-- in the example, invoices are created using the "new" button and "save" button, even though the form as no editable fields for the user to input. In these edge cases, an invisible form field is inserted to make the form submission work correctly. This only happens for an action that has no inputable fields. 
+                        - cleaner code for the _form output and also the controller output 
 
-#### 2022-01-11 - v0.4.5 - buttons on smarty layouts take up 1 bootstrap column each; fixes confirmation alert for delete buttons
+#### 2022-01-23 - v0.4.6 -  `--no-list-labels` (flag; defaults false)
+                        (additional features in this release have been subsequently removed)
 
-#### 2022-01-01 - v0.4.3 and 0.4.4 - adding fully email based license; no activation codes required
+#### 2022-01-11 - v0.4.5 - buttons on smart layouts take up 1 bootstrap column each; fixes confirmation alert for delete buttons
+
+#### 2022-01-01 - v0.4.3 and 0.4.4 - adding fully email-based license, no activation codes required.
 
 #### 2022-12-30 - v0.4.2 -- Smart layouts introduced
 
@@ -761,14 +754,13 @@ Obviously, the created controller will always have this base controller as its s
 #### 2021-12-11 - v0.3.5 - Downnesting
 
 
-#### 2021-11-27 - v0.2.9E   — EXPERIMENTAL
+#### 2021-11-27 - v0.2.9E   (experimental)
                      - Downnesting
                      - Adds spec coverage support for enums
                      - Several more fixes; this is preparation for forthcoming release.
                      - Some parts still experimental. Use with caution. 
 
 #### 2021-10-11 - v0.2.6 - many additional automatic fixes for default Rails installation 6 or 7 for the generate hot_glue:install command
-
 
 #### 2021-10-10 - v0.2.5 - this version is all about developer happyness:
                             - significant fixes for the behavioral (system) specs. they now create new & update interactions
