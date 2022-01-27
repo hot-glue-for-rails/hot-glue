@@ -406,6 +406,8 @@ end
 ### `--nested=`
 
 This object is nested within another tree of objects, and there is a nested route in your `routes.rb` file
+Example #1: 
+Invoice `has_many :lines` and a Line `belongs_to :invoice`
 
 ```
 resources :invoices do
@@ -413,25 +415,36 @@ resources :invoices do
 end
 ```
 
+`rails generate hot_glue:scaffold Invoice`
+
 `rails generate hot_glue:scaffold Line --nested=invoice`
 
-Example #1: Invoice `has_many :lines` and a Line `belongs_to :invoice`
 
-_For multi-level nesting use slashes to separate your levels of nesting._ 
+Remember, you should match what you have in your `routes.rb` file.
 
-`rails generate hot_glue:scaffold Charge --nested=invoice`
-`rails generate hot_glue:scaffold Charge --nest=invoice/line`
+Example #2: 
+Invoice `has_many :lines` and a Line `belongs_to :invoice`
+Line `has_many :charges` and Charge `belongs_to :line`
 
-Remember, you should match what you have in your routes.rb file.
-
+**config/routes.rb**
 ```
 resources :invoices do
     resources :lines do
         resources :charge
     end    
 end
-
 ```
+
+
+_For multi-level nesting use slashes to separate your levels of nesting._
+
+`rails generate hot_glue:scaffold Invoice`
+
+`rails generate hot_glue:scaffold Line --nested=invoice`
+
+`rails generate hot_glue:scaffold Charge --nested=invoice/line`
+
+
 
 For non-Gd controllers, your auth root will be used as the starting point when loading the objects from the URL if this object is nested.
 
