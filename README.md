@@ -726,15 +726,15 @@ Obviously, the created controller will always have this base controller as its s
 # VERSION HISTORY
 
 #### 2022-01-26 - v0.4.7 `--nest` has been renamed to `--nested`; please use `--nested` moving forward
-                        - `--alt-controller-name` feature from the last release has been removed, I have something better coming soon
-                        - significant improvements to how child portals are handled, including setting the owner (parent) object when creating new records from a child portal
-                        - improvements to how 'self-auth' is handled, i.e., when a controller is built using an authentication identifier (e.g. `current_user`) that is the same as the controller's object
-                        - note that when building a self-auth controller, the list view still behaves as-if it is a list but controller only has access to the auth object (e.g. `current_user`). You would really only need this for the edge case of a user updating their own record, or, as in the example, to use as the starting point for building the child portals.  
-                        - another edge case in here that has been fixed involved creating a 'no field' form-- in the example, invoices are created using the "new" button and "save" button, even though the form as no editable fields for the user to input. In these edge cases, an invisible form field is inserted to make the form submission work correctly. This only happens for an action that has no inputable fields. 
-                        - cleaner code for the _form output and also the controller output 
+- `--alt-controller-name` feature from the last release has been removed, I have something better coming soon
+- significant improvements to how child portals are handled, including setting the owner (parent) object when creating new records from a child portal
+- improvements to how 'self-auth' is handled, i.e., when a controller is built using an authentication identifier (e.g. `current_user`) that is the same as the controller's object
+- note that when building a self-auth controller, the list view still behaves as-if it is a list but controller only has access to the auth object (e.g. `current_user`). You would really only need this for the edge case of a user updating their own record, or, as in the example, to use as the starting point for building the child portals.  
+- another edge case in here that has been fixed involved creating a 'no field' form-- in the example, invoices are created using the "new" button and "save" button, even though the form as no editable fields for the user to input. In these edge cases, an invisible form field is inserted to make the form submission work correctly. This only happens for an action that has no inputable fields. 
+- cleaner code for the _form output and also the controller output 
 
 #### 2022-01-23 - v0.4.6 -  `--no-list-labels` (flag; defaults false)
-                        (additional features in this release have been subsequently removed)
+(additional features in this release have been subsequently removed)
 
 #### 2022-01-11 - v0.4.5 - buttons on smart layouts take up 1 bootstrap column each; fixes confirmation alert for delete buttons
 
