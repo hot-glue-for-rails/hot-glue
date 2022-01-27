@@ -283,7 +283,7 @@ This tells Devise to fall back to non-Turbo interaction for the log-in and regis
 
 ### Hot Glue Installer Notes 
 
-ALL of the things were DONE FOR YOUR in Step #3 (above). You don't need to think about them but if you are familiar with Capybara and/or adding Hot Glue to an existing app, you may want to:
+These things were **done for you** in Step #3 (above). You don't need to think about them but if you are familiar with Capybara and/or adding Hot Glue to an existing app, you may want to:
 
 ####  Hot Glue modified `application.html.erb`
 Note: if you have some kind of non-standard application layout, like one at a different file
