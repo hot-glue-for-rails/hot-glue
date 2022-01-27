@@ -139,7 +139,7 @@ The themes are just SCSS files installed into app/assets/stylesheets. You can tw
 
 ### `--markup` flag
 
-default is `erb`
+default is `erb`. IMPORTANT: As of right now, I am only supporting & building against ERB. HAML and SLIM are not currently supported.
 
 
 ## 3. RUN HOT-GLUE INSTALL:
