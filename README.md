@@ -406,7 +406,8 @@ end
 ### `--nested=`
 
 This object is nested within another tree of objects, and there is a nested route in your `routes.rb` file
-Example #1: 
+
+#### Example #1: One-level Nesting
 Invoice `has_many :lines` and a Line `belongs_to :invoice`
 
 ```
@@ -422,7 +423,8 @@ end
 
 Remember, you should match what you have in your `routes.rb` file.
 
-Example #2: 
+#### Example #2: Two-level Nesting
+
 Invoice `has_many :lines` and a Line `belongs_to :invoice`
 Line `has_many :charges` and Charge `belongs_to :line`
 
