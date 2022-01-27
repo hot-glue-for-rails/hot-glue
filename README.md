@@ -3,7 +3,6 @@
 
 Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of the admin-interface style scaffolding systems of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold)).
 
-
 Using Turbo-Rails and Hotwire (default in Rails 7) you get a lightning-fast out-of-the-box CRUD building experience.
 
 Every page displays only a list view: new and edit operations happen as 'edit-in-place', so the user never leaves the page.
@@ -712,18 +711,16 @@ Obviously, the created controller will always have this base controller as its s
 
 ## Field Types Supported
 
-- Integers that don't end with `_id`, they will be displayed as text fields.
+- Integers that don't end with `_id`: displayed as input fields with type="number"
 - Integers that do end with `_id` will be treated automatically as associations. You should have a Rails association defined. (Hot Glue will warn you if it can't find one.)
-- String*
-- Text*
-- Float*
-- Datetime
-- Date
-- Time
-- Boolean
-- Enum - will display as a value list populated from the enum list defined on your model. see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
-
-* shows in a size-aware container, i.e. in a bigger box if the field allows for more content
+- String: displayed as small input box 
+- Text: displayed as large textarea
+- Float: displayed as input box
+- Datetime: displayed as HTML5 datetime picker
+- Date: displayed as HTML5 date picker
+- Time: displayed as HTML5 time picker
+- Boolean: displayed radio buttons yes/ no
+- Enum - displayed as a drop-down list (defined the enum values on your model). For Rails 6 see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
 
 
 # VERSION HISTORY
@@ -775,9 +772,9 @@ Obviously, the created controller will always have this base controller as its s
 
 #### 2021-09-30 - v0.2.3 - fixes ERB output for show-only fields; fixes flash_notices for erb or haml; adds @stimulus_syntax flag for delete confirmations with stimulus
 
-#### 2021-09-27  - v0.2.2 - Fixes some issues with related fields; unlocks Rails 7 in Gemspec file
+#### 2021-09-27 - v0.2.2 - Fixes some issues with related fields; unlocks Rails 7 in Gemspec file
 
-#### 2021-09-20  - v0.2.1 - Fixes nesting behavior when using gd option
+#### 2021-09-20 - v0.2.1 - Fixes nesting behavior when using gd option
 
 #### 2021-09-06 - v0.2.0 - ERB or HAML; use the option --markup=erb or --markup=haml (default is now erb)
 
@@ -802,9 +799,6 @@ Obviously, the created controller will always have this base controller as its s
 #### 2021-02-25 - v0.0.2 - bootstrapy
 
 #### 2021-02-24 - v0.0.1 - first proof of concept release -- basic CRUD works
-
-
-
 
 
 
