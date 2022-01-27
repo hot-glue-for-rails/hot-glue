@@ -283,10 +283,9 @@ This tells Devise to fall back to non-Turbo interaction for the log-in and regis
 
 ### Hot Glue Installer Notes 
 
-These things were DONE FOR YOUR in Step #3 (above). You don't need to think about them but if you are familiar with Capybara and/or adding Hot Glue to an existing app, you may want to:
+ALL of the things were DONE FOR YOUR in Step #3 (above). You don't need to think about them but if you are familiar with Capybara and/or adding Hot Glue to an existing app, you may want to:
 
-##  Hot Glue modified `application.html.erb`
-(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
+####  Hot Glue modified `application.html.erb`
 Note: if you have some kind of non-standard application layout, like one at a different file
 or if you have modified your opening <body> tag, this may not have been automatically applied by the installer.
 
@@ -295,8 +294,7 @@ or if you have modified your opening <body> tag, this may not have been automati
   <%= render partial: 'layouts/flash_notices' %>
 ```
 
-## Hot Glue modified `rails_helper.rb`
-(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
+#### Hot Glue modified `rails_helper.rb`
 Note: if you have some kind of non-standard rails_helper.rb, like one that does not use the standard ` do |config|` syntax after your `RSpec.configure`
 this may not have been automatically applied by the installer.
 
@@ -309,8 +307,7 @@ this may not have been automatically applied by the installer.
   ```  
 
 
-## Hot Glue switched Capybara from RACK-TEST to HEADLESS CHROME
-(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION)
+#### Hot Glue switched Capybara from RACK-TEST to HEADLESS CHROME
 
 - By default Capybara is installed with :rack_test as its driver.
 - This does not support Javascript, and the code from Hot Glue IS NOT fallback compatible-- it will not work on non-Javascript browsers.
@@ -350,7 +347,7 @@ Alternatively, you can define your own driver like so:
     
   ```
 
-## Hot Glue Added a Quick (Old-School) Capybara Login For Devise
+#### Hot Glue Added a Quick (Old-School) Capybara Login For Devise
 
 - for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
 - in the default code, the devise login would be for an object called account and lives at the route `/accounts/sign_in`
