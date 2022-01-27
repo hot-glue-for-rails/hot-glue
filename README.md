@@ -467,12 +467,11 @@ Then, finally the @charge will be loaded
 This is "starfish access control" or "poor man's access control."  It works when the current user has several things they can manage, and by extension can manage children of those things.  
 
 
-## Optional Nesting
+## ~ Optional Nesting~ COMING SOON!
 
-**God controllers only ** have a special build feature where they can be specified to be optionally nested. 
+~**God controllers only ** have a special build feature where they can be specified to be optionally nested. ~
 
-When build as optionally nested, 
-
+**COMING SOON!**
 
 ### `--auth=`
 
