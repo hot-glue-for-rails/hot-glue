@@ -405,20 +405,19 @@ end
 
 ### `--nested=`
 
-This object is nested within another tree of objects, and there is a nested route in your routes.rb file
+This object is nested within another tree of objects, and there is a nested route in your `routes.rb` file
 
+```
 resources :invoices do
   resource :lines do
 end
-
+```
 
 `rails generate hot_glue:scaffold Line --nested=invoice`
 
+Example #1: Invoice `has_many :lines` and a Line `belongs_to :invoice`
 
-Example #1: Invoice has many  :lines and line belongs_to :invoice
-
-
-For multi-level nesting use slashes to separate your levels of nesting. 
+_For multi-level nesting use slashes to separate your levels of nesting._ 
 
 `rails generate hot_glue:scaffold Charge --nested=invoice`
 `rails generate hot_glue:scaffold Charge --nest=invoice/line`
