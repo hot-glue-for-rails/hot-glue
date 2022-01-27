@@ -405,7 +405,7 @@ end
 
 ### `--nested=`
 
-This object is nested within another tree of objects, and there is a nested route in your `routes.rb` file
+This object is nested within another tree of objects, and there is a nested route in your `routes.rb` file. When specifying the parent(s), be sure to use **singular case**.
 
 #### Example #1: One-level Nesting
 Invoice `has_many :lines` and a Line `belongs_to :invoice`
@@ -421,7 +421,7 @@ end
 `rails generate hot_glue:scaffold Line --nested=invoice`
 
 
-Remember, you should match what you have in your `routes.rb` file.
+Remember, nested should match how the hierarchy of nesting is in your `routes.rb` file. (Which Hot Glue does not create or edit for you.)
 
 #### Example #2: Two-level Nesting
 
