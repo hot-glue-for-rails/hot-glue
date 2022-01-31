@@ -28,7 +28,7 @@ Hot Glue generates functionality that's quick and dirty. It lets you be crafty. 
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
 # Hot Glue Tutorial 
-## [GET THE COURSE TODAY (includes Hot Glue License)](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
+## [GET THE COURSE TODAY (includes Hot Glue License)](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
 
 |   |  |  
 | ------------- | ------------- |
@@ -53,10 +53,24 @@ Instantly get a simple CRUD interface
 
 # Getting Started
 
-_If you are on Rails 6, skip to section Rails 6 Setup and complete those steps FIRST._
+_If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github/jasonfb/hot-glue/README2.md) and complete those steps FIRST._
 
 
-## 1. ADD RSPEC, FACTORY-BOT, AND FFAKER
+## 1. Rails 7 New App
+
+There are two ways to create new apps on Rails 7: With or without ImportMap. These instructions prefer the Without Importmap method, but to help you choose [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-do-i-need-importmap-rails/)
+
+`rails new --css=bootstrap --javascript=webpack`
+
+Confirm that both Stimulus and Turbo are working. For the quick step-by-step on confirm that both Stiumuls and Turbo are working for your new JSBundling-Rails/CSSBunlding-Rails setup [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-new-app-with-js-bundling-css-bundling/).
+
+(Note that Bootstrap is optional for Hot Glue, see the layout option below.)
+
+For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/)
+
+Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github/jasonfb/hot-glue/README2.md) before continueing. 
+
+## 2. ADD RSPEC, FACTORY-BOT, AND FFAKER
 
 add these 3 gems to your gemfile **inside a group for both :development and :test*. Do not add these gems to only the :test group or else your will have problems with the generators.
 ```
@@ -67,36 +81,7 @@ gem 'ffaker'
 
 - run `rails generate rspec:install`
 
-- replace `application.css` with a new file (delete old contents) `application.scss`
 
-THIS FILE CAN BE EMPTY, BUT WILL BE USED BY THEME INSTALLER
-
-## 2. ADD BOOTSTRAP (OPTIONAL)
-
-_BOOTSTRAP IS NO LONGER NEEDED_, but I recommend it.
-
-IF you are using `--layout=bootstrap` (step 3), you must install Bootstrap here.
-
-Webpacker is no longer in Rails 7. Also, there is a new option for Rails 7 to build Bootstrap using `cssbundling-rails`
-
-
-
-
-
-For the old method:
-
-- https://github.com/twbs/bootstrap-rubygem
-
-With the old method, install the gem using:
-```
-gem 'bootstrap', '~> 5.1.3'
-```
-
-Then, all you need to do is add to `app/assets/stylesheets/application.scss`
-
-```
-@import "bootstrap";
-```
 
 ## 3. HOTGLUE INSTALLER
 Add `gem 'hot-glue'` to your Gemfile & `bundle install`
@@ -200,85 +185,6 @@ Those features come by default with Devise, and you'll find the fields for them 
 In this example above, you are creating all of those fields along with a simple 'name' (string) field for your User table.
 
 
-
-## LEGACY SETUP FOR RAILS 6
-
-## Legacy Step #1. ADD HOTWIRE
-(RAILS 6 ONLY— SKIP THIS STEP FOR RAILS 7)
-```
-yarn add @hotwired/turbo-rails
-```
-or `npm install @hotwired/turbo-rails`
-
-
-## Legacy Step #2. SWITCH FROM TurblLinks to Turbo-Rails
-(RAILS 6 ONLY — SKIP FOR RAILS 7)
-(THIS WAS AUTOMATICALLY DONE BY THE HOT GLUE INSTALLATION -- CONFIRM CHANGES ONLY)
-- Add `gem 'turbo-rails'` to your Gemfile & `bundle install`
-- Then install it with `rails turbo:install`
-- The Turbo install has switched your action cable settings from 'async' to Redis, so be sure to start a redis server
-- in `app/javascript/packs/application.js` remove this line
-```
-import Turbolinks from "turbolinks"
-```
-and replace it with
-```
-import { Turbo } from "@hotwired/turbo-rails"
-```
-
-
-Also replace
-``` 
-Turbolinks.start()
-```
-with:
-```
-Turbo.start()
-```
-
-
-## Legacy Step #3. INSTALL WEBPACKER
-(_SKIP FOR RAILS 7_ unless you want to use Webpacker with Rails 7)
-
-** For webpacker, you must be using Node version ^12.13.0 || ^14.15.0 || >=16 **
-
-I recommend Node Version Manager (NVM) to switch between nodes. You will not be able to get through the following command with a Node version that does not match above.
-
-Check your node version with `node -v`
-
-```
-`yarn add @rails/webpacker`
-```
-
-
-rails webpacker:install
-
-## Legacy Step #4: Postgresql Enum Support for Rail 6
-For Enum support, I recommend activerecord-pg_enum
-Instructions for Rails 6 are here:
-https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
-
-_This functionality is now built-in to Rails 7._
-
-
-## Legacy Step #5: Fix Devise if adding Turbo To Your Project
-## IMPORTANT: Devise currently has serious compatibility issues with Turbo Rails. In particular, your log-in screens do not work out of the box. Follow the next step to fix them.
-
-Manually port the Devise views into your app with
-
-`rails generate devise:views`
-
-Edit `devise/registrations/new`, `devise/sessions/new`, `devise/passwords/new` and `devise/confirmations/new` modifying all four templates like so:
-
-form_for(resource, as: resource_name, url: session_path(resource_name) ) do |f|
-
-add the data-turbo false option in the html key:
-```bigquery
-
-```
-form_for(resource, as: resource_name, **html: {'data-turbo' => "false"},** url: session_path(resource_name) ) do |f|
-
-This tells Devise to fall back to non-Turbo interaction for the log-in and registration. For the rest of the app, we will use Turbo Rails interactions.
 
 
 ### Hot Glue Installer Notes 
