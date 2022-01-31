@@ -53,22 +53,23 @@ Instantly get a simple CRUD interface
 
 # Getting Started
 
-_If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github/jasonfb/hot-glue/README2.md) and complete those steps FIRST._
+_If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/README2.md) and complete those steps FIRST._
 
 
 ## 1. Rails 7 New App
 
-There are two ways to create new apps on Rails 7: With or without ImportMap. These instructions prefer the Without Importmap method, but to help you choose [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-do-i-need-importmap-rails/)
+There are two ways to create new apps on Rails 7: With or without ImportMap. These instructions prefer the **without Importmap** method, but to help you choose [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-do-i-need-importmap-rails/)
 
-`rails new --css=bootstrap --javascript=webpack`
+`rails new --css=bootstrap --javascript=webpack --database=postgresql`
 
-Confirm that both Stimulus and Turbo are working. For the quick step-by-step on confirm that both Stiumuls and Turbo are working for your new JSBundling-Rails/CSSBunlding-Rails setup [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-new-app-with-js-bundling-css-bundling/).
+Confirm that both Stimulus and Turbo are working. For the quick step-by-step to help you confirm 
+that both Stimulus and Turbo are working for your new JSBundling-Rails/CSSBunlding-Rails setup [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-new-app-with-js-bundling-css-bundling/).
 
-(Note that Bootstrap is optional for Hot Glue, see the layout option below.)
+(Note that Bootstrap is optional for Hot Glue. Here, I am just showing you the default isntallation for simplicity.)
 
 For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/)
 
-Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github/jasonfb/hot-glue/README2.md) before continueing. 
+Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/README2.md) before continuing. 
 
 ## 2. ADD RSPEC, FACTORY-BOT, AND FFAKER
 
