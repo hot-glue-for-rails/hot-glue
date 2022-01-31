@@ -541,9 +541,10 @@ For more information see Example 5 in the Tutorial
 ### `--downnest`
 
 Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object.
-You will need to build scaffolding with the same name for the related object as well.
-On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line.
+You will need to build scaffolding with the same name for the related object as well. On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line.
 
+The downnested child table (not to be confused with this object's `--nested` setting, where you are specifying this object's _parents_) is called a **child portal**. When you create a record in the child portal, the related record is automatically set to be owned by its parent (as specified by `--nested`). For an example, see the [v0.4.7 release notes](https://github.com/jasonfb/hot-glue/releases/tag/v0.4.7).
+ 
 
 
 
