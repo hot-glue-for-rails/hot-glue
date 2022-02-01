@@ -472,22 +472,79 @@ If you specify an include list, it will be treated as a whitelist: no fields wil
 
 `rails generate hot_glue:scaffold Account --include=first_name,last_name,company_name,created_at,kyc_verified_at`
 
-Separate COLUMNS by a COLON
-If you want to group up fields together into columns, use a COLON (`:`) character to specify columns.
-Your input may have a COLON at the end of it, but otherwise your columns will made flush left.
+You may not specify both include and exclude.
 
-Without colons, no group will happen, so these two fields would display in two columns:
+Include setting is affected by both specified grouping and smarty layouts, explained below.
+
+
+#### Specified Grouping
+
+To specify grouped columns, separate COLUMNS by a COLON, then separate fields with commas. Specified groupings work like smart layouts (see below), except you drive which groupings make up the columns. 
+
+(Smarty layouts, below, achieves the same effect but automatically groups your fields into a smart number of columns. ) 
+
+If you want to group up fields together into columns, use a COLON (`:`) character to specify columns.
+
+Your input **may** have a COLON at the end of it, but otherwise your columns will made **flush left**.
+
+Without specified grouping (and not using smart layout), no group will happen, so these two fields would display in two columns:
 `--include=api_id,api_key`
 
-With a trailing colon, you're telling Hot Glue to make the two fields into column #1. (Here, there is no other column.)
+With a trailing colon you would be specifying the grouping. You're telling Hot Glue to make the two fields into column #1. (There is no other column.)
 `--include=api_id,api_key:`
+
 
 If, for example, you wanted to put the `name` field into column #1 and then the api_id and api_key into column #2, you would use:
 `--include=name:api_id,api_key`
 
-Specifying any colon in your include syntax switches the builder into 12-column mode, whereas without you might create more than 12 columns if there are too many feilds for the available columns on the layout.
 
-You may not specify both include and exclude.
+
+Specifying any colon in your include syntax switches the builder into specified grouping mode. The effect will be that the fields will be stacked together into nicely fit columns. (This will look confusing if your user expect an Excel-like interface.)
+
+With Bootstrap in specified grouping or smart layout mode, it automatically attempts to fit everything into 12-columns. 
+
+Using Bootstrap with neither specified grouping nor smart layouts may make 12 columns, which will produce strange result. (Bootstrap is not designed to work with, for example, a 13-column layout.)
+
+You should typically either specify your grouping or use smart layouts when building with Bootstrap, but if your use case does not fit the stacking feature you can specify neither and then you may have deal with the over-stuffed layouts as explained above. 
+
+
+
+### `--smart-layout` (automatic grouping) (default: false)
+
+Smart layouts are like specified grouping but Hot Glue does the work of figuring out how many fields you want in each column. 
+
+It will concatinate your fields into groups that will fit into the Bootstraps 12-column grid.
+
+The effect will be that the fields will be stacked together into nicely fit columns.
+
+**Some people expect each field to be a column and think this looks strange.**
+
+**If your customer is used to Excel, this feature will confuse them.**
+
+Also, this feature will **probably not** be supported by the SORTING (not yet implemented; TBD). I'm not really sure it makes sense to build a non-columnar layout with sorting, so I think I **probably won't support smart layouts** if you want sorting. (You will be forced to choose between the two which I think makes sense.)
+
+The layout builder works from right-to-left and starts with 12, the number of Bootstrap's columns.
+
+It reserves 2 columns for the default buttons. Then +1 additional column for **each magic button** you have specified.
+
+Then it takes 4 columns for **each downnested portal**.
+
+If you're keeping track, that means we may have used 6 to 8 out of our Bootstrap columns already if we have buttons & portals. (With no portals and no magic buttons you have a nice even 10 columns to work with.)
+
+If we have 2 downnested portals and only the default buttons, that uses 10 out of 12 Bootstrap columns, leaving only 2 bootstrap columns for the fields.
+
+THe layout builder takes the number of columns left and then distributes the feilds 'evenly' among them. However, note that order specified translates to up-to-down within the column, and then left-to-right across the columns, like so:
+
+A D G
+
+B E H
+
+C F I
+
+This is what would happen if 9 fields, specified in the order A,B,C,D,E,F,G,H,I, were distributed across 3 columns. 
+
+(If you had a number of fields that wasn't easily divisible by the number of columns, it would leave the final column a few fields short of the others.)
+
 
 
 ### `--show-only=`
@@ -610,7 +667,6 @@ Sometimes you might want to redisplay the entire list after you make an update (
 
 To do this, use flag `--display_list_after_update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
 
-### `--smart-layout` (default: false)
 
 
 
