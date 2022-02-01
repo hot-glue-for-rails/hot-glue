@@ -14,11 +14,26 @@ module HotGlue
 
 
   # TODO: Implement me with specs
-  # def self.optionalized_ternary(params)
-  #   namespace = params[0][:namespace]
-  #   target = params[0][:target]
-  #
-  # end
+  def self.optionalized_ternary(params)
+
+    namespace = params[:namespace]
+    target = params[:target]
+    nested_set = params[:nested_set]
+
+    if nested_set.empty?
+      return "#{namespace}_#{target}_path"
+    elsif nested_set[0][:optional] == false
+      return namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path"
+    else
+      nonoptional = nested_set[0].dup
+      nonoptional[:optional] = false
+      rest_of_nest = nested_set[1..-1]
+
+      is_present_path = HotGlue.optionalized_ternary(namespace: namespace, nested_set:  [nonoptional, *rest_of_nest], target: target)
+      is_missing_path = HotGlue.optionalized_ternary(namespace: namespace, nested_set:  rest_of_nest, target: target)
+      return "@#{nested_set[0][:singular]} ? #{is_present_path} : #{is_missing_path}"
+    end
+  end
 
   def self.derrive_reference_name(thing_as_string)
     assoc_class = eval(thing_as_string)
@@ -571,21 +586,26 @@ module HotGlue
     end
 
     def path_helper_plural
-      if ! @nested
-        "#{@namespace+"_" if @namespace}#{@controller_build_folder}_path"
-      else
 
-        # whatever ris optionalized needs to build a TREE that includes all of the other things
-        # not optional -> leads to the IS PRESENT path
-        # IS optional -> leads to the IS OPTIONAL path
-        #       account -> present ? (is present conditions) : (is absent conditions)
+      HotGlue.optionalized_ternary(namespace: namespace,
+                                   target: @controller_build_folder,
+                                   nested_st: @nested_set)
 
-        if @nested_set.any?
-          nested_args = @nested_set.collect{|x| x[:singular]}.join("_") + "_"
-        end
-
-        "#{@namespace+"_" if @namespace}#{nested_args || ""}#{plural}_path"
-      end
+      # if ! @nested
+      #   "#{@namespace+"_" if @namespace}#{@controller_build_folder}_path"
+      # else
+      #
+      #   # whatever ris optionalized needs to build a TREE that includes all of the other things
+      #   # not optional -> leads to the IS PRESENT path
+      #   # IS optional -> leads to the IS OPTIONAL path
+      #   #       account -> present ? (is present conditions) : (is absent conditions)
+      #
+      #   if @nested_set.any?
+      #     nested_args = @nested_set.collect{|x| x[:singular]}.join("_") + "_"
+      #   end
+      #
+      #   "#{@namespace+"_" if @namespace}#{nested_args || ""}#{plural}_path"
+      # end
     end
 
     def path_arity
