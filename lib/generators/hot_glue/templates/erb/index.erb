@@ -8,7 +8,7 @@
 
   <div class="clearfix"></div>
   <\%= render partial: '<%= list_path_partial %>',
-    locals: {<%= plural %>: @<%= plural %><%= nested_for_assignments_constructor %><%= nest_assignments_operator(true, true) if @nestable %> } \%>
+    locals: {<%= plural %>: @<%= plural %><%= nested_for_assignments_constructor %><%= nest_assignments_operator(true, true) if @nested_set.any? %> } \%>
 
   <% if @layout == "bootstrap" %></div></div><% else  %></div><% end %>
 </div>

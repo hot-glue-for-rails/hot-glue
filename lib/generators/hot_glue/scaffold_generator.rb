@@ -231,16 +231,42 @@ module HotGlue
         raise "This controller appears to be the same as the authentication object but in this context you cannot build a new/create action; please re-run with --no-create flag"
       end
 
+      # old syntax
       @nested_args = []
+
+      # new syntax
+      # @nested_set = [
+      # {
+      #    singular: ...,
+      #    plural: ...,
+      #    optional: false
+      # }]
+      @nested_set = []
+
       if ! @nested.nil?
-        @nested_args = @nested.split("/")
+
+
+        @nested_args = @nested.split("/").collect{|x| x.gsub("~","")}
+
+        @nested_set = @nested.split("/").collect { |arg|
+          is_optional = arg.start_with?("~")
+          arg.gsub!("~","")
+          {
+            singular: arg,
+            pluaral: arg.pluralize,
+            optional: is_optional
+          }
+
+        }
+
+        puts "@nested_set is #{@nested_set}"
         @nested_args_plural = {}
+
+
         @nested_args.each do |a|
           @nested_args_plural[a] = a + "s"
         end
       end
-      @nestable = @nested_args.any?
-
 
       @magic_buttons = []
       if options['magic_buttons']
@@ -257,11 +283,14 @@ module HotGlue
       if @auth && ! @self_auth && @nested_args.none?
         @object_owner_sym = @auth.gsub("current_", "").to_sym
         @object_owner_eval = @auth
+        @object_owner_optional = false
       else
 
         if @nested_args.any?
-          @object_owner_sym = @nested_args.last.to_sym
-          @object_owner_eval = "@#{@nested_args.last}"
+          @object_owner_sym = @nested_set.last[:singular].to_sym
+          @object_owner_eval = "@#{@nested_set.last[:singular]}"
+          @object_owner_name = @nested_set.last[:singular]
+          @object_owner_optional = @nested_set.last[:optional]
         else
           @object_owner_sym = ""
           @object_owner_eval = ""

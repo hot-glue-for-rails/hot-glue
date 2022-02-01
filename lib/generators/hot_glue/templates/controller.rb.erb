@@ -3,66 +3,61 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   include HotGlue::ControllerHelper
 
   <% unless @auth_identifier == '' || @god %>before_action :authenticate_<%= @auth_identifier %>!<% end %>
-  <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
+  <% if any_nested? %><% nest_chain = [] %> <% @nested_set.each { |arg|
 
-    if auth_identifier == arg
+    if auth_identifier == arg[:singular]
       this_scope = auth_object
     elsif nest_chain.empty?
-      this_scope =  "#{@auth ? auth_object : class_name}.#{arg}s"
+      this_scope = "#{@auth ? auth_object : class_name}.#{arg}s"
     else
-      this_scope = "#{nest_chain.last}.#{arg}s"
+      this_scope = "#{nest_chain.last}.#{arg[:plural]}"
     end
 
      nest_chain << arg %>
-  before_action :<%= arg %>
+  before_action :<%= arg[:singular] %><%= ", if: -> { params.include?(:#{arg[:singular]}_id) }" if arg[:optional] %>
+
     <% } %><% end %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
   after_action -> { flash.discard }, if: -> { request.format.symbol ==  :turbo_stream }
 <% if @nested_args.any? %>
-  def <%= @nested_args[0] %><% if @god
+  def <%= @nested_set[0][:singular] %><% if @god
        next_object = nil
-       collect_objects = @nested_args.reverse.collect {|x|
-           if eval("#{next_object || class_name}.reflect_on_association(:#{x})").nil?
-             raise "***** Unable to find the association `#{x}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{x}` to the #{next_object || class_name} object?"
+       collect_objects = @nested_set.reverse.collect {|x|
+           if eval("#{next_object || class_name}.reflect_on_association(:#{x[:singular]})").nil?
+             raise "***** Unable to find the association `#{x[:singular]}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{x}` to the #{next_object || class_name} object?"
            end
-           next_object = eval("#{next_object || class_name}.reflect_on_association(:#{x})").class_name
+           next_object = eval("#{next_object || class_name}.reflect_on_association(:#{x[:singular]})").class_name
        }
        root_object = collect_objects.last
      else
-       if @nested_args[0] == @auth_identifier
+       if @nested_set[0][:singular] == @auth_identifier
          root_object = @auth
        else
-         root_object = @auth + "." + @nested_args[0] + "s"
+         root_object = @auth + "." + @nested_set[0][:plural]
        end
      end
- %><% if !@god &&  @nested_args[0] == @auth_identifier %>
-    @<%= @nested_args[0] %> ||= <%= root_object %> <% elsif !@god %>
-    @<%= @nested_args[0] %> ||= <%= root_object %>.find(params[:<%=  @nested_args[0]  %>_id]) <% else %>
-    @<%= @nested_args[0] %> ||= <%= root_object %>.find(params[:<%=  @nested_args[0]  %>_id]) <% end %>
+ %><% if !@god && @nested_set[0][:singular] == @auth_identifier %>
+    @<%= @nested_set[0][:singular] %> ||= <%= root_object %> <% else %>
+    @<%= @nested_set[0][:singular] %> ||= <%= root_object %>.find(params[:<%=  @nested_set[0][:singular]  %>_id])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0][:optional] %> <% end %>
   end
-  <% end %>
-  <% if any_nested? %><% nest_chain = [@nested_args[0]]; this_scope = @nested_args[0] + 's'; %> <%   @nested_args[1..-1].each { |arg|
-    this_scope =  "#{nest_chain.last}.#{arg}s"
-    nest_chain << arg
-    %>
+  <% end %><% if any_nested? %><% nest_chain = [@nested_set[0][:singular]]; this_scope = @nested_set[0][:plural]; %> <%   @nested_set[1..-1].each { |arg|
+    this_scope =  "#{nest_chain.last}.#{arg[:plural]}"
+    nest_chain << arg %>
   def <%= arg %>
-    @<%= arg %> ||= <%= this_scope %>.find(params[:<%= arg %>_id])
+    @<%= arg %> ||= <%= this_scope %>.find(params[:<%= arg[:singular] %>_id])
   end<% } %> <% end %> <% if !@self_auth %>
 
   def load_<%= singular_name %>
-    @<%= singular_name %> = <%= object_scope.gsub("@",'') %>.find(params[:id])
+    @<%= singular_name %> = (<%= object_scope.gsub("@",'') %>.find(params[:id])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0][:optional]  %>)<% if @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %>
   end
   <% else %>
   def load_<%= singular_name %>
-    @<%= singular_name %> = <%= auth_object.gsub("@",'') %>
+    @<%= singular_name %> = (<%= auth_object.gsub("@",'') %><%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0][:optional] %>)<% if @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %>
   end<% end %>
 
-  def load_all_<%= plural %>
-    <% if !@self_auth %>
-    @<%= plural_name %> = <%= object_scope.gsub("@",'') %>.page(params[:page])
-    <% else %>
-    @<%= plural_name %> = <%= class_name %>.where(id: <%= auth_object.gsub("@",'') %>.id) # returns iterable even though this <%= singular_name %> is anly allowed access to themselves
-    <% end %>
+  def load_all_<%= plural %> <% if !@self_auth %>
+    @<%= plural_name %> = ( <%= object_scope.gsub("@",'') %>.page(params[:page])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0][:optional] %>) <% if @nested_set[0][:optional] %> || <%= class_name %>.all<% end %> <% else %>
+    @<%= plural_name %> = <%= class_name %>.where(id: <%= auth_object.gsub("@",'') %>.id) # returns iterable even though this <%= singular_name %> is anly allowed access to themselves<% end %>
   end
 
   def index
@@ -75,7 +70,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 <% if create_action %>  def new
     <% if ! @god %>
     @<%= singular_name %> = <%= class_name  %>.new(<%= @object_owner_sym %>: <%= @object_owner_eval %>)
-   <% else %>
+   <% elsif @object_owner_optional && any_nested? %>
+    @<%= singular_name %> = <%= class_name  %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {})) <% else %>
     @<%= singular_name %> = <%= class_name  %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)
    <% end %>
     respond_to do |format|
@@ -84,7 +80,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
   def create
-    modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup<% if ! @object_owner_sym.empty? %>.merge!(<%= @object_owner_sym %>: <%= @object_owner_eval %> )<% end %> <%= @auth ? ', ' + @auth : '' %>)
+    modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup<% if ! @object_owner_sym.empty? %>.merge!(<% if @object_owner_optional && any_nested? %><%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {} <% else  %> <%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>) <% end %>)
+
+
     @<%=singular_name %> = <%= class_name %>.create(modified_params)
 
     if @<%= singular_name %>.save

@@ -1,7 +1,7 @@
 
 <\%= turbo_frame_tag "<%= singular %>__#{ <%= singular %>.id }" do  %>
   <div class='row scaffold-row' data-id='<\%= <%= singular  %>.id %>' data-edit='false'>
-    <\%= render partial: '<%=  show_path_partial %>', locals: { <%= singular %>: <%= singular %><%= nest_assignments_operator(false, true) if @nestable %><%= (", nested_for: \"" + @nested_args.collect{|a| a + "-" + '#{'+ a + '.id}' }.join("__") + "\"") if @nestable %> } %>
+    <\%= render partial: '<%=  show_path_partial %>', locals: { <%= singular %>: <%= singular %><%= nest_assignments_operator(false, true) if @nested_set.any? %><%= (", nested_for: \"" + @nested_args.collect{|a| a + "-" + '#{'+ a + '.id}' }.join("__") + "\"") if @nested_set.any? %> } %>
 
   </div>
 <\% end %>

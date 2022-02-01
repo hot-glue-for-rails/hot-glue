@@ -35,7 +35,7 @@
     </div>
       <\% end %>
       <\% <%= plural %>.each do |<%= singular %>| %>
-        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if  @nestable %><%= ", nested_for: nested_for" if @nestable %> } %>
+        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if  @nested_set.any? %><%= ", nested_for: nested_for" if @nested_set.any? %> } %>
       <\% end %>
     <%=  @no_paginate ? "" : paginate %>
   <% end  %>
