@@ -20,7 +20,7 @@ module HotGlue
     target = params[:target]
     nested_set = params[:nested_set]
 
-    if nested_set.empty?
+    if nested_set.nil? || nested_set.empty?
       return "#{namespace}_#{target}_path"
     elsif nested_set[0][:optional] == false
       return namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path"
