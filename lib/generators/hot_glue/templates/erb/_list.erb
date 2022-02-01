@@ -2,7 +2,7 @@
   <div class="<%= @container_name %> scaffold-list">
     <% unless @no_list || @nested_args.any? %><h4><%= plural.gsub("_", " ").upcase %></h4><% end %>
 
-    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  @controller_build_folder + '/new_button", locals: {' + nested_assignments + '}' + '%\>'.gsub('\\',"")  %><br /><% end %>
+    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  @controller_build_folder + '/new_button", locals: {}' + @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join()  + ' %\>'.gsub('\\',"")  %><br /><% end %>
 
     <% unless @no_list %>
       <% unless @no_list_labels %>
@@ -35,7 +35,10 @@
     </div>
       <\% end %>
       <\% <%= plural %>.each do |<%= singular %>| %>
-        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %><%= nested_assignments_with_leading_comma if  @nested_set.any? %><%= ", nested_for: nested_for" if @nested_set.any? %> } %>
+        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %>}
+            .merge(defined?(nested_for) ? {nested_for: account} : {})
+      <%= @nested_set.collect{|arg| "      .merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join("\n") %>
+        %>
       <\% end %>
     <%=  @no_paginate ? "" : paginate %>
   <% end  %>

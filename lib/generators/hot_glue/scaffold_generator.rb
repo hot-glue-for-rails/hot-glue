@@ -973,10 +973,10 @@ module HotGlue
 
 
     def nested_for_turbo_id_list_constructor
-      if @nested_args.none?
-        ""
+      if @nested_set.any?
+        '+ (((\'__\' + nested_for) if defined?(nested_for)) || "")'
       else
-        "+ ('__' + nested_for)"
+        ""
       end
     end
 
