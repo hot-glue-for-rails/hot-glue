@@ -586,10 +586,9 @@ module HotGlue
     end
 
     def path_helper_plural
-
-      HotGlue.optionalized_ternary(namespace: namespace,
+      HotGlue.optionalized_ternary(namespace: @namespace,
                                    target: @controller_build_folder,
-                                   nested_st: @nested_set)
+                                   nested_set: @nested_set)
 
       # if ! @nested
       #   "#{@namespace+"_" if @namespace}#{@controller_build_folder}_path"
