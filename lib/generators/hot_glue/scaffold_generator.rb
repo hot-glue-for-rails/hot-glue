@@ -12,6 +12,14 @@ module HotGlue
   class Error < StandardError
   end
 
+
+  # TODO: Implement me with specs
+  # def self.optionalized_ternary(params)
+  #   namespace = params[0][:namespace]
+  #   target = params[0][:target]
+  #
+  # end
+
   def self.derrive_reference_name(thing_as_string)
     assoc_class = eval(thing_as_string)
 
@@ -564,7 +572,17 @@ module HotGlue
       if ! @nested
         "#{@namespace+"_" if @namespace}#{@controller_build_folder}_path"
       else
-        "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{plural}_path"
+
+        # whatever ris optionalized needs to build a TREE that includes all of the other things
+        # not optional -> leads to the IS PRESENT path
+        # IS optional -> leads to the IS OPTIONAL path
+        #       account -> present ? (is present conditions) : (is absent conditions)
+
+        if @nested_set.any?
+          nested_args = @nested_set.collect{|x| x[:singular]}.join("_") + "_"
+        end
+
+        "#{@namespace+"_" if @namespace}#{nested_args || ""}#{plural}_path"
       end
     end
 
