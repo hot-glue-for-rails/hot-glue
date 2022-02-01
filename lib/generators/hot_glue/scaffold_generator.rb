@@ -16,21 +16,36 @@ module HotGlue
   # TODO: Implement me with specs
   def self.optionalized_ternary(params)
 
-    namespace = params[:namespace]
+    namespace = params[:namespace] || ""
     target = params[:target]
     nested_set = params[:nested_set]
+    modifier = params[:modifier] || ""
+    with_params = params[:with_params] || false
 
     if nested_set.nil? || nested_set.empty?
-      return "#{namespace}_#{target}_path"
+      return modifier + "#{namespace}_#{target}_path"
     elsif nested_set[0][:optional] == false
-      return namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path"
+      return modifier + namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path" + (("(#{nested_set.collect{|x| x[:singular] }.join(",") })" if with_params) || "")
     else
+      # copy the first item, make a ternery in this cycle, and recursively move to both the
+      # is present path and the is optional path
+
       nonoptional = nested_set[0].dup
       nonoptional[:optional] = false
       rest_of_nest = nested_set[1..-1]
 
-      is_present_path = HotGlue.optionalized_ternary(namespace: namespace, nested_set:  [nonoptional, *rest_of_nest], target: target)
-      is_missing_path = HotGlue.optionalized_ternary(namespace: namespace, nested_set:  rest_of_nest, target: target)
+      is_present_path = HotGlue.optionalized_ternary(namespace: namespace,
+                                                     nested_set:  [nonoptional, *rest_of_nest],
+                                                     target: target,
+                                                     modifier: modifier,
+                                                     with_params: with_params)
+
+      is_missing_path = HotGlue.optionalized_ternary(namespace: namespace,
+                                                     nested_set:  rest_of_nest,
+                                                     target: target,
+                                                     modifier: modifier,
+                                                     with_params: with_params)
+
       return "@#{nested_set[0][:singular]} ? #{is_present_path} : #{is_missing_path}"
     end
   end
@@ -589,22 +604,6 @@ module HotGlue
       HotGlue.optionalized_ternary(namespace: @namespace,
                                    target: @controller_build_folder,
                                    nested_set: @nested_set)
-
-      # if ! @nested
-      #   "#{@namespace+"_" if @namespace}#{@controller_build_folder}_path"
-      # else
-      #
-      #   # whatever ris optionalized needs to build a TREE that includes all of the other things
-      #   # not optional -> leads to the IS PRESENT path
-      #   # IS optional -> leads to the IS OPTIONAL path
-      #   #       account -> present ? (is present conditions) : (is absent conditions)
-      #
-      #   if @nested_set.any?
-      #     nested_args = @nested_set.collect{|x| x[:singular]}.join("_") + "_"
-      #   end
-      #
-      #   "#{@namespace+"_" if @namespace}#{nested_args || ""}#{plural}_path"
-      # end
     end
 
     def path_arity
@@ -628,13 +627,19 @@ module HotGlue
     end
 
     def new_path_name
-      base =   "new_#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_") if @nested_args.any?}#{@controller_build_folder_singular}_path"
-      if @nested_args.any?
-        base += "(" + @nested_args.collect { |arg|
-          "#{arg}.id"
-        }.join(", ") + ")"
-      end
-      base
+
+      HotGlue.optionalized_ternary(namespace: @namespace,
+                                   target: @controller_build_folder,
+                                   nested_set: @nested_set,
+                                   modifier: "new_",
+                                   with_params: true)
+      # base =   "new_#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_") if @nested_args.any?}#{@controller_build_folder_singular}_path"
+      # if @nested_args.any?
+      #   base += "(" + @nested_args.collect { |arg|
+      #     "#{arg}.id"
+      #   }.join(", ") + ")"
+      # end
+      # base
     end
 
     def nested_assignments
