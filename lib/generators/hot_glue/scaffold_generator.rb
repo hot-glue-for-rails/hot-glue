@@ -25,7 +25,7 @@ module HotGlue
     if nested_set.nil? || nested_set.empty?
       return modifier + "#{namespace}_#{target}_path"
     elsif nested_set[0][:optional] == false
-      return modifier + namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path" + (("(#{nested_set.collect{|x| x[:singular] }.join(",") })" if with_params) || "")
+      return modifier + namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path" + (("(#{nested_set.collect{|x| "@" + x[:singular] }.join(",") })" if with_params) || "")
     else
       # copy the first item, make a ternery in this cycle, and recursively move to both the
       # is present path and the is optional path
@@ -605,6 +605,15 @@ module HotGlue
                                    target: @controller_build_folder,
                                    nested_set: @nested_set)
     end
+
+    def form_path_helper
+      HotGlue.optionalized_ternary(namespace: @namespace,
+                                   target: @controller_build_folder,
+                                   nested_set: @nested_set,
+                                   with_params: true)
+    end
+
+
 
     def path_arity
       res = ""

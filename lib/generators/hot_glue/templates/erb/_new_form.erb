@@ -2,7 +2,7 @@
 <h3>
   New <%= singular.titlecase %>
   </h3>
-  <\%= form_with model:  <%= singular %>, url: <%= path_helper_plural %>(<%= nested_objects_arity %>), method: "post" do  |f| %>
+  <\%= form_with model:  <%= singular %>, url: <%= form_path_helper %>, method: :post do  |f| %>
     <\%=  render partial: "<%= namespace_with_slash +  @controller_build_folder %>/form",
       locals: { <%=  singular %>: <%= singular %> <%= nest_assignments_operator(false,  true)  %>, f: f} %>
   <\% end %>
