@@ -100,7 +100,10 @@ module  HotGlue
                   display_column = HotGlue.derrive_reference_name(assoc.class_name)
 
                   # TODO: add is_owner && check if this nested arg is optional
-                  (is_owner ? "<% unless #{assoc_name} %>\n" : "") +  "  <%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>\n" + (is_owner ? "<% end %>" : "")
+                  (is_owner ? "<% unless #{assoc_name} %>\n" : "") +
+                    "  <%= f.collection_select(:#{col.to_s}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control') %>\n" +
+                  (is_owner ? "<% else %>\n  <%= #{assoc_name}.#{display_column} %>" : "") +
+                  (is_owner ? "\n<% end %>" : "")
 
                 else
                   "<%= f.text_field :#{col.to_s}, value: #{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number' %>"
