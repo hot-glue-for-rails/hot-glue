@@ -48,7 +48,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% } %> <% end %> <% if !@self_auth %>
 
   def load_<%= singular_name %>
-    @<%= singular_name %> = (<%= object_scope.gsub("@",'') %>.find(params[:id])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0][:optional]  %>)<% if @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %>
+    @<%= singular_name %> = (<%= object_scope.gsub("@",'') %>.find(params[:id])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0] && @nested_set[0][:optional]  %>)<% if @nested_set[0] && @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %>
   end
   <% else %>
   def load_<%= singular_name %>
@@ -56,7 +56,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
 
   def load_all_<%= plural %> <% if !@self_auth %>
-    @<%= plural_name %> = ( <%= object_scope.gsub("@",'') %>.page(params[:page])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0][:optional] %>) <% if @nested_set[0][:optional] %> || <%= class_name %>.all<% end %> <% else %>
+    @<%= plural_name %> = ( <%= object_scope.gsub("@",'') %>.page(params[:page])<%= " if params.include?(:#{ @nested_set[0][:singular]}_id)" if @nested_set[0] &&  @nested_set[0][:optional] %>) <% if @nested_set[0] &&  @nested_set[0][:optional] %> || <%= class_name %>.all<% end %> <% else %>
     @<%= plural_name %> = <%= class_name %>.where(id: <%= auth_object.gsub("@",'') %>.id) # returns iterable even though this <%= singular_name %> is anly allowed access to themselves<% end %>
   end
 

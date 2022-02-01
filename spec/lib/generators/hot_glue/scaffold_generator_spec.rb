@@ -68,7 +68,7 @@ describe HotGlue::ScaffoldGenerator do
         rescue StandardError => e
 
           expect(e.class).to eq(HotGlue::Error)
-          expect(e.message).to eq("*** Oops: The model Abc is missing an association for :def or the model Def doesn't exist. TODO: Please implement a model for Def; your model Abc should belong_to :def.  To make a controller that can read all records, specify with --god.")
+          expect(e.message).to eq("*** Oops: It looks like is no association from class called Abc to the current_user. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god.")
         end
       end
     end
@@ -200,10 +200,10 @@ describe HotGlue::ScaffoldGenerator do
   end
 
 
-  describe "--nest" do
+  describe "--nested" do
     it "should create a file at and specs/system" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Ghi","--nest=dfg"])
+                                          ["Ghi","--nested=dfg"])
       # begin
       #
       # rescue StandardError => e
@@ -269,7 +269,7 @@ describe HotGlue::ScaffoldGenerator do
     describe "--exclude" do
       it "should allow a list of exlcuded fields" do
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Jkl","--exclude=long_description,cost"])
+                                            ["Jkl","--god","--exclude=long_description,cost"])
 
         # cost is excluded
         expect(
@@ -311,7 +311,7 @@ describe HotGlue::ScaffoldGenerator do
       describe "basic --include usage" do
         it "should allow a list of whitelisted fields separated by comma fields" do
           response = Rails::Generators.invoke("hot_glue:scaffold",
-                                              ["Jkl","--include=long_description,blurb"])
+                                              ["Jkl","--god","--include=long_description,blurb"])
 
           # cost is excluded
           expect(
@@ -544,7 +544,7 @@ describe HotGlue::ScaffoldGenerator do
     it "should make detele with 'confirm': true for ujs_syntax=true" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Abc","--ujs_syntax=true"])
+                                            ["Abc","--god","--ujs_syntax=true"])
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
@@ -557,10 +557,10 @@ describe HotGlue::ScaffoldGenerator do
 
 
 
-    it "should make detele with 'confirm': true for ujs_syntax=true" do
+    it "should make delete with 'confirm': true for ujs_syntax=true" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Abc","--ujs_syntax=true"])
+                                            ["Abc","--god","--ujs_syntax=true"])
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
