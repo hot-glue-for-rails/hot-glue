@@ -9,8 +9,8 @@
     <\% end %>
 
     <h2>Editing <\%= @<%= @singular %>.<%= display_class %> %></h2>
-    <\%= form_with model: <%= "@" + singular%>, url: <%= path_helper_singular %>(<%= path_arity %>) do |f| %>
-    <\%=  render partial: "form",  locals: {:<%=  singular  %> => <%= "@" + singular%>, f: f} %>
+    <\%= form_with model: <%= "@" + singular%>, url: <%= form_path_edit_helper %> do |f| %>
+    <\%=  render partial: "form",  locals: {:<%=  singular  %> => <%= "@" + singular%>, f: f}<%= @nested_set.collect{|arg| ".merge(@#{arg[:singular]} ? {#{arg[:singular]}: @#{arg[:singular]}} : {})" }.join %> \%>
     <\% end %>
 
   </div>

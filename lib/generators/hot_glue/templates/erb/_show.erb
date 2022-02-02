@@ -29,6 +29,6 @@
   <% end %>
 
   <% unless @no_edit %>
-  <\%= link_to "Edit <i class='fa fa-1x fa-list-alt'></i>".html_safe, edit_<%= path_helper_singular %>(<%= path_helper_args %>), <% if @big_edit %>'data-turbo' => 'false', <% end %>disable_with: "Loading...", class: "edit-<%= singular %>-button btn btn-primary btn-sm" %>
+  <\%= link_to "Edit <i class='fa fa-1x fa-list-alt'></i>".html_safe, <%= edit_path_helper %>, <% if @big_edit %>'data-turbo' => 'false', <% end %>disable_with: "Loading...", class: "edit-<%= singular %>-button btn btn-primary btn-sm" %>
   <% end %>
 </div>

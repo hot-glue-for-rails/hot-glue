@@ -1,7 +1,7 @@
 <% if !@display_list_after_update %><\%= turbo_stream.replace "<%= singular%>__#{@<%= singular %>.id}" do %>
-  <\%= render partial: 'line', locals: {<%= singular %>: @<%= singular %> <%= nest_assignments_operator(true,true) %> } %>
+  <\%= render partial: 'line', locals: {<%= singular %>: @<%= singular %> }<%= @nested_set.collect{|arg| ".merge(@#{arg[:singular]} ? {#{arg[:singular]}: @#{arg[:singular]}} : {})" }.join %> \%>
 <\% end %><% else %><\%= turbo_stream.replace "<%= plural %>-list" do %>
-  <\%= render partial: '<%= list_path_partial %>', locals: {<%= plural %>: @<%= plural %><%= nest_assignments_operator(true, true) if @nested_set.any? %><%= nested_for_assignments_constructor %> } \%>
+  <\%= render partial: '<%= list_path_partial %>', locals: {<%= plural %>: @<%= plural %>}<%= @nested_set.collect{|arg| ".merge(@#{arg[:singular]} ? {#{arg[:singular]}: @#{arg[:singular]}} : {})" }.join %> \%>
 <\% end %>
 <% end %>
 

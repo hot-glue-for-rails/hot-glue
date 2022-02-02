@@ -18,13 +18,21 @@ module HotGlue
     nested_set = params[:nested_set]
     modifier = params[:modifier] || ""
     with_params = params[:with_params] || false
+    top_level = params[:top_level] || false
+
+    instance_sym = top_level ? "@" : ""
 
     put_form =  params[:put_form] || false
 
     if nested_set.nil? || nested_set.empty?
-      return modifier + "#{namespace}_#{target}_path" + (("(#{target})" if put_form) || "")
+      return modifier + "#{namespace}_#{target}_path" + (("(#{instance_sym}#{target})" if put_form) || "")
     elsif nested_set[0][:optional] == false
-      return modifier + namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path" + (("(#{nested_set.collect{|x|  x[:singular] }.join(",")}#{ put_form ? ',' + target : '' })" if with_params) || "")
+      return modifier + namespace + "_" + nested_set.collect{|x|
+        x[:singular] + "_"
+      }.join() + target + "_path" + (("(#{nested_set.collect{
+        |x| instance_sym + x[:singular] }.join(",")
+      }#{ put_form ? ',' + instance_sym + target : '' })" if with_params) || "")
+
     else
       # copy the first item, make a ternery in this cycle, and recursively move to both the
       # is present path and the is optional path
@@ -33,21 +41,18 @@ module HotGlue
       nonoptional[:optional] = false
       rest_of_nest = nested_set[1..-1]
 
-      is_present_path = HotGlue.optionalized_ternary(namespace: namespace,
-                                                     nested_set:  [nonoptional, *rest_of_nest],
-                                                     target: target,
-                                                     modifier: modifier,
-                                                     with_params: with_params,
-                                                     put_form: put_form)
+      all_params = {namespace: namespace,
+                    target: target,
+                    modifier: modifier,
+                    top_level: top_level,
+                    with_params: with_params,
+                    put_form: put_form}
+      is_present_path = HotGlue.optionalized_ternary(all_params.merge({  nested_set: [nonoptional, *rest_of_nest]})       )
 
-      is_missing_path = HotGlue.optionalized_ternary(namespace: namespace,
-                                                     nested_set:  rest_of_nest,
-                                                     target: target,
-                                                     modifier: modifier,
-                                                     with_params: with_params,
-                                                     put_form: put_form)
+      is_missing_path = HotGlue.optionalized_ternary(all_params.merge({  nested_set: rest_of_nest})       )
 
-      return "defined?(#{nested_set[0][:singular]}) ? #{is_present_path} : #{is_missing_path}"
+
+      return "defined?(#{instance_sym + nested_set[0][:singular]}) ? #{is_present_path} : #{is_missing_path}"
     end
   end
 
@@ -607,11 +612,21 @@ module HotGlue
                                    nested_set: @nested_set)
     end
 
-    def form_path_helper
+    def form_path_new_helper
       HotGlue.optionalized_ternary(namespace: @namespace,
                                    target: @controller_build_folder,
                                    nested_set: @nested_set,
-                                   with_params: true)
+                                   with_params: true,
+                                   top_level: false)
+    end
+
+    def form_path_edit_helper
+      HotGlue.optionalized_ternary(namespace: @namespace,
+                                   target: @singular,
+                                   nested_set: @nested_set,
+                                   with_params: true,
+                                   put_form: true,
+                                   top_level: true)
     end
 
 
@@ -619,6 +634,15 @@ module HotGlue
       HotGlue.optionalized_ternary(namespace: @namespace,
                                    target: @singular,
                                    nested_set: @nested_set,
+                                   with_params: true,
+                                   put_form: true)
+    end
+
+    def edit_path_helper
+      HotGlue.optionalized_ternary(namespace: @namespace,
+                                   target: @singular,
+                                   nested_set: @nested_set,
+                                   modifier: "edit_",
                                    with_params: true,
                                    put_form: true)
     end
