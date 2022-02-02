@@ -15,17 +15,18 @@ module HotGlue
 
   # TODO: Implement me with specs
   def self.optionalized_ternary(params)
-
     namespace = params[:namespace] || ""
     target = params[:target]
     nested_set = params[:nested_set]
     modifier = params[:modifier] || ""
     with_params = params[:with_params] || false
 
+    put_form =  params[:put_form] || false
+
     if nested_set.nil? || nested_set.empty?
-      return modifier + "#{namespace}_#{target}_path"
+      return modifier + "#{namespace}_#{target}_path" + (("(#{target})" if put_form) || "")
     elsif nested_set[0][:optional] == false
-      return modifier + namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path" + (("(#{nested_set.collect{|x| "@" + x[:singular] }.join(",") })" if with_params) || "")
+      return modifier + namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path" + (("(#{nested_set.collect{|x| "@" + x[:singular] }.join(",")} #{ put_form ? ',' + target : '' })" if with_params) || "")
     else
       # copy the first item, make a ternery in this cycle, and recursively move to both the
       # is present path and the is optional path
@@ -38,13 +39,15 @@ module HotGlue
                                                      nested_set:  [nonoptional, *rest_of_nest],
                                                      target: target,
                                                      modifier: modifier,
-                                                     with_params: with_params)
+                                                     with_params: with_params,
+                                                     put_form: put_form)
 
       is_missing_path = HotGlue.optionalized_ternary(namespace: namespace,
                                                      nested_set:  rest_of_nest,
                                                      target: target,
                                                      modifier: modifier,
-                                                     with_params: with_params)
+                                                     with_params: with_params,
+                                                     put_form: put_form)
 
       return "@#{nested_set[0][:singular]} ? #{is_present_path} : #{is_missing_path}"
     end
@@ -732,8 +735,11 @@ module HotGlue
 
     def magic_button_output
       @template_builder.magic_button_output(
-        path_helper_singular: path_helper_singular,
-        path_helper_args: path_helper_args,
+        path: HotGlue.optionalized_ternary(namespace: @namespace,
+                                           target: @controller_build_folder,
+                                           nested_set: @nested_set,
+                                           with_params: true,
+                                           put_form: true),
         singular: singular,
         magic_buttons: @magic_buttons,
         small_buttons: @small_buttons
@@ -998,9 +1004,11 @@ module HotGlue
       instance_symbol = "@" if top_level
       instance_symbol = "" if !top_level
       if @nested_args.none?
-        ""
+        "\"\""
       else
-        "__" + @nested_args.collect{|a| "#{a}-" + '#{' + instance_symbol + a + '.id}'}.join("__")
+        @nested_set.collect{|arg|
+          "(((\"__#{arg[:singular]}-\#{" + "@" + arg[:singular] + ".id}\") if @account) || \"\")"
+        }.join("__")
       end
     end
 
