@@ -617,7 +617,7 @@ module HotGlue
                                    target: @controller_build_folder,
                                    nested_set: @nested_set,
                                    with_params: true,
-                                   top_level: false)
+                                   top_level: true)
     end
 
     def form_path_edit_helper

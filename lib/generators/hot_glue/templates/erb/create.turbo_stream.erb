@@ -7,7 +7,7 @@
   <\% if @<%= singular %>.errors.none? %>
   <\%= render partial: "new_button", locals: {}<%=  @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {" + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> %>
   <\% else %>
-  <\%= render partial: "new_form", locals: {<%= singular %>: @<%= singular %> <%= nest_assignments_operator(true, true) %> } %>
+  <\%= render partial: "new_form", locals: {<%= singular %>: @<%= singular %>}<%=  @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {" + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> %>
   <\% end %>
   <\% end %>
   <\%= turbo_stream.replace "flash_notices" do %>
