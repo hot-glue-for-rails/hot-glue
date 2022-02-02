@@ -12,8 +12,6 @@ module HotGlue
   class Error < StandardError
   end
 
-
-  # TODO: Implement me with specs
   def self.optionalized_ternary(params)
     namespace = params[:namespace] || ""
     target = params[:target]
@@ -26,7 +24,7 @@ module HotGlue
     if nested_set.nil? || nested_set.empty?
       return modifier + "#{namespace}_#{target}_path" + (("(#{target})" if put_form) || "")
     elsif nested_set[0][:optional] == false
-      return modifier + namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path" + (("(#{nested_set.collect{|x| "@" + x[:singular] }.join(",")} #{ put_form ? ',' + target : '' })" if with_params) || "")
+      return modifier + namespace + "_" + nested_set.collect{|x| x[:singular] + "_"}.join() + target + "_path" + (("(#{nested_set.collect{|x|  x[:singular] }.join(",")}#{ put_form ? ',' + target : '' })" if with_params) || "")
     else
       # copy the first item, make a ternery in this cycle, and recursively move to both the
       # is present path and the is optional path
@@ -49,7 +47,7 @@ module HotGlue
                                                      with_params: with_params,
                                                      put_form: put_form)
 
-      return "@#{nested_set[0][:singular]} ? #{is_present_path} : #{is_missing_path}"
+      return "defined?(#{nested_set[0][:singular]}) ? #{is_present_path} : #{is_missing_path}"
     end
   end
 
@@ -617,6 +615,13 @@ module HotGlue
     end
 
 
+    def delete_path_helper
+      HotGlue.optionalized_ternary(namespace: @namespace,
+                                   target: @singular,
+                                   nested_set: @nested_set,
+                                   with_params: true,
+                                   put_form: true)
+    end
 
     def path_arity
       res = ""
@@ -641,7 +646,7 @@ module HotGlue
     def new_path_name
 
       HotGlue.optionalized_ternary(namespace: @namespace,
-                                   target: @controller_build_folder,
+                                   target: singular,
                                    nested_set: @nested_set,
                                    modifier: "new_",
                                    with_params: true)
@@ -736,7 +741,7 @@ module HotGlue
     def magic_button_output
       @template_builder.magic_button_output(
         path: HotGlue.optionalized_ternary(namespace: @namespace,
-                                           target: @controller_build_folder,
+                                           target: @singular,
                                            nested_set: @nested_set,
                                            with_params: true,
                                            put_form: true),
