@@ -250,6 +250,10 @@ module HotGlue
       @display_list_after_update = options['display_list_after_update'] || false
       @smart_layout = options['smart_layout']
 
+      if options['include'].include?(":") && @smart_layout
+        raise "You specified both --smart-layout and also specified grouping mode (there is a : character in your field include list); you must remove the colon(s) from your --include tag or remove the --smart-layout option"
+      end
+
 
       @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
       @downnest = options['downnest'] || false
@@ -617,7 +621,7 @@ module HotGlue
                                    target: @controller_build_folder,
                                    nested_set: @nested_set,
                                    with_params: true,
-                                   top_level: true)
+                                   top_level: false)
     end
 
     def form_path_edit_helper
@@ -880,12 +884,7 @@ module HotGlue
     end
 
     def all_form_fields
-      # TODO: DRY THIS
-      if !@smart_layout
-        col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col-md-1"
-      else
-        col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col-md-2"
-      end
+      col_identifier = (@layout == "hotglue") ? "scaffold-cell" : "col-md-#{@layout_object[:columns][:size_each]}"
 
       @template_builder.all_form_fields(
         columns: @layout_object[:columns][:container],
@@ -922,6 +921,7 @@ module HotGlue
     end
 
     def all_line_fields
+      col_identifier = (@layout == "hotglue") ? "scaffold-cell" : "col-md-#{@layout_object[:columns][:size_each]}"
 
       @template_builder.all_line_fields(
         perc_width: column_width,
@@ -929,7 +929,8 @@ module HotGlue
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
-        layout: @layout
+        layout: @layout,
+        col_identifier: col_identifier
       )
     end
 
@@ -1036,8 +1037,8 @@ module HotGlue
         "\"\""
       else
         @nested_set.collect{|arg|
-          "(((\"__#{arg[:singular]}-\#{" + "@" + arg[:singular] + ".id}\") if @account) || \"\")"
-        }.join("__")
+          "(((\"__#{arg[:singular]}-\#{" + "@" + arg[:singular] + ".id}\") if @" + arg[:singular] + ") || \"\")"
+        }.join(" + ")
       end
     end
 

@@ -40,15 +40,15 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @<%= @nested_set[0][:singular] %> ||= <%= root_object %> <% else %>
     @<%= @nested_set[0][:singular] %> ||= <%= root_object %>.find(params[:<%=  @nested_set[0][:singular]  %>_id])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0][:optional] %> <% end %>
   end
-  <% end %><% if any_nested? %><% nest_chain = [@nested_set[0][:singular]]; this_scope = @nested_set[0][:plural]; %> <%   @nested_set[1..-1].each { |arg|
+  <% end %><% if any_nested? %><% nest_chain = [@nested_set[0][:singular]]; this_scope = @nested_set[0][:plural]; %> <%   @nested_set[1..-1].each_with_index { |arg,index|
     this_scope =  "#{nest_chain.last}.#{arg[:plural]}"
     nest_chain << arg %>
-  def <%= arg %>
-    @<%= arg %> ||= <%= this_scope %>.find(params[:<%= arg[:singular] %>_id])
+  def <%= arg[:singular] %>
+    @<%= arg[:singular] %> ||= (<%= this_scope %>.find(params[:<%= arg[:singular] %>_id])<%= " if params.include?(:#{@nested_set[index][:singular]}_id)" if @god && arg[:optional] %>)<% if @god &&  arg[:optional] %> || (<%= collect_objects[index] %>.find(params[:<%= arg[:singular] %>_id]) if params.include?(:<%= arg[:singular] %>_id) )   <% end %>
   end<% } %> <% end %> <% if !@self_auth %>
 
   def load_<%= singular_name %>
-    @<%= singular_name %> = (<%= object_scope.gsub("@",'') %>.find(params[:id])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0] && @nested_set[0][:optional]  %>)<% if @nested_set[0] && @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %>
+    @<%= singular_name %> = (<%= object_scope.gsub("@",'') %>.find(params[:id])<%= " if params.include?(:#{@nested_set.last[:singular]}_id)" if @nested_set[0] && @nested_set[0][:optional]  %>)<% if @nested_set[0] && @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %>
   end
   <% else %>
   def load_<%= singular_name %>
@@ -56,7 +56,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
 
   def load_all_<%= plural %> <% if !@self_auth %>
-    @<%= plural_name %> = ( <%= object_scope.gsub("@",'') %>.page(params[:page])<%= " if params.include?(:#{ @nested_set[0][:singular]}_id)" if @nested_set[0] &&  @nested_set[0][:optional] %>) <% if @nested_set[0] &&  @nested_set[0][:optional] %> || <%= class_name %>.all<% end %> <% else %>
+    @<%= plural_name %> = ( <%= object_scope.gsub("@",'') %>.page(params[:page])<%= " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set[0] &&  @nested_set[0][:optional] %>) <% if @nested_set[0] &&  @nested_set[0][:optional] %> || <%= class_name %>.all<% end %> <% else %>
     @<%= plural_name %> = <%= class_name %>.where(id: <%= auth_object.gsub("@",'') %>.id) # returns iterable even though this <%= singular_name %> is anly allowed access to themselves<% end %>
   end
 

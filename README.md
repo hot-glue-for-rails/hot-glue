@@ -477,7 +477,7 @@ You may not specify both include and exclude.
 Include setting is affected by both specified grouping and smarty layouts, explained below.
 
 
-#### Specified Grouping
+#### Specified Grouping Mode
 
 To specify grouped columns, separate COLUMNS by a COLON, then separate fields with commas. Specified groupings work like smart layouts (see below), except you drive which groupings make up the columns. 
 
@@ -509,7 +509,7 @@ You should typically either specify your grouping or use smart layouts when buil
 
 
 
-### `--smart-layout` (automatic grouping) (default: false)
+### `--smart-layout` mode (automatic grouping) (default: false)
 
 Smart layouts are like specified grouping but Hot Glue does the work of figuring out how many fields you want in each column. 
 

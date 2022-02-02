@@ -3,7 +3,10 @@
 module HotGlue
   module Layout
     class Builder
-      attr_reader :include_setting, :downnest_children, :buttons_width, :columns, :smart_layout
+      attr_reader :include_setting,
+                  :downnest_children,
+                  :buttons_width, :columns,
+                  :smart_layout, :specified_grouping_mode
 
       def initialize(params)
         @include_setting = params[:include_setting]
@@ -14,12 +17,13 @@ module HotGlue
         @no_buttons = @buttons_width == 0
         @columns = params[:columns]
         @smart_layout = params[:smart_layout]
+        @specified_grouping_mode = include_setting.include?(":")
       end
 
       def construct
         layout_object = {
           columns: {
-            size_each: nil,
+            size_each: smart_layout ? 2 : (specified_grouping_mode ? nil : 1),
             container: [] # array of arrays
           },
           portals:  {
@@ -68,20 +72,25 @@ module HotGlue
             }
             layout_object[:columns][:container].reject!{|x| x == [nil]}
           end
-        elsif !include_setting.include?(":")
+        elsif ! specified_grouping_mode
+          # not smart and no specified grouping
+          #
           layout_object[:columns][:container] = columns.collect{|col| [col]}
 
-        else
+        else # specified grouping mode -- the builder is given control
 
           (0..available_columns-1).each do |int|
             layout_object[:columns][:container][int] = []
           end
 
           # input control
-          user_layout_columns = @include_setting .split(":")
+          user_layout_columns = @include_setting.split(":")
+          size_each = (bootstrap_columns / user_layout_columns.count).floor # this is the bootstrap size
+
+          layout_object[:columns][:size_each] = size_each
 
           if user_layout_columns.size > available_columns
-            raise "Your include statement #{@include_setting }  has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
+            raise "Your include statement #{@include_setting } has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
           end
           user_layout_columns.each_with_index  do |column,i|
             layout_object[:columns][:container][i] = column.split(",")
@@ -92,21 +101,22 @@ module HotGlue
           end
         end
 
-        if layout_object[:columns][:container].size < available_columns
-          available = available_columns - layout_object[:columns][:container].size
-          downnest_child_count = 0
 
-          while(available > 0)
-            if (downnest_child_count <= downnest_children.size-1)
-              layout_object[:portals][downnest_children[downnest_child_count]][:size] = layout_object[:portals][downnest_children[downnest_child_count]][:size]  + 2
-            else
-              # leave as-is
-            end
-            downnest_child_count = downnest_child_count + 1
-            available = available - 1
-          end
-          # give some space back to the downnest
-        end
+        # if layout_object[:columns][:container].size < available_columns
+        #   available = available_columns - layout_object[:columns][:container].size
+        #   downnest_child_count = 0
+        #
+        #   while(available > 0)
+        #     if (downnest_child_count <= downnest_children.size-1)
+        #       layout_object[:portals][downnest_children[downnest_child_count]][:size] = layout_object[:portals][downnest_children[downnest_child_count]][:size]  + 2
+        #     else
+        #       # leave as-is
+        #     end
+        #     downnest_child_count = downnest_child_count + 1
+        #     available = available - 1
+        #   end
+        #   # give some space back to the downnest
+        # end
 
         puts "*** constructed layout columns #{layout_object.inspect}"
         layout_object

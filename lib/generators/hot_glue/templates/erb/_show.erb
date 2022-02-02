@@ -6,14 +6,18 @@
   <% @downnest_children.each_with_index do |downnest,i| %>
 
     <% downnest_object =  eval("#{singular_class}.reflect_on_association(:#{downnest})") %>
+    <% if downnest_object.nil?; raise "no relationship for downnested portal `#{downnest}` found on `#{singular_class}`; please check relationship for has_many :#{downnest}"; end; %>
     <% downnest_class = downnest_object.class_name %>
     <% downnest_object_name = eval("#{downnest_class}.table_name") %>
     <% downnest_style =  @layout == "hotglue" ? 'style="flex-basis: ' +  each_downnest_width.to_s + '%"' : "" %>
     <div class="<%= " col-md-#{@layout_object[:portals][downnest][:size]}" if @layout == "bootstrap" %> scaffold-downnest" <%= downnest_style  %> >
   <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest_object_name %>/list", locals: {
-    nested_for: "<% if @nested_args.any? %>#{nested_for + "__" if nested_for}<% end %><%= @singular %>-#{<%= @singular %>.id}",
-    <%= @singular %>: <%= @singular %><%= nest_assignments_operator(false, true) %>,
-    <%= downnest_object_name %>: <%= @singular %>.<%= downnest %>} %>
+        <%= @singular %>: <%= @singular %>,
+        <%= downnest_object_name %>: <%= @singular %>.<%= downnest %>
+      }
+      .merge( defined?(nested_for) ? {nested_for: "<% if @nested_args.any? %>#{nested_for + "__" if nested_for}<% end %><%= @singular %>-#{<%= @singular %>.id}"} : {} )
+      <%= @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {} )"}.join("\n") %>
+    \%>
   </div>
   <% end %>
 <% end %>

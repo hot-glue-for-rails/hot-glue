@@ -69,8 +69,6 @@ module  HotGlue
       col_identifier = args[0][:col_identifier]
       ownership_field  = args[0][:ownership_field]
 
-
-      # TODO: CLEAN ME
       @singular = args[0][:singular]
       singular = @singular
 
@@ -176,20 +174,20 @@ module  HotGlue
       singular = args[0][:singular]
       perc_width = args[0][:perc_width]
       layout = args[0][:layout]
+      col_identifier =   args[0][:col_identifier]  || (layout == "bootstrap" ? "col-md-2" :  "scaffold-cell")
+
 
       columns_count = layout_columns.count + 1
       perc_width = (perc_width).floor
 
       if layout == "bootstrap"
-        col_identifer = "col-md-2"
         style_with_flex_basis = ""
       else
         style_with_flex_basis = " style='flex-basis: #{perc_width}%'"
-        col_identifer = "scaffold-cell"
       end
 
       result = layout_columns.map{ |column|
-        "<div class='#{col_identifer}'#{style_with_flex_basis}>" +
+        "<div class='#{col_identifier}'#{style_with_flex_basis}>" +
 
 
         column.map { |col|
