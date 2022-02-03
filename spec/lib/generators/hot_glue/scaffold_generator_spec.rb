@@ -95,7 +95,7 @@ describe HotGlue::ScaffoldGenerator do
       rescue StandardError => e
         expect("error building in spec #{e}")
       end
-      expect(File.exist?("spec/Dummy/spec/system/dfgs_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/dfgs_behavior_spec.rb")).to be(true)
     end
   end
 
@@ -108,7 +108,7 @@ describe HotGlue::ScaffoldGenerator do
       rescue StandardError => e
         expect("error building in spec #{e}")
       end
-      expect(File.exist?("spec/Dummy/app/spec/system/dfgs_spec.rb")).to be(false)
+      expect(File.exist?("spec/dummy/app/spec/system/dfgs_spec.rb")).to be(false)
     end
   end
 
@@ -133,15 +133,15 @@ describe HotGlue::ScaffoldGenerator do
         rescue StandardError => e
           raise("error building in spec #{e}")
         end
-        expect(File.exist?("spec/Dummy/app/views/dfgs/edit.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/index.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/new.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/_form.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/_new_form.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/_line.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/_list.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/_new_button.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/_show.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/edit.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/index.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/new.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/_form.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/_new_form.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/_line.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/_list.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/_new_button.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/_show.erb")).to be(true)
       end
 
 
@@ -152,10 +152,10 @@ describe HotGlue::ScaffoldGenerator do
         rescue StandardError => e
           raise("error building in spec #{e}")
         end
-        expect(File.exist?("spec/Dummy/app/views/dfgs/create.turbo_stream.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/destroy.turbo_stream.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/edit.turbo_stream.erb")).to be(true)
-        expect(File.exist?("spec/Dummy/app/views/dfgs/update.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/create.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/destroy.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/edit.turbo_stream.erb")).to be(true)
+        expect(File.exist?("spec/dummy/app/views/dfgs/update.turbo_stream.erb")).to be(true)
       end
 
 
@@ -166,7 +166,7 @@ describe HotGlue::ScaffoldGenerator do
         rescue StandardError => e
           raise("error building in spec #{e}")
         end
-        expect(File.exist?("spec/Dummy/app/controllers/dfgs_controller.rb")).to be(true)
+        expect(File.exist?("spec/dummy/app/controllers/dfgs_controller.rb")).to be(true)
       end
     end
   end
@@ -181,21 +181,21 @@ describe HotGlue::ScaffoldGenerator do
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/edit.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/index.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/new.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_form.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_new_form.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_line.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_list.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_new_button.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/_show.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/controllers/hello/dfgs_controller.rb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/create.turbo_stream.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/destroy.turbo_stream.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/edit.turbo_stream.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/app/views/hello/dfgs/update.turbo_stream.erb")).to be(true)
-      expect(File.exist?("spec/Dummy/spec/system/hello/dfgs_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/edit.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/index.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/new.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/_form.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/_new_form.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/_line.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/_list.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/_new_button.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/_show.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/controllers/hello/dfgs_controller.rb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/create.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/destroy.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/edit.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/update.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/hello/dfgs_behavior_spec.rb")).to be(true)
     end
   end
 
@@ -210,8 +210,8 @@ describe HotGlue::ScaffoldGenerator do
       #   raise("error building in spec #{e}")
       # end
 
-      expect(File.exist?("spec/Dummy/app/controllers/ghis_controller.rb")).to be(true)
-      expect(File.exist?("spec/Dummy/spec/system/ghis_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/app/controllers/ghis_controller.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/ghis_behavior_spec.rb")).to be(true)
     end
   end
 
@@ -221,7 +221,7 @@ describe HotGlue::ScaffoldGenerator do
         response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Dfg"])
         expect(
-          File.read("spec/Dummy/app/controllers/dfgs_controller.rb") =~ /before_action :authenticate_user!/
+          File.read("spec/dummy/app/controllers/dfgs_controller.rb") =~ /before_action :authenticate_user!/
         ).to be_a(Numeric)
       end
     end
@@ -231,7 +231,7 @@ describe HotGlue::ScaffoldGenerator do
         response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Dfg","--auth=cantelope"])
         expect(
-          File.read("spec/Dummy/app/controllers/dfgs_controller.rb") =~ /before_action :authenticate_cantelope!/
+          File.read("spec/dummy/app/controllers/dfgs_controller.rb") =~ /before_action :authenticate_cantelope!/
         ).to be_a(Numeric)
       end
     end
@@ -242,7 +242,7 @@ describe HotGlue::ScaffoldGenerator do
                                             ["Dfg","--auth_identifier=account"])
 
         expect(
-          File.read("spec/Dummy/app/controllers/dfgs_controller.rb") =~ /before_action :authenticate_account!/
+          File.read("spec/dummy/app/controllers/dfgs_controller.rb") =~ /before_action :authenticate_account!/
         ).to be_a(Numeric)
       end
     end
@@ -252,7 +252,7 @@ describe HotGlue::ScaffoldGenerator do
         response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Dfg","--gd"])
         expect(
-          File.read("spec/Dummy/app/controllers/dfgs_controller.rb") =~ /Dfg.find\(params\[:id\]\)/
+          File.read("spec/dummy/app/controllers/dfgs_controller.rb") =~ /Dfg.find\(params\[:id\]\)/
         ).to be_a(Numeric)
       end
     end
@@ -273,35 +273,35 @@ describe HotGlue::ScaffoldGenerator do
 
         # cost is excluded
         expect(
-          File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /cost/
+          File.read("spec/dummy/app/views/jkls/_show.erb") =~ /cost/
         ).to be(nil)
         expect(
-          File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /cost/
+          File.read("spec/dummy/app/views/jkls/_form.erb") =~ /cost/
         ).to be(nil)
         expect(
-          File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /cost/
+          File.read("spec/dummy/app/controllers/jkls_controller.rb") =~ /cost/
         ).to be(nil)
 
         # long description is excluded
         expect(
-          File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /long_description/
+          File.read("spec/dummy/app/views/jkls/_show.erb") =~ /long_description/
         ).to be(nil)
         expect(
-          File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /long_description/
+          File.read("spec/dummy/app/views/jkls/_form.erb") =~ /long_description/
         ).to be(nil)
         expect(
-          File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /long_description/
+          File.read("spec/dummy/app/controllers/jkls_controller.rb") =~ /long_description/
         ).to be(nil)
 
         # blurb is not excluded
         expect(
-          File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /blurb/
+          File.read("spec/dummy/app/views/jkls/_show.erb") =~ /blurb/
         ).to be_a(Numeric)
         expect(
-          File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /blurb/
+          File.read("spec/dummy/app/views/jkls/_form.erb") =~ /blurb/
         ).to be_a(Numeric)
         expect(
-          File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /blurb/
+          File.read("spec/dummy/app/controllers/jkls_controller.rb") =~ /blurb/
         ).to be_a(Numeric)
       end
     end
@@ -315,35 +315,35 @@ describe HotGlue::ScaffoldGenerator do
 
           # cost is excluded
           expect(
-            File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /cost/
+            File.read("spec/dummy/app/views/jkls/_show.erb") =~ /cost/
           ).to be(nil)
           expect(
-            File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /cost/
+            File.read("spec/dummy/app/views/jkls/_form.erb") =~ /cost/
           ).to be(nil)
           expect(
-            File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /cost/
+            File.read("spec/dummy/app/controllers/jkls_controller.rb") =~ /cost/
           ).to be(nil)
 
           # long description is included
           expect(
-            File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /long_description/
+            File.read("spec/dummy/app/views/jkls/_show.erb") =~ /long_description/
           ).to be_a(Numeric)
           expect(
-            File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /long_description/
+            File.read("spec/dummy/app/views/jkls/_form.erb") =~ /long_description/
           ).to be_a(Numeric)
           expect(
-            File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /long_description/
+            File.read("spec/dummy/app/controllers/jkls_controller.rb") =~ /long_description/
           ).to be_a(Numeric)
 
           # long description is included
           expect(
-            File.read("spec/Dummy/app/views/jkls/_show.erb") =~ /blurb/
+            File.read("spec/dummy/app/views/jkls/_show.erb") =~ /blurb/
           ).to be_a(Numeric)
           expect(
-            File.read("spec/Dummy/app/views/jkls/_form.erb") =~ /blurb/
+            File.read("spec/dummy/app/views/jkls/_form.erb") =~ /blurb/
           ).to be_a(Numeric)
           expect(
-            File.read("spec/Dummy/app/controllers/jkls_controller.rb") =~ /blurb/
+            File.read("spec/dummy/app/controllers/jkls_controller.rb") =~ /blurb/
           ).to be_a(Numeric)
         end
 
@@ -353,13 +353,13 @@ describe HotGlue::ScaffoldGenerator do
             response = Rails::Generators.invoke("hot_glue:scaffold",
                                                 ["User","--gd", "--layout=bootstrap"])
             expect(
-               File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class='col-md-1'>Email<\/div>/
+               File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-md-1'>Email<\/div>/
             ).to be_a(Numeric)
 
-            file = File.read("spec/Dummy/app/views/users/_show.erb")
+            file = File.read("spec/dummy/app/views/users/_show.erb")
 
             expect(
-              File.read("spec/Dummy/app/views/users/_list.erb") =~ /scaffold-col-heading-buttons col-md-2/
+              File.read("spec/dummy/app/views/users/_list.erb") =~ /scaffold-col-heading-buttons col-md-2/
             ).to be_a(Numeric)
           end
         end
@@ -379,12 +379,12 @@ describe HotGlue::ScaffoldGenerator do
 
               # TODO: IMPLEMENT ME
               # expect(
-              #   File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class='col-md-10'>Email<\/div>/
+              #   File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-md-10'>Email<\/div>/
               # ).to be_a(Numeric)
               #
 
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /scaffold-col-heading-buttons col-md-2/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /scaffold-col-heading-buttons col-md-2/
               ).to be_a(Numeric)
             end
           end
@@ -397,14 +397,14 @@ describe HotGlue::ScaffoldGenerator do
                                                    "--smart-layout",
                                                    "--downnest=dfgs", "--layout=bootstrap"])
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class='col-md-2'>Email<\/div>/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-md-2'>Email<\/div>/
               ).to be_a(Numeric)
 
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4" >/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4" >/
               ).to be_a(Numeric)
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /Dfgs/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /Dfgs/
               ).to be_a(Numeric)
             end
           end
@@ -417,16 +417,16 @@ describe HotGlue::ScaffoldGenerator do
                                                    "--downnest=dfgs,xyzs",
                                                    "--layout=bootstrap"])
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4" >/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4" >/
               ).to be_a(Numeric)
 
 
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /Dfgs/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /Dfgs/
               ).to be_a(Numeric)
 
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /Xyzs/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /Xyzs/
               ).to be_a(Numeric)
             end
           end
@@ -452,7 +452,7 @@ describe HotGlue::ScaffoldGenerator do
       end
 
       expect(
-        File.read("spec/Dummy/app/views/dfgs/_list.erb") =~ /paginate dfgs/
+        File.read("spec/dummy/app/views/dfgs/_list.erb") =~ /paginate dfgs/
       ).to be(nil)
     end
   end
@@ -466,10 +466,10 @@ describe HotGlue::ScaffoldGenerator do
         raise("error building in spec #{e}")
       end
 
-      expect(File.exist?("spec/Dummy/app/views/dfgs/new.erb")).to be(false)
-      expect(File.exist?("spec/Dummy/app/views/dfgs/_new_form.erb")).to be(false)
-      expect(File.exist?("spec/Dummy/app/views/dfgs/_new_button.erb")).to be(false)
-      expect(File.exist?("spec/Dummy/app/views/dfgs/create.turbo_stream.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/dfgs/new.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/dfgs/_new_form.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/dfgs/_new_button.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/dfgs/create.turbo_stream.erb")).to be(false)
     end
   end
 
@@ -482,9 +482,9 @@ describe HotGlue::ScaffoldGenerator do
         raise("error building in spec #{e}")
       end
 
-      expect(File.exist?("spec/Dummy/app/views/dfgs/_form.erb")).to be(false)
-      expect(File.exist?("spec/Dummy/app/views/dfgs/edit.erb")).to be(false)
-      expect(File.exist?("spec/Dummy/app/views/dfgs/update.turbo_stream.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/dfgs/_form.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/dfgs/edit.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/dfgs/update.turbo_stream.erb")).to be(false)
     end
   end
 
@@ -496,7 +496,7 @@ describe HotGlue::ScaffoldGenerator do
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
-      expect(File.exist?("spec/Dummy/app/views/dfgs/destroy.turbo_stream.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/dfgs/destroy.turbo_stream.erb")).to be(false)
     end
   end
 
@@ -510,7 +510,7 @@ describe HotGlue::ScaffoldGenerator do
       end
 
       expect(
-        File.read("spec/Dummy/app/views/dfgs/_show.erb") =~ /edit_dfg_path\(dfg\)/
+        File.read("spec/dummy/app/views/dfgs/_show.erb") =~ /edit_dfg_path\(dfg\)/
       ).to_not be(nil)
     end
   end
@@ -525,7 +525,7 @@ describe HotGlue::ScaffoldGenerator do
       end
 
       expect(
-        File.read("spec/Dummy/app/views/dfgs/_form.erb") =~ /f\.text_field :name/
+        File.read("spec/dummy/app/views/dfgs/_form.erb") =~ /f\.text_field :name/
       ).to be(nil)
 
     end
@@ -548,7 +548,7 @@ describe HotGlue::ScaffoldGenerator do
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
-      result = File.read("spec/Dummy/app/views/abcs/_show.erb")
+      result = File.read("spec/dummy/app/views/abcs/_show.erb")
       
       expect(
         result =~ /{data: {'confirm': "Are you sure/
@@ -566,12 +566,12 @@ describe HotGlue::ScaffoldGenerator do
       end
 
       expect(
-        File.read("spec/Dummy/app/views/abcs/_show.erb") =~ /data: {'turbo-confirm': 'Are you sure/
+        File.read("spec/dummy/app/views/abcs/_show.erb") =~ /data: {'turbo-confirm': 'Are you sure/
       ).to be(nil)
 
 
       expect(
-        File.read("spec/Dummy/app/views/abcs/_show.erb") =~ / html: {data: {'confirm': "Are you sure /
+        File.read("spec/dummy/app/views/abcs/_show.erb") =~ / html: {data: {'confirm': "Are you sure /
       ).to_not be(nil)
     end
 
