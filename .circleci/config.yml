@@ -57,7 +57,7 @@ jobs:
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       # Run rspec in parallel
-      - ruby/rspec-test
+      - run: bundle exec rspec --profile 10 --format RspecJunitFormatter --out /tmp/test-results/rspec/results.xml --format progress
 
 # We use workflows to orchestrate the jobs that we declared above.
 workflows:
