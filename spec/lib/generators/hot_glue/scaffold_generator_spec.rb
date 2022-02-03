@@ -401,7 +401,7 @@ describe HotGlue::ScaffoldGenerator do
               ).to be_a(Numeric)
 
               expect(
-                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-6" >/
+                File.read("spec/Dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4" >/
               ).to be_a(Numeric)
               expect(
                 File.read("spec/Dummy/app/views/users/_list.erb") =~ /Dfgs/
@@ -510,7 +510,7 @@ describe HotGlue::ScaffoldGenerator do
       end
 
       expect(
-        File.read("spec/Dummy/app/views/dfgs/_show.erb") =~ /edit_dfg_path\(dfg\), 'data-turbo' => 'false',/
+        File.read("spec/Dummy/app/views/dfgs/_show.erb") =~ /edit_dfg_path\(dfg\)/
       ).to_not be(nil)
     end
   end

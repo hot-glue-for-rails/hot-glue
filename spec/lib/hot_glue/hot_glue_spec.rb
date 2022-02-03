@@ -13,7 +13,7 @@ describe HotGlue do
         result = HotGlue.optionalized_ternary(target: 'invoices',
                                               nested_set: nested_set,
                                               namespace: "admin")
-        expect(result).to eq("@account ? admin_account_invoices_path : admin_invoices_path")
+        expect(result).to eq("defined?(account) ? admin_account_invoices_path : admin_invoices_path")
       end
     end
 
@@ -39,5 +39,30 @@ describe HotGlue do
 
       end
     end
+  end
+
+
+  describe "for two level optional" do
+
+  end
+
+  describe "with top level" do
+
+  end
+
+  describe "namespace" do
+
+  end
+
+  describe "modifier" do
+
+  end
+
+  describe "with_params" do
+
+  end
+
+  describe "top_level" do
+
   end
 end

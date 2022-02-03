@@ -13,7 +13,7 @@ module HotGlue
   end
 
   def self.optionalized_ternary(params)
-    namespace = params[:namespace] || ""
+    namespace = params[:namespace] || nil
     target = params[:target]
     nested_set = params[:nested_set]
     modifier = params[:modifier] || ""
@@ -25,9 +25,9 @@ module HotGlue
     put_form =  params[:put_form] || false
 
     if nested_set.nil? || nested_set.empty?
-      return modifier + "#{namespace}_#{target}_path" + (("(#{instance_sym}#{target})" if put_form) || "")
+      return modifier + "#{(namespace + '_') if namespace}#{target}_path" + (("(#{instance_sym}#{target})" if put_form) || "")
     elsif nested_set[0][:optional] == false
-      return modifier + namespace + "_" + nested_set.collect{|x|
+      return modifier + ((namespace + "_" if namespace) || "") + nested_set.collect{|x|
         x[:singular] + "_"
       }.join() + target + "_path" + (("(#{nested_set.collect{
         |x| instance_sym + x[:singular] }.join(",")
