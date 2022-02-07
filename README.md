@@ -849,6 +849,6 @@ ln -s  spec/dummy/db/schema.rb db/schema.rb
  
  Test coverage as of 2022-02-06
  
- ![Screen Shot 2022-02-06 at 10 25 43 PM](https://user-images.githubusercontent.com/59002/152719806-073ddca3-e8f4-4f24-8edd-8022a88f766e.png)
+![Screen Shot 2022-02-06 at 10 26 36 PM](https://user-images.githubusercontent.com/59002/152719855-fdd3da6d-8348-44b9-8753-b0e73eee8065.png)
 
 
