@@ -830,24 +830,28 @@ The DUMMY testing DOES NOT test the actual functionality of the output code (it 
 
 
 # DATABASE
-
-`cd spec/dummy`
-`rails db:drop`
-`rails db:create`
-`rails db:migrate`
-`RAILS_ENV=test rails db:migrate`
-
-
-being able to run `rake spec` at the root of this repo is acheived using
+being able to run `rake spec` at the root of this repo is achieved using
 ```
 ln -s  spec/dummy/db/schema.rb db/schema.rb
 ```
 
  
- --
- --
+
+Run rspec as
+``` 
+rake spec
+```
+Or with test coverage report:
+
+```
+COVERGE=on rake spec
+
+```
+
+--
+--
  
- Test coverage as of 2022-02-06
+Test coverage as of 2022-02-06
  
 ![Screen Shot 2022-02-06 at 10 26 36 PM](https://user-images.githubusercontent.com/59002/152719855-fdd3da6d-8348-44b9-8753-b0e73eee8065.png)
 
