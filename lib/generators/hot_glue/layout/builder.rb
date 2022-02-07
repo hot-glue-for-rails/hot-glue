@@ -50,9 +50,6 @@ module HotGlue
         @downnest_children_width = []
         @downnest_children.each_with_index{ |child, i| @downnest_children_width[i] = 4}
 
-        if include_setting.nil?
-
-        end
 
         if smart_layout
           # automatic control
@@ -84,6 +81,7 @@ module HotGlue
           end
 
           # input control
+
           user_layout_columns = @include_setting.split(":")
           size_each = (bootstrap_columns / user_layout_columns.count).floor # this is the bootstrap size
 
