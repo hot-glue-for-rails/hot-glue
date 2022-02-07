@@ -20,3 +20,5 @@ spec/dummy/specs/
 
 spec/dummy/node_modules/
 spec/dummy/log/
+
+coverage/
