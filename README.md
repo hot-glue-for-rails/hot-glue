@@ -398,20 +398,9 @@ If you supply nesting (see below), your nest chain will automatically begin with
 
 #### Optionalized Nested Parents
 
+Add `~` in front of any nested parameter (any parent in the `--nest` list) you want to make optional. This creates a two-headed controller: It can operate with or without that optionalized parameter. 
 
-This is an advanced feature is to use two duplicitous routes to the same controller.
-
-You can only use this feature with Gd controller.
-
-
-To use, specify your controller *twice* in your routes.rb. Then, in your `--nest` setting, add `~` to any nested parent you want to **make optional**.
-
-"Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.
-
-Then the same controller will 'exist' again one-level up in your routes. 
-
-**If the route has sub-routes, you'll need to re-specify the entire subtree also**. 
-
+This is an advanced feature is to use two duplicitous routes to the same controller.  You can only use this feature with Gd controller.  To use, specify your controller *twice* in your routes.rb. Then, in your `--nest` setting, add `~` to any nested parent you want to **make optional**. "Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.  Then the same controller will 'exist' again one-level up in your routes. **If the route has sub-routes, you'll need to re-specify the entire subtree also**.
 ```
 namespace :admin
   resources :users do
@@ -420,17 +409,12 @@ namespace :admin
   resoures :invoices
 end
 ```
-
-We will  build the scaffolding once for users and once again for invoice. Even though we have two routes pointed to invoices, 
-
+Hot Glue will build the scaffolding once for users and once again for invoice. Even though we have two routes pointed to invoices, 
+```
 rails generate hot_glue:scaffold User --namespace=admin --gd --downnest=invoices
 rails generate hot_glue:scaffold Invoice --namespace=admin --gd --nest=~users
-
-Notice for the Invoice build, the parent user is *optionalized* (not 'optional'-- optionalized: to be made so it can be made optional).
-
-The Invoices controller, which is a Gd controller, will load the User if a user is specified in the route (`/admin/users/:user_id/invoices/`)
-
-It will ALSO work at `/admin/invoices` and will switch back into loading directly from the base class when routed this way.
+```
+Notice for the Invoice build, the parent user is *optionalized* (not 'optional'-- optionalized: to be made so it can be made optional).  The Invoices controller, which is a Gd controller, will load the User if a user is specified in the route (`/admin/users/:user_id/invoices/`). It will ALSO work at `/admin/invoices` and will switch back into loading directly from the base class when routed this way.
 
 
 
@@ -730,8 +714,26 @@ Obviously, the created controller will always have this base controller as its s
 # VERSION HISTORY
 
 
-#### 2022-02-02 - v0.4.7 Optionalized Nested Parents -- see docs above
+
+
+#### 2022-02-06 - v0.4.8 Optionalized Nested Parents
     - optinoalized nested parents. to use add `~` in front of any nested parameter you want to make optional
+    
+    - This is an advanced feature is to use two duplicitous routes to the same controller.  You can only use this feature with Gd controller.  To use, specify your controller *twice* in your routes.rb. Then, in your `--nest` setting, add `~` to any nested parent you want to **make optional**. "Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.  Then the same controller will 'exist' again one-level up in your routes. **If the route has sub-routes, you'll need to re-specify the entire subtree also**.
+```
+namespace :admin
+  resources :users do
+    resources :invoices
+  end
+  resoures :invoices
+end
+```
+We will  build the scaffolding once for users and once again for invoice. Even though we have two routes pointed to invoices,
+```
+rails generate hot_glue:scaffold User --namespace=admin --gd --downnest=invoices
+rails generate hot_glue:scaffold Invoice --namespace=admin --gd --nest=~users
+```
+    - Notice for the Invoice build, the parent user is *optionalized* (not 'optional'-- optionalized: to be made so it can be made optional).  The Invoices controller, which is a Gd controller, will load the User if a user is specified in the route (`/admin/users/:user_id/invoices/`). It will ALSO work at `/admin/invoices` and will switch back into loading directly from the base class when routed this way.
     - fixes to specified grouping mode-- the columns you specify now grab up the remaining bootstrap columns to fill space
 
 #### 2022-01-26 - v0.4.7 `--nest` has been renamed to `--nested`; please use `--nested` moving forward
