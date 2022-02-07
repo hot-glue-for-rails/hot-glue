@@ -17,13 +17,13 @@ By default, it generates code that gives users full control over objects they 'o
 
 Hot Glue generates functionality that's quick and dirty. It lets you be crafty. As with a real hot glue gun, use with caution.
 
-* Build plug-and-play scaffolding mixing generated ERB or HAML with the power of Hotwire and Turbo-Rails
-* Everything edits-in-place (unless you use --big-edit, then it won't)
-* Automatically Reads Your Models (make them before building your scaffolding!)
+* Build plug-and-play scaffolding mixing generated ERB with the power of Hotwire and Turbo-Rails
+* Everything edits-in-place (unless you use `--big-edit`, then it won't)
+* Automatically Reads Your Models (make them AND migrate your DB before building your scaffolding!)
 * Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination (coming soon: searching & sorting)
 * Great for prototyping, but you should learn Rails fundamentals first.
 * 'Packaged' with Devise, Kaminari, Rspec, FontAwesome
-* Create system specs  automatically along with the generated code.
+* Create system specs automatically along with the generated code.
 * Nest your routes model-by-model for built-in poor man's authentication.
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
@@ -91,7 +91,7 @@ Purchase a license at https://heliosdev.shop/hot-glue-license
 
 During in installation, you MUST supply a `--layout` flag.
 
-### `--layout` flag
+### `--layout` flag (NOTE: haml and slim are no longer supported at this time)
 Here you will set up and install Hot Glue for the first time. It will install a config file that will save two preferences: layout (hotglue or bootstrap) and markup (erb or haml or slim).
 
 Once you run the installer, the installer will save what you set it to in `config/hot_glue.yml`. Newly generated scaffolds will use these two settings, but you can modify them just by modifying the config file (you don't need to re-run the installer)
