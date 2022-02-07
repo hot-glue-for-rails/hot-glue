@@ -14,20 +14,23 @@ describe HotGlue::InstallGenerator do
   end
 
 
+  describe "with bootstrap" do
+    it "should install correctly with bootstrap " do
+      # not sure how how I can invoke this
+      # # alternative: do rake here?
+
+      # generator = HotGlue::InstallGenerator.new("layout=bootstrap")
+    end
+  end
+
   describe "with a theme " do
     it "should install correctly with hotglue layout syntax" do
-      response = Rails::Generators.invoke("hot_glue:install --theme=dark_knight")
+      # response = Rails::Generators.invoke("hot_glue:install --theme=dark_knight")
 
     end
   end
 
-  describe "with bootstrap" do
-    it "should install correclty with bootstrap " do
-      response = Rails::Generators.invoke("hot_glue:install --layout=bootstrap")
 
-
-    end
-  end
 
   # describe "ERROR RESPONESES" do
   #   it "with missing object name should give error" do

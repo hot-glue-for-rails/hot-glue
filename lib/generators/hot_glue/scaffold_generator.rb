@@ -3,8 +3,8 @@ require 'ffaker'
 
 require_relative './markup_templates/base'
 require_relative './markup_templates/erb'
-require_relative './markup_templates/haml'
-require_relative './markup_templates/slim'
+# require_relative './markup_templates/haml'
+# require_relative './markup_templates/slim'
 
 require_relative './layout/builder'
 

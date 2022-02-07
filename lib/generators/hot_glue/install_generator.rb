@@ -17,7 +17,7 @@ module HotGlue
       super
       @layout = options['layout'] || "hotglue"
       @theme =  options['theme']
-
+      byebug
       if @layout == "hotglue" && options['theme'].nil?
         puts "You have selected to install Hot Glue without a theme. You can either use the --layout=bootstrap to install NO HOT GLUE THEME, or to use a Hot Glue theme please choose: like_boostrap, like_menlo_park, like_cupertino, like_mountain_view, dark_knight"
         return

@@ -6,7 +6,7 @@ require "hotglue/version"
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
   spec.name        = "hot-glue"
-  spec.version     = HotGlue::VERSION
+  spec.version     = HotGlue::Version::CURRENT
   spec.license     = 'Commercial with free option'
   spec.date        = Time.now.strftime("%Y-%m-%d")
   spec.summary     = "A gem to build Tubro Rails scaffolding."
