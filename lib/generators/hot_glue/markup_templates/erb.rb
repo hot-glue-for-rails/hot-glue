@@ -85,8 +85,8 @@ module  HotGlue
                 case type
                 when :integer
                   # look for a belongs_to on this object
-                  if col.ends_with?("_id")
-                    assoc_name = col.gsub("_id","")
+                  if col.to_s.ends_with?("_id")
+                    assoc_name = col.to_s.gsub("_id","")
                     assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
                     if assoc.nil?
                       exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
@@ -122,14 +122,14 @@ module  HotGlue
                 when :float
                   field_output(col, nil, 5, col_identifier)
                 when :datetime
-                  "<%= datetime_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+                  "<%= datetime_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
                 when :date
-                  "<%= date_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+                  "<%= date_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
                 when :time
-                  "<%= time_field_localized(f, :#{col}, #{singular}.#{col},  '#{ col.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+                  "<%= time_field_localized(f, :#{col}, #{singular}.#{col},  '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
                 when :boolean
                   " " +
-                    "  <span>#{col.humanize}</span>" +
+                    "  <span>#{col.to_s.humanize}</span>" +
                     "  <%= f.radio_button(:#{col},  '0', checked: #{singular}.#{col}  ? '' : 'checked') %>\n" +
                     "  <%= f.label(:#{col}, value: 'No', for: '#{singular}_#{col}_0') %>\n" +
                     "  <%= f.radio_button(:#{col}, '1',  checked: #{singular}.#{col}  ? 'checked' : '') %>\n" +
@@ -142,14 +142,14 @@ module  HotGlue
 
               end
 
-            if (type == :integer) && col.ends_with?("_id")
-              field_error_name = col.gsub("_id","")
+            if (type == :integer) && col.to_s.ends_with?("_id")
+              field_error_name = col.to_s.gsub("_id","")
             else
               field_error_name = col
             end
 
             add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{ 'style="display: inherit;"'}  >\n" +
-                                    add_spaces_each_line(field_result + "\n<label class='small form-text text-muted'>#{col.humanize}</label>", 4) +
+                                    add_spaces_each_line(field_result + "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>", 4) +
                                     "\n  </span>\n  <br />", 2)
 
           }.join("") + "\n  </div>"
@@ -198,7 +198,7 @@ module  HotGlue
             # look for a belongs_to on this object
             if col.ends_with?("_id")
 
-              assoc_name = col.gsub("_id","")
+              assoc_name = col.to_s.gsub("_id","")
 
 
               assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
