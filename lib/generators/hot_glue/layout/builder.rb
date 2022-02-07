@@ -91,7 +91,7 @@ module HotGlue
             raise "Your include statement #{@include_setting } has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
           end
           user_layout_columns.each_with_index  do |column,i|
-            layout_object[:columns][:container][i] = column.split(",")
+            layout_object[:columns][:container][i] = column.split(",").collect(&:to_sym)
           end
 
           if user_layout_columns.size < layout_object[:columns][:container].size
@@ -99,7 +99,8 @@ module HotGlue
           end
         end
 
-
+        # TODO: do I want this code that expands the downnest portal
+        # maybe refactor into a setting on the --downnest flag itself somehow
         # if layout_object[:columns][:container].size < available_columns
         #   available = available_columns - layout_object[:columns][:container].size
         #   downnest_child_count = 0

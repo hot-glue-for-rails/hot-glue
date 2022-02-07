@@ -716,7 +716,7 @@ Obviously, the created controller will always have this base controller as its s
 
 
 
-#### 2022-02-06 - v0.4.8 Optionalized Nested Parents
+#### 2022-02-07 - v0.4.8 Optionalized Nested Parents
     - optinoalized nested parents. to use add `~` in front of any nested parameter you want to make optional
     
     - This is an advanced feature is to use two duplicitous routes to the same controller.  You can only use this feature with Gd controller.  To use, specify your controller *twice* in your routes.rb. Then, in your `--nest` setting, add `~` to any nested parent you want to **make optional**. "Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.  Then the same controller will 'exist' again one-level up in your routes. **If the route has sub-routes, you'll need to re-specify the entire subtree also**.

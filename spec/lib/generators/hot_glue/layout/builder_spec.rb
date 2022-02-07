@@ -66,41 +66,59 @@ describe HotGlue::Layout::Builder do
 
 
     describe "Specified Grouping mode ( using colons)" do
-      # it "should concat the two fields and give 2 more columns back to the downnest" do
-      #   x = HotGlue::Layout::Builder.new({:include_setting=>"api_key,api_id:",
-      #                                     :downnest_children=>["get_emails_rules"],
-      #                                     :buttons_width => 2,
-      #                                     :columns=>[:api_key, :api_id],
-      #                                     :smart_layout=>true})
-      #   result = x.construct
-      #   expect(result[:columns][:container]).to eq([[:api_key], [:api_id]])
-      #   expect(result[:portals]["get_emails_rules"][:size]).to eq(4)
-      # end
+      it "should concat the two fields into one column " do
+        x = HotGlue::Layout::Builder.new({:include_setting=>"api_key,api_id:",
+                                          :downnest_children=>["get_emails_rules"],
+                                          :buttons_width => 2,
+                                          :columns=>[:api_key, :api_id],
+                                          :smart_layout=>false})
+        result = x.construct
+        expect(result[:columns][:container]).to eq([[:api_key, :api_id]])
+        expect(result[:portals]["get_emails_rules"][:size]).to eq(4)
+      end
     end
 
 
     describe "with smart layouts" do
       describe "when not using semicolons" do
-        it "should turn 7 columns into 3" do
-          # TODO: implement me
+        it "should concat the two fields and give 2 more columns back to the downnest" do
+          x = HotGlue::Layout::Builder.new({:include_setting=>"api_key,api_id",
+                                            :downnest_children=>["get_emails_rules"],
+                                            :buttons_width => 2,
+                                            :columns=>[:api_key, :api_id],
+                                            :smart_layout=>true})
+          result = x.construct
+          expect(result[:columns][:container]).to eq([[:api_key], [:api_id]])
+          expect(result[:portals]["get_emails_rules"][:size]).to eq(4)
         end
       end
 
 
       describe "when given 4 fields and 1 downnested portal" do
         it "should give 4 - 4 - 2" do
-          # TODO: implement me
         end
       end
 
 
       describe "when given 7 fields and 1 downnested portal" do
         it "should give 4 - 4 - 2" do
-          # TODO: implement me
 
         end
       end
+    end
 
+
+    describe "When not specified grouping mode and when not smarty layouts" do
+      it "should just give 1 column per field" do
+        x = HotGlue::Layout::Builder.new({:include_setting=>"name,how_many",
+                                          :downnest_children=>[],
+                                          :buttons_width => 2,
+                                          :columns=>[:name, :how_many],
+                                          :smart_layout=>false})
+        result = x.construct
+        expect(result[:columns][:container]).to eq([[:name], [:how_many]])
+
+      end
     end
   end
 end
