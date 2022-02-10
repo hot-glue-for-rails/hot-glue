@@ -28,12 +28,9 @@ Hot Glue generates functionality that's quick and dirty. It lets you be crafty. 
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
 
-# Hot Glue License Only
+# Get Hot Glue
 ## [Licence Only Option Now Available](https://heliosdev.shop/p/hot-glue/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $50 USD!**
-
-
-# Hot Glue Tutorial 
-## [GET THE COURSE TODAY (includes Hot Glue License)](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
+## [GET THE COURSE TODAY (includes License)](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
 
 |   |  |  
 | ------------- | ------------- |
