@@ -366,7 +366,9 @@ This is "starfish access control" or "poor man's access control."  It works when
 
 Add `~` in front of any nested parameter (any parent in the `--nest` list) you want to make optional. This creates a two-headed controller: It can operate with or without that optionalized parameter.
 
-This is an advanced feature is to use two duplicitous routes to the same controller.  You can only use this feature with Gd controller.  To use, specify your controller *twice* in your routes.rb. Then, in your `--nest` setting, add `~` to any nested parent you want to **make optional**. "Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.  Then the same controller will 'exist' again one-level up in your routes. **If the route has sub-routes, you'll need to re-specify the entire subtree also**.
+This is an advanced feature is to use **two duplicative routes to the same controller**. You can only use this feature with Gd controller.  
+
+Specify your controller *twice* in your routes.rb. Then, in your `--nest` setting, add `~` to any nested parent you want to **make optional**. "Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.  Then the same controller will 'exist' again one-level up in your routes. **If the route has sub-routes, you'll need to re-specify the entire subtree also**.
 ```
 namespace :admin
   resources :users do
@@ -375,12 +377,16 @@ namespace :admin
   resources :invoices
 end
 ```
-Hot Glue will build the scaffolding once for users and once again for invoice. Even though we have two routes pointed to invoices,
+
+Even though we have two routes pointed to invoices, both will go to the same controller (`invoices_controller.rb`)
+
 ```
 rails generate hot_glue:scaffold User --namespace=admin --gd --downnest=invoices
 rails generate hot_glue:scaffold Invoice --namespace=admin --gd --nest=~users
 ```
-Notice for the Invoice build, the parent user is *optionalized* (not 'optional'-- optionalized: to be made so it can be made optional).  The Invoices controller, which is a Gd controller, will load the User if a user is specified in the route (`/admin/users/:user_id/invoices/`). It will ALSO work at `/admin/invoices` and will switch back into loading directly from the base class when routed this way.
+Notice for the Invoice build, the parent user is *optionalized* (not 'optional'-- optionalized: to be made so it can be made optional).  
+
+The Invoices controller, which is a Gd controller, will load the User if a user is specified in the route (`/admin/users/:user_id/invoices/`). It will ALSO work at `/admin/invoices` and will switch back into loading directly from the base class when routed this way.
 
 
                                                          
