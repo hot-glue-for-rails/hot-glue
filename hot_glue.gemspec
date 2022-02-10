@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_runtime_dependency "rails",  '> 5.1'
-  spec.homepage    = 'https://jfbcodes.com/p/hot-glue-in-depth-tutorial?utm_source=rubygems.org&utm_campaign=rubygems_link'
+  spec.homepage    = 'https://heliosdev.shop/p/hot-glue?utm_source=rubygems.org&utm_campaign=rubygems_link'
   spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/hot-glue" }
   spec.add_runtime_dependency('kaminari', '~> 1.2')
   # spec.add_runtime_dependency('sass-rails')

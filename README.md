@@ -27,7 +27,12 @@ Hot Glue generates functionality that's quick and dirty. It lets you be crafty. 
 * Nest your routes model-by-model for built-in poor man's authentication.
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
-# Hot Glue Tutorial 
+
+# Hot Glue License Only
+## [Licence Only Option Now Available](https://heliosdev.shop/p/hot-glue/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $50 USD!**
+
+
+# Hot Glue Tutorial 
 ## [GET THE COURSE TODAY (includes Hot Glue License)](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
 
 |   |  |  
@@ -62,8 +67,11 @@ There are two ways to create new apps on Rails 7: With or without ImportMap. The
 
 `rails new --css=bootstrap --javascript=webpack --database=postgresql`
 
-Confirm that both Stimulus and Turbo are working. For the quick step-by-step to help you confirm 
-that both Stimulus and Turbo are working for your new JSBundling-Rails/CSSBunlding-Rails setup [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-new-app-with-js-bundling-css-bundling/).
+Confirm that both Stimulus and Turbo are working.
+
+**If using JSBundling, make sure to use the new `bin/dev rails` instead of the old `rails server` or else your Webpack will not compile.** 
+
+For the quick step-by-step to help you confirm that both Stimulus and Turbo are working for your new JSBundling-Rails/CSSBunlding-Rails setup [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-new-app-with-js-bundling-css-bundling/).
 
 (Note that Bootstrap is optional for Hot Glue. Here, I am just showing you the default isntallation for simplicity.)
 
@@ -92,21 +100,13 @@ Purchase a license at https://heliosdev.shop/hot-glue-license
 During in installation, you MUST supply a `--layout` flag.
 
 ### `--layout` flag (NOTE: haml and slim are no longer supported at this time)
-Here you will set up and install Hot Glue for the first time. It will install a config file that will save two preferences: layout (hotglue or bootstrap) and markup (erb or haml or slim).
+Here you will set up and install Hot Glue for the first time. 
 
-Once you run the installer, the installer will save what you set it to in `config/hot_glue.yml`. Newly generated scaffolds will use these two settings, but you can modify them just by modifying the config file (you don't need to re-run the installer)
+It will install a config file that will save two preferences: layout (`hotglue` or `bootstrap`)
 
-If you do NOT specify `--layout=bootstrap`, then `hotglue` will be assumed. When constructing scaffold with bootstrap layout (at this time Hot Glue peeks into config/hot_glue.yml to see what you've set there), your views come out with divs that have classes like .container-fluid, .row, and .col. You'll need to install Bootstrap separately, any way you like, but jQuery is not required as Hot Glue does not rely on jQuery-dependant Bootstrap features.
+The installer create `config/hot_glue.yml`. 
 
-
-If instead you install Hot Glue (or switch the setting) using the default layout mode (`--layout=hotglue`),
-your scaffolding will be built using no-Bootstrap syntax: It has its own syntax with classes like
-`.scaffold-container`,
-`.scaffold-list`,
-`.scaffold-row`, and
-`.scaffold-cell`
-
-During the installation, if your `--layout` flag is left unspecified or set to `hotglue` you must also pass `--theme` flag.
+During the installation, if your `--layout` flag is set to `hotglue` you must also pass `--theme` flag.
 
 the themes are:
 • like_mountain_view (Google)
@@ -116,19 +116,17 @@ the themes are:
 • like_cupertino (modern Apple-UX inspired)
 • gradeschool (spiral bound/lined notebook inspired)
 
-Please note that the scaffold is ** built with different market up for boostrap**, so you cannot switch between the Bootstrap and Hotglue layouts without rebuilding the scaffold.
+Please note that the scaffold is ** built with different market up for boostrap **, so you cannot switch between the Bootstrap and Hotglue layouts without rebuilding the scaffold.
 
 (On the other hand, if you build within the Hotglue layout, all of the Hotglue theme files CAN be swapped out without rebuilding the scaffold.)
 
 The themes are just SCSS files installed into app/assets/stylesheets. You can tweak or modify or remove them after they get installed.
-
 
 ### `--markup` flag
 
 default is `erb`. IMPORTANT: As of right now, I am only supporting & building against ERB. HAML and SLIM are not currently supported.
 
 
-## 3. RUN HOT-GLUE INSTALL:
 ### example installing ERB using Bootstrap layout:
 `rails generate hot_glue:install --markup=erb --layout=bootstrap`
 
