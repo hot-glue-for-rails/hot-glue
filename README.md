@@ -101,7 +101,7 @@ Here you will set up and install Hot Glue for the first time.
 
 It will install a config file that will save two preferences: layout (`hotglue` or `bootstrap`)
 
-The installer create `config/hot_glue.yml`. 
+The installer will create `config/hot_glue.yml`. 
 
 During the installation, if your `--layout` flag is set to `hotglue` you must also pass `--theme` flag.
 
@@ -111,17 +111,10 @@ the themes are:
 • like_bootstrap (bootstrap 4 copy)
 • dark_knight (_The Dark Night_ (2008) inspired)
 • like_cupertino (modern Apple-UX inspired)
-• gradeschool (spiral bound/lined notebook inspired)
-
-Please note that the scaffold is ** built with different market up for boostrap **, so you cannot switch between the Bootstrap and Hotglue layouts without rebuilding the scaffold.
-
-(On the other hand, if you build within the Hotglue layout, all of the Hotglue theme files CAN be swapped out without rebuilding the scaffold.)
-
-The themes are just SCSS files installed into app/assets/stylesheets. You can tweak or modify or remove them after they get installed.
 
 ### `--markup` flag
 
-default is `erb`. IMPORTANT: As of right now, I am only supporting & building against ERB. HAML and SLIM are not currently supported.
+default is `erb`. IMPORTANT: As of right now, HAML and SLIM are not currently supported.
 
 
 ### example installing ERB using Bootstrap layout:
