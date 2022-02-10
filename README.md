@@ -361,6 +361,28 @@ Then, finally the @charge will be loaded
 
 This is "starfish access control" or "poor man's access control."  It works when the current user has several things they can manage, and by extension can manage children of those things.  
 
+
+#### Optionalized Nested Parents
+
+Add `~` in front of any nested parameter (any parent in the `--nest` list) you want to make optional. This creates a two-headed controller: It can operate with or without that optionalized parameter.
+
+This is an advanced feature is to use two duplicitous routes to the same controller.  You can only use this feature with Gd controller.  To use, specify your controller *twice* in your routes.rb. Then, in your `--nest` setting, add `~` to any nested parent you want to **make optional**. "Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.  Then the same controller will 'exist' again one-level up in your routes. **If the route has sub-routes, you'll need to re-specify the entire subtree also**.
+```
+namespace :admin
+  resources :users do
+    resources :invoices
+  end
+  resources :invoices
+end
+```
+Hot Glue will build the scaffolding once for users and once again for invoice. Even though we have two routes pointed to invoices,
+```
+rails generate hot_glue:scaffold User --namespace=admin --gd --downnest=invoices
+rails generate hot_glue:scaffold Invoice --namespace=admin --gd --nest=~users
+```
+Notice for the Invoice build, the parent user is *optionalized* (not 'optional'-- optionalized: to be made so it can be made optional).  The Invoices controller, which is a Gd controller, will load the User if a user is specified in the route (`/admin/users/:user_id/invoices/`). It will ALSO work at `/admin/invoices` and will switch back into loading directly from the base class when routed this way.
+
+
                                                          
 ### `--auth=`
 
@@ -383,28 +405,6 @@ You will note that in this example it is presumed that the Account object will h
 It is also presumed that when viewing their own dashboard of things, the user will want to see ALL of their associated things.
 
 If you supply nesting (see below), your nest chain will automatically begin with your auth root object (see nesting)
-
-#### Optionalized Nested Parents
-
-Add `~` in front of any nested parameter (any parent in the `--nest` list) you want to make optional. This creates a two-headed controller: It can operate with or without that optionalized parameter. 
-
-This is an advanced feature is to use two duplicitous routes to the same controller.  You can only use this feature with Gd controller.  To use, specify your controller *twice* in your routes.rb. Then, in your `--nest` setting, add `~` to any nested parent you want to **make optional**. "Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.  Then the same controller will 'exist' again one-level up in your routes. **If the route has sub-routes, you'll need to re-specify the entire subtree also**.
-```
-namespace :admin
-  resources :users do
-    resources :invoices
-  end
-  resources :invoices
-end
-```
-Hot Glue will build the scaffolding once for users and once again for invoice. Even though we have two routes pointed to invoices, 
-```
-rails generate hot_glue:scaffold User --namespace=admin --gd --downnest=invoices
-rails generate hot_glue:scaffold Invoice --namespace=admin --gd --nest=~users
-```
-Notice for the Invoice build, the parent user is *optionalized* (not 'optional'-- optionalized: to be made so it can be made optional).  The Invoices controller, which is a Gd controller, will load the User if a user is specified in the route (`/admin/users/:user_id/invoices/`). It will ALSO work at `/admin/invoices` and will switch back into loading directly from the base class when routed this way.
-
-
 
 
 ### `--auth_identifier=`
@@ -513,7 +513,7 @@ With Bootstrap in specified grouping or smart layout mode, it automatically atte
 
 Using Bootstrap with neither specified grouping nor smart layouts may make 12 columns, which will produce strange result. (Bootstrap is not designed to work with, for example, a 13-column layout.)
 
-You should typically either specify your grouping or use smart layouts when building with Bootstrap, but if your use case does not fit the stacking feature you can specify neither and then you may have deal with the over-stuffed layouts as explained above. 
+You should typically either specify your grouping or use smart layouts when building with Bootstrap, but if your use case does not fit the stacking feature you can specify neither flag and then you may then have to deal with the over-stuffed layouts as explained. 
 
 
 
@@ -521,7 +521,7 @@ You should typically either specify your grouping or use smart layouts when buil
 
 Smart layouts are like specified grouping but Hot Glue does the work of figuring out how many fields you want in each column. 
 
-It will concatinate your fields into groups that will fit into the Bootstraps 12-column grid.
+It will concatinate your fields into groups that will fit into the Bootstrap's 12-column grid.
 
 The effect will be that the fields will be stacked together into nicely fit columns.
 
@@ -541,7 +541,7 @@ If you're keeping track, that means we may have used 6 to 8 out of our Bootstrap
 
 If we have 2 downnested portals and only the default buttons, that uses 10 out of 12 Bootstrap columns, leaving only 2 bootstrap columns for the fields.
 
-THe layout builder takes the number of columns left and then distributes the feilds 'evenly' among them. However, note that order specified translates to up-to-down within the column, and then left-to-right across the columns, like so:
+The layout builder takes the number of columns left and then distributes the feilds 'evenly' among them. However, note that order specified translates to up-to-down within the column, and then left-to-right across the columns, like so:
 
 A D G
 
@@ -702,27 +702,13 @@ Obviously, the created controller will always have this base controller as its s
 # VERSION HISTORY
 
 
+#### 2022-02-09 - v0.4.8.1 - Issue with Installer for v0.4.8
+    - There was an issue for the installer for v0.4.8. This new version v0.4.8.1 correts it.
 
 
 #### 2022-02-07 - v0.4.8 Optionalized Nested Parents
     - optionalized nested parents. to use add `~` in front of any nested parameter you want to make optional
     
-    - This is an advanced feature is to use two duplicitous routes to the same controller.  You can only use this feature with Gd controller.  To use, specify your controller *twice* in your routes.rb. Then, in your `--nest` setting, add `~` to any nested parent you want to **make optional**. "Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.  Then the same controller will 'exist' again one-level up in your routes. **If the route has sub-routes, you'll need to re-specify the entire subtree also**.
-```
-namespace :admin
-  resources :users do
-    resources :invoices
-  end
-  resoures :invoices
-end
-```
-We will  build the scaffolding once for users and once again for invoice. Even though we have two routes pointed to invoices,
-```
-rails generate hot_glue:scaffold User --namespace=admin --gd --downnest=invoices
-rails generate hot_glue:scaffold Invoice --namespace=admin --gd --nest=~users
-```
-    - Notice for the Invoice build, the parent user is *optionalized* (not 'optional'-- optionalized: to be made so it can be made optional).  The Invoices controller, which is a Gd controller, will load the User if a user is specified in the route (`/admin/users/:user_id/invoices/`). It will ALSO work at `/admin/invoices` and will switch back into loading directly from the base class when routed this way.
-    - fixes to specified grouping mode-- the columns you specify now grab up the remaining bootstrap columns to fill space
 
 #### 2022-01-26 - v0.4.7 `--nest` has been renamed to `--nested`; please use `--nested` moving forward
   - `--alt-controller-name` feature from the last release has been removed, I have something better coming soon
