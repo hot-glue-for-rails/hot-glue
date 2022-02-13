@@ -379,6 +379,7 @@ module HotGlue
       @layout_object = builder.construct
 
       @menu_file_exists = true if @nested_args.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
+
     end
 
     def identify_object_owner
@@ -430,6 +431,7 @@ module HotGlue
         @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
       end
 
+      @associations = []
       @columns.each do |col|
         if col.to_s.starts_with?("_")
           @show_only << col
@@ -456,6 +458,7 @@ module HotGlue
               raise(HotGlue::Error,exit_message)
             end
 
+            @associations << assoc_name.to_sym
             assoc_class = eval(assoc_model.name)
             name_list = [:name, :to_label, :full_name, :display_name, :email]
             if name_list.collect{ |field|
@@ -1036,6 +1039,15 @@ module HotGlue
     def nested_for_turbo_id_list_constructor
       if @nested_set.any?
         '+ (((\'__\' + nested_for) if defined?(nested_for)) || "")'
+      else
+        ""
+      end
+    end
+
+
+    def n_plus_one_includes
+      if @associations.any?
+        ".includes(" + @associations.map{|x| ":#{x.to_s}"}.join(", ") + ")"
       else
         ""
       end
