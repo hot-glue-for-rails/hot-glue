@@ -94,7 +94,8 @@ module  HotGlue
                     end
 
                     is_owner = col == ownership_field
-                    display_column = HotGlue.derrive_reference_name(assoc.class_name)
+                    assoc_class_name = assoc.active_record.name
+                    display_column = HotGlue.derrive_reference_name(assoc_class_name)
 
                     # TODO: add is_owner && check if this nested arg is optional
                     (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
@@ -209,9 +210,8 @@ module  HotGlue
                 exit
                 # raise(HotGlue::Error,exit_message)
               end
-
-              display_column =  HotGlue.derrive_reference_name(assoc.class_name)
-
+              assoc_class_name = assoc.active_record.name
+              display_column =  HotGlue.derrive_reference_name(assoc_class_name)
               "<%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
 
             else

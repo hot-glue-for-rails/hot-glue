@@ -191,6 +191,12 @@ module HotGlue
 
 
       @singular = args.first.tableize.singularize # should be in form hello_world
+
+
+      if @singular.include?("/")
+        @singular = @singular.split("/").last
+      end
+
       @plural = options['plural'] || @singular + "s" # supply to override; leave blank to use default
       @namespace = options['namespace'] || nil
 
@@ -217,9 +223,10 @@ module HotGlue
 
       @nested = (!options['nested'].empty? && options['nested']) || nil
 
-      @singular_class = @singular.titleize.gsub(" ", "")
-      @exclude_fields = []
+      @singular_class = args.first # note this is the full class name with a model namespace
 
+
+      @exclude_fields = []
       @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
 
       if !options['include'].empty?
@@ -379,6 +386,7 @@ module HotGlue
 
       if !@object_owner_sym.empty?
         auth_assoc_field = auth_assoc + "_id" unless @god
+
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
 
         if assoc
@@ -431,11 +439,10 @@ module HotGlue
           if col.to_s.ends_with?("_id")
             # guess the association name label
             assoc_name = col.to_s.gsub("_id","")
-            assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
 
             begin
-              eval(assoc.class_name)
+              assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name}).active_record")
             rescue NameError => e
               exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; your model #{singular_class.titlecase} should belong_to :#{assoc_name}.  To make a controller that can read all records, specify with --god."
               puts exit_message
@@ -443,20 +450,20 @@ module HotGlue
             end
 
 
-            if assoc.nil?
+            if assoc_model.nil?
               exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
               puts exit_message
               raise(HotGlue::Error,exit_message)
             end
 
-            assoc_class = eval(assoc.class_name)
+            assoc_class = eval(assoc_model.name)
             name_list = [:name, :to_label, :full_name, :display_name, :email]
             if name_list.collect{ |field|
               assoc_class.column_names.include?(field.to_s) ||  assoc_class.instance_methods.include?(field)
             }.any?
               # do nothing here
             else
-              exit_message = "*** Oops: Missing a label for #{assoc.class_name.upcase}. Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name.upcase} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+              exit_message = "\n*** Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: \n1) name, \n2) to_label, \n3) full_name, \n4) display_name \n5) email \nYou can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
               raise(HotGlue::Error,exit_message)
             end
           end
@@ -586,6 +593,10 @@ module HotGlue
       @singular
     end
 
+    def singular_class_name
+      @singular_class
+    end
+
     def plural_name
       plural
     end
@@ -626,7 +637,7 @@ module HotGlue
 
     def form_path_edit_helper
       HotGlue.optionalized_ternary(namespace: @namespace,
-                                   target: @singular,
+                                   target: @singular_class,
                                    nested_set: @nested_set,
                                    with_params: true,
                                    put_form: true,

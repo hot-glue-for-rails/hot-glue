@@ -694,7 +694,8 @@ Obviously, the created controller will always have this base controller as its s
 ## Field Types Supported
 
 - Integers that don't end with `_id`: displayed as input fields with type="number"
-- Integers that do end with `_id` will be treated automatically as associations. You should have a Rails association defined. (Hot Glue will warn you if it can't find one.)
+- Foreign keys: Integers that do end with `_id` will be treated automatically as associations. You should have a Rails association defined. (Hot Glue will warn you if it can't find one.)
+  - Note:  if your foreign key has a nonusual class name, it should be using the `class_name:` in the model definition
 - String: displayed as small input box 
 - Text: displayed as large textarea
 - Float: displayed as input box
