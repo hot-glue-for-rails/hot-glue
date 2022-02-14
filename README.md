@@ -616,7 +616,11 @@ Automatically create subviews down your object tree. This should be the name of 
 You will need to build scaffolding with the same name for the related object as well. On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line.
 
 The downnested child table (not to be confused with this object's `--nested` setting, where you are specifying this object's _parents_) is called a **child portal**. When you create a record in the child portal, the related record is automatically set to be owned by its parent (as specified by `--nested`). For an example, see the [v0.4.7 release notes](https://github.com/jasonfb/hot-glue/releases/tag/v0.4.7).
- 
+
+Can now be created with more space (wider) by adding a `+` to the end of the downnest name
+- e.g. `--downnest=abc+,xyz`
+
+The 'Abcs' portal will display as 5 bootstrap columns instead of the typical 4. (You may use multiple ++ to keep making it wider but the inverse with minus is not supported
 
 
 
@@ -714,8 +718,11 @@ Obviously, the created controller will always have this base controller as its s
     - N+1 queries for any association built by the list are now automagically killed by the list controllers.
     - Thanks to the work done back in Rails 5.2, Rails smartly uses either two queries to glob up the data OR one query with a LEFT OUTER JOIN if it's faster. Thanks Rails!
     - Hot Glue now adds `.includes(...)` if it is including an association when it loads the list view to eliminate the N+1s
+• Downnest children (portals) can now be created with more space (wider) by adding a + to the end of the downnest name
+    - e.g. `--downnest=abc+,xyz`
 
-
+    - This creates two portals: Abcs and Xyzs, but gives the "Abc" portal 5 bootstrap columns instead of 4
+    - Use ++ to give the portal 6 bootstrap columns, etc. 
 
 #### 2022-02-09 - v0.4.8.1 - Issue with Installer for v0.4.8
     - There was an issue for the installer for v0.4.8. This new version v0.4.8.1 correts it.
