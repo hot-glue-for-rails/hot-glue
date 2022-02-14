@@ -12,6 +12,15 @@ module HotGlue
   class Error < StandardError
   end
 
+  def self.construct_downnest_object(input)
+    res = input.split(",").map { |child|
+      child_name = child.gsub("+","")
+      extra_size = child.count("+")
+      {child_name => 4+extra_size}
+    }
+    Hash[*res.collect{|hash| hash.collect{|key,value| [key,value].flatten}.flatten}.flatten]
+  end
+
   def self.optionalized_ternary(params)
     namespace = params[:namespace] || nil
     target = params[:target]
@@ -265,12 +274,12 @@ module HotGlue
       @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
       @downnest = options['downnest'] || false
 
-      @downnest_children = []
-
+      @downnest_children = [] # TODO: defactor @downnest_children in favor of downnest_object
+      @downnest_object = {}
       if @downnest
-        @downnest_children = @downnest.split(",")
+        @downnest_children = @downnest.split(",").map{|child| child.gsub("+","")}
+        @downnest_object = HotGlue.construct_downnest_object(@downnest)
       end
-
 
       if @god
         @auth = nil
@@ -371,7 +380,7 @@ module HotGlue
 
       builder = HotGlue::Layout::Builder.new({
                                               include_setting: options['include'],
-                                              downnest_children: @downnest_children,
+                                              downnest_object: @downnest_object,
                                               buttons_width: buttons_width,
                                               columns: @columns,
                                               smart_layout: @smart_layout
@@ -522,16 +531,12 @@ module HotGlue
     end
 
     def list_column_headings
-      if @nested_args.any?
+      if @layout == "bootstrap"
+        column_width = @layout_object[:columns][:size_each]
+        col_identifier = "col-md-#{column_width}"
+      elsif @layout == "hotglue"
         column_width = each_col * @columns.count
-      else
-        column_width = 0
-      end
-
-      if !@smart_layout
-        col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col-md-1"
-      else
-        col_identifier = @layout == "hotglue" ? "scaffold-cell" : "col-md-2"
+        col_identifier = "scaffold-cell"
       end
 
       @template_builder.list_column_headings(
@@ -1074,7 +1079,6 @@ module HotGlue
         ", \n    nested_for: \"" + @nested_args.collect{|a| "#{a}-" + '#{' + instance_symbol + a + ".id}"}.join("__") + "\""
       end
     end
-
 
     private # thor does something fancy like sending the class all of its own methods during some strange run sequence
     # does not like public methods

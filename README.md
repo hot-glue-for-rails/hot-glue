@@ -708,6 +708,14 @@ Obviously, the created controller will always have this base controller as its s
 
 # VERSION HISTORY
 
+#### 2022-XX-XX - (unreleased on master)
+• Fixes issue building models with namespaced class names (`Fruits::Apple` and `Fruits::Bannana`). You can now build against these kinds of models natively (be sure to pass the full model name, with double-colon syntax, when building scaffolding). Also fixes issues when associations themselves were namespaced models.
+• N+1 Killer!!! 
+    - N+1 queries for any association built by the list are now automagically killed by the list controllers.
+    - Thanks to the work done back in Rails 5.2, Rails smartly uses either two queries to glob up the data OR one query with a LEFT OUTER JOIN if it's faster. Thanks Rails!
+    - Hot Glue now adds `.includes(...)` if it is including an association when it loads the list view to eliminate the N+1s
+
+
 
 #### 2022-02-09 - v0.4.8.1 - Issue with Installer for v0.4.8
     - There was an issue for the installer for v0.4.8. This new version v0.4.8.1 correts it.

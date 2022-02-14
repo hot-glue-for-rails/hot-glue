@@ -4,13 +4,13 @@ module HotGlue
   module Layout
     class Builder
       attr_reader :include_setting,
-                  :downnest_children,
+                  :downnest_object,
                   :buttons_width, :columns,
                   :smart_layout, :specified_grouping_mode
 
       def initialize(params)
         @include_setting = params[:include_setting]
-        @downnest_children = params[:downnest_children]
+        @downnest_object = params[:downnest_object]
 
         @buttons_width = params[:buttons_width]
 
@@ -32,23 +32,28 @@ module HotGlue
           buttons: { size: @buttons_width}
         }
 
-        downnest_children.each do |child|
-          layout_object[:portals][child] = {size: 4}
-        end
+        # downnest_object.each do |child, size|
+        #   layout_object[:portals][child] = {size: size}
+        # end
 
         # smart layout: 2 columns per field; 4 column for EACH downnested portals, 2 column for buttons
-        how_many_downnest = downnest_children.size
+        how_many_downnest = downnest_object.size
 
-        bootstrap_columns = (12-@buttons_width )
-        bootstrap_columns = bootstrap_columns - (how_many_downnest*4)
+        bootstrap_columns = (12 - @buttons_width )
+
+        bootstrap_columns = bootstrap_columns - (downnest_object.collect{|k,v| v}.sum)
+
         available_columns = (bootstrap_columns / 2).floor # bascially turns the 12-column grid into a 6-column grid
 
         if available_columns < 0
           raise "Cannot build layout with #{how_many_downnest} downnested portals"
         end
 
-        @downnest_children_width = []
-        @downnest_children.each_with_index{ |child, i| @downnest_children_width[i] = 4}
+        downnest_children_width = []
+
+        downnest_object.each do |child, size|
+          layout_object[:portals][child] = {size:  size}
+        end
 
 
         if smart_layout

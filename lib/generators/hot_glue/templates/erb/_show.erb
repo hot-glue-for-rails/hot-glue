@@ -3,7 +3,7 @@
 <% if @downnest_children.any? %>
   <% each_downnest_width = @downnest_children.count == 1 ? 33 : (53/@downnest_children.count).floor %>
 
-  <% @downnest_children.each_with_index do |downnest,i| %>
+  <% @downnest_object.each do |downnest, size| %>
 
     <% downnest_object =  eval("#{singular_class}.reflect_on_association(:#{downnest})") %>
     <% if downnest_object.nil?; raise "no relationship for downnested portal `#{downnest}` found on `#{singular_class}`; please check relationship for has_many :#{downnest}"; end; %>
