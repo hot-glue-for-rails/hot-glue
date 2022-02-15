@@ -26,6 +26,7 @@ describe HotGlue::ScaffoldGenerator do
 
     FileUtils.rm("spec/dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/dummy/app/controllers/xyzs_controller.rb")
     FileUtils.rm("spec/dummy/app/controllers/dfgs_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
+    FileUtils.rm("spec/dummy/app/controllers/cantelopes_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
 
     FileUtils.rm("spec/dummy/app/controllers/all_dfgs_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
 
@@ -35,7 +36,8 @@ describe HotGlue::ScaffoldGenerator do
     FileUtils.rm_rf('spec/dummy/spec/')
     FileUtils.rm_rf('spec/dummy/app/views/hello/dfgs')
     FileUtils.rm_rf('spec/dummy/app/views/xyzs')
-    FileUtils.rm_rf('spec/dummy/app/views/all_dfgs')
+    FileUtils.rm_rf('spec/dummy/app/views/cantelopes/')
+    FileUtils.rm_rf('spec/dummy/app/views/fruits/')
 
     FileUtils.rm_rf('spec/dummy/app/views/users')
 
@@ -576,6 +578,46 @@ describe HotGlue::ScaffoldGenerator do
     end
 
   end
+
+  describe "can build a table name that has a nested model name" do
+    it "should generate scaffold for a model at a namespace" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Fruits::Cantelope","--gd"])
+
+      expect(
+        File.read("spec/dummy/app/controllers/cantelopes_controller.rb") =~ /class CantelopesController < ApplicationController/
+      ).to be_a(Numeric)
+    end
+  end
+
+
+  describe "N+1 killer" do
+    it "should allow a list of whitelisted fields separated by comma fields" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--god","--include=user_id"])
+      expect(
+        File.read("spec/dummy/app/controllers/dfgs_controller.rb") =~ /\.includes\(:user\)/
+      ).to be_a(Numeric)
+    end
+
+  end
+
+  describe "--no-list-heading" do
+    it "should omit the list heading when flag is passed" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Abc","--god","--no-list-heading"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
+
+      expect(
+        File.read("spec/dummy/app/views/abcs/_list.erb") =~ /Abcs/
+      ).to be(nil)
+    end
+  end
+
+
   # TODO: add tests for
   # --magic-buttons
   # --downnest

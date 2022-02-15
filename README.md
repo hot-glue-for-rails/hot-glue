@@ -731,28 +731,42 @@ Child portals have the headings omitted automatically (there is a heading identi
 
 # VERSION HISTORY
 
-#### 2022-XX-XX - (unreleased on master)
-• Fixes issue building models with namespaced class names (`Fruits::Apple` and `Fruits::Bannana`). You can now build against these kinds of models natively (be sure to pass the full model name, with double-colon syntax, when building scaffolding). Also fixes issues when associations themselves were namespaced models.
+#### 2022-02-14 - v0.4.9
+• Fixed issue building models with namespaced class names (e.g. `Fruits::Apple` and `Fruits::Bannana`). 
+  You can now build against these kinds of models natively (be sure to pass the full model name, with double-colon syntax). 
+
+• Also fixes issues when associations themselves were namespaced models.
 
 • The N+1 Killer (!!!) 
-    - N+1 queries for any association built by the list are now automagically killed by the list controllers.
-    - Thanks to the work done back in Rails 5.2, Rails smartly uses either two queries to glob up the data OR one query with a LEFT OUTER JOIN if it's faster. Thanks Rails!
+    - N+1 queries for _any association_ built by the list are now automagically killed by the list controllers.
+    - Thanks to the work done back in Rails 5.2, Rails smartly uses either two queries to glob up the data OR one query with a LEFT OUTER JOIN if that's faster. You don't have to think about it. **Thanks Rails 5.2!**
     - Hot Glue now adds `.includes(...)` if it is including an association when it loads the list view to eliminate the N+1s
-    - Bullet is still the best way to identify, find, & fix your N+1 queries and I still highly recommend it. 
+    - Bullet is still the best way to identify, find, & fix your N+1 queries is still highly recommended. https://github.com/flyerhzm/bullet 
 
-• Downnest children (portals) can now be created with more space (wider) by adding a `+` to the end of the downnest name
+• Downnest children (portals) can now be created with more space (made wider) by adding one or more `+` to the end of the downnest name, denoting add 1 bootstrap column.
     - e.g. `--downnest=abc+,xyz`
 
-    - This creates two portals: Abcs and Xyzs, but gives the "Abc" portal 5 bootstrap columns instead of 4
-    - Use ++ to give the portal 6 bootstrap columns, etc.
+    The "Abc" portal will take up 5 bootstrap columns and the Xyz portal will take up 4 columns. (++ to indicate 6, `+++` for 7, etc)
 
-• To give a special label to a model, add `@@table_label_plural = "The Things"` and `@@table_label_singular = "The Thing"`. This model will now have a list heading of "The Things" instead of its usual name.
+• Now that you can expand the downnest child portal width, you can easily give them too much width taking up more than 12 bootstrap columns. 
+  The builder stops you from building if you have taken up too many bootstrap columns, are in _either_ **Smart Layout mode** or **Specified Grouping mode**.
+  However, this check is not in place if you are in neither mode, in which case you should watch out for building more than 12 bootstrap columns.
 
-• You can also use `@@table_label_plural = nil` to set these tables to omit the label headings, or use the new flag...
+• To give a special label to a model, add `@@table_label_plural = "The Things"` and `@@table_label_singular = "The Thing"`. 
+  This model will now have a list heading of "The Things" instead of its usual name. 
+  For 'create buttons' and the 'New' screen, the builder will use the singular setting. 
+  This affects all builds against that model and affects the UI (display) only. 
+  All route names, table names, and variables are unaffected by this.
 
-• New flag `--no-list-heading`
+• You can also use `@@table_label_plural = nil` to set these tables to **omit** the label headings, or use the new flag...
 
-Omits the list heading. 
+• `--no-list-heading` (defaults to false but note several conditions when list headings are now hidden)
+
+Omits the list heading. Note that the listing heading is omitted: 
+1) if there is no list, 
+2) if you set the `--no-list-heading` flag, 
+3) if the model has `@@table_label_plural = nil`, or 
+4) if you are constructing a nested child portal with only non-optionalized parents. 
 
 
 
@@ -879,8 +893,8 @@ COVERGE=on rake spec
 --
 --
  
-Test coverage as of 2022-02-06
- 
-![Screen Shot 2022-02-06 at 10 26 36 PM](https://user-images.githubusercontent.com/59002/152719855-fdd3da6d-8348-44b9-8753-b0e73eee8065.png)
+Test coverage as of 2022-02-14 (v0.4.9)
+
+![Screen Shot 2022-02-14 at 8 33 29 PM](https://user-images.githubusercontent.com/59002/153975911-30fa9c84-c8d8-49e7-bd5c-e2b958d6f10e.png)
 
 
