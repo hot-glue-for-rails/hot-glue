@@ -97,7 +97,6 @@ module  HotGlue
                     assoc_class_name = assoc.active_record.name
                     display_column = HotGlue.derrive_reference_name(assoc_class_name)
 
-                    # TODO: add is_owner && check if this nested arg is optional
                     (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
                       "  <%= f.collection_select(:#{col}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col} }, class: 'form-control') %>\n" +
                       (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
