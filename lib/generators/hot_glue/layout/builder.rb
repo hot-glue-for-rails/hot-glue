@@ -61,6 +61,10 @@ module HotGlue
           #
 
           if columns.size > available_columns
+            if available_columns == 0
+              raise "Oopps... No available columns in SMART LAYOUT"
+            end
+
             each_col_can_have = (columns.size.to_f / available_columns.to_f).round
 
             layout_object[:columns][:container] = (0..available_columns-1).collect { |x|

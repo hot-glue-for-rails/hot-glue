@@ -1,6 +1,6 @@
 <\%= turbo_frame_tag "<%=  singular %>-new" do %>
 <h3>
-  New <%= singular.titlecase %>
+  New <%= thing_label %>
   </h3>
   <\%= form_with model:  <%= singular %>, url: <%= form_path_new_helper %>, method: :post do  |f| \%>
     <\%=  render partial: "<%= namespace_with_slash +  @controller_build_folder %>/form",

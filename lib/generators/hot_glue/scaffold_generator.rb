@@ -126,6 +126,8 @@ module HotGlue
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # if used here it will override what is in the config
     class_option :no_list_labels, type: :boolean, default: false
+    class_option :no_list_heading, type: :boolean, default: false
+
     class_option :before_list_labels, type: :boolean, default: false
 
     def initialize(*meta_args)
@@ -263,6 +265,8 @@ module HotGlue
       @no_edit = options['no_edit'] || false
       @no_list = options['no_list'] || false
       @no_list_labels = options['no_list_labels'] || false
+      @no_list_heading = options['no_list_heading'] || false
+
       @display_list_after_update = options['display_list_after_update'] || false
       @smart_layout = options['smart_layout']
 
@@ -645,7 +649,7 @@ module HotGlue
 
     def form_path_edit_helper
       HotGlue.optionalized_ternary(namespace: @namespace,
-                                   target: @singular_class,
+                                   target: @singular,
                                    nested_set: @nested_set,
                                    with_params: true,
                                    put_form: true,
@@ -917,6 +921,22 @@ module HotGlue
 
     def column_width
       @each_col ||= each_col
+    end
+
+    def list_label
+      if(eval("#{class_name}.class_variable_defined?(:@@table_label_plural)"))
+        eval("#{class_name}.class_variable_get(:@@table_label_plural)")
+      else
+        plural.gsub("_", " ").upcase
+      end
+    end
+
+    def thing_label
+      if(eval("#{class_name}.class_variable_defined?(:@@table_label_singular)"))
+        eval("#{class_name}.class_variable_get(:@@table_label_singular)")
+      else
+        singular.gsub("_", " ").upcase
+      end
     end
 
     def each_col

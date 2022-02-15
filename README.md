@@ -663,7 +663,14 @@ Omits list action. Only makes sense to use this if you are create a view where y
 
 ### `--no-list-labels`
 
-Omits list labels. (note that in the form the labels are rendered again anyway)
+Omits list labels at the top of the list.
+
+### `--no-list-heading`
+
+Omits the list heading. 
+
+(Note that on a per model basis, you can also globally omit the heading or set a unique value using 
+`@@table_label_singular` and `@@table_label_plural` on your model objects.)
 
 ### `--no-create`
 
@@ -695,6 +702,18 @@ HotGlue will copy a file named base_controller.rb to the same folder where it tr
 
 Obviously, the created controller will always have this base controller as its subclass. In this way, you are encouraged to implement functionality common to the *namespace* (shared between the controllers in the namespace), using this technique.
 
+## Special Table Labels
+
+If your object is very wordy (like MyGreatHook) and you want it to display in the UI as something shorter,
+add `@@table_label_plural = "The Things"` and `@@table_label_singular = "The Things"`. 
+
+Hot Glue will use this as the listing heading label and New record label. This affects only the UI only.
+
+You can also set these to `nil` to omit the labels completely. 
+
+Child portals have the headings omitted automatically (there is a heading identifying them already on the parent view where they get included), or you can use the `--no-list-heading` on any specific build. 
+
+
 ## Field Types Supported
 
 - Integers that don't end with `_id`: displayed as input fields with type="number"
@@ -714,15 +733,28 @@ Obviously, the created controller will always have this base controller as its s
 
 #### 2022-XX-XX - (unreleased on master)
 • Fixes issue building models with namespaced class names (`Fruits::Apple` and `Fruits::Bannana`). You can now build against these kinds of models natively (be sure to pass the full model name, with double-colon syntax, when building scaffolding). Also fixes issues when associations themselves were namespaced models.
-• N+1 Killer!!! 
+
+• The N+1 Killer (!!!) 
     - N+1 queries for any association built by the list are now automagically killed by the list controllers.
     - Thanks to the work done back in Rails 5.2, Rails smartly uses either two queries to glob up the data OR one query with a LEFT OUTER JOIN if it's faster. Thanks Rails!
     - Hot Glue now adds `.includes(...)` if it is including an association when it loads the list view to eliminate the N+1s
-• Downnest children (portals) can now be created with more space (wider) by adding a + to the end of the downnest name
+    - Bullet is still the best way to identify, find, & fix your N+1 queries and I still highly recommend it. 
+
+• Downnest children (portals) can now be created with more space (wider) by adding a `+` to the end of the downnest name
     - e.g. `--downnest=abc+,xyz`
 
     - This creates two portals: Abcs and Xyzs, but gives the "Abc" portal 5 bootstrap columns instead of 4
-    - Use ++ to give the portal 6 bootstrap columns, etc. 
+    - Use ++ to give the portal 6 bootstrap columns, etc.
+
+• To give a special label to a model, add `@@table_label_plural = "The Things"` and `@@table_label_singular = "The Thing"`. This model will now have a list heading of "The Things" instead of its usual name.
+
+• You can also use `@@table_label_plural = nil` to set these tables to omit the label headings, or use the new flag...
+
+• New flag `--no-list-heading`
+
+Omits the list heading. 
+
+
 
 #### 2022-02-09 - v0.4.8.1 - Issue with Installer for v0.4.8
     - There was an issue for the installer for v0.4.8. This new version v0.4.8.1 correts it.

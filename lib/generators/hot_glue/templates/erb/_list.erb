@@ -1,6 +1,10 @@
 <\%= turbo_frame_tag "<%= plural %>-list" <%= nested_for_turbo_id_list_constructor %>  do %>
   <div class="<%= @container_name %> scaffold-list">
-    <% unless @no_list || @nested_args.any? %><h4><%= plural.gsub("_", " ").upcase %></h4><% end %>
+    <% unless @no_list || @no_list_heading || (@nested_set.any? && !@nested_set.collect{|x| x[:optional]}.any?)  %>
+      <% unless list_label.nil? %><h4>
+        <%= list_label %>
+      </h4><% end %>
+    <% end %>
 
     <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  @controller_build_folder + '/new_button", locals: {}' + @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join()  + ' %\>'.gsub('\\',"")  %><br /><% end %>
 
