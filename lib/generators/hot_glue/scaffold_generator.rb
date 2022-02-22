@@ -125,7 +125,7 @@ module HotGlue
     class_option :smart_layout, type: :boolean, default: false
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # if used here it will override what is in the config
-    class_option :no_list_labels, type: :boolean, default: false
+    class_option :no_list_label, type: :boolean, default: false
     class_option :no_list_heading, type: :boolean, default: false
 
     class_option :before_list_labels, type: :boolean, default: false
@@ -264,7 +264,7 @@ module HotGlue
 
       @no_edit = options['no_edit'] || false
       @no_list = options['no_list'] || false
-      @no_list_labels = options['no_list_labels'] || false
+      @no_list_label = options['no_list_label'] || false
       @no_list_heading = options['no_list_heading'] || false
 
       @display_list_after_update = options['display_list_after_update'] || false
