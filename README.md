@@ -7,7 +7,7 @@ Using Turbo-Rails and Hotwire (default in Rails 7) you get a lightning-fast out-
 
 Every page displays only a list view: new and edit operations happen as 'edit-in-place', so the user never leaves the page.
 
-Because all page navigation is Turbo's responsibilty, everything plugs & plays nicely into a Turbo-backed Rails app.
+Because all page navigation is Turbo's responsibility, everything plugs & plays nicely into a Turbo-backed Rails app.
 
 Alternatively, you can use this tool to create a Turbo-backed *section* of your Rails app-- like an admin interface -- while still treating the rest of the Rails app as an API or building out other features by hand.
 
@@ -661,16 +661,18 @@ Omits pagination. (All list views have pagination by default.)
 Omits list action. Only makes sense to use this if you are create a view where you only want the create button you want to navigate to the update screen alternative ways.
 
 
-### `--no-list-labels`
+### `--no-list-label`
 
-Omits list labels at the top of the list.
+Omits list LABEL itself above the list.
+
+(Note that on a per model basis, you can also globally omit the label or set a unique label value using
+`@@table_label_singular` and `@@table_label_plural` on your model objects.)
+
+Note that list labels may  be automatically omitted on downnested scaffolds.
 
 ### `--no-list-heading`
 
-Omits the list heading. 
-
-(Note that on a per model basis, you can also globally omit the heading or set a unique value using 
-`@@table_label_singular` and `@@table_label_plural` on your model objects.)
+Omits the heading of field names that appears above the 1st row. 
 
 ### `--no-create`
 
