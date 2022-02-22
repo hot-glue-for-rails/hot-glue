@@ -40,11 +40,15 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @<%= @nested_set[0][:singular] %> ||= <%= root_object %> <% else %>
     @<%= @nested_set[0][:singular] %> ||= <%= root_object %>.find(params[:<%=  @nested_set[0][:singular]  %>_id])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0][:optional] %> <% end %>
   end
-  <% end %><% if any_nested? %><% nest_chain = [@nested_set[0][:singular]]; this_scope = @nested_set[0][:plural]; %> <%   @nested_set[1..-1].each_with_index { |arg,index|
-    this_scope =  "#{nest_chain.last}.#{arg[:plural]}"
-    nest_chain << arg %>
+  <% end %><% if any_nested? %><% nest_chain = [@nested_set[0][:singular]]; this_scope = @nested_set[0][:plural]; %>
+    <%   0..(@nested_set.count - 1).step(1).each {  |index|
+      arg = @nested_set[index]
+      last_arg = (index == 0 ? nil : @nested_set[index-1])
+      this_scope =  "#{nest_chain.last}.#{arg[:plural]}"
+      nest_chain << arg %>
   def <%= arg[:singular] %>
-    @<%= arg[:singular] %> ||= (<%= this_scope %>.find(params[:<%= arg[:singular] %>_id])<%= " if params.include?(:#{@nested_set[index][:singular]}_id)" if @god && arg[:optional] %>)<% if @god &&  arg[:optional] %> || (<%= collect_objects[index] %>.find(params[:<%= arg[:singular] %>_id]) if params.include?(:<%= arg[:singular] %>_id) )   <% end %>
+    @<%= arg[:singular] %> ||= (<%= this_scope %>.find(params[:<%= arg[:singular] %>_id])<%= " if params.include?(:#{last_arg[:singular]}_id)" if last_arg && @god && last_arg[:optional] %>)
+    <% if @god &&  (last_arg[:optional] ) %>@<%= arg[:singular] %> ||=  (<%=  collect_objects[index-1] %>.find(params[:<%= arg[:singular] %>_id]) if params.include?(:<%= arg[:singular] %>_id) )   <% end %>
   end<% } %> <% end %> <% if !@self_auth %>
 
   def load_<%= singular_name %>
