@@ -38,7 +38,7 @@ module HotGlue
         require 'open-uri'
 
         # ask HeliosDev.shop if this email is good
-        stream = URI.open("https://heliosdev.shop/check_licenses/hot-glue-license?email=#{license_email}")
+        stream = URI.open("https://heliosdev.shop/check_licenses/hot-glue?email=#{license_email}")
         resp = JSON.parse(stream.read)
 
         if resp['status'] == 'success'
