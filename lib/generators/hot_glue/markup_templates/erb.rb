@@ -5,7 +5,7 @@ module  HotGlue
                   :magic_buttons, :small_buttons,
                   :show_only, :column_width, :layout, :perc_width,
                   :ownership_field,
-                  :columns, :column_width, :col_identifier
+                  :columns, :column_width, :col_identifier, :singular
 
     def add_spaces_each_line(text, num_spaces)
       add_spaces = " " * num_spaces
@@ -13,13 +13,6 @@ module  HotGlue
     end
 
 
-    # include GeneratorHelper
-    attr_accessor :singular
-
-    def field_output(col, type = nil, width, col_identifier )
-      "  <%= f.text_field :#{col}, value: @#{@singular}.#{col}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}' %>\n "+
-      "\n"
-    end
 
 
     def magic_button_output(*args)
@@ -38,14 +31,7 @@ module  HotGlue
       }.join("\n")
     end
 
-    def text_area_output(col, field_length, col_identifier )
-      lines = field_length % 40
-      if lines > 5
-        lines = 5
-      end
 
-      "<%= f.text_area :#{col}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}' %>"
-    end
 
     def list_column_headings(*args)
       @columns = args[0][:columns]
@@ -65,6 +51,10 @@ module  HotGlue
       return result
     end
 
+
+    ################################################################
+
+    # THE FORM
 
     def all_form_fields(*args)
       @columns = args[0][:columns]
@@ -91,13 +81,8 @@ module  HotGlue
                   integer_result(col)
                 when :string
                   string_result(col, sql_type, limit)
-
                 when :text
-                  if sql_type == "varchar"
-                    field_output(col, nil, limit, col_identifier)
-                  else
-                    text_area_output(col, 65536, col_identifier)
-                  end
+                  text_result(col, sql_type, limit)
                 when :float
                   field_output(col, nil, 5, col_identifier)
                 when :datetime
@@ -107,18 +92,10 @@ module  HotGlue
                 when :time
                   "<%= time_field_localized(f, :#{col}, #{singular}.#{col},  '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
                 when :boolean
-                  " " +
-                    "  <span>#{col.to_s.humanize}</span>" +
-                    "  <%= f.radio_button(:#{col},  '0', checked: #{singular}.#{col}  ? '' : 'checked') %>\n" +
-                    "  <%= f.label(:#{col}, value: 'No', for: '#{singular}_#{col}_0') %>\n" +
-                    "  <%= f.radio_button(:#{col}, '1',  checked: #{singular}.#{col}  ? 'checked' : '') %>\n" +
-                    "  <%= f.label(:#{col}, value: 'Yes', for: '#{singular}_#{col}_1') %>\n" +
-                    ""
+                  boolean_result(col)
                 when :enum
-                  enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
-                  "<%= f.collection_select(:#{col},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {selected: @#{singular}.#{col} }, class: 'form-control') %>"
+                  enum_result(col)
                 end
-
               end
 
             if (type == :integer) && col.to_s.ends_with?("_id")
@@ -127,9 +104,10 @@ module  HotGlue
               field_error_name = col
             end
 
-            add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{ 'style="display: inherit;"'}  >\n" +
+            add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
                                     add_spaces_each_line(field_result + "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>", 4) +
                                     "\n  </span>\n  <br />", 2)
+
 
           }.join("") + "\n  </div>"
       }.join("\n")
@@ -170,11 +148,57 @@ module  HotGlue
       end
     end
 
+
+    def text_result(col, sql_type, limit)
+      if sql_type == "varchar"
+        field_output(col, nil, limit, col_identifier)
+      else
+        text_area_output(col, 65536, col_identifier)
+      end
+    end
+
+    def field_output(col, type = nil, width, col_identifier )
+      "  <%= f.text_field :#{col}, value: @#{@singular}.#{col}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}' %>\n "+
+        "\n"
+    end
+
+    def text_area_output(col, field_length, col_identifier )
+      lines = field_length % 40
+      if lines > 5
+        lines = 5
+      end
+
+      "<%= f.text_area :#{col}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}' %>"
+    end
+
+    def boolean_result(col)
+      " " +
+        "  <span>#{col.to_s.humanize}</span>" +
+        "  <%= f.radio_button(:#{col},  '0', checked: #{singular}.#{col}  ? '' : 'checked') %>\n" +
+        "  <%= f.label(:#{col}, value: 'No', for: '#{singular}_#{col}_0') %>\n" +
+        "  <%= f.radio_button(:#{col}, '1',  checked: #{singular}.#{col}  ? 'checked' : '') %>\n" +
+        "  <%= f.label(:#{col}, value: 'Yes', for: '#{singular}_#{col}_1') %>\n" +
+        ""
+    end
+
+    def enum_result(col)
+      enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
+      "<%= f.collection_select(:#{col},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {selected: @#{singular}.#{col} }, class: 'form-control') %>"
+    end
+
+    ################################################################
+
     def paginate(*args)
       plural = args[0][:plural]
 
       "<% if #{plural}.respond_to?(:total_pages) %><%= paginate(#{plural}) %> <% end %>"
     end
+
+
+
+
+    ################################################################
+
 
     def all_line_fields(*args)
       @columns = args[0][:columns]
