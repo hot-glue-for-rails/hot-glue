@@ -3,24 +3,24 @@
 
 Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of the admin-interface style scaffolding systems of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold)).
 
-Using Turbo-Rails and Hotwire (default in Rails 7) you get a lightning-fast out-of-the-box CRUD building experience.
+Using Turbo-Rails and Hotwire (default in Rails 7) you get a lightning-fast out-of-the-box CRUD-building experience.
 
-Every page displays only a list view: new and edit operations happen as 'edit-in-place', so the user never leaves the page.
+Every page displays only a list view: new and edit operations happen as 'edit-in-place,' so the user never leaves the page.
 
 Because all page navigation is Turbo's responsibility, everything plugs & plays nicely into a Turbo-backed Rails app.
 
-Alternatively, you can use this tool to create a Turbo-backed *section* of your Rails app-- like an admin interface -- while still treating the rest of the Rails app as an API or building out other features by hand.
+Alternatively, you can use this tool to create a Turbo-backed *section* of your Rails app -- such as an admin interface -- while still treating the rest of the Rails app as an API or building out other features by hand.
 
-It will read your relationships and field types to generate your code for you, leaving you with a 'sourdough starter' to work from. If you modify the generated code, you're on your own if you want to preserve your changes and also re-generate scaffold after adding fields.
+It will read your relationships and field types to generate your code for you, leaving you with a 'sourdough starter' to work from. If you modify the generated code, you're on your own if you want to preserve your changes and also re-generate scaffolding after adding fields.
 
 By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields.
 
-Hot Glue generates functionality that's quick and dirty. It lets you be crafty. As with a real hot glue gun, use with caution.
+Hot Glue generates functionality that is quick and dirty. It lets you be crafty. As with a real glue gun, use it with caution.
 
 * Build plug-and-play scaffolding mixing generated ERB with the power of Hotwire and Turbo-Rails
-* Everything edits-in-place (unless you use `--big-edit`, then it won't)
-* Automatically Reads Your Models (make them AND migrate your DB before building your scaffolding!)
-* Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination (coming soon: searching & sorting)
+* Everything edits-in-place (unless you use `--big-edit`)
+* Automatically reads your models (make them AND migrate your database before building your scaffolding!)
+* Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination
 * Great for prototyping, but you should learn Rails fundamentals first.
 * 'Packaged' with Devise, Kaminari, Rspec, FontAwesome
 * Create system specs automatically along with the generated code.
@@ -68,9 +68,9 @@ Confirm that both Stimulus and Turbo are working.
 
 **If using JSBundling, make sure to use the new `bin/dev rails` instead of the old `rails server` or else your Webpack will not compile.** 
 
-For the quick step-by-step to help you confirm that both Stimulus and Turbo are working for your new JSBundling-Rails/CSSBunlding-Rails setup [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-new-app-with-js-bundling-css-bundling/).
+For the quick step-by-step guide to help you confirm that both Stimulus and Turbo are working for your new JSBundling-Rails/CSSBunlding-Rails setup [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-new-app-with-js-bundling-css-bundling/).
 
-(Note that Bootstrap is optional for Hot Glue. Here, I am just showing you the default isntallation for simplicity.)
+(Note that Bootstrap is optional for Hot Glue. Here, I am just showing you the default installation for simplicity.)
 
 For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/)
 
@@ -92,18 +92,20 @@ gem 'ffaker'
 ## 3. HOTGLUE INSTALLER
 Add `gem 'hot-glue'` to your Gemfile & `bundle install`
 
-Purchase a license at https://heliosdev.shop/hot-glue-license
+Purchase a license at https://heliosdev.shop/p/hot-glue
 
 During in installation, you MUST supply a `--layout` flag.
 
-### `--layout` flag (NOTE: haml and slim are no longer supported at this time)
+### `--layout` flag (only two options: `hotglue` or `bootstrap`; default is `bootstrap`) 
 Here you will set up and install Hot Glue for the first time. 
 
 It will install a config file that will save two preferences: layout (`hotglue` or `bootstrap`)
 
 The installer will create `config/hot_glue.yml`. 
 
-During the installation, if your `--layout` flag is set to `hotglue` you must also pass `--theme` flag.
+
+### `--theme` flag 
+During the installation, **if** your `--layout` flag is set to `hotglue` you must also pass `--theme` flag.
 
 the themes are:
 • like_mountain_view (Google)
@@ -112,15 +114,16 @@ the themes are:
 • dark_knight (_The Dark Night_ (2008) inspired)
 • like_cupertino (modern Apple-UX inspired)
 
-### `--markup` flag
 
-default is `erb`. IMPORTANT: As of right now, HAML and SLIM are not currently supported.
+### `--markup` flag (NOTE: haml and slim are no longer supported at this time)
+
+default is `erb`. IMPORTANT: As of right now, HAML and SLIM are not currently supported so the only option is also the default `erb`.
 
 
 ### example installing ERB using Bootstrap layout:
 `rails generate hot_glue:install --markup=erb --layout=bootstrap`
 
-### Example installing HAML using Hot Glue layout and the 'like_mountain_view' (Gmail-inspired) theme:
+### Example installing using Hot Glue layout and the 'like_mountain_view' (Gmail-inspired) theme:
 `rails generate hot_glue:install --markup=erb --layout=hotglue --theme=like_mountain_view`
 
 The Hot Glue installer did several things for you in this step. Examine the git diffs or see 'Hot Glue Installer Notes' below.
@@ -140,11 +143,11 @@ https://github.com/FortAwesome/font-awesome-sass
 
 Add to your Gemfile
 
-As of 2022-01-26 Devise for Rails 7 is still not released so you must use **main branch**, like so:
+As of now, Devise for Rails 7 is still not released so you must use **main branch**, like so:
 
 `gem 'devise', branch: 'main', git: 'https://github.com/heartcombo/devise.git'`
 
-(If you are on Rails 6, you must do ALL of the steps in the Legacy Setup steps. Be sure not to skip **Legacy Step #5** (below))
+(If you are on Rails 6, you must do ALL of the steps in the Legacy Setup steps. Be sure not to skip **Legacy Step #5** below)
 
 For Rails 7, be sure you are on the main branch of devise above and your logins should work. (The previously necessary step of disabling turbo shown in Legacy Step #5 is no longer needed. )
 
@@ -205,7 +208,7 @@ this may not have been automatically applied by the installer.
 #### Hot Glue switched Capybara from RACK-TEST to HEADLESS CHROME
 
 - By default Capybara is installed with :rack_test as its driver.
-- This does not support Javascript, and the code from Hot Glue IS NOT fallback compatible-- it will not work on non-Javascript browsers.
+- This does not support Javascript. Hot Glue is not targeted for fallback browsers.
 - From the [Capybara docs](https://github.com/teamcapybara/capybara#drivers):
 ```
 By default, Capybara uses the :rack_test driver, which is fast but limited: it does not support JavaScript
@@ -300,7 +303,7 @@ end
 
 ### `--nested=`
 
-This object is nested within another tree of objects, and there is a nested route in your `routes.rb` file. When specifying the parent(s), be sure to use **singular case**.
+This object is nested within another tree of objects, and there is a nested route in your `routes.rb` file with the specified parent controllers above this controller. When specifying the parent(s), be sure to use **singular case**.
 
 #### Example #1: One-level Nesting
 Invoice `has_many :lines` and a Line `belongs_to :invoice`
@@ -364,11 +367,11 @@ This is "starfish access control" or "poor man's access control."  It works when
 
 #### Optionalized Nested Parents
 
-Add `~` in front of any nested parameter (any parent in the `--nest` list) you want to make optional. This creates a two-headed controller: It can operate with or without that optionalized parameter.
+Add `~` in front of any nested parameter (any parent in the `--nested` list) you want to make optional. This creates a two-headed controller: It can operate with or without that optionalized parameter.
 
-This is an advanced feature is to use **two duplicative routes to the same controller**. You can only use this feature with Gd controller.  
+This is an advanced feature. To use, **make duplicative routes to the same controller**. You can only use this feature with Gd controller.  
 
-Specify your controller *twice* in your routes.rb. Then, in your `--nest` setting, add `~` to any nested parent you want to **make optional**. "Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.  Then the same controller will 'exist' again one-level up in your routes. **If the route has sub-routes, you'll need to re-specify the entire subtree also**.
+Specify your controller *twice* in your routes.rb. Then, in your `--nested` setting, add `~` to any nested parent you want to **make optional**. "Make optional" means the controller will behave as-if it exists in two places: once, at the normal nest level.  Then the same controller will 'exist' again one-level up in your routes. **If the route has sub-routes, you'll need to re-specify the entire subtree also**.
 ```
 namespace :admin
   resources :users do
@@ -378,15 +381,15 @@ namespace :admin
 end
 ```
 
-Even though we have two routes pointed to invoices, both will go to the same controller (`invoices_controller.rb`)
+Even though we have two routes pointed to **invoices**, both will go to the same controller (`app/controllers/admin/invoices_controller.rb`)
 
 ```
-rails generate hot_glue:scaffold User --namespace=admin --gd --downnest=invoices
-rails generate hot_glue:scaffold Invoice --namespace=admin --gd --nest=~users
+rails generate hot_glue:scaffold User --namespace=admin --gd
+rails generate hot_glue:scaffold Invoice --namespace=admin --gd --nested=~users
 ```
 Notice for the Invoice build, the parent user is *optionalized* (not 'optional'-- optionalized: to be made so it can be made optional).  
 
-The Invoices controller, which is a Gd controller, will load the User if a user is specified in the route (`/admin/users/:user_id/invoices/`). It will ALSO work at `/admin/invoices` and will switch back into loading directly from the base class when routed this way.
+The Invoices controller, which is a Gd controller, will load the User if a user is specified in the route (`/admin/users/:user_id/invoices/`). It will ALSO work at `/admin/invoices` and will switch back into loading directly from the base class when routed without the parent user.
 
 
                                                          
@@ -394,11 +397,11 @@ The Invoices controller, which is a Gd controller, will load the User if a user 
 
 By default, it will be assumed you have a `current_user` for your user authentication. This will be treated as the "authentication root" for the "poor man's auth" explained above.
 
-The poor man's auth presumes that object graphs have only one natural way to traverse them (that is, one primary way to traverse them), and that all relationships infer that a set of things or their descendants are granted access to me for reading, writing, updating, and deleting.
+The poor man's auth presumes that object graphs have only one natural way to traverse them (that is, one primary way to traverse them), and that all relationships infer that a set of things or their descendants are granted access to "me" for reading, writing, updating, and deleting.
 
 Of course this is a sloppy way to do access control, and can easily leave open endpoints your real users shouldn't have access to.
 
-When you display anything built with the scaffolding, we assume the `current_user` will have `has_many` association that matches the pluralized name of the scaffold. In the case of nesting, we will automatically find the nested objects first, then continue down the nest chain to find the target object. In this way, we know that all object are 'anchored' to the logged-in user.
+When you display anything built with the scaffolding, Hot Glue assumes the `current_user` will have `has_many` association that matches the pluralized name of the scaffold. In the case of nesting, we will automatically find the nested objects first, then continue down the nest chain to find the target object. This is how Hot Glue assumes all object are 'anchored' to the logged-in user. (As explained in the `--nested` section.)
 
 If you use Devise, you probably already have a `current_user` method available in your controllers. If you don't use Devise, you can implement it in your ApplicationController.
 
@@ -444,6 +447,8 @@ The default (do not pass `auth_identifier=`) will match the `auth` (So if you us
 
 
 `rails generate hot_glue:scaffold Thing --auth=current_account --auth_identifier=login`
+
+ 
 In this example, the controller produced with:
 ```
    before_action :authenticate_login!
@@ -454,11 +459,12 @@ However, the object graph anchors would continue to start from current_account. 
 ```
 
 Use empty string to **turn this method off**:
+ 
 `rails generate hot_glue:scaffold Thing --auth=current_account --auth_identifier=''`
 
 In this case a controller would be generated that would have NO before_action to authenticate the account, but it would still treat the current_account as the auth root for the purpose of loading the objects.
 
-Please note that this example would product non-functional code, so you would need to manually fix your controllers to make sure `current_account` is available to the controller.
+Please note that this example would produce non-functional code, so you would need to manually fix your controllers to make sure `current_account` is available to the controller.
 
 
 ### `--plural=`
@@ -469,14 +475,14 @@ You don't need this if the pluralized version is just + "s" of the singular vers
 ### `--exclude=`
 (separate field names by COMMA)
 
-By default, all fields are included unless they are on the exclude list. (The default for the exclude list is `id`, `created_at`, and `updated_at`  so you don't need to exclude those-- they are added.)
+By default, all fields are included unless they are on the default exclude list. (The default exclude list is `id`, `created_at`, `updated_at`, `encrypted_password`, `reset_password_token`, `reset_password_sent_at`, `remember_created_at`, `confirmation_token`, `confirmed_at`, `confirmation_sent_at`, `unconfirmed_email`.)
 
-If you specify an exclude list, those and the default excluded list will be excluded.
+If you specify any exclude list, those excluded **and** the default exclude list will be excluded. (If you need any of the fields on the default exclude list, you must use `--include` instead.)
 
 
 `rails generate hot_glue:scaffold Account --exclude=password`
 
-(The default excluded list is: :id, :created_at, :updated_at, :encrypted_password, :reset_password_token, :reset_password_sent_at, :remember_created_at, :confirmation_token, :confirmed_at, :confirmation_sent_at, :unconfirmed_email. If you want to edit any fields with the same name, you must use the include flag instead.)
+(The default excluded list is:  If you want to edit any fields with the same name, you must use the include flag instead.)
 
 
 ### `--include=`
@@ -488,42 +494,46 @@ If you specify an include list, it will be treated as a whitelist: no fields wil
 
 You may not specify both include and exclude.
 
-Include setting is affected by both specified grouping and smarty layouts, explained below.
+Include setting is affected by both specified grouping mode and smart layouts, explained below.
 
 
 #### Specified Grouping Mode
 
 To specify grouped columns, separate COLUMNS by a COLON, then separate fields with commas. Specified groupings work like smart layouts (see below), except you drive which groupings make up the columns. 
 
-(Smarty layouts, below, achieves the same effect but automatically groups your fields into a smart number of columns. ) 
+(Smart layouts, below, achieves the same effect but automatically group your fields into a smart number of columns.) 
 
 If you want to group up fields together into columns, use a COLON (`:`) character to specify columns.
 
 Your input **may** have a COLON at the end of it, but otherwise your columns will made **flush left**.
 
-Without specified grouping (and not using smart layout), no group will happen, so these two fields would display in two columns:
-`--include=api_id,api_key`
+Without specified grouping (and not using smart layout), no grouping will happen. So these two fields would display in two (small, 1-column Bootstrap) columns:
+ 
+`--include=first,last`
 
-With a trailing colon you would be specifying the grouping. You're telling Hot Glue to make the two fields into column #1. (There is no other column.)
-`--include=api_id,api_key:`
+With a **trailing colon** you switch Hot Glue into specified grouping mode. You're telling Hot Glue to make the two fields into column #1. (There is no other column.)
+`--include=first,last:`
 
+Hot Glue also happens to know that, for example, when you say "one column" you really want _one visual_ column made up of the available Bootstrap columns. For example, with 1 child portal (4) + the default edit/create buttons (2), you would have 6 remaining bootstrap columns (2+4+6=12). With 6 remaining Bootstrap columns Hot Glue will make 1 _visual colum_ into a 6-column Bootstrap column.
 
-If, for example, you wanted to put the `name` field into column #1 and then the api_id and api_key into column #2, you would use:
-`--include=name:api_id,api_key`
+If, for example, you wanted to put the `email` field into column #1 and then the `first` and `last` into column #2, you would use:
+`--include=email:first,last`
 
+Assuming we have the same number of columns as the above example (6), Hot Glue knows that you now have 2 _visual columns_. It then gives each visual column 3-colum bootstrap columns, which makes your layout into a 3+3+4+2=12 Bootstrap layout. 
 
+**Specifying any colon in your include syntax switches the builder into specified grouping mode.** 
+ 
+The effect will be that the fields will be stacked together into nicely fit columns. (This will look confusing if your end-user is expecting an Excel-like interface.)
 
-Specifying any colon in your include syntax switches the builder into specified grouping mode. The effect will be that the fields will be stacked together into nicely fit columns. (This will look confusing if your user expect an Excel-like interface.)
+With Hot Glue in specified grouping or smart layout mode, it automatically attempts to fit everything into Bootstrap 12-columns. 
 
-With Bootstrap in specified grouping or smart layout mode, it automatically attempts to fit everything into 12-columns. 
-
-Using Bootstrap with neither specified grouping nor smart layouts may make 12 columns, which will produce strange result. (Bootstrap is not designed to work with, for example, a 13-column layout.)
+Using Bootstrap with neither specified grouping nor smart layouts may make more than 12 columns, which will produce strange results. (Bootstrap is not designed to work with, for example, a 13-column layout.)
 
 You should typically either specify your grouping or use smart layouts when building with Bootstrap, but if your use case does not fit the stacking feature you can specify neither flag and then you may then have to deal with the over-stuffed layouts as explained. 
 
 
 
-### `--smart-layout` mode (automatic grouping) (default: false)
+### `--smart-layout` (also known as automatic grouping)
 
 Smart layouts are like specified grouping but Hot Glue does the work of figuring out how many fields you want in each column. 
 
@@ -535,7 +545,7 @@ The effect will be that the fields will be stacked together into nicely fit colu
 
 **If your customer is used to Excel, this feature will confuse them.**
 
-Also, this feature will **probably not** be supported by the SORTING (not yet implemented; TBD). I'm not really sure it makes sense to build a non-columnar layout with sorting, so I think I **probably won't support smart layouts** if you want sorting. (You will be forced to choose between the two which I think makes sense.)
+Also, this feature will **probably not** be supported by the SORTING (not yet implemented). (You will be forced to choose between the two which I think makes sense.)
 
 The layout builder works from right-to-left and starts with 12, the number of Bootstrap's columns.
 
@@ -547,7 +557,7 @@ If you're keeping track, that means we may have used 6 to 8 out of our Bootstrap
 
 If we have 2 downnested portals and only the default buttons, that uses 10 out of 12 Bootstrap columns, leaving only 2 bootstrap columns for the fields.
 
-The layout builder takes the number of columns left and then distributes the feilds 'evenly' among them. However, note that order specified translates to up-to-down within the column, and then left-to-right across the columns, like so:
+The layout builder takes the number of columns remaining and then distributes the feilds 'evenly' among them. However, note that order specified translates to up-to-down within the column, and then left-to-right across the columns, like so:
 
 A D G
 
@@ -557,7 +567,7 @@ C F I
 
 This is what would happen if 9 fields, specified in the order A,B,C,D,E,F,G,H,I, were distributed across 3 columns. 
 
-(If you had a number of fields that wasn't easily divisible by the number of columns, it would leave the final column a few fields short of the others.)
+(If you had a number of fields that wasn't easily divisible by the number of columns, it would leave the final column one or a few fields short of the others.)
 
 
 
@@ -658,12 +668,12 @@ Omits pagination. (All list views have pagination by default.)
 
 ### `--no-list`
 
-Omits list action. Only makes sense to use this if you are create a view where you only want the create button you want to navigate to the update screen alternative ways.
+Omits list action. Only makes sense to use this if want to create a view where you only want the create button or to navigate to the update screen alternative ways. (The new/create still appears, as well the edit, update & destroy actions are still created even though there is no natural way to navigate to them.)
 
 
 ### `--no-list-label`
 
-Omits list LABEL itself above the list.
+Omits list LABEL itself above the list. (Do not confuse with the field labels.)
 
 (Note that on a per model basis, you can also globally omit the label or set a unique label value using
 `@@table_label_singular` and `@@table_label_plural` on your model objects.)
@@ -672,27 +682,27 @@ Note that list labels may  be automatically omitted on downnested scaffolds.
 
 ### `--no-list-heading`
 
-Omits the heading of field names that appears above the 1st row. 
+Omits the heading of column names that appears above the 1st row of data.
 
 ### `--no-create`
 
-Omits create action.
+Omits new & create actions.
 
 ### `--no-delete`
 
-Omits delete action.
+Omits delete button & destroy action.
 
 ### `--big-edit`
 
-If you do not want inline editing of your list items but instead to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
+If you do not want inline editing of your list items but instead want to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
 
-### `--display-list-after-update` (default: false)
+### `--display-list-after-update` 
 
 After an update-in-place normally only the edit view is swapped out for the show view of the record you just edited.
 
 Sometimes you might want to redisplay the entire list after you make an update (for example, if your action removes that record from the result set).
 
-To do this, use flag `--display_list_after_update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
+To do this, use flag `--display-list-after-update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
 
 
 
@@ -702,14 +712,14 @@ To do this, use flag `--display_list_after_update`. The update will behave like 
 
 HotGlue will copy a file named base_controller.rb to the same folder where it tries to create any controller, unless such a file exists there already.
 
-Obviously, the created controller will always have this base controller as its subclass. In this way, you are encouraged to implement functionality common to the *namespace* (shared between the controllers in the namespace), using this technique.
+The created controller will always have this base controller as its subclass. You are encouraged to implement functionality common to the *namespace* (shared between the controllers in the namespace) using this technique.
 
 ## Special Table Labels
 
 If your object is very wordy (like MyGreatHook) and you want it to display in the UI as something shorter,
-add `@@table_label_plural = "The Things"` and `@@table_label_singular = "The Things"`. 
+add `@@table_label_plural = "Hooks"` and `@@table_label_singular = "Hook"`. 
 
-Hot Glue will use this as the listing heading label and New record label. This affects only the UI only.
+Hot Glue will use this as the **list heading** and **New record label**, respectively. This affects only the UI only.
 
 You can also set these to `nil` to omit the labels completely. 
 
@@ -729,6 +739,7 @@ Child portals have the headings omitted automatically (there is a heading identi
 - Time: displayed as HTML5 time picker
 - Boolean: displayed radio buttons yes/ no
 - Enum - displayed as a drop-down list (defined the enum values on your model). For Rails 6 see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
+  - AFAIK, you must specify the enum definition both in your model and also in your database migration for both Rails 6 + Rails 7
 
 
 # VERSION HISTORY
