@@ -97,7 +97,6 @@ module HotGlue
     class_option :nest, type: :string, default: nil # DEPRECATED —— DO NOT USE
     class_option :nested, type: :string, default: ""
 
-
     class_option :namespace, type: :string, default: nil
     class_option :auth, type: :string, default: nil
     class_option :auth_identifier, type: :string, default: nil
@@ -105,6 +104,7 @@ module HotGlue
     class_option :include, type: :string, default: ""
     class_option :god, type: :boolean, default: false
     class_option :gd, type: :boolean, default: false # alias for god
+
     class_option :specs_only, type: :boolean, default: false
     class_option :no_specs, type: :boolean, default: false
     class_option :no_delete, type: :boolean, default: false
@@ -116,23 +116,28 @@ module HotGlue
     class_option :show_only, type: :string, default: ""
 
     class_option :ujs_syntax, type: :boolean, default: nil
-
     class_option :downnest, type: :string, default: nil
     class_option :magic_buttons, type: :string, default: nil
     class_option :small_buttons, type: :boolean, default: nil
-
     class_option :display_list_after_update, type: :boolean, default: false
     class_option :smart_layout, type: :boolean, default: false
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # if used here it will override what is in the config
+
     class_option :no_list_label, type: :boolean, default: false
+
     class_option :no_list_heading, type: :boolean, default: false
 
-    class_option :before_list_labels, type: :boolean, default: false
+
+    # determines if the labels show up BEFORE or AFTER on the NEW/EDIT (form)
+    class_option :form_labels_position, default: 'after' #  'before' or nil for omitted
+    class_option :form_placeholder_labels, default: false # puts the field names into the placeholder labels
+
+    # determines if labels appear within the rows of the list (does NOT affect the list heading)
+    class_option :inline_list_labels, default: false
 
     def initialize(*meta_args)
       super
-
 
       begin
         @the_object = eval(class_name)

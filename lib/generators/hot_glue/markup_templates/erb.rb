@@ -4,16 +4,14 @@ module  HotGlue
     attr_accessor :path, :singular, :singular_class,
                   :magic_buttons, :small_buttons,
                   :show_only, :column_width, :layout, :perc_width,
-                  :ownership_field,
+                  :ownership_field, :form_labels_position,
+                  :inline_list_labels,
                   :columns, :column_width, :col_identifier, :singular
 
     def add_spaces_each_line(text, num_spaces)
       add_spaces = " " * num_spaces
       text.lines.collect{|line| add_spaces + line}.join("")
     end
-
-
-
 
     def magic_button_output(*args)
       path = args[0][:path]
@@ -62,6 +60,7 @@ module  HotGlue
       @singular_class = args[0][:singular_class]
       @col_identifier = args[0][:col_identifier]
       @ownership_field  = args[0][:ownership_field]
+      @form_labels_position = args[0][:form_labels_position]
 
       @singular = args[0][:singular]
       singular = @singular
