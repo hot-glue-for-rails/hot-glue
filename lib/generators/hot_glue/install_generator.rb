@@ -87,11 +87,6 @@ module HotGlue
 
       end
 
-      if Rails.version.split(".")[0].to_i >= 7
-        copy_file "confirmable.js", "#{'spec/dummy/' if Rails.env.test?}app/javascript/controllers/confirmable.js"
-      end
-
-
       begin
         if Rails.version.split(".")[0].to_i == 6
           app_js_contents = File.read("app/javascript/packs/application.js")
