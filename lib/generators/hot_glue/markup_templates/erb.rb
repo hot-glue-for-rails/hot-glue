@@ -1,7 +1,11 @@
 module  HotGlue
   class ErbTemplate < TemplateBase
 
-
+    attr_accessor :path, :singular, :singular_class,
+                  :magic_buttons, :small_buttons,
+                  :show_only, :column_width, :layout, :perc_width,
+                  :ownership_field,
+                  :columns, :column_width, :col_identifier
 
     def add_spaces_each_line(text, num_spaces)
       add_spaces = " " * num_spaces
@@ -44,10 +48,10 @@ module  HotGlue
     end
 
     def list_column_headings(*args)
-      layout_columns = args[0][:columns]
-      column_width = args[0][:column_width]
-      col_identifier = args[0][:col_identifier]
-      layout = args[0][:layout]
+      @columns = args[0][:columns]
+      @column_width = args[0][:column_width]
+      @col_identifier = args[0][:col_identifier]
+      @layout = args[0][:layout]
 
       if layout == "hotglue"
         col_style = " style='flex-basis: #{column_width}%'"
@@ -55,7 +59,7 @@ module  HotGlue
         col_style = ""
       end
 
-      result = layout_columns.map{ |column|
+      result = columns.map{ |column|
         "<div class='#{col_identifier}'" + col_style + ">" +  column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
       }.join("\n")
       return result
@@ -63,15 +67,15 @@ module  HotGlue
 
 
     def all_form_fields(*args)
-      layout_columns = args[0][:columns]
-      show_only = args[0][:show_only]
-      singular_class = args[0][:singular_class]
-      col_identifier = args[0][:col_identifier]
-      ownership_field  = args[0][:ownership_field]
+      @columns = args[0][:columns]
+      @show_only = args[0][:show_only]
+      @singular_class = args[0][:singular_class]
+      @col_identifier = args[0][:col_identifier]
+      @ownership_field  = args[0][:ownership_field]
 
       @singular = args[0][:singular]
       singular = @singular
-      result = layout_columns.map{ |column|
+      result = columns.map{ |column|
         "  <div class='#{col_identifier}' >" +
           column.map { |col|
             field_result =
@@ -84,34 +88,9 @@ module  HotGlue
 
                 case type
                 when :integer
-                  # look for a belongs_to on this object
-                  if col.to_s.ends_with?("_id")
-                    assoc_name = col.to_s.gsub("_id","")
-                    assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-                    if assoc.nil?
-                      exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-                      exit
-                    end
-
-                    is_owner = col == ownership_field
-                    assoc_class_name = assoc.active_record.name
-                    display_column = HotGlue.derrive_reference_name(assoc_class_name)
-
-                    (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
-                      "  <%= f.collection_select(:#{col}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col} }, class: 'form-control') %>\n" +
-                      (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
-                      (is_owner ? "\n<% end %>" : "")
-
-                  else
-                    "<%= f.text_field :#{col}, value: #{singular}.#{col}, class: 'form-control', size: 4, type: 'number' %>"
-
-                  end
+                  integer_result(col)
                 when :string
-                  if sql_type == "varchar" || sql_type == "character varying"
-                    field_output(col, nil, limit || 40, col_identifier)
-                  else
-                    text_area_output(col, 65536, col_identifier)
-                  end
+                  string_result(col, sql_type, limit)
 
                 when :text
                   if sql_type == "varchar"
@@ -158,6 +137,38 @@ module  HotGlue
     end
 
 
+    def integer_result(col)
+      # look for a belongs_to on this object
+      if col.to_s.ends_with?("_id")
+        assoc_name = col.to_s.gsub("_id","")
+        assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+        if assoc.nil?
+          exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+          exit
+        end
+
+        is_owner = col == ownership_field
+        assoc_class_name = assoc.active_record.name
+        display_column = HotGlue.derrive_reference_name(assoc_class_name)
+
+        (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
+          "  <%= f.collection_select(:#{col}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col} }, class: 'form-control') %>\n" +
+          (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
+          (is_owner ? "\n<% end %>" : "")
+
+      else
+        "<%= f.text_field :#{col}, value: #{singular}.#{col}, class: 'form-control', size: 4, type: 'number' %>"
+
+      end
+    end
+
+    def string_result(col, sql_type, limit)
+      if sql_type == "varchar" || sql_type == "character varying"
+        field_output(col, nil, limit || 40, col_identifier)
+      else
+        text_area_output(col, 65536, col_identifier)
+      end
+    end
 
     def paginate(*args)
       plural = args[0][:plural]
@@ -166,17 +177,17 @@ module  HotGlue
     end
 
     def all_line_fields(*args)
-      layout_columns = args[0][:columns]
-      show_only = args[0][:show_only]
-      singular_class = args[0][:singular_class]
-      singular = args[0][:singular]
-      perc_width = args[0][:perc_width]
-      layout = args[0][:layout]
-      col_identifier =   args[0][:col_identifier]  || (layout == "bootstrap" ? "col-md-2" :  "scaffold-cell")
+      @columns = args[0][:columns]
+      @show_only = args[0][:show_only]
+      @singular_class = args[0][:singular_class]
+      @singular = args[0][:singular]
+      @perc_width = args[0][:perc_width]
+      @layout = args[0][:layout]
+      @col_identifier =   args[0][:col_identifier]  || (layout == "bootstrap" ? "col-md-2" :  "scaffold-cell")
 
 
-      columns_count = layout_columns.count + 1
-      perc_width = (perc_width).floor
+      columns_count = columns.count + 1
+      perc_width = (@perc_width).floor
 
       if layout == "bootstrap"
         style_with_flex_basis = ""
@@ -184,7 +195,7 @@ module  HotGlue
         style_with_flex_basis = " style='flex-basis: #{perc_width}%'"
       end
 
-      result = layout_columns.map{ |column|
+      result = columns.map{ |column|
         "<div class='#{col_identifier}'#{style_with_flex_basis}>" +
 
 
