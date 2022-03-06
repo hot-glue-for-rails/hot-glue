@@ -6,7 +6,8 @@ module  HotGlue
                   :show_only, :column_width, :layout, :perc_width,
                   :ownership_field, :form_labels_position,
                   :inline_list_labels,
-                  :columns, :column_width, :col_identifier, :singular
+                  :columns, :column_width, :col_identifier, :singular,
+                  :form_placeholder_labels
 
     def add_spaces_each_line(text, num_spaces)
       add_spaces = " " * num_spaces
@@ -61,6 +62,7 @@ module  HotGlue
       @col_identifier = args[0][:col_identifier]
       @ownership_field  = args[0][:ownership_field]
       @form_labels_position = args[0][:form_labels_position]
+      @form_placeholder_labels = args[0][:form_placeholder_labels]
 
       @singular = args[0][:singular]
       singular = @singular
@@ -136,7 +138,11 @@ module  HotGlue
           (is_owner ? "\n<% end %>" : "")
 
       else
-        "<%= f.text_field :#{col}, value: #{singular}.#{col}, class: 'form-control', size: 4, type: 'number' %>"
+        "  <%= f.text_field :#{col}, value: #{@singular}.#{col}, autocomplete: 'off', size: 4, class: 'form-control', type: 'number'"  + (@form_placeholder_labels ? ", placeholder: '#{col.to_s.humanize}'" : "")  +  " %>\n " + "\n"
+
+        # field_output(col, nil, 4, col_identifier)
+        #
+        # # "<%= f.text_field :#{col}, value: #{singular}.#{col}, class: 'form-control', size: 4, type: 'number' %>"
 
       end
     end
@@ -159,8 +165,7 @@ module  HotGlue
     end
 
     def field_output(col, type = nil, width, col_identifier )
-      "  <%= f.text_field :#{col}, value: @#{@singular}.#{col}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}' %>\n "+
-        "\n"
+      "  <%= f.text_field :#{col}, value: #{@singular}.#{col}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (@form_placeholder_labels ? ", placeholder: '#{col.to_s.humanize}'" : "")  +  " %>\n " + "\n"
     end
 
     def text_area_output(col, field_length, col_identifier )
@@ -169,7 +174,7 @@ module  HotGlue
         lines = 5
       end
 
-      "<%= f.text_area :#{col}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}' %>"
+      "<%= f.text_area :#{col}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}'"  + ( @form_placeholder_labels ? ", placeholder: '#{col.to_s.humanize}'" : "") + " %>"
     end
 
     def boolean_result(col)

@@ -130,11 +130,11 @@ module HotGlue
 
 
     # determines if the labels show up BEFORE or AFTER on the NEW/EDIT (form)
-    class_option :form_labels_position, default: 'after' #  'before' or nil for omitted
+    class_option :form_labels_position, default: 'after' #  choices are before, after, omit
     class_option :form_placeholder_labels, default: false # puts the field names into the placeholder labels
 
-    # determines if labels appear within the rows of the list (does NOT affect the list heading)
-    class_option :inline_list_labels, default: false
+    # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
+    class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
 
     def initialize(*meta_args)
       super
@@ -274,8 +274,15 @@ module HotGlue
 
       @form_labels_position = options['form_labels_position']
       if !['before','after','omit'].include?(@form_labels_position)
-        raise "You passed '#{@form_labels_position}' as the setting for --form-labels-position; the only allowed optinos are before, after, and omit"
+        raise "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
       end
+
+      @form_placeholder_labels = options['form_placeholder_labels'] # true or false
+
+
+      # if !['before','after','omit'].include?(@form_placeholder_labels)
+      #   raise "You passed '#{@form_placeholder_labels}' as the setting for --form-placeholder-labels but the only allowed options are before, after, and omit (default)"
+      # end
 
       @display_list_after_update = options['display_list_after_update'] || false
       @smart_layout = options['smart_layout']
@@ -926,7 +933,8 @@ module HotGlue
         singular: singular,
         col_identifier:  col_identifier,
         ownership_field: @ownership_field,
-        form_labels_position: @form_labels_position
+        form_labels_position: @form_labels_position,
+        form_placeholder_labels: @form_placeholder_labels
       )
     end
 
