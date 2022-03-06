@@ -43,8 +43,10 @@ While you're over there could you give my Youtube channel a follow? Thanks so mu
 --
 
 ## NEW GETTING STARTED VIDEO
-Now with an explanation of the options for **jsbundling/cssbudling** when creating a new Rails 7 app
+The getting started video is newly updated with an explanation of the options for **`jsbundling-rails`/`cssbudling-rails`** when creating a new Rails 7 app.
+
 Check it out on Youtube at https://www.youtube.com/watch?v=bKjKHMTvzZc
+
 While you're over there could you give my Youtube channel a follow? Thanks so much!
 
 
