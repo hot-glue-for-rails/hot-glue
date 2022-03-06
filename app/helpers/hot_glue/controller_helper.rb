@@ -8,43 +8,25 @@ module HotGlue
 
 
     def datetime_field_localized(form_object, field_name, value, label, timezone = nil )
-      res = form_object.label(label,
-                              field_name,
-                              class: 'small form-text text-muted')
-
-      res << form_object.text_field(field_name, class: 'form-control',
+        form_object.text_field(field_name, class: 'form-control',
                                     type: 'datetime-local',
                                     value: date_to_current_timezone(value, timezone))
-
-      res << timezonize(timezone)
-      res
+        + timezonize(timezone)
     end
 
 
     def date_field_localized(form_object, field_name, value, label, timezone = nil )
-
-      res = form_object.label(label,
-                              field_name,
-                              class: 'small form-text text-muted')
-
-      res << form_object.text_field(field_name, class: 'form-control',
+      form_object.text_field(field_name, class: 'form-control',
                                     type: 'date',
                                     value: value )
-
-      res
     end
 
     def time_field_localized(form_object, field_name, value, label, timezone = nil )
-      res = form_object.label(label,
-                              field_name,
-                              class: 'small form-text text-muted')
-
-      res << form_object.text_field(field_name, class: 'form-control',
+      form_object.text_field(field_name, class: 'form-control',
                                     type: 'time',
                                     value: date_to_current_timezone(value, timezone))
+      + timezonize(timezone)
 
-      res << timezonize(timezone)
-      res
     end
 
     def current_timezone

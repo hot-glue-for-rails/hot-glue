@@ -272,6 +272,11 @@ module HotGlue
       @no_list_label = options['no_list_label'] || false
       @no_list_heading = options['no_list_heading'] || false
 
+      @form_labels_position = options['form_labels_position']
+      if !['before','after','omit'].include?(@form_labels_position)
+        raise "You passed '#{@form_labels_position}' as the setting for --form-labels-position; the only allowed optinos are before, after, and omit"
+      end
+
       @display_list_after_update = options['display_list_after_update'] || false
       @smart_layout = options['smart_layout']
 
@@ -920,7 +925,8 @@ module HotGlue
         singular_class: singular_class,
         singular: singular,
         col_identifier:  col_identifier,
-        ownership_field: @ownership_field
+        ownership_field: @ownership_field,
+        form_labels_position: @form_labels_position
       )
     end
 

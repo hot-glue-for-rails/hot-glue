@@ -103,8 +103,10 @@ module  HotGlue
               field_error_name = col
             end
 
+            the_label = "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
             add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
-                                    add_spaces_each_line(field_result + "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>", 4) +
+                                    add_spaces_each_line( (@form_labels_position == 'before' ? the_label : "") +
+                                      field_result + (@form_labels_position == 'after' ? the_label : "")   , 4) +
                                     "\n  </span>\n  <br />", 2)
 
 
@@ -171,8 +173,7 @@ module  HotGlue
     end
 
     def boolean_result(col)
-      " " +
-        "  <span>#{col.to_s.humanize}</span>" +
+      " <br />"  +
         "  <%= f.radio_button(:#{col},  '0', checked: #{singular}.#{col}  ? '' : 'checked') %>\n" +
         "  <%= f.label(:#{col}, value: 'No', for: '#{singular}_#{col}_0') %>\n" +
         "  <%= f.radio_button(:#{col}, '1',  checked: #{singular}.#{col}  ? 'checked' : '') %>\n" +
