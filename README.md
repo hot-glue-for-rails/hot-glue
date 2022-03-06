@@ -47,7 +47,7 @@ The getting started video is newly updated with an explanation of the options fo
 
 Check it out on Youtube at https://www.youtube.com/watch?v=bKjKHMTvzZc
 
-While you're over there could you give my Youtube channel a follow? Thanks so much!
+While you're over there could you give my Youtube channel a 'Subscribe'? (look for the RED SUBSCRIBE BUTTON) Thanks so much!
 
 
 -- 
