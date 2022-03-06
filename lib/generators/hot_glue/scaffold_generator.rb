@@ -133,8 +133,10 @@ module HotGlue
     class_option :form_labels_position, default: 'after' #  choices are before, after, omit
     class_option :form_placeholder_labels, default: false # puts the field names into the placeholder labels
 
+
+    # NOT YET IMPLEMENTED
     # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
-    class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
+    # class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
 
     def initialize(*meta_args)
       super
@@ -170,7 +172,6 @@ module HotGlue
       if !options['markup'].nil?
         message = "Using --markup flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
         raise(HotGlue::Error, message)
-
       end
 
       if !options['markup'].nil?

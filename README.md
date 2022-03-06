@@ -472,6 +472,13 @@ Please note that this example would produce non-functional code, so you would ne
 You don't need this if the pluralized version is just + "s" of the singular version. Only use for non-standard plurlizations, and be sure to pass it as TitleCase (as if you pluralized the model name which is non-standard for Rails)
 
 
+### `--form-labels-position` (default: `after`; options are **before**, **after**, and **omit**)
+By default form labels appear after the form inputs. To make them appear before or omit them, use this flag.
+
+See also `--form-placeholder-labels` to use placeolder labels. 
+
+
+
 ### `--exclude=`
 (separate field names by COMMA)
 
@@ -679,6 +686,13 @@ Omits list LABEL itself above the list. (Do not confuse with the field labels.)
 `@@table_label_singular` and `@@table_label_plural` on your model objects.)
 
 Note that list labels may  be automatically omitted on downnested scaffolds.
+
+### `--form-placeholder-labels` (default: false)
+
+When set to true, fields, numbers, and text areas will have placeholder labels.
+Will not apply to dates, times, datetimes, dropdowns (enums + foreign keys), or booleans.
+
+See also setting `--form-labels-position` to control position or omit normal labels.
 
 ### `--no-list-heading`
 
