@@ -769,6 +769,18 @@ Child portals have the headings omitted automatically (there is a heading identi
 
 # VERSION HISTORY
 
+#### 2022-03-06 - v0.5.0 - Label options before or after or with placeholder labels
+     -  `--form-labels-position` (default: `after`; options are **before**, **after**, and **omit**)
+By default, form labels appear after the form inputs. To make them appear before or omit them, use this flag.
+
+     -  `--form-placeholder-labels` (default: false)
+
+When this flag is set, fields, numbers, and text areas will have placeholder labels.
+Will not apply to dates, times, datetimes, dropdowns (enums + foreign keys), or booleans.
+
+For example see the [https://github.com/jasonfb/hot-glue/releases/tag/v0.5.0](release notes)
+
+
 #### 2022-02-14 - v0.4.9
 • Fixed issue building models with namespaced class names (e.g. `Fruits::Apple` and `Fruits::Bannana`). 
   You can now build against these kinds of models natively (be sure to pass the full model name, with double-colon syntax). 
