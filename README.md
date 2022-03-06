@@ -36,6 +36,11 @@ Hot Glue generates functionality that is quick and dirty. It lets you be crafty.
 | ------------- | ------------- |
 | ![Teachable-225x225](https://user-images.githubusercontent.com/59002/147857335-a919e095-e6de-4718-8513-736d1f283a0b.png)  | Now avaiale on [Teachable](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page)  |
 
+# GETTING STARTED VIDEO
+Now with an explanation of the options for **jsbundling/cssbudling** when creating a new Rails 7 app 
+Check it out on Youtube at https://www.youtube.com/watch?v=bKjKHMTvzZc
+While you're over there could you give my Youtube channel a follow? Thanks so much!
+--
 
 
 
