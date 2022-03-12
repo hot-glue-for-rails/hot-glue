@@ -2,7 +2,6 @@ require 'rails_helper'
 
 
 describe HotGlue::Layout::Builder do
-
   describe "#initialize" do
     let(:builder) {HotGlue::Layout::Builder.new({:include_setting=>nil,
                                                  :downnest_object=> {},
@@ -11,8 +10,6 @@ describe HotGlue::Layout::Builder do
                                                  :columns=>[],
                                                  :smart_layout=>true})
     }
-
-
   end
 
   describe "#construct" do

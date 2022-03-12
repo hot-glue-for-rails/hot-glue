@@ -58,6 +58,7 @@ describe HotGlue::ScaffoldGenerator do
     FileUtils.rm_rf('spec/dummy/app/views/ghis')
     FileUtils.rm_rf('spec/dummy/app/views/abcs')
     FileUtils.rm_rf('spec/dummy/app/views/jkls')
+    FileUtils.rm_rf('spec/dummy/app/views/dfgs')
 
     remove_dir_with_namespace('spec/dummy/app/views/hello')
     remove_dir_with_namespace('spec/dummy/app/controllers/hello')
@@ -703,15 +704,51 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "--inline-list-labels" do
+    it "should by default NOT make inline list labels" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Abc","--god"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
+
+      expect(
+        File.read("spec/dummy/app/views/abcs/_show.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>/
+      ).to be(nil)
+    end
+
+    it "should make placeholder labels" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Abc","--god",
+                                             "--inline-list-labels"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
+
+      expect(
+        File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>/
+      ).to_not be(nil)
+    end
 
   end
 
   describe "--magic-buttons" do
 
+    it "should make a magic button" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--god",
+                                             "--magic-buttons=activate"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
+      res = File.read("spec/dummy/app/views/dfgs/_show.erb")
+      expect(res).to include("<%= f.submit 'Activate'.html_safe, disabled: (dfg.respond_to?(:activateable?) && ! dfg.activateable? ), class: 'dfg-button btn btn-primary ' %>")
+    end
   end
-
-
-  descirbe "--downnest" do
+  
+  describe "--downnest" do
 
   end
 
