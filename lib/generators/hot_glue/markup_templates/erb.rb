@@ -213,7 +213,7 @@ module  HotGlue
       @perc_width = args[0][:perc_width]
       @layout = args[0][:layout]
       @col_identifier =   args[0][:col_identifier]  || (layout == "bootstrap" ? "col-md-2" :  "scaffold-cell")
-
+      @inline_list_labels = args[0][:inline_list_labels] || false
 
       columns_count = columns.count + 1
       perc_width = (@perc_width).floor
@@ -233,7 +233,7 @@ module  HotGlue
           limit = eval("#{singular_class}.columns_hash['#{col}']").limit
           sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
 
-          case type
+          field_output = case type
           when :integer
             # look for a belongs_to on this object
             if col.ends_with?("_id")
@@ -304,7 +304,9 @@ module  HotGlue
 
   "
           end #end of switch
-        }.join("<br />") + "</div>"
+          label = + (inline_list_labels ? "<br/><label class='small form-text text-muted'>#{col.to_s.humanize}</label>" : "")
+          field_output + label
+        }.join(  "<br />") + "</div>"
       }.join("\n")
     end
   end
