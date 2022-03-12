@@ -125,7 +125,6 @@ describe HotGlue::ErbTemplate do
   end
 
   describe "form_placeholder_labels" do
-
     describe "default (no placeholders)" do
       it "with 'omit' should make no labels" do
         res = factory_all_form_fields({columns: [[:name, :blurb]],
@@ -134,7 +133,6 @@ describe HotGlue::ErbTemplate do
 
         expect(res).to eq("  <div class='col-md-2' >  \n    <span class='<%= \"alert-danger\" if jkl.errors.details.keys.include?(:name) %>'  style=\"display: inherit;\"  >\n        <%= f.text_field :name, value: jkl.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>\n       \n  \n    </span>\n    <br />  \n    <span class='<%= \"alert-danger\" if jkl.errors.details.keys.include?(:blurb) %>'  style=\"display: inherit;\"  >\n        <%= f.text_field :blurb, value: jkl.blurb, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>\n       \n  \n    </span>\n    <br />\n  </div>")
       end
-
     end
 
     it "with placeholder labels " do
