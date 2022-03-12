@@ -619,7 +619,6 @@ describe HotGlue::ScaffoldGenerator do
 
 
   describe "--form-labels-position" do
-
     it "by default incldue them after" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
@@ -661,14 +660,42 @@ describe HotGlue::ScaffoldGenerator do
         File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>  <%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>/
       ).to_not be(nil)
     end
-
   end
 
   describe "--form-placeholder-labels" do
+    it "should by default NOT make placeholder labels" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Abc","--god"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
 
+      expect(
+        File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>/
+      ).to_not be(nil)
+    end
+
+    it "should make placeholder labels" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Abc","--god",
+                                             "--form-placeholder-labels"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
+
+      expect(
+        File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '', placeholder: 'Name' %>/
+      ).to_not be(nil)
+    end
   end
 
   describe "--inline-list-labels" do
+
+  end
+
+  describe "--magic-buttons" do
 
   end
 
