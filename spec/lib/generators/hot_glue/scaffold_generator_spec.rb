@@ -2,6 +2,20 @@ require 'rails_helper'
 
 describe HotGlue::ScaffoldGenerator do
 
+  # NOTE: a lot of what is tested here is duplicative with the
+  # tests in some of the service objects
+  # if the functionality has been extracted out of ScaffoldGenerator,
+  # then it only needs to be tested whether or not the flag works
+  # i.e., the smart layout generation is tested by itself
+  #
+  # if, in the event that the ScaffoldGenerator, which is the primary setup agent
+  # + the god (unfortunate) god object somehow doesn't do ITS job correctly,
+  # this file should catch that -- i.e., test only the flags themselves, default, etc.
+
+  # it turns out this is an unfortunate amount of snapshot testing but for
+  # this case I think it has actually worked out well (despite the fact that I generally don't prefer snapshot testing)
+  #
+
   before(:each) do
     remove_everything
   end
@@ -539,9 +553,6 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-
-
-
   describe "ujs syntax" do
     it "should make detele with 'confirm': true for ujs_syntax=true" do
       begin
@@ -699,10 +710,17 @@ describe HotGlue::ScaffoldGenerator do
 
   end
 
-  # TODO: add tests for
-  # --magic-buttons
-  # --downnest
-  # --display-list-after-update
-  # --smart-layout
 
+  descirbe "--downnest" do
+
+  end
+
+  describe "--display-list-after-update" do
+
+  end
+
+
+  describe "--smart-layout" do
+
+  end
 end
