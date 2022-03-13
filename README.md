@@ -691,7 +691,7 @@ Omits list action. Only makes sense to use this if want to create a view where y
 
 ### `--no-list-label`
 
-Omits list LABEL itself above the list. (Do not confuse with the field labels.)
+Omits list LABEL itself above the list. (Do not confuse with the list heading which contains the field labels.)
 
 (Note that on a per model basis, you can also globally omit the label or set a unique label value using
 `@@table_label_singular` and `@@table_label_plural` on your model objects.)

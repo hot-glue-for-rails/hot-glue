@@ -178,12 +178,32 @@ describe HotGlue::ErbTemplate do
     it "should show labels when --inline-list-labels" do
       res = factory_all_line_fields({columns: [[:name], [:blurb], [:cost]],
                                      no_list_heading: true,
-                                     inline_list_labels: true})
+                                     inline_list_labels: 'before'})
 
       expect(res).to include("<label class='small form-text text-muted'>Cost</label>")
       expect(res).to include("<label class='small form-text text-muted'>Blurb</label>")
       expect(res).to include("<label class='small form-text text-muted'>Name</label>")
 
+    end
+
+    it "should show labels when --inline-list-labels" do
+      res = factory_all_line_fields({columns: [[:name], [:blurb], [:cost]],
+                                     no_list_heading: true,
+                                     inline_list_labels: 'after'})
+
+      expect(res).to include("<label class='small form-text text-muted'>Cost</label>")
+      expect(res).to include("<label class='small form-text text-muted'>Blurb</label>")
+      expect(res).to include("<label class='small form-text text-muted'>Name</label>")
+    end
+
+    it "should show labels when --inline-list-labels" do
+      res = factory_all_line_fields({columns: [[:name], [:blurb], [:cost]],
+                                     no_list_heading: true,
+                                     inline_list_labels: 'omit'})
+
+      expect(res).to_not include("<label class='small form-text text-muted'>Cost</label>")
+      expect(res).to_not include("<label class='small form-text text-muted'>Blurb</label>")
+      expect(res).to_not include("<label class='small form-text text-muted'>Name</label>")
     end
   end
 
