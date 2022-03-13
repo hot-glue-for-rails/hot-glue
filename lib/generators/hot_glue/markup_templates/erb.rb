@@ -7,7 +7,9 @@ module  HotGlue
                   :ownership_field, :form_labels_position,
                   :inline_list_labels,
                   :columns, :column_width, :col_identifier, :singular,
-                  :form_placeholder_labels
+                  :form_placeholder_labels, :hawk_keys
+
+
 
     def add_spaces_each_line(text, num_spaces)
       add_spaces = " " * num_spaces
@@ -29,8 +31,6 @@ module  HotGlue
     <% end %>"
       }.join("\n")
     end
-
-
 
     def list_column_headings(*args)
       @columns = args[0][:columns]
@@ -63,6 +63,7 @@ module  HotGlue
       @ownership_field  = args[0][:ownership_field]
       @form_labels_position = args[0][:form_labels_position]
       @form_placeholder_labels = args[0][:form_placeholder_labels]
+      @hawk_keys = args[0][:hawk_keys]
 
       @singular = args[0][:singular]
       singular = @singular
@@ -132,18 +133,19 @@ module  HotGlue
         assoc_class_name = assoc.active_record.name
         display_column = HotGlue.derrive_reference_name(assoc_class_name)
 
+        if @hawk_keys[assoc.foreign_key.to_sym]
+          hawked_association = "#{@hawk_keys[assoc.foreign_key.to_sym]}.#{assoc.plural_name}"
+        else
+          hawked_association = "#{assoc.class_name}.all"
+        end
+
         (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
-          "  <%= f.collection_select(:#{col}, #{assoc.class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col} }, class: 'form-control') %>\n" +
+          "  <%= f.collection_select(:#{col}, #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col} }, class: 'form-control') %>\n" +
           (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
           (is_owner ? "\n<% end %>" : "")
 
       else
         "  <%= f.text_field :#{col}, value: #{@singular}.#{col}, autocomplete: 'off', size: 4, class: 'form-control', type: 'number'"  + (@form_placeholder_labels ? ", placeholder: '#{col.to_s.humanize}'" : "")  +  " %>\n " + "\n"
-
-        # field_output(col, nil, 4, col_identifier)
-        #
-        # # "<%= f.text_field :#{col}, value: #{singular}.#{col}, class: 'form-control', size: 4, type: 'number' %>"
-
       end
     end
 

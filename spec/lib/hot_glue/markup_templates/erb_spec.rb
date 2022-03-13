@@ -28,6 +28,7 @@ describe HotGlue::ErbTemplate do
                                         singular_class: Jkl,
                                         singular: "jkl",
                                         col_identifier:  "col-md-2",
+                                        hawk_keys: {},
                                         ownership_field: "hgi"
                                       }.merge(options)
     )
@@ -223,5 +224,23 @@ describe HotGlue::ErbTemplate do
 
   describe "with an ownership_field" do
 
+  end
+
+
+
+
+  describe "hawked foreign keys" do
+    #  this test is proxy-texting to HotGlue::ErbTemplate#integer_result
+    #
+    #
+
+
+    it "should hawk the dfg_id to the current user" do
+      res = factory_all_form_fields({columns: [[:dfg_id]],
+                                     singular_class: Ghi,
+                                     singular: "ghi",
+                                     hawk_keys: {dfg_id: "current_user"}})
+      expect(res).to include("f.collection_select(:dfg_id, current_user.dfgs,")
+    end
   end
 end

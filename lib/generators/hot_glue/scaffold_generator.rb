@@ -935,6 +935,7 @@ module HotGlue
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
+        hawk_keys: {},  #TODO: FIX ME
         col_identifier:  col_identifier,
         ownership_field: @ownership_field,
         form_labels_position: @form_labels_position,
