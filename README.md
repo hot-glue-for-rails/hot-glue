@@ -71,13 +71,13 @@ _If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github.com/jasonf
 
 ## 1. Rails 7 New App
 
-There are two ways to create new apps on Rails 7: With or without ImportMap. These instructions prefer the **without Importmap** method, but to help you choose [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-do-i-need-importmap-rails/)
+There are two ways to create new apps on Rails 7: With or Without ImportMap. These instructions prefer the **without Importmap** method using ESBuild as the bundler, but to help you choose [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-do-i-need-importmap-rails/)
 
-`rails new --css=bootstrap --javascript=webpack --database=postgresql`
+`rails new --css=bootstrap --javascript=esbuild --database=postgresql`
+
+**If using JSBundling, make sure to use the new `./bin/dev` to start your server instead of the old `rails server` or else your Turbo interactions will not work correctly.** 
 
 Confirm that both Stimulus and Turbo are working.
-
-**If using JSBundling, make sure to use the new `bin/dev rails` instead of the old `rails server` or else your Webpack will not compile.** 
 
 For the quick step-by-step guide to help you confirm that both Stimulus and Turbo are working for your new JSBundling-Rails/CSSBunlding-Rails setup [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-new-app-with-js-bundling-css-bundling/).
 
