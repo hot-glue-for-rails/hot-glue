@@ -428,7 +428,7 @@ module HotGlue
           @ownership_field = assoc.name.to_s + "_id"
         elsif ! @nested_args.any?
 
-          exit_message = "*** Oops: It looks like is no association from class called #{@singular_class} to the current_#{@object_owner_sym}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
+          exit_message = "*** Oops: It looks like is no association from class called `#{@object_owner_sym}` to the object #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
           raise(HotGlue::Error, exit_message)
 
         else
