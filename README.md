@@ -705,6 +705,16 @@ Will not apply to dates, times, datetimes, dropdowns (enums + foreign keys), or 
 
 See also setting `--form-labels-position` to control position or omit normal labels.
 
+### `--inline-list-labels` (before, after, omit; default: omit)
+
+Determines if field label will appear on the LIST VIEW. NOoe that because Hot Glue has no sparate show route or page, 
+this affects the `_show` template which is rendered as a partial from the LIST view.
+
+Because the labels are already in the heading, this `omit` by default. (Use with `--no-list-heading` to omit the labels in the list heading.)
+
+Use `before` to make the labels come before or `after` to make them come after. See Version 0.5.1 release notes for an example.
+
+
 ### `--no-list-heading`
 
 Omits the heading of column names that appears above the 1st row of data.
@@ -768,6 +778,16 @@ Child portals have the headings omitted automatically (there is a heading identi
 
 
 # VERSION HISTORY
+
+#### 2022-03-12  - v0.5.1 - Inline list Labels
+
+`--inline-list-labels` (default: `after`; options are **before**, **after**, and **omit**)
+
+Determines if field label will appear on the LIST VIEW. Note that because Hot Glue has no separate show route or page, this affects the `_show` template which is rendered as a partial from the LIST view.
+
+Because the labels are already in the heading, this `omit` by default. (Use with `--no-list-heading` to omit the labels in the list heading.)
+
+Use `before` to make the labels come before or `after` to make them come after. See Version 0.5.1 release notes for an example.
 
 #### 2022-03-06 - v0.5.0 - Label options before or after or with placeholder labels
    `--form-labels-position` (default: `after`; options are **before**, **after**, and **omit**)
