@@ -26,7 +26,6 @@ describe HotGlue::ErbTemplate do
                                         columns: [[:name, :blurb]],
                                         show_only: [],
                                         singular_class: Jkl,
-
                                         singular: "jkl",
                                         col_identifier:  "col-md-2",
                                         ownership_field: "hgi"

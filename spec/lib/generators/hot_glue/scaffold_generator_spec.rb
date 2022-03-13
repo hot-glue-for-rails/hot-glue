@@ -704,7 +704,7 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "--inline-list-labels" do
-    it "should by default NOT make inline list labels" do
+    it "should by default NOT make inline labels on the show page" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc","--god"])
@@ -717,20 +717,31 @@ describe HotGlue::ScaffoldGenerator do
       ).to be(nil)
     end
 
-    it "should make placeholder labels" do
+    it "should make inline labels on the show page - after" do
       begin
         response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc","--god",
-                                             "--inline-list-labels"])
+                                             "--inline-list-labels=after"])
       rescue StandardError => e
         raise("error building in spec #{e}")
       end
 
-      expect(
-        File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>/
-      ).to_not be(nil)
+      res = File.read("spec/dummy/app/views/abcs/_show.erb")
+      expect(res).to include("<%= abc.name %><br/><label class='small form-text text-muted'>Name</label>")
+
     end
 
+    it "should make inline labels on the show page" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Abc","--god",
+                                             "--inline-list-labels=before"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
+      res = File.read("spec/dummy/app/views/abcs/_show.erb")
+      expect(res).to include("<label class='small form-text text-muted'>Name</label><%= abc.name %>")
+    end
   end
 
   describe "--magic-buttons" do

@@ -136,7 +136,7 @@ module HotGlue
 
     # NOT YET IMPLEMENTED
     # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
-    # class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
+    class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
 
     def initialize(*meta_args)
       super
@@ -279,11 +279,14 @@ module HotGlue
       end
 
       @form_placeholder_labels = options['form_placeholder_labels'] # true or false
+      @inline_list_labels = options['inline_list_labels']  || 'omit' # 'before','after','omit'
 
 
-      # if !['before','after','omit'].include?(@form_placeholder_labels)
-      #   raise "You passed '#{@form_placeholder_labels}' as the setting for --form-placeholder-labels but the only allowed options are before, after, and omit (default)"
-      # end
+      if !['before','after','omit'].include?(@inline_list_labels)
+        raise "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
+      end
+
+
 
       @display_list_after_update = options['display_list_after_update'] || false
       @smart_layout = options['smart_layout']
@@ -989,7 +992,9 @@ module HotGlue
         singular_class: singular_class,
         singular: singular,
         layout: @layout,
-        col_identifier: col_identifier
+        col_identifier: col_identifier,
+        inline_list_labels: @inline_list_labels
+
       )
     end
 
