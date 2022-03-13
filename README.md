@@ -34,7 +34,7 @@ Hot Glue generates functionality that is quick and dirty. It lets you be crafty.
 
 |   |  |  
 | ------------- | ------------- |
-| ![Teachable-225x225](https://user-images.githubusercontent.com/59002/147857335-a919e095-e6de-4718-8513-736d1f283a0b.png)  | Now avaiale on [Teachable](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page)  |
+| ![Teachable-225x225](https://user-images.githubusercontent.com/59002/147857335-a919e095-e6de-4718-8513-736d1f283a0b.png)  | Now avaiale on [Teachable](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page)  |
 
 
 ---
@@ -707,10 +707,9 @@ See also setting `--form-labels-position` to control position or omit normal lab
 
 ### `--inline-list-labels` (before, after, omit; default: omit)
 
-Determines if field label will appear on the LIST VIEW. NOoe that because Hot Glue has no sparate show route or page, 
-this affects the `_show` template which is rendered as a partial from the LIST view.
+Determines if field label will appear on the LIST VIEW. Note that because Hot Glue has no separate show route or page, this affects the `_show` template which is rendered as a partial from the LIST view.
 
-Because the labels are already in the heading, this `omit` by default. (Use with `--no-list-heading` to omit the labels in the list heading.)
+Because the labels are already in the heading, this is `omit` by default. (Use with `--no-list-heading` to omit the labels in the list heading.)
 
 Use `before` to make the labels come before or `after` to make them come after. See Version 0.5.1 release notes for an example.
 
