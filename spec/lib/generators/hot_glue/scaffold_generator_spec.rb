@@ -85,7 +85,7 @@ describe HotGlue::ScaffoldGenerator do
         rescue StandardError => e
 
           expect(e.class).to eq(HotGlue::Error)
-          expect(e.message).to eq("*** Oops: It looks like is no association from class called Abc to the current_user. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god.")
+          expect(e.message).to eq("*** Oops: It looks like is no association from class called `user` to the object Abc. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god.")
         end
       end
     end
