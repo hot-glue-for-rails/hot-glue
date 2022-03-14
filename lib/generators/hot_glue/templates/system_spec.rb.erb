@@ -10,7 +10,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     when :integer
       if col.to_s.ends_with?("_id")
         assoc = "#{col.to_s.gsub('_id','')}"
-        "let!(:#{assoc}1) {create(:#{assoc})}"
+        "let!(:#{assoc}1) {create(:#{assoc}" +  (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")   + ")}"
       end
     else
     end
