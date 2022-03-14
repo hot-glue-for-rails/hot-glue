@@ -151,10 +151,6 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     params.require(:<%=singular_name%>).permit( <%= @columns + @magic_buttons.collect(&:to_sym) %> )
   end
 
-  def default_colspan
-    <%= @default_colspan %>
-  end
-
   def namespace
     <% if @namespace %>"<%= @namespace %>/" <% else %>""<% end %>
   end

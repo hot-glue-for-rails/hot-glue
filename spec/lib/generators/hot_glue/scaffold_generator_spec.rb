@@ -40,6 +40,8 @@ describe HotGlue::ScaffoldGenerator do
 
     FileUtils.rm("spec/dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/dummy/app/controllers/xyzs_controller.rb")
     FileUtils.rm("spec/dummy/app/controllers/dfgs_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
+    FileUtils.rm("spec/dummy/app/controllers/ghis_controller.rb") if File.exists?("spec/dummy/app/controllers/ghis_controller.rb")
+
     FileUtils.rm("spec/dummy/app/controllers/cantelopes_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
 
     FileUtils.rm("spec/dummy/app/controllers/all_dfgs_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
