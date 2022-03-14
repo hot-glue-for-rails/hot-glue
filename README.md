@@ -480,7 +480,21 @@ Please note that this example would produce non-functional code, so you would ne
 
 ### `--plural=`
 
-You don't need this if the pluralized version is just + "s" of the singular version. Only use for non-standard plurlizations, and be sure to pass it as TitleCase (as if you pluralized the model name which is non-standard for Rails)
+You don't need this if the pluralized version is just + "s" of the singular version.
+Only use for non-standard plurlizations, and be sure to pass it as TitleCase (as if you pluralized the model name which is non-standard for Rails)
+
+An better alternative is to define the non-standard plurlizations globally in your app.
+
+Make a file at `config/initializers/inflections.rb`
+
+# Add new inflection rules using the following format
+ActiveSupport::Inflector.inflections do |inflect|
+    inflect.irregular 'clothing', 'clothes'
+    inflect.irregular 'human', 'humans'  
+
+
+    # the standard pluralization is pretty sexist and will pluralize `human` to `humen`
+end
 
 
 ### `--form-labels-position` (default: `after`; options are **before**, **after**, and **omit**)
@@ -772,13 +786,20 @@ Child portals have the headings omitted automatically (there is a heading identi
 - Date: displayed as HTML5 date picker
 - Time: displayed as HTML5 time picker
 - Boolean: displayed radio buttons yes/ no
-- Enum - displayed as a drop-down list (defined the enum values on your model). For Rails 6 see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
+- Enum - displayed as a drop-down list (defined the enum values on your model). 
+  - For Rails 6 see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
   - AFAIK, you must specify the enum definition both in your model and also in your database migration for both Rails 6 + Rails 7
 
 
 # VERSION HISTORY
 
-#### 2022-03-12  - v0.5.1 - Inline list Labels
+#### ???? - v0.5.2 - Hawked Foreign Keys
+
+
+
+
+
+#### 2022-03-12  - v0.5.1 - Inline List Labels
 
 `--inline-list-labels` (default: `after`; options are **before**, **after**, and **omit**)
 

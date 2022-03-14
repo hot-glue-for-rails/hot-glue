@@ -6,4 +6,6 @@ class User < ApplicationRecord
 
   has_many :dfgs
   has_many :xyzs
+
+  has_many :ghis, through: :dfgs
 end

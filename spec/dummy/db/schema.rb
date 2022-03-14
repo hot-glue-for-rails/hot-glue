@@ -12,6 +12,12 @@
 
 ActiveRecord::Schema.define(version: 2022_02_01_165048) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
+  # These are custom enum types that must be created before they can be used in the schema definition
+  create_enum "genres", ["Fiction", "Nonfiction", "Mystery", "Romance", "Novel"]
+
   create_table "abcs", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
@@ -34,6 +40,7 @@ ActiveRecord::Schema.define(version: 2022_02_01_165048) do
 
   create_table "ghis", force: :cascade do |t|
     t.integer "dfg_id"
+    t.integer "xyz_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -57,7 +64,7 @@ ActiveRecord::Schema.define(version: 2022_02_01_165048) do
     t.date "release_on"
     t.time "time_of_day"
     t.boolean "selected"
-    t.integer "genre"
+    t.enum "genre", as: "genres"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

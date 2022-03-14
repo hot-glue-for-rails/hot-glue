@@ -6,10 +6,11 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 gemspec
 
 # not required for your app
-gem 'sqlite3'
+gem 'postgresql'
 gem 'byebug'
 gem 'rails'
 gem 'devise', require: true
+# gem 'progress_formatter'
 
 # for testing
 gem "rails-controller-testing", group: [:test]

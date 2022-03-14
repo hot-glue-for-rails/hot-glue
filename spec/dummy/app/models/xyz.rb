@@ -6,6 +6,8 @@ class Xyz < ApplicationRecord
 
   belongs_to :user
 
+  has_many :ghis
+
   def name
     # "nothing here"
   end

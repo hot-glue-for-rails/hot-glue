@@ -123,6 +123,7 @@ module HotGlue
     class_option :smart_layout, type: :boolean, default: false
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # if used here it will override what is in the config
+    class_option :hawk, type: :string, default: nil #
 
     class_option :no_list_label, type: :boolean, default: false
 
@@ -414,6 +415,31 @@ module HotGlue
 
       @menu_file_exists = true if @nested_args.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
+      @hawk_keys = {}
+
+      if options['hawk']
+        options['hawk'].split(",").each do |hawk_entry|
+          # format is: abc_id[thing]
+
+          if hawk_entry.include?("[")
+            # TODO: IMPLEMENT ME
+            # regexp_res =  hawk_entry =~ /$1[$2]/
+            # byebug
+            #
+            # key, hawk_to = $1, $2
+            #
+            # puts ""
+          else
+            key = hawk_entry
+            hawk_to = @auth
+          end
+
+          @hawk_keys[key.to_sym] = hawk_to
+        end
+
+        puts "HAWKING: #{@hawk_keys}"
+      end
+
     end
 
     def identify_object_owner
@@ -427,8 +453,7 @@ module HotGlue
         if assoc
           @ownership_field = assoc.name.to_s + "_id"
         elsif ! @nested_args.any?
-
-          exit_message = "*** Oops: It looks like is no association from class called `#{@object_owner_sym}` to the object #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
+          exit_message = "*** Oops: It looks like is no association `#{@object_owner_sym}` from the object #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
           raise(HotGlue::Error, exit_message)
 
         else
@@ -935,7 +960,7 @@ module HotGlue
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
-        hawk_keys: {},  #TODO: FIX ME
+        hawk_keys: @hawk_keys,
         col_identifier:  col_identifier,
         ownership_field: @ownership_field,
         form_labels_position: @form_labels_position,
