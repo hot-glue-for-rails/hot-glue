@@ -433,8 +433,8 @@ module HotGlue
             key = hawk_entry
             hawk_to = @auth
           end
-
-          @hawk_keys[key.to_sym] = hawk_to
+          hawk_scope = key.gsub("_id", "").pluralize
+          @hawk_keys[key.to_sym] = [hawk_to, hawk_scope]
         end
 
         puts "HAWKING: #{@hawk_keys}"
@@ -1156,7 +1156,17 @@ module HotGlue
     def cc_filename_with_extensions(name, file_format = format)
       [name, file_format].compact.join(".")
     end
+
+
+
+    def hawk_to_ruby
+      @hawk_keys.collect{ |k,v|
+        "#{k}: [#{v[0]}, \"#{v[1]}\"] "
+      }.join(", ")
+    end
   end
+
+
 end
 
 

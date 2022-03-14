@@ -239,7 +239,7 @@ describe HotGlue::ErbTemplate do
       res = factory_all_form_fields({columns: [[:dfg_id]],
                                      singular_class: Ghi,
                                      singular: "ghi",
-                                     hawk_keys: {dfg_id: "current_user"}})
+                                     hawk_keys: {dfg_id: ["current_user", "dfgs"] }})
       expect(res).to include("f.collection_select(:dfg_id, current_user.dfgs,")
     end
   end

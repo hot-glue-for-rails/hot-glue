@@ -790,8 +790,19 @@ describe HotGlue::ScaffoldGenerator do
     end
 
 
+    it "should protect against a malicious input" do
+      begin
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Ghi",
+                                             "--hawk=dfg_id,xyz_id"])
+      rescue StandardError => e
+        raise("error building in spec #{e}")
+      end
 
+      res = File.read("spec/dummy/app/controllers/ghis_controller.rb")
+      expect(res).to include("hawk_params( {dfg_id: [current_user, \"dfgs\"] , xyz_id: [current_user, \"xyzs\"] }, modified_params)")
 
+    end
   end
 
   describe "--downnest" do

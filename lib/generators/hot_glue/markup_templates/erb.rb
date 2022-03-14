@@ -134,7 +134,10 @@ module  HotGlue
         display_column = HotGlue.derrive_reference_name(assoc_class_name)
 
         if @hawk_keys[assoc.foreign_key.to_sym]
-          hawked_association = "#{@hawk_keys[assoc.foreign_key.to_sym]}.#{assoc.plural_name}"
+          hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
+          hawk_root = hawk_definition[0]
+          hawk_scope = hawk_definition[1]
+          hawked_association = "#{hawk_root}.#{hawk_scope}"
         else
           hawked_association = "#{assoc.class_name}.all"
         end
