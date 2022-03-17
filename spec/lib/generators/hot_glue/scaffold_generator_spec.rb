@@ -66,6 +66,65 @@ describe HotGlue::ScaffoldGenerator do
     remove_dir_with_namespace('spec/dummy/app/controllers/hello')
   end
 
+  describe "#identify_object_owner" do
+    # the Dfh model has an association for user_id
+    let (:generator) {HotGlue::ScaffoldGenerator.new(["Dfg"], [], {:shell=> Thor::Shell::Color.new})}
+
+    describe "when @object_owner_sym is empty" do
+      it "should do nothing" do
+        expect{
+          generator.identify_object_owner
+        }.to_not raise_error(HotGlue::Error)
+      end
+    end
+
+    describe "when @object_owner_sym is NOT empty it should attempt to find the object's owner" do
+      describe "when the object owner symbol is found via reflect_on_association (the current object has such an association)" do
+        it "should set the object owner to the association" do
+          expect(generator.instance_variable_get(:@ownership_field)).to eq("user_id")
+        end
+      end
+
+      describe "when the object owner symbol is NOT found via reflect_on_association" do
+        let (:generator) {HotGlue::ScaffoldGenerator.new(["Abc"], [], {:shell=> Thor::Shell::Color.new})}
+
+        describe "when there are not any nested args" do
+          it "should raise" do
+            # the Abc model does not have a user_id
+            #
+            expect {
+              generator.identify_object_owner
+            }.to raise_exception
+          end
+        end
+
+        describe "When there are nested args" do
+
+          describe "when the user accidentally uses the plural form for the object owner" do
+            let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--nested=dfgs"], {:shell=> Thor::Shell::Color.new})}
+
+            it "should suggest that I meant the singular version" do
+              expect {
+                generator.identify_object_owner
+              }.to raise_exception("*** Oops: you tried to nest Ghi within a route for `dfgs` but I can't find an association for this relationship. Did you mean `dfg` (singular) instead?")
+            end
+          end
+
+          describe "when all else fails" do
+            # I think not reachable
+            # let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--nested=dfg"], {:shell=> Thor::Shell::Color.new})}
+
+            # it "should tell me I'm missing a relationship from Dfg to user " do
+            #   expect {
+            #     generator.identify_object_owner
+            #   }.to raise_exception("")
+            # end
+          end
+        end
+      end
+    end
+  end
+
   describe "with no object for the model specified" do
     it "with no object for the model specified" do
 
@@ -178,7 +237,7 @@ describe HotGlue::ScaffoldGenerator do
       end
 
 
-      it "should create the controler" do
+      it "should create the controller" do
         begin
           response = Rails::Generators.invoke("hot_glue:scaffold",
                                               ["Dfg"])
@@ -223,11 +282,6 @@ describe HotGlue::ScaffoldGenerator do
     it "should create a file at and specs/system" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Ghi","--nested=dfg"])
-      # begin
-      #
-      # rescue StandardError => e
-      #   raise("error building in spec #{e}")
-      # end
 
       expect(File.exist?("spec/dummy/app/controllers/ghis_controller.rb")).to be(true)
       expect(File.exist?("spec/dummy/spec/system/ghis_behavior_spec.rb")).to be(true)
@@ -812,8 +866,7 @@ describe HotGlue::ScaffoldGenerator do
   describe "--display-list-after-update" do
 
   end
-
-
+  
   describe "--smart-layout" do
 
   end

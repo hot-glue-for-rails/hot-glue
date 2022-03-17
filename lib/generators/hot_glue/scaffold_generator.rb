@@ -370,12 +370,19 @@ module HotGlue
       # if the magic buttons are present, build the update action anyway
 
 
+      @ujs_syntax = options['ujs_syntax']
+      if !@ujs_syntax
+        @ujs_syntax = !defined?(Turbo::Engine)
+      end
+
+
+
+      @reference_name = HotGlue.derrive_reference_name(singular_class)
       if @auth && ! @self_auth && @nested_args.none?
         @object_owner_sym = @auth.gsub("current_", "").to_sym
         @object_owner_eval = @auth
         @object_owner_optional = false
       else
-
         if @nested_args.any?
           @object_owner_sym = @nested_set.last[:singular].to_sym
           @object_owner_eval = "@#{@nested_set.last[:singular]}"
@@ -386,14 +393,6 @@ module HotGlue
           @object_owner_eval = ""
         end
       end
-
-
-      @ujs_syntax = options['ujs_syntax']
-
-      if !@ujs_syntax
-        @ujs_syntax = !defined?(Turbo::Engine)
-      end
-      @reference_name = HotGlue.derrive_reference_name(singular_class)
 
       identify_object_owner
       setup_fields
@@ -457,10 +456,9 @@ module HotGlue
           raise(HotGlue::Error, exit_message)
 
         else
-
           if eval(singular_class + ".reflect_on_association(:#{@object_owner_sym.to_s})").nil? && !eval(singular_class + ".reflect_on_association(:#{@object_owner_sym.to_s.singularize})").nil?
             exit_message = "*** Oops: you tried to nest #{singular_class} within a route for `#{@object_owner_sym}` but I can't find an association for this relationship. Did you mean `#{@object_owner_sym.to_s.singularize}` (singular) instead?"
-          else
+          else  # NOTE: not reachable
             exit_message = "*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god."
           end
 
@@ -1157,16 +1155,12 @@ module HotGlue
       [name, file_format].compact.join(".")
     end
 
-
-
     def hawk_to_ruby
       @hawk_keys.collect{ |k,v|
         "#{k}: [#{v[0]}, \"#{v[1]}\"] "
       }.join(", ")
     end
   end
-
-
 end
 
 
