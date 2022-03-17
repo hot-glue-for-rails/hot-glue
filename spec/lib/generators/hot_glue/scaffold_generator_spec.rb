@@ -866,7 +866,7 @@ describe HotGlue::ScaffoldGenerator do
   describe "--display-list-after-update" do
 
   end
-  
+
   describe "--smart-layout" do
 
   end

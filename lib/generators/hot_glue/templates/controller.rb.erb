@@ -19,7 +19,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <% } %><% end %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
   after_action -> { flash.discard }, if: -> { request.format.symbol ==  :turbo_stream }
-<% if @nested_args.any? %>
+<% if @nested_set.any? %>
   def <%= @nested_set[0][:singular] %><% if @god
        next_object = nil
        collect_objects = @nested_set.reverse.collect {|x|

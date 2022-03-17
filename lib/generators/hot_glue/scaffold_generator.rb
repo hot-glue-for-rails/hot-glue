@@ -321,43 +321,6 @@ module HotGlue
         raise "This controller appears to be the same as the authentication object but in this context you cannot build a new/create action; please re-run with --no-create flag"
       end
 
-      # old syntax
-      @nested_args = []
-
-      # new syntax
-      # @nested_set = [
-      # {
-      #    singular: ...,
-      #    plural: ...,
-      #    optional: false
-      # }]
-      @nested_set = []
-
-      if ! @nested.nil?
-
-
-        @nested_args = @nested.split("/").collect{|x| x.gsub("~","")}
-
-        @nested_set = @nested.split("/").collect { |arg|
-          is_optional = arg.start_with?("~")
-          arg.gsub!("~","")
-          {
-            singular: arg,
-            plural: arg.pluralize,
-            optional: is_optional
-          }
-
-        }
-
-        puts "@nested_set is #{@nested_set}"
-        @nested_args_plural = {}
-
-
-        @nested_args.each do |a|
-          @nested_args_plural[a] = a + "s"
-        end
-      end
-
       @magic_buttons = []
       if options['magic_buttons']
         @magic_buttons = options['magic_buttons'].split(',')
@@ -369,21 +332,46 @@ module HotGlue
       @build_update_action = !@no_edit || !@magic_buttons.empty?
       # if the magic buttons are present, build the update action anyway
 
-
       @ujs_syntax = options['ujs_syntax']
       if !@ujs_syntax
         @ujs_syntax = !defined?(Turbo::Engine)
       end
 
 
+      # NEST CHAIN
+      # old syntax —— TODO: REMOVE ME
 
+      # new syntax
+      # @nested_set = [
+      # {
+      #    singular: ...,
+      #    plural: ...,
+      #    optional: false
+      # }]
+      @nested_set = []
+
+      if ! @nested.nil?
+        @nested_set = @nested.split("/").collect { |arg|
+          is_optional = arg.start_with?("~")
+          arg.gsub!("~","")
+          {
+            singular: arg,
+            plural: arg.pluralize,
+            optional: is_optional
+          }
+
+        }
+        puts "NESTING: #{@nested_set}"
+      end
+
+      # OBJECT OWNERSHIP & NESTING
       @reference_name = HotGlue.derrive_reference_name(singular_class)
-      if @auth && ! @self_auth && @nested_args.none?
+      if @auth && ! @self_auth && @nested_set.none?
         @object_owner_sym = @auth.gsub("current_", "").to_sym
         @object_owner_eval = @auth
         @object_owner_optional = false
       else
-        if @nested_args.any?
+        if @nested_set.any?
           @object_owner_sym = @nested_set.last[:singular].to_sym
           @object_owner_eval = "@#{@nested_set.last[:singular]}"
           @object_owner_name = @nested_set.last[:singular]
@@ -393,10 +381,11 @@ module HotGlue
           @object_owner_eval = ""
         end
       end
-
       identify_object_owner
-      setup_fields
 
+
+      # SETUP FIELDS & LAYOUT
+      setup_fields
       if  (@columns - @show_only - (@object_owner_sym.empty? ? [] : [@ownership_field.to_sym])).empty?
         @no_field_form = true
       end
@@ -412,7 +401,7 @@ module HotGlue
                                             })
       @layout_object = builder.construct
 
-      @menu_file_exists = true if @nested_args.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
+      @menu_file_exists = true if @nested_set.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
       @hawk_keys = {}
 
@@ -451,7 +440,7 @@ module HotGlue
 
         if assoc
           @ownership_field = assoc.name.to_s + "_id"
-        elsif ! @nested_args.any?
+        elsif ! @nested_set.any?
           exit_message = "*** Oops: It looks like is no association `#{@object_owner_sym}` from the object #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
           raise(HotGlue::Error, exit_message)
 
@@ -613,8 +602,8 @@ module HotGlue
     end
 
     def object_parent_mapping_as_argument_for_specs
-      if @nested_args.any?
-        ", " + @nested_args.last + ": " + @nested_args.last
+      if @nested_set.any?
+        ", " + @nested_set.last[:singular] + ": " + @nested_set.last[:singular]
       elsif @auth
         ", #{@auth_identifier}: #{@auth}"
       end
@@ -626,20 +615,18 @@ module HotGlue
         last_parent = ", #{@auth_identifier}: #{@auth}"
       end
 
-      @nested_args.each do |arg|
-        res << "  let(:#{arg}) {create(:#{arg} #{last_parent} )}\n"
-        last_parent = ", #{arg}: #{arg}"
+      @nested_set.each do |arg|
+        res << "  let(:#{arg[:singular]}) {create(:#{arg[:singular]} #{last_parent} )}\n"
+        last_parent = ", #{arg[:singular]}: #{arg[:singular]}"
       end
       res
     end
 
-
     def objest_nest_params_by_id_for_specs
-      @nested_args.map{|arg|
-        "#{arg}_id: #{arg}.id"
+      @nested_set.map{|arg|
+        "#{arg[:singular]}_id: #{arg[:singular]}.id"
       }.join(",\n          ")
     end
-
 
     def controller_class_name
       @controller_build_name
@@ -662,8 +649,8 @@ module HotGlue
     end
 
     def path_helper_args
-      if @nested_args.any? && @nested
-        [(@nested_args).collect{|a| "#{a}"} , singular].join(",")
+      if @nested_set.any? && @nested
+        [(@nested_set).collect{|a| "#{a[:singular]}"} , singular].join(",")
       else
         singular
       end
@@ -671,7 +658,7 @@ module HotGlue
 
     def path_helper_singular
       if @nested
-        "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{@controller_build_folder_singular}_path"
+        "#{@namespace+"_" if @namespace}#{(@nested_set.collect{|x| x[:singular]}.join("_") + "_" if @nested_set.any?)}#{@controller_build_folder_singular}_path"
       else
         "#{@namespace+"_" if @namespace}#{@controller_build_folder_singular}_path"
       end
@@ -720,7 +707,7 @@ module HotGlue
 
     def path_arity
       res = ""
-      if @nested_args.any? && @nested
+      if @nested_set.any? && @nested
         res << nested_objects_arity + ", "
       end
       res << "@" + singular
@@ -739,33 +726,24 @@ module HotGlue
     end
 
     def new_path_name
-
       HotGlue.optionalized_ternary(namespace: @namespace,
                                    target: singular,
                                    nested_set: @nested_set,
                                    modifier: "new_",
                                    with_params: true)
-      # base =   "new_#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_") if @nested_args.any?}#{@controller_build_folder_singular}_path"
-      # if @nested_args.any?
-      #   base += "(" + @nested_args.collect { |arg|
-      #     "#{arg}.id"
-      #   }.join(", ") + ")"
-      # end
-      # base
     end
 
     def nested_assignments
-      return "" if @nested_args.none?
-      @nested_args.map{|a| "#{a}: #{a}"}.join(", ") #metaprgramming into Ruby hash
+      return "" if @nested_set.none?
+      @nested_set.map{|a| "#{a}: #{a}"}.join(", ") #metaprgramming into Ruby hash
     end
 
     def nested_assignments_top_level # this is by accessing the instance variable-- only use at top level
-      @nested_args.map{|a| "#{a}: @#{a}"}.join(", ") #metaprgramming into Ruby hash
+      @nested_set.map{|a| "#{a[:singular]}"}.join(", ") #metaprgramming into Ruby hash
     end
 
-
     def nest_assignments_operator(top_level = false, leading_comma = false)
-      if @nested_args.any?
+      if @nested_set.any?
         "#{", " if leading_comma}#{top_level ? nested_assignments_top_level : nested_assignments }"
       else
         ""
@@ -777,25 +755,25 @@ module HotGlue
     end
 
     def nested_objects_arity
-      @nested_args.map{|a| "@#{a}"}.join(", ")
+      @nested_set.map{|a| "@#{a[:singular]}"}.join(", ")
     end
 
     def nested_arity_for_path
-      [@nested_args[0..-1].collect{|a| "@#{a}"}].join(", ") #metaprgramming into arity for the Rails path helper
+      [@nested_set[0..-1].collect{|a| "@#{a[:singular]}"}].join(", ") #metaprgramming into arity for the Rails path helper
     end
 
     def object_scope
       if @auth
-        if @nested_args.none?
+        if @nested_set.none?
           @auth + ".#{plural}"
         else
-          "@" + @nested_args.last + ".#{plural}"
+          "@" + @nested_set.last[:singular] + ".#{plural}"
         end
       else
-        if @nested_args.none?
+        if @nested_set.none?
           @singular_class
         else
-          "@" + @nested_args.last + ".#{plural}"
+          "@" + @nested_set.last[:singular] + ".#{plural}"
         end
 
       end
@@ -806,10 +784,10 @@ module HotGlue
       if @auth
         if @self_auth
           @singular_class + ".where(id: #{@auth}.id)"
-        elsif @nested_args.none?
+        elsif @nested_set.none?
           @auth + ".#{plural}"
         else
-          "@" + @nested_args.last + ".#{plural}"
+          "@" + @nested_set.last[:singular] + ".#{plural}"
         end
       else
         @singular_class + ".all"
@@ -817,7 +795,7 @@ module HotGlue
     end
 
     def any_nested?
-      @nested_args.any?
+      @nested_set.any?
     end
 
     def all_objects_variable
@@ -1130,7 +1108,7 @@ module HotGlue
     def nested_for_turbo_nested_constructor(top_level = true)
       instance_symbol = "@" if top_level
       instance_symbol = "" if !top_level
-      if @nested_args.none?
+      if @nested_set.none?
         "\"\""
       else
         @nested_set.collect{|arg|
@@ -1142,10 +1120,10 @@ module HotGlue
     def nested_for_assignments_constructor(top_level = true)
       instance_symbol = "@" if top_level
       instance_symbol = "" if !top_level
-      if @nested_args.none?
+      if @nested_set.none?
         ""
       else
-        ", \n    nested_for: \"" + @nested_args.collect{|a| "#{a}-" + '#{' + instance_symbol + a + ".id}"}.join("__") + "\""
+        ", \n    nested_for: \"" + @nested_set.collect{|a| "#{a[:singular]}-" + '#{' + instance_symbol + a[:singular] + ".id}"}.join("__") + "\""
       end
     end
 
