@@ -10,7 +10,7 @@ describe HotGlue::ControllerHelper do
 
   subject {FakeController.new}
 
-  describe "#timezoneize" do
+  describe "#timezonize" do
     # it "should take a timezone and turn it into a string" do
     #   res = subject.timezoneize(ActiveSupport::TimeZone['Central Time (US & Canada)'])
     #   expect(res).to eq("-06:00")

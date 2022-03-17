@@ -8,10 +8,9 @@ module HotGlue
 
 
     def datetime_field_localized(form_object, field_name, value, label, timezone = nil )
-        form_object.text_field(field_name, class: 'form-control',
+      form_object.text_field(field_name, class: 'form-control',
                                     type: 'datetime-local',
-                                    value: date_to_current_timezone(value, timezone))
-        + timezonize(timezone)
+                                    value: date_to_current_timezone(value, timezone))  + timezonize(timezone)
     end
 
 
@@ -24,8 +23,7 @@ module HotGlue
     def time_field_localized(form_object, field_name, value, label, timezone = nil )
       form_object.text_field(field_name, class: 'form-control',
                                     type: 'time',
-                                    value: date_to_current_timezone(value, timezone))
-      + timezonize(timezone)
+                                    value: date_to_current_timezone(value, timezone)) + timezonize(timezone)
 
     end
 
@@ -36,21 +34,11 @@ module HotGlue
         else
           server_timezone
         end
-      elsif true
-        server_timezone
-      # elsif defined?(controller) == "method"
-      #   # controller.try(:current_timezone)
-      # elsif self.class.ancestors.include?(ApplicationController)
-      #   self.try(:current_timezone)
       else
-        puts "no method current_user is available; please implement/override the method current_timezone IN YOUR CONTROLLER"
-        exit
+        server_timezone
       end
     end
 
-    def server_timezone
-      Time.now.strftime("%z").to_i/100
-    end
 
     def date_to_current_timezone(date, timezone = nil)
       # if the timezone is nil, use the server date'
@@ -102,5 +90,11 @@ module HotGlue
       end
       modified_params
     end
+
+    private
+    def server_timezone
+      Time.now.strftime("%z").to_i/100
+    end
+
   end
 end

@@ -339,8 +339,6 @@ module HotGlue
 
 
       # NEST CHAIN
-      # old syntax —— TODO: REMOVE ME
-
       # new syntax
       # @nested_set = [
       # {
@@ -455,7 +453,6 @@ module HotGlue
         end
       end
     end
-
 
     def setup_fields
       auth_assoc = @auth && @auth.gsub("current_","")
@@ -860,7 +857,7 @@ module HotGlue
       #
       # if File.exists?(menu_file)
       #   # TODO: can I insert the new menu item into the menu programatically here?
-      #   # not sure how i would acheive this without nokogiri
+      #   # not sure how i would achieve this without nokogiri
       #
       # end
 
