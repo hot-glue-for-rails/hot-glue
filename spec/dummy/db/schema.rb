@@ -10,10 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_01_165048) do
+ActiveRecord::Schema.define(version: 2022_03_18_093221) do
 
   create_table "abcs", force: :cascade do |t|
     t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "appointments", force: :cascade do |t|
+    t.integer "pet_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -47,6 +53,12 @@ ActiveRecord::Schema.define(version: 2022_02_01_165048) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "humen", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "jkls", force: :cascade do |t|
     t.integer "hgi_id"
     t.string "name"
@@ -59,6 +71,13 @@ ActiveRecord::Schema.define(version: 2022_02_01_165048) do
     t.time "time_of_day"
     t.boolean "selected"
     t.integer "genre"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "pets", force: :cascade do |t|
+    t.string "name"
+    t.integer "human_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

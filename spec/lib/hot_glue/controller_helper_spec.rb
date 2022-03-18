@@ -157,10 +157,37 @@ describe HotGlue::ControllerHelper do
     end
   end
 
-
   describe "#hawk_params" do
+    let(:human) {Human.create}
+    let(:pet) {Pet.create(human: human)}
+    let(:pet2) {Pet.create(human: Human.create)}
 
+    let(:input_params) { ActionController::Parameters.new( {"when_at"=>"", "pet_id"=>pet.id})}
+    let(:hawk_params) {{:pet_id=>[human, "pets"]}}
 
+    describe "When the hawked params aren't passed at all" do
+      it "should do nothing" do
+        expect(input_params).to eq(fake_controller.hawk_params({}, input_params))
+      end
+    end
 
+    describe "when the hawked params are passed and validly within the scope" do
+      it "should return the same params it was passed" do
+        expect(input_params).to eq(fake_controller.hawk_params(hawk_params, input_params))
+      end
+    end
+
+    describe "when the hawked params are passed and the foreign key is out of scope" do
+      let(:input_params) { ActionController::Parameters.new( {"when_at"=>"", "pet_id"=>pet2.id})}
+
+      it "should set the hawk_alarm" do
+        fake_controller.hawk_params(hawk_params, input_params)
+        expect("You aren't allowed to set pet_id to 1. ").to eq(fake_controller.instance_variable_get(:@hawk_alarm))
+      end
+
+      it "should tap away the parameters" do
+        expect(fake_controller.hawk_params({}, input_params)[:human_id]).to be(nil)
+      end
+    end
   end
 end
