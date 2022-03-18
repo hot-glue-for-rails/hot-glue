@@ -1,11 +1,9 @@
 module HotGlue
   module ControllerHelper
-
     def timezonize(tz)
       tz = tz.to_i
       (tz >= 0 ? "+" : "-") + sprintf('%02d',tz.abs) + ":00"
     end
-
 
     def datetime_field_localized(form_object, field_name, value, label, timezone = nil )
       form_object.text_field(field_name, class: 'form-control',
@@ -39,25 +37,25 @@ module HotGlue
       end
     end
 
-
     def date_to_current_timezone(date, timezone = nil)
       # if the timezone is nil, use the server date'
+
       if timezone.nil?
         timezone = Time.now.strftime("%z").to_i/100
       end
 
       return nil if date.nil?
 
-      begin
-        return date.in_time_zone(timezone).strftime("%Y-%m-%dT%H:%M")
-      rescue
-        return nil
-      end
+      return date.in_time_zone(timezone).strftime("%Y-%m-%dT%H:%M")
+      # begin
+      #
+      # rescue
+      #   return nil
+      # end
     end
 
-
-
     def modify_date_inputs_on_params(modified_params, current_user_object = nil)
+
       use_timezone = (current_user_object.try(:timezone)) || Time.now.strftime("%z")
 
       modified_params = modified_params.tap do |params|
@@ -92,9 +90,9 @@ module HotGlue
     end
 
     private
+
     def server_timezone
       Time.now.strftime("%z").to_i/100
     end
-
   end
 end

@@ -94,9 +94,73 @@ describe HotGlue::ControllerHelper do
     describe "when current_user is not defined" do
       it "should return the server timezone" do
         expect(fake_controller.current_timezone).to eq( Time.now.strftime("%z").to_i/100)
-
       end
     end
   end
 
+  describe "#date_to_current_timezone" do
+    describe "for date nil" do
+      it "should return nil" do
+        expect(fake_controller.date_to_current_timezone("2022-03-18 08:44AM", -4)).to eq("2022-03-18T08:44")
+      end
+    end
+
+
+    describe "for timezone nil" do
+      it "should use the server's timezone" do
+        expect(fake_controller.date_to_current_timezone("2022-03-18 08:44AM", nil)).to eq("2022-03-18T08:44")
+      end
+    end
+
+
+    describe "for a parseable timezone" do
+      it "should reformat the time into the provided timezone" do
+        expect(fake_controller.date_to_current_timezone("2022-03-18 08:44AM", -8)).to eq("2022-03-18T08:44")
+      end
+    end
+  end
+
+
+  describe "#modify_date_inputs_on_params" do
+    let (:current_user) {OpenStruct.new}
+    let(:params) {ActionController::Parameters.new "name"=>"", "approved_at"=>date, "genre"=>"mystery"}
+    let(:date) {"2022-03-19T07:56"}
+    let(:use_timezone) {Time.now.strftime("%z")}
+
+    describe "with a current_user who has a timezone" do
+      describe "when a param ends with _at" do
+        let(:params) {ActionController::Parameters.new "name"=>"", "approved_at"=>"2022-03-19T07:56", "genre"=>"mystery"}
+
+        it "should reformat the provided time" do
+          expect(DateTime.strptime("#{date} #{use_timezone}", '%Y-%m-%dT%H:%M %z')).to eq(fake_controller.modify_date_inputs_on_params(params, current_user)[:approved_at])
+        end
+      end
+
+      describe "when a param ends with _date" do
+        it "should reformat the provided date" do
+
+        end
+      end
+    end
+
+    describe "when a current user who has a timezone" do
+      let (:current_user) {OpenStruct.new(timezone: -9)}
+      let(:use_timezone) {-9}
+      it "should use the server's timezone" do
+        expect(DateTime.strptime("#{date} #{use_timezone}", '%Y-%m-%dT%H:%M %z')).to eq(fake_controller.modify_date_inputs_on_params(params, current_user)[:approved_at])
+      end
+    end
+    describe "with a current user who does not have a timezone" do
+      it "should use the server's timezone" do
+        expect(DateTime.strptime("#{date} #{use_timezone}", '%Y-%m-%dT%H:%M %z')).to eq(fake_controller.modify_date_inputs_on_params(params, current_user)[:approved_at])
+      end
+    end
+  end
+
+
+  describe "#hawk_params" do
+
+
+
+  end
 end
