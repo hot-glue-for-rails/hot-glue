@@ -580,11 +580,22 @@ describe HotGlue::ScaffoldGenerator do
       expect(
         File.read("spec/dummy/app/controllers/dfgs_controller.rb") =~ /.permit\( \[:name/
       ).to be(nil)
-
     end
 
     it "should automatically add fields that begin with underscore (_) as show only" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Fruits::Cantelope", "--gd"])
+      # this table has a field named _a_show_only_field
 
+      expect(
+        File.read("spec/dummy/app/views/cantelopes/_form.erb") =~ /f\.text_field :_a_show_only_field/
+      ).to be(nil)
+
+      res = File.read("spec/dummy/app/views/cantelopes/_form.erb")
+      expect(res).to include("<%= cantelope._a_show_only_field %>")
+      expect(
+        File.read("spec/dummy/app/controllers/cantelopes_controller.rb") =~ /:_a_show_only_field/
+      ).to be(nil)
     end
   end
 
@@ -901,6 +912,18 @@ describe HotGlue::ScaffoldGenerator do
       expect(res).to include('%= f.hidden_field "_________" %>')
     end
   end
+
+
+
+  describe "a table that has a field that should be an association (_id) but is missing" do
+    it "should tell me no no " do
+      expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                        ["Borked", "--gd"])
+
+      }.to raise_exception("*** Oops: The model Borked is missing an association for :xyz or the model Xyz doesn't exist. TODO: Please implement a model for Xyz; your model Borked should belong_to :xyz.  To make a controller that can read all records, specify with --god.")
+    end
+  end
+
 
   describe "--downnest" do
 

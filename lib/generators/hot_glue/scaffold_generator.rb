@@ -489,12 +489,12 @@ module HotGlue
               raise(HotGlue::Error, exit_message)
             end
 
-
-            if assoc_model.nil?
-              exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-              puts exit_message
-              raise(HotGlue::Error,exit_message)
-            end
+            # unreachable
+            # if assoc_model.nil?
+            #   exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+            #   puts exit_message
+            #   raise(HotGlue::Error,exit_message)
+            # end
 
             @associations << assoc_name.to_sym
             assoc_class = eval(assoc_model.name)
