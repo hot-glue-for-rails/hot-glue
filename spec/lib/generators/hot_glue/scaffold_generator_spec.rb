@@ -25,42 +25,43 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   def remove_dir_with_namespace(path)
-    FileUtils.rm_rf(path + "dfgs/")
+    FileUtils.rm_rf(path)
   end
 
   def remove_dir(path)
     FileUtils.rm_rf(path)
   end
 
+  def remove_file(file)
+    FileUtils.rm(file) if File.exists?(file)
+
+  end
+
   def remove_everything
     # TODO: this feels a little ugly but is effective
     remove_dir_with_namespace('spec/dummy/app/views/')
     remove_dir_with_namespace('spec/dummy/app/controllers/')
-    # FileUtils.rm("spec/dummy/app/controllers/users_controller.rb") if File.exists?("spec/dummy/app/controllers/xyzs_controller.rb")
+    remove_file("spec/dummy/app/controllers/users_controller.rb")
+    #
+    remove_file("spec/dummy/app/controllers/xyzs_controller.rb")
+    remove_file("spec/dummy/app/controllers/dfgs_controller.rb")
+    remove_file("spec/dummy/app/controllers/ghis_controller.rb")
 
-    FileUtils.rm("spec/dummy/app/controllers/xyzs_controller.rb") if File.exists?("spec/dummy/app/controllers/xyzs_controller.rb")
-    FileUtils.rm("spec/dummy/app/controllers/dfgs_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
-    FileUtils.rm("spec/dummy/app/controllers/ghis_controller.rb") if File.exists?("spec/dummy/app/controllers/ghis_controller.rb")
+    remove_file("spec/dummy/app/controllers/cantelopes_controller.rb")
 
-    FileUtils.rm("spec/dummy/app/controllers/cantelopes_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
+    remove_file("spec/dummy/app/controllers/all_dfgs_controller.rb")
 
-    FileUtils.rm("spec/dummy/app/controllers/all_dfgs_controller.rb") if File.exists?("spec/dummy/app/controllers/dfgs_controller.rb")
+    remove_file("spec/dummy/app/controllers/hello/dfgs_controller.rb")
+    remove_file("spec/dummy/app/controllers/jkls_controller.rb")
 
-    FileUtils.rm("spec/dummy/app/controllers/hello/dfgs_controller.rb") if File.exists?("spec/dummy/app/controllers/hello/dfgs_controller.rb")
-    FileUtils.rm("spec/dummy/app/controllers/jkls_controller.rb") if File.exists?("spec/dummy/app/controllers/jkls_controller.rb")
+    remove_dir_with_namespace('spec/dummy/app/views/users')
+    remove_dir_with_namespace('spec/dummy/spec/system')
 
-    FileUtils.rm_rf('spec/dummy/spec/')
-    FileUtils.rm_rf('spec/dummy/app/views/hello/dfgs')
-    FileUtils.rm_rf('spec/dummy/app/views/xyzs')
-    FileUtils.rm_rf('spec/dummy/app/views/cantelopes/')
-    FileUtils.rm_rf('spec/dummy/app/views/fruits/')
-
-    FileUtils.rm_rf('spec/dummy/app/views/users')
-
-    FileUtils.rm_rf('spec/dummy/app/views/ghis')
-    FileUtils.rm_rf('spec/dummy/app/views/abcs')
-    FileUtils.rm_rf('spec/dummy/app/views/jkls')
-    FileUtils.rm_rf('spec/dummy/app/views/dfgs')
+    remove_dir_with_namespace('spec/dummy/app/views/ghis')
+    remove_dir_with_namespace('spec/dummy/app/views/abcs')
+    remove_dir_with_namespace('spec/dummy/app/views/jkls')
+    remove_dir_with_namespace('spec/dummy/app/views/dfgs')
+    remove_dir_with_namespace('spec/dummy/app/views/xyzs')
 
     remove_dir_with_namespace('spec/dummy/app/views/hello')
     remove_dir_with_namespace('spec/dummy/app/controllers/hello')
@@ -150,9 +151,6 @@ describe HotGlue::ScaffoldGenerator do
       end
     end
   end
-
-
-
 
   describe "--specs-only" do
     it "should create a file specs/system" do
@@ -539,6 +537,23 @@ describe HotGlue::ScaffoldGenerator do
           #
         end
       end
+    end
+  end
+
+  describe "self auth" do
+    it "when run with auth as the same name as the object but without --no-create" do
+      expect{ Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["User","--auth=user"])
+      }.to raise_exception("This controller appears to be the same as the authentication object but in this context you cannot build a new/create action; please re-run with --no-create flag")
+
+    end
+
+    it "when run with auth as the same name as the object but without --no-create" do
+      res = Rails::Generators.invoke("hot_glue:scaffold",
+                                       ["User","--auth=user", "--no-create"])
+      expect(
+        File.read("spec/dummy/app/controllers/users_controller.rb") =~ /User.where\(id: user.id/
+      ).to be_a(Numeric)
     end
   end
 
