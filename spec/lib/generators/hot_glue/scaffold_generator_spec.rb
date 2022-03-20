@@ -919,6 +919,34 @@ describe HotGlue::ScaffoldGenerator do
   end
 
 
+  describe "mocking the yaml for markup and layout config" do
+
+    describe "for --markup=haml" do
+      before(:each) do
+        allow(YAML).to receive(:load).and_return({layout: "bootstrap", markup: "haml"})
+      end
+
+      it "should tell me no no " do
+        expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Ghi"])
+        }.to raise_exception("HAML IS NOT IMPLEMENTED")
+
+      end
+    end
+    describe "for --markup=slim" do
+      before(:each) do
+        allow(YAML).to receive(:load).and_return({layout: "bootstrap", markup: "slim"})
+      end
+
+      it "should tell me no no " do
+        expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Ghi"])
+        }.to raise_exception("SLIM IS NOT IMPLEMENTED")
+
+      end
+    end
+  end
+
   describe "--downnest" do
 
   end

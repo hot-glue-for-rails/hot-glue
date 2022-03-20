@@ -181,12 +181,10 @@ module HotGlue
       if  @markup == "erb"
         @template_builder = HotGlue::ErbTemplate.new
       elsif  @markup == "slim"
-        message =  "SLIM IS NOT IMPLEMENTED; please see https://github.com/jasonfb/hot-glue/issues/3"
-        raise(HotGlue::Error, message)
-        @template_builder = HotGlue::SlimTemplate.new
-
+        raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
       elsif  @markup == "haml"
-        @template_builder = HotGlue::HamlTemplate.new
+        raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
+
       end
 
 
