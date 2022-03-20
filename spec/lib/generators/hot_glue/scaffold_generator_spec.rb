@@ -152,17 +152,7 @@ describe HotGlue::ScaffoldGenerator do
   end
 
 
-  describe "--specs-only and --no-specs" do
-    it "with both --specs-only and --no-specs" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--specs-only","--no-specs"])
-      rescue StandardError => e
-        expect(e.class).to eq(HotGlue::Error)
-        expect(e.message).to eq("*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry.")
-      end
-    end
-  end
+
 
   describe "--specs-only" do
     it "should create a file specs/system" do
@@ -895,6 +885,39 @@ describe HotGlue::ScaffoldGenerator do
 
     end
   end
+
+
+  describe "--markup" do
+    # this is to catch for mistaken entry
+    it "raise an exception" do
+      expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Ghi",
+                                             "--markup=haml"])
+      }.to raise_exception("Using --markup flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`")
+    end
+  end
+
+
+  describe "--spec-only and --no-specs" do
+    # this is to catch for mistaken entry
+    it "raise an exception" do
+      expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                        ["Ghi",
+                                         "--specs-only", "--no-specs"])
+      }.to raise_exception("*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. Aborting.")
+    end
+  end
+
+  describe "--exclude and --include" do
+    # this is to catch for mistaken entry
+    it "raise an exception" do
+      expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                        ["Ghi",
+                                         "--exclude=abc,def", "--include=def"])
+      }.to raise_exception("*** Oops: You seem to have specified both --include and --exclude. Please use one or the other. Aborting.")
+    end
+  end
+
 
   describe "--downnest" do
 

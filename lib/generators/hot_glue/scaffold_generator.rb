@@ -78,9 +78,8 @@ module HotGlue
       display_column = "display_name"
     elsif assoc_class.new.respond_to?("email")
       display_column = "email"
-    else
-      raise("this should have been caught by the checker in the initializer")
-      # puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+    # else # SHOULD BE UNREACHABLE
+    #   raise("this should have been caught by the checker in the initializer")
     end
     display_column
   end
@@ -150,8 +149,9 @@ module HotGlue
         raise(HotGlue::Error, message)
       end
 
-      if !options['spec_only'].nil? && !options['no_spec'].nil?
-        puts "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry."
+
+      if options['specs_only'] && options['no_specs']
+        raise(HotGlue::Error,  "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. Aborting.")
       end
 
       if !options['exclude'].empty? && !options['include'].empty?
@@ -172,11 +172,6 @@ module HotGlue
 
       if !options['markup'].nil?
         message = "Using --markup flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
-        raise(HotGlue::Error, message)
-      end
-
-      if !options['markup'].nil?
-        message = "Using --layout flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
         raise(HotGlue::Error, message)
       end
 
