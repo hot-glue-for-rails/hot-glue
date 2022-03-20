@@ -565,10 +565,25 @@ describe HotGlue::ScaffoldGenerator do
       expect(
         File.read("spec/dummy/app/views/dfgs/_form.erb") =~ /f\.text_field :name/
       ).to be(nil)
+
+      res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+      expect(res).to include("<%= dfg.name %>")
+
     end
 
     it "should not include the show-only fields in the allowed parameters" do
-      # TODO ADD SPECS HERE
+
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--show-only=name"])
+
+
+      expect(
+        File.read("spec/dummy/app/controllers/dfgs_controller.rb") =~ /.permit\( \[:name/
+      ).to be(nil)
+
+    end
+
+    it "should automatically add fields that begin with underscore (_) as show only" do
 
     end
   end
@@ -874,6 +889,16 @@ describe HotGlue::ScaffoldGenerator do
                                         ["Ghi", "--nest=xyz"])
 
       }.to raise_exception("STOP: the flag --nest has been replaced with --nested; please re-run using the --nested flag")
+    end
+  end
+
+  describe "for when there are no fields" do
+    it "should tell me no no " do
+      generator = Rails::Generators.invoke("hot_glue:scaffold",
+                                           ["Ghi", "--exclude=dfg_id,xyz_id"])
+
+      res = File.read("spec/dummy/app/views/ghis/_form.erb")
+      expect(res).to include('%= f.hidden_field "_________" %>')
     end
   end
 

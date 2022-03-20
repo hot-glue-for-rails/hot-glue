@@ -72,7 +72,7 @@ module  HotGlue
           column.map { |col|
             field_result =
               if show_only.include?(col.to_sym)
-                "<%= @#{singular}.#{col} %>"
+                "<%= #{singular}.#{col} %>"
               else
                 type = eval("#{singular_class}.columns_hash['#{col}']").type
                 limit = eval("#{singular_class}.columns_hash['#{col}']").limit
