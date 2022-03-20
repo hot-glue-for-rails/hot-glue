@@ -218,7 +218,7 @@ module HotGlue
       @controller_build_name = (( @namespace.titleize.gsub(" ","") + "::" if @namespace) || "") + use_controller_name + "Controller"
       @controller_build_folder = use_controller_name.underscore
       @controller_build_folder_singular = singular
-
+      
       if ! @controller_build_folder.ends_with?("s")
         raise "can't build with controller name #{@controller_build_folder} because it doesn't end with an 's'"
       end
