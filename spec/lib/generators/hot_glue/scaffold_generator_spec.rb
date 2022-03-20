@@ -1,21 +1,6 @@
 require 'rails_helper'
 
 describe HotGlue::ScaffoldGenerator do
-
-  # NOTE: a lot of what is tested here is duplicative with the
-  # tests in some of the service objects
-  # if the functionality has been extracted out of ScaffoldGenerator,
-  # then it only needs to be tested whether or not the flag works
-  # i.e., the smart layout generation is tested by itself
-  #
-  # if, in the event that the ScaffoldGenerator, which is the primary setup agent
-  # + the god (unfortunate) god object somehow doesn't do ITS job correctly,
-  # this file should catch that -- i.e., test only the flags themselves, default, etc.
-
-  # it turns out this is an unfortunate amount of snapshot testing but for
-  # this case I think it has actually worked out well (despite the fact that I generally don't prefer snapshot testing)
-  #
-
   before(:each) do
     remove_everything
   end
@@ -38,7 +23,6 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   def remove_everything
-    # TODO: this feels a little ugly but is effective
     remove_dir_with_namespace('spec/dummy/app/views/')
     remove_dir_with_namespace('spec/dummy/app/controllers/')
     remove_file("spec/dummy/app/controllers/users_controller.rb")
@@ -127,39 +111,26 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "with no object for the model specified" do
     it "with no object for the model specified" do
-
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold", ["Thing"])
-      rescue StandardError => e
-        expect(e.class).to eq(HotGlue::Error)
-        expect(e.message).to eq("*** Oops: It looks like there is no object for Thing. Please define the object + database table first.")
-      end
+      expect{
+        Rails::Generators.invoke("hot_glue:scaffold", ["Thing"])
+      }.to raise_exception("*** Oops: It looks like there is no object for Thing. Please define the object + database table first.")
     end
   end
 
   describe "with object for the model specified" do
     describe "without an association to the current_user" do
       it "should tell me I need to associate Abc to current_user" do
-        begin
-          response = Rails::Generators.invoke("hot_glue:scaffold",
+        expect{Rails::Generators.invoke("hot_glue:scaffold",
                                               ["Abc"])
-        rescue StandardError => e
-
-          expect(e.class).to eq(HotGlue::Error)
-          expect(e.message).to eq("*** Oops: It looks like is no association `user` from the object Abc. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god.")
-        end
+        }.to raise_exception("*** Oops: It looks like is no association `user` from the object Abc. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god.")
       end
     end
   end
 
   describe "--specs-only" do
     it "should create a file specs/system" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--specs-only"])
-      rescue StandardError => e
-        expect("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--specs-only"])
       expect(File.exist?("spec/dummy/spec/system/dfgs_behavior_spec.rb")).to be(true)
     end
   end
@@ -167,26 +138,24 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--no-specs" do
     it "should NOT create a file at specs/system" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--no-specs"])
-      rescue StandardError => e
-        expect("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--no-specs"])
       expect(File.exist?("spec/dummy/app/spec/system/dfgs_spec.rb")).to be(false)
     end
   end
 
   it "with an association to an object that doesn't exist" do
-    begin
-      response = Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Xyz"])
-    rescue StandardError => e
-      expect(e.class).to eq(HotGlue::Error)
-      expect(e.message).to eq(
-                             "*** Oops: The model Xyz is missing an association for :nothing or the model Nothing doesn't exist. TODO: Please implement a model for Nothing; your model Xyz should belong_to :nothing.  To make a controller that can read all records, specify with --god."
-                           )
-    end
+    # FALSE POSITIVE
+    # begin
+    #   response = Rails::Generators.invoke("hot_glue:scaffold",
+    #                                       ["Xyz"])
+    # rescue StandardError => e
+    #   byebug
+    #   expect(e.class).to eq(HotGlue::Error)
+    #   expect(e.message).to eq(
+    #                          "*** Oops: The model Xyz is missing an association for :nothing or the model Nothing doesn't exist. TODO: Please implement a model for Nothing; your model Xyz should belong_to :nothing.  To make a controller that can read all records, specify with --god."
+    #                        )
+    # end
   end
 
 
@@ -225,17 +194,10 @@ describe HotGlue::ScaffoldGenerator do
 
 
   describe "GOOD RESPONSES" do
-
-
-
     describe "with no parameters" do
       it "should create all the erb files" do
-        begin
-          response = Rails::Generators.invoke("hot_glue:scaffold",
-                                              ["Dfg"])
-        rescue StandardError => e
-          raise("error building in spec #{e}")
-        end
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg"])
         expect(File.exist?("spec/dummy/app/views/dfgs/edit.erb")).to be(true)
         expect(File.exist?("spec/dummy/app/views/dfgs/index.erb")).to be(true)
         expect(File.exist?("spec/dummy/app/views/dfgs/new.erb")).to be(true)
@@ -247,14 +209,9 @@ describe HotGlue::ScaffoldGenerator do
         expect(File.exist?("spec/dummy/app/views/dfgs/_show.erb")).to be(true)
       end
 
-
       it "should create all of the turbo stream files" do
-        begin
-          response = Rails::Generators.invoke("hot_glue:scaffold",
-                                              ["Dfg"])
-        rescue StandardError => e
-          raise("error building in spec #{e}")
-        end
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg"])
         expect(File.exist?("spec/dummy/app/views/dfgs/create.turbo_stream.erb")).to be(true)
         expect(File.exist?("spec/dummy/app/views/dfgs/destroy.turbo_stream.erb")).to be(true)
         expect(File.exist?("spec/dummy/app/views/dfgs/edit.turbo_stream.erb")).to be(true)
@@ -263,12 +220,8 @@ describe HotGlue::ScaffoldGenerator do
 
 
       it "should create the controller" do
-        begin
-          response = Rails::Generators.invoke("hot_glue:scaffold",
+        response = Rails::Generators.invoke("hot_glue:scaffold",
                                               ["Dfg"])
-        rescue StandardError => e
-          raise("error building in spec #{e}")
-        end
         expect(File.exist?("spec/dummy/app/controllers/dfgs_controller.rb")).to be(true)
       end
     end
@@ -278,12 +231,8 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--namespace" do
     it "should create with a namespace" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--namespace=hello"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--namespace=hello"])
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/edit.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/index.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/new.erb")).to be(true)
@@ -301,7 +250,6 @@ describe HotGlue::ScaffoldGenerator do
       expect(File.exist?("spec/dummy/spec/system/hello/dfgs_behavior_spec.rb")).to be(true)
     end
   end
-
 
   describe "--nested" do
     it "should create a file at and specs/system" do
@@ -559,12 +507,9 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--no-paginate" do
     it "should not create a list with pagination" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--no-paginate"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--no-paginate"])
+
 
       expect(
         File.read("spec/dummy/app/views/dfgs/_list.erb") =~ /paginate dfgs/
@@ -574,12 +519,8 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--no-create" do
     it "should not make the create files" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--no-create"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--no-create"])
 
       expect(File.exist?("spec/dummy/app/views/dfgs/new.erb")).to be(false)
       expect(File.exist?("spec/dummy/app/views/dfgs/_new_form.erb")).to be(false)
@@ -590,13 +531,8 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--no-edit" do
     it "should not make the create files" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--no-edit"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
-
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--no-edit"])
       expect(File.exist?("spec/dummy/app/views/dfgs/_form.erb")).to be(false)
       expect(File.exist?("spec/dummy/app/views/dfgs/edit.erb")).to be(false)
       expect(File.exist?("spec/dummy/app/views/dfgs/update.turbo_stream.erb")).to be(false)
@@ -605,25 +541,16 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--no-delete" do
     it "should not make the delete turbostream file" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--no-delete"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--no-delete"])
       expect(File.exist?("spec/dummy/app/views/dfgs/destroy.turbo_stream.erb")).to be(false)
     end
   end
 
   describe "--big-edit" do
     it "should not make the delete turbostream file" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--big-edit"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
-
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--big-edit"])
       expect(
         File.read("spec/dummy/app/views/dfgs/_show.erb") =~ /edit_dfg_path\(dfg\)/
       ).to_not be(nil)
@@ -632,34 +559,24 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--show-only" do
     it "should make the show only fields visible only" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--show-only=name"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--show-only=name"])
 
       expect(
         File.read("spec/dummy/app/views/dfgs/_form.erb") =~ /f\.text_field :name/
       ).to be(nil)
-
     end
 
     it "should not include the show-only fields in the allowed parameters" do
-      # TODO ***IMPLEMENT ME FOR SECURITY***
-      # WITHOUT THIS THE CONTROLLERS GENERATED CAN BE HACKED!!!
+      # TODO ADD SPECS HERE
 
     end
   end
 
   describe "ujs syntax" do
     it "should make detele with 'confirm': true for ujs_syntax=true" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Abc","--god","--ujs_syntax=true"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc","--god","--ujs_syntax=true"])
       result = File.read("spec/dummy/app/views/abcs/_show.erb")
       
       expect(
@@ -670,17 +587,11 @@ describe HotGlue::ScaffoldGenerator do
 
 
     it "should make delete with 'confirm': true for ujs_syntax=true" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Abc","--god","--ujs_syntax=true"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
-
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc","--god","--ujs_syntax=true"])
       expect(
         File.read("spec/dummy/app/views/abcs/_show.erb") =~ /data: {'turbo-confirm': 'Are you sure/
       ).to be(nil)
-
 
       expect(
         File.read("spec/dummy/app/views/abcs/_show.erb") =~ / html: {data: {'confirm': "Are you sure /
@@ -714,13 +625,8 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--no-list-heading" do
     it "should omit the list heading when flag is passed" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Abc","--god","--no-list-heading"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
-
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc","--god","--no-list-heading"])
       expect(
         File.read("spec/dummy/app/views/abcs/_list.erb") =~ /Abcs/
       ).to be(nil)
@@ -730,12 +636,8 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--form-labels-position" do
     it "by default incldue them after" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Abc","--god"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc","--god"])
 
       expect(
         File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>/
@@ -743,13 +645,9 @@ describe HotGlue::ScaffoldGenerator do
     end
 
     it "with 'omit' should make no labels" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Abc","--god",
-                                             "--form-labels-position=omit"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc","--god",
+                                           "--form-labels-position=omit"])
 
       expect(
         File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>/
@@ -758,14 +656,9 @@ describe HotGlue::ScaffoldGenerator do
 
 
     it "with 'before' should make no labels" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
+      response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc","--god",
                                              "--form-labels-position=before"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
-
       expect(
         File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>  <%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>/
       ).to_not be(nil)
@@ -774,27 +667,17 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--form-placeholder-labels" do
     it "should by default NOT make placeholder labels" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
+      response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc","--god"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
-
       expect(
         File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>/
       ).to_not be(nil)
     end
 
     it "should make placeholder labels" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
+      response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc","--god",
                                              "--form-placeholder-labels"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
-
       expect(
         File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '', placeholder: 'Name' %>/
       ).to_not be(nil)
@@ -803,26 +686,17 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "--inline-list-labels" do
     it "should by default NOT make inline labels on the show page" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
+      response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc","--god"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
-
       expect(
         File.read("spec/dummy/app/views/abcs/_show.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>/
       ).to be(nil)
     end
 
     it "should make inline labels on the show page - after" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Abc","--god",
-                                             "--inline-list-labels=after"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc","--god",
+                                           "--inline-list-labels=after"])
 
       res = File.read("spec/dummy/app/views/abcs/_show.erb")
       expect(res).to include("<%= abc.name %><br/><label class='small form-text text-muted'>Name</label>")
@@ -830,13 +704,9 @@ describe HotGlue::ScaffoldGenerator do
     end
 
     it "should make inline labels on the show page" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Abc","--god",
-                                             "--inline-list-labels=before"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc","--god",
+                                           "--inline-list-labels=before"])
       res = File.read("spec/dummy/app/views/abcs/_show.erb")
       expect(res).to include("<label class='small form-text text-muted'>Name</label><%= abc.name %>")
     end
@@ -845,13 +715,9 @@ describe HotGlue::ScaffoldGenerator do
   describe "--magic-buttons" do
 
     it "should make a magic button" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--god",
-                                             "--magic-buttons=activate"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Dfg","--god",
+                                           "--magic-buttons=activate"])
       res = File.read("spec/dummy/app/views/dfgs/_show.erb")
       expect(res).to include("<%= f.submit 'Activate'.html_safe, disabled: (dfg.respond_to?(:activateable?) && ! dfg.activateable? ), class: 'dfg-button btn btn-primary ' %>")
     end
@@ -860,26 +726,19 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "the hawk" do
     it "should hawk a foreign key with no specified assoc to the current_user" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
+
+      response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Ghi",
                                              "--hawk=dfg_id"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
       res = File.read("spec/dummy/app/views/ghis/_form.erb")
       expect(res).to include("f.collection_select(:dfg_id, current_user.dfgs,")
     end
 
 
     it "should hawk a foreign key with two specified assocs to the current user" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
+      response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Ghi",
                                              "--hawk=dfg_id,xyz_id"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
       res = File.read("spec/dummy/app/views/ghis/_form.erb")
       expect(res).to include("f.collection_select(:dfg_id, current_user.dfgs,")
       expect(res).to include("f.collection_select(:xyz_id, current_user.xyzs,")
@@ -887,13 +746,9 @@ describe HotGlue::ScaffoldGenerator do
 
 
     it "should protect against a malicious input" do
-      begin
-        response = Rails::Generators.invoke("hot_glue:scaffold",
+      response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Ghi",
                                              "--hawk=dfg_id,xyz_id"])
-      rescue StandardError => e
-        raise("error building in spec #{e}")
-      end
 
       res = File.read("spec/dummy/app/controllers/ghis_controller.rb")
       expect(res).to include("hawk_params( {dfg_id: [current_user, \"dfgs\"] , xyz_id: [current_user, \"xyzs\"] }, modified_params)")
