@@ -218,9 +218,9 @@ module HotGlue
       @controller_build_name = (( @namespace.titleize.gsub(" ","") + "::" if @namespace) || "") + use_controller_name + "Controller"
       @controller_build_folder = use_controller_name.underscore
       @controller_build_folder_singular = singular
-      
+
       if ! @controller_build_folder.ends_with?("s")
-        raise "can't build with controller name #{@controller_build_folder} because it doesn't end with an 's'"
+        raise HotGlue::Error, "can't build with controller name #{@controller_build_folder} because it doesn't end with an 's'"
       end
 
       @auth = options['auth'] || "current_user"
@@ -229,7 +229,7 @@ module HotGlue
 
 
       if options['nest']
-        raise "STOP: the flag --nest has been replaced with --nested; please re-run using the --nested flag"
+        raise HotGlue::Error, "STOP: the flag --nest has been replaced with --nested; please re-run using the --nested flag"
 
       end
 
@@ -270,7 +270,8 @@ module HotGlue
 
       @form_labels_position = options['form_labels_position']
       if !['before','after','omit'].include?(@form_labels_position)
-        raise "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
+
+        raise HotGlue::Error, "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
       end
 
       @form_placeholder_labels = options['form_placeholder_labels'] # true or false
@@ -278,7 +279,7 @@ module HotGlue
 
 
       if !['before','after','omit'].include?(@inline_list_labels)
-        raise "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
+        raise HotGlue::Error, "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
       end
 
 
@@ -287,7 +288,7 @@ module HotGlue
       @smart_layout = options['smart_layout']
 
       if options['include'].include?(":") && @smart_layout
-        raise "You specified both --smart-layout and also specified grouping mode (there is a : character in your field include list); you must remove the colon(s) from your --include tag or remove the --smart-layout option"
+        raise HotGlue::Error, "You specified both --smart-layout and also specified grouping mode (there is a : character in your field include list); you must remove the colon(s) from your --include tag or remove the --smart-layout option"
       end
 
 

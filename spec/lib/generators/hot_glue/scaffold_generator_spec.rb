@@ -960,18 +960,34 @@ describe HotGlue::ScaffoldGenerator do
 
       end
     end
+  end
 
+  describe "for --plural that doesn't end with an s (?should the be supported?)" do
+    it "should tell me no no " do
+      expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                        ["Ghi", "--plural=thing"])
+      }.to raise_exception("can't build with controller name thing because it doesn't end with an 's'")
 
-    describe "for --plural that doesn't end with an s (?should the be supported?)" do
-
-      it "should tell me no no " do
-        expect { Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Ghi", "--plural=thing"])
-        }.to raise_exception("can't build with controller name thing because it doesn't end with an 's'")
-
-      end
     end
+  end
 
+  describe "for --form-labels-position is invalid" do
+    it "should tell me no no " do
+      expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                        ["Ghi", "--form-labels-position=nonsense"])
+
+      }.to raise_exception("You passed 'nonsense' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit")
+    end
+  end
+
+
+  describe "for --nest deprecated syntax" do
+    it "should tell me no no " do
+      expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                        ["Ghi", "--nest=xyz"])
+
+      }.to raise_exception("STOP: the flag --nest has been replaced with --nested; please re-run using the --nested flag")
+    end
   end
 
   describe "--downnest" do
