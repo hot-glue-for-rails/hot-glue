@@ -481,31 +481,43 @@ module HotGlue
             assoc_name = col.to_s.gsub("_id","")
 
 
-            begin
-              assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name}).active_record")
-            rescue NameError => e
-              exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; your model #{singular_class.titlecase} should belong_to :#{assoc_name}.  To make a controller that can read all records, specify with --god."
+            assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+
+            if assoc_model.nil?
+              exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; or add to #{singular_class} `belongs_to :#{assoc_name}`.  To make a controller that can read all records, specify with --god."
               puts exit_message
               raise(HotGlue::Error, exit_message)
             end
 
-            # unreachable
-            # if assoc_model.nil?
-            #   exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-            #   puts exit_message
-            #   raise(HotGlue::Error,exit_message)
-            # end
+            begin
+              assoc_class = eval(assoc_model.try(:class_name))
+              @associations << assoc_name.to_sym
+              name_list = [:name, :to_label, :full_name, :display_name, :email]
 
-            @associations << assoc_name.to_sym
-            assoc_class = eval(assoc_model.name)
-            name_list = [:name, :to_label, :full_name, :display_name, :email]
+            rescue
+              if eval("#{singular_class}.reflect_on_association(:#{assoc_name.singularize})")
+                exit_message = "*** Oops: #{singular_class} has no association for #{assoc_name.singularize}"
+                raise(HotGlue::Error,exit_message)
+              else
+                exit_message = "*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god."
 
-            if name_list.collect{ |field|
+                raise(HotGlue::Error,exit_message)
+
+                # else  # NOTE: not reachable
+                #   exit_message = "*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god."
+              end
+
+              # exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
+              # raise(HotGlue::Error,exit_message)
+
+            end
+
+            if assoc_class && name_list.collect{ |field|
               assoc_class.column_names.include?(field.to_s) ||  assoc_class.instance_methods.include?(field)
             }.any?
               # do nothing here
             else
-              exit_message = "\n*** Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: \n1) name, \n2) to_label, \n3) full_name, \n4) display_name \n5) email \nYou can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
+              exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
               raise(HotGlue::Error,exit_message)
             end
           end

@@ -153,7 +153,7 @@ describe HotGlue::ScaffoldGenerator do
     #   byebug
     #   expect(e.class).to eq(HotGlue::Error)
     #   expect(e.message).to eq(
-    #                          "*** Oops: The model Xyz is missing an association for :nothing or the model Nothing doesn't exist. TODO: Please implement a model for Nothing; your model Xyz should belong_to :nothing.  To make a controller that can read all records, specify with --god."
+    #                          "*** Oops: The model Xyz is missing an association for :nothing or the model Nothing doesn't exist. TODO: Please implement a model for Nothing; or add to Xyz `belongs_to :nothing`. To make a controller that can read all records, specify with --god."
     #                        )
     # end
   end
@@ -281,6 +281,20 @@ describe HotGlue::ScaffoldGenerator do
         ).to be_a(Numeric)
       end
     end
+
+    describe "#object_scope" do
+
+      describe "when auth" do
+        # already green
+      end
+
+      describe "when no auth" do
+        xit "should set my object_scope to the last item in the nested set to the current pluralized object" do
+          pending
+        end
+      end
+    end
+
 
     describe "--auth_identifier" do
       it "should generate code protected to current user" do
@@ -736,6 +750,52 @@ describe HotGlue::ScaffoldGenerator do
       res = File.read("spec/dummy/app/views/abcs/_show.erb")
       expect(res).to include("<label class='small form-text text-muted'>Name</label><%= abc.name %>")
     end
+
+    describe "#list_label" do
+      xit "should pick up @@table_label_plural on the class if present" do
+
+      end
+    end
+
+    describe "#thing_label" do
+      xit "should pick up @@table_label_singular on the class if present" do
+
+      end
+    end
+
+
+
+    describe "#display_class" do
+
+      let (:generator) {HotGlue::ScaffoldGenerator.new(["Xyz"], ["--include=name", "--gd"], {:shell=> Thor::Shell::Color.new})}
+      it "should suggest that I meant the singular version" do
+        expect(generator.display_class).to eq( "name")
+      end
+
+
+      describe "for to_label" do
+        let (:generator) {HotGlue::ScaffoldGenerator.new(["AtwToLabel"], ["--gd"], {:shell=> Thor::Shell::Color.new})}
+        it "should refer to a table with to_label if there is no name field" do
+          expect(generator.display_class).to eq( "to_label")
+        end
+
+      end
+
+      describe "for full_name" do
+        let (:generator) {HotGlue::ScaffoldGenerator.new(["AtwFullName"], ["--gd"], {:shell=> Thor::Shell::Color.new})}
+        it "should refer to a table with full_name if there is no name field" do
+          expect(generator.display_class).to eq( "full_name")
+        end
+      end
+
+
+      describe "for display_name" do
+        let (:generator) {HotGlue::ScaffoldGenerator.new(["AtwDisplayName"], ["--gd", "--include="], {:shell=> Thor::Shell::Color.new})}
+        it "should refer to a table with full_name if there is no name field" do
+          expect(generator.display_class).to eq( "display_name")
+        end
+      end
+    end
   end
 
   describe "--magic-buttons" do
@@ -920,9 +980,36 @@ describe HotGlue::ScaffoldGenerator do
       expect { Rails::Generators.invoke("hot_glue:scaffold",
                                         ["Borked", "--gd"])
 
-      }.to raise_exception("*** Oops: The model Borked is missing an association for :xyz or the model Xyz doesn't exist. TODO: Please implement a model for Xyz; your model Borked should belong_to :xyz.  To make a controller that can read all records, specify with --god.")
+      }.to raise_exception("*** Oops: The model Borked is missing an association for :xyz or the model Xyz doesn't exist. TODO: Please implement a model for Xyz; or add to Borked `belongs_to :xyz`.  To make a controller that can read all records, specify with --god.")
     end
   end
+
+
+  describe "a table that has a field that should be an association (_id) but is missing" do
+    it "should tell me no no " do
+      expect {
+         Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Borked", "--gd", "--include=missing_label_table_id"])
+      }.to raise_exception("Oops: Missing a label for `MissingLabelTable`. Can't find any column to use as the display label for the missing_label_table association on the Borked model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`MissingLabelTable` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)")
+
+    end
+  end
+
+  describe "When a base controller doesn't already exist" do
+    it "should copy the base controller to the namespace" do
+
+    end
+  end
+
+  describe "for when a base controller already exists" do
+    it "should skip adding the base controller" do
+
+    end
+  end
+
+
+
+
 
 
   describe "--downnest" do

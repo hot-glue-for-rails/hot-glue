@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_20_214017) do
+ActiveRecord::Schema.define(version: 2022_03_20_223316) do
 
   create_table "abcs", force: :cascade do |t|
     t.string "name"
@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(version: 2022_03_20_214017) do
 
   create_table "borkeds", force: :cascade do |t|
     t.integer "xyz_id"
+    t.integer "missing_label_table_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -99,6 +100,11 @@ ActiveRecord::Schema.define(version: 2022_03_20_214017) do
     t.time "time_of_day"
     t.boolean "selected"
     t.integer "genre"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "missing_label_tables", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
