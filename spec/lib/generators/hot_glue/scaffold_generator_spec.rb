@@ -850,6 +850,23 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
+  describe "for --inline-list-labels is invalid" do
+    it "should tell me no no " do
+      expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                        ["Ghi", "--inline-list-labels=nonsense"])
+
+      }.to raise_exception("You passed 'nonsense' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)")
+    end
+  end
+
+  describe "for --include with specified grouping and also --smart-layout" do
+    it "should tell me no no " do
+      expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                        ["Xyz", "--include=abc:","--smart-layout"])
+
+      }.to raise_exception("You specified both --smart-layout and also specified grouping mode (there is a : character in your field include list); you must remove the colon(s) from your --include tag or remove the --smart-layout option")
+    end
+  end
 
   describe "for --nest deprecated syntax" do
     it "should tell me no no " do
