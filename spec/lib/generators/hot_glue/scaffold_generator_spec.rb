@@ -920,10 +920,10 @@ describe HotGlue::ScaffoldGenerator do
 
 
   describe "mocking the yaml for markup and layout config" do
-
+    let(:yaml_stub) {{layout: "bootstrap", markup: "erb"}}
     describe "for --markup=haml" do
       before(:each) do
-        allow(YAML).to receive(:load).and_return({layout: "bootstrap", markup: "haml"})
+        allow(YAML).to receive(:load).and_return(yaml_stub.merge( markup: "haml"))
       end
 
       it "should tell me no no " do
@@ -935,13 +935,28 @@ describe HotGlue::ScaffoldGenerator do
     end
     describe "for --markup=slim" do
       before(:each) do
-        allow(YAML).to receive(:load).and_return({layout: "bootstrap", markup: "slim"})
+        allow(YAML).to receive(:load).and_return(yaml_stub.merge(markup: "slim"))
       end
 
       it "should tell me no no " do
         expect { Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Ghi"])
         }.to raise_exception("SLIM IS NOT IMPLEMENTED")
+
+      end
+    end
+
+
+
+    describe "for --layout=nonsense" do
+      before(:each) do
+        allow(YAML).to receive(:load).and_return(yaml_stub.merge(layout: "nonsense"))
+      end
+
+      it "should tell me no no " do
+        expect { Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Ghi"])
+        }.to raise_exception("Invalid option nonsense in Hot glue config (config/hot_glue.yml). You must either use --layout= when generating or have a file config/hotglue.yml; specify layout as either 'hotglue' or 'bootstrap'")
 
       end
     end

@@ -163,11 +163,12 @@ module HotGlue
 
 
       if @stimulus_syntax.nil?
-        if Rails.version.split(".")[0].to_i >= 7
-          @stimulus_syntax = true
-        else
-          @stimulus_syntax = false
-        end
+        @stimulus_syntax = true
+
+        # if Rails.version.split(".")[0].to_i >= 7
+        #   @stimulus_syntax = true
+        # else
+        # end
       end
 
       if !options['markup'].nil?
