@@ -1,0 +1,2 @@
+class AtwFullName < ApplicationRecord
+end

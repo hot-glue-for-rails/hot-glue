@@ -1,0 +1,2 @@
+class AtwDisplayName < ApplicationRecord
+end

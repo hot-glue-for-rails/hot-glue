@@ -99,7 +99,6 @@ describe HotGlue::ScaffoldGenerator do
         end
 
         describe "When there are nested args" do
-
           describe "when the user accidentally uses the plural form for the object owner" do
             let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--nested=dfgs"], {:shell=> Thor::Shell::Color.new})}
 
@@ -202,7 +201,45 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
+
+
+  describe "#derrive_reference_name" do
+
+    let (:hot_glue) {HotGlue}
+
+    it "should suggest that I meant the singular version" do
+      res = hot_glue.derrive_reference_name("Xyz")
+      expect(res).to eq( "name")
+    end
+
+    it "should refer to a table with to_label if there is no name field" do
+      res = hot_glue.derrive_reference_name("AtwToLabel")
+      expect(res).to eq( "to_label")
+    end
+
+    it "should refer to a table with full_name if there is no name field" do
+      res = hot_glue.derrive_reference_name("AtwFullName")
+      expect(res).to eq( "full_name")
+    end
+
+
+    it "should refer to a table with display_name if there is no name field" do
+      res = hot_glue.derrive_reference_name("AtwDisplayName")
+      expect(res).to eq( "display_name")
+    end
+
+    it "should refer to a table with email if there is no name field" do
+      res = hot_glue.derrive_reference_name("User")
+      expect(res).to eq( "email")
+    end
+  end
+
+
+
   describe "GOOD RESPONSES" do
+
+
+
     describe "with no parameters" do
       it "should create all the erb files" do
         begin

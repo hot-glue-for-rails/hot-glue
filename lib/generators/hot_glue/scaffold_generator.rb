@@ -68,15 +68,15 @@ module HotGlue
   def self.derrive_reference_name(thing_as_string)
     assoc_class = eval(thing_as_string)
 
-    if assoc_class.respond_to?("name")
+    if assoc_class.new.respond_to?("name")
       display_column = "name"
-    elsif assoc_class.respond_to?("to_label")
+    elsif assoc_class.new.respond_to?("to_label")
       display_column = "to_label"
-    elsif assoc_class.respond_to?("full_name")
+    elsif assoc_class.new.respond_to?("full_name")
       display_column = "full_name"
-    elsif assoc_class.respond_to?("display_name")
+    elsif assoc_class.new.respond_to?("display_name")
       display_column = "display_name"
-    elsif assoc_class.respond_to?("email")
+    elsif assoc_class.new.respond_to?("email")
       display_column = "email"
     else
       raise("this should have been caught by the checker in the initializer")
@@ -504,6 +504,7 @@ module HotGlue
             @associations << assoc_name.to_sym
             assoc_class = eval(assoc_model.name)
             name_list = [:name, :to_label, :full_name, :display_name, :email]
+
             if name_list.collect{ |field|
               assoc_class.column_names.include?(field.to_s) ||  assoc_class.instance_methods.include?(field)
             }.any?
