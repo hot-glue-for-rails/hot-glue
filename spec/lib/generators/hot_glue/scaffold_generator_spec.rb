@@ -24,12 +24,13 @@ describe HotGlue::ScaffoldGenerator do
 
   def remove_everything
     remove_dir_with_namespace('spec/dummy/app/views/')
-    remove_dir_with_namespace('spec/dummy/app/controllers/')
+    # remove_dir_with_namespace('spec/dummy/app/controllers/')
     remove_file("spec/dummy/app/controllers/users_controller.rb")
-    #
+    remove_file("spec/dummy/app/controllers/abcs_controller.rb")
     remove_file("spec/dummy/app/controllers/xyzs_controller.rb")
     remove_file("spec/dummy/app/controllers/dfgs_controller.rb")
     remove_file("spec/dummy/app/controllers/ghis_controller.rb")
+    remove_file("spec/dummy/app/controllers/atw_display_names_controller.rb")
 
     remove_file("spec/dummy/app/controllers/cantelopes_controller.rb")
 
@@ -94,16 +95,6 @@ describe HotGlue::ScaffoldGenerator do
             end
           end
 
-          describe "when all else fails" do
-            # I think not reachable
-            # let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--nested=dfg"], {:shell=> Thor::Shell::Color.new})}
-
-            # it "should tell me I'm missing a relationship from Dfg to user " do
-            #   expect {
-            #     generator.identify_object_owner
-            #   }.to raise_exception("")
-            # end
-          end
         end
       end
     end
@@ -258,6 +249,15 @@ describe HotGlue::ScaffoldGenerator do
 
       expect(File.exist?("spec/dummy/app/controllers/ghis_controller.rb")).to be(true)
       expect(File.exist?("spec/dummy/spec/system/ghis_behavior_spec.rb")).to be(true)
+    end
+
+
+    describe "when the user accidentally uses the plural form for the object owner" do
+      let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--nested=dfg", "--gd"], {:shell=> Thor::Shell::Color.new})}
+
+      it "should treat the object scope as the last thing in the chain" do
+        expect(generator.object_scope).to eq("@dfg.ghis")
+      end
     end
   end
 
@@ -752,14 +752,52 @@ describe HotGlue::ScaffoldGenerator do
     end
 
     describe "#list_label" do
-      xit "should pick up @@table_label_plural on the class if present" do
+      it "should table has no @@table_label_plural on the class if present" do
+
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["AtwDisplayName","--god"])
+
+        res = File.read("spec/dummy/app/views/atw_display_names/_list.erb")
+        expect(res).to include("<h4>
+        ATW DISPLAY NAMES
+      </h4>")
+
+      end
+
+      it "should tabelis if NO @@table_label_plural on the class if present" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Abc","--god",
+                                             "--inline-list-labels=before"])
+
+        res = File.read("spec/dummy/app/views/abcs/_list.erb")
+        expect(res).to include("<h4>
+        Apples
+      </h4>")
 
       end
     end
 
     describe "#thing_label" do
-      xit "should pick up @@table_label_singular on the class if present" do
+      describe "when there is no @@table_label_singular on the class" do
+        it "should tabelize the class" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["AtwDisplayName","--god"])
 
+          res = File.read("spec/dummy/app/views/atw_display_names/_new_button.erb")
+          expect(res).to include("<%= link_to \"New ATW DISPLAY NAME\",")
+        end
+      end
+
+
+      describe "when there IS a @@table_label_singular on the class" do
+        it "should tabelize the class" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Abc","--god"])
+          res = File.read("spec/dummy/app/views/abcs/_list.erb")
+          expect(res).to include("<h4>
+        Apples
+      </h4>")
+        end
       end
     end
 
@@ -997,19 +1035,23 @@ describe HotGlue::ScaffoldGenerator do
 
   describe "When a base controller doesn't already exist" do
     it "should copy the base controller to the namespace" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc","--namespace=hello", "--gd"])
 
+      res = File.read("spec/dummy/app/controllers/hello/base_controller.rb")
+
+      expect(res).to include("class Hello::BaseController < ApplicationController")
     end
   end
 
   describe "for when a base controller already exists" do
     it "should skip adding the base controller" do
-
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc","--gd", "---namespace=fruits"])
+      res = File.read("spec/dummy/app/controllers/fruits/base_controller.rb")
+      expect(res).to include("# check: I should not be overwrittern")
     end
   end
-
-
-
-
 
 
   describe "--downnest" do
