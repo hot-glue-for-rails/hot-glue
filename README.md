@@ -149,18 +149,13 @@ https://github.com/FortAwesome/font-awesome-sass
 
 
 ## 5. Devise
+!!! Warning: as of 2022-03-22, Devise is still not compatible out-of-the-box with Rails 7.
 
-(or only use --gd mode, see below)
+please see https://github.com/heartcombo/devise/issues/5478 or check this README for updated information. 
 
-Add to your Gemfile
-
-As of now, Devise for Rails 7 is still not released so you must use **main branch**, like so:
-
-`gem 'devise', branch: 'main', git: 'https://github.com/heartcombo/devise.git'`
 
 (If you are on Rails 6, you must do ALL of the steps in the Legacy Setup steps. Be sure not to skip **Legacy Step #5** below)
 
-For Rails 7, be sure you are on the main branch of devise above and your logins should work. (The previously necessary step of disabling turbo shown in Legacy Step #5 is no longer needed. )
 
 You MUST run the installer FIRST or else you will put your app into a non-workable state:
 ```
