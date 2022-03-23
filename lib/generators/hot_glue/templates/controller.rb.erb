@@ -2,7 +2,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   helper :hot_glue
   include HotGlue::ControllerHelper
 
-  <% unless @auth_identifier == '' || @god %>before_action :authenticate_<%= @auth_identifier %>!<% end %>
+  <% unless @auth_identifier == '' || @god %>before_action :<%= auth_root %><% end %>
   <% if any_nested? %><% nest_chain = [] %> <% @nested_set.each { |arg|
 
     if auth_identifier == arg[:singular]
@@ -74,7 +74,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
 <% if create_action %>  def new
-    <% if ! @god %>
+    <% if @object_owner_sym %>
     @<%= singular_name %> = <%= class_name  %>.new(<%  if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)
 
    <% elsif @object_owner_optional && any_nested? %>
@@ -87,8 +87,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
   def create
-    modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup<% if ! @object_owner_sym.empty? &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>.merge!(<% if @object_owner_optional && any_nested? %><%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {} <% else  %> <%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>) <% end %>)
-<% if @hawk_keys.any? %>    modified_params = hawk_params( {<%= hawk_to_ruby %>}, modified_params) <% end %>
+    modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup<% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>.merge!(<% if @object_owner_optional && any_nested? %><%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {} <% else  %> <%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>) <% end %>)
+<% if @hawk_keys.any? %>    modified_params = hawk_params( {<%= hawk_to_ruby %>}, modified_params)<% end %>
 
     @<%=singular_name %> = <%= class_name %>.create(modified_params)
 
@@ -123,7 +123,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
 <% end %><% if @build_update_action %>  def update
     modified_params = modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>)<%= controller_update_params_tap_away_magic_buttons %>
-<% if @hawk_keys.any? %>    modified_params = hawk_params( {<%= hawk_to_ruby %>}, modified_params) <% end %>
+<% if @hawk_keys.any? %>    modified_params = hawk_params( {<%= hawk_to_ruby %>}, modified_params)<% end %>
       <%= controller_magic_button_update_actions %>    if @<%= singular_name %>.update(modified_params)
       flash[:notice] = (flash[:notice] || "") << "Saved #{@<%= singular %>.<%= display_class %>}"
       flash[:alert] = @hawk_alarm  if !@hawk_alarm.empty?

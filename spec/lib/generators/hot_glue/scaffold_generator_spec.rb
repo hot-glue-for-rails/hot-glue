@@ -33,6 +33,7 @@ describe HotGlue::ScaffoldGenerator do
     remove_file("spec/dummy/app/controllers/atw_display_names_controller.rb")
 
     remove_file("spec/dummy/app/controllers/cantelopes_controller.rb")
+    remove_file("spec/dummy/app/controllers/visits_controller.rb")
 
     remove_file("spec/dummy/app/controllers/all_dfgs_controller.rb")
 
@@ -262,6 +263,30 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "authorization and object ownership" do
+    describe "#auth_root" do
+      # @auth_identifier is passed in by user and
+      describe "When @auth_identifier has no . in it" do
+        let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--auth=current_user"], {:shell=> Thor::Shell::Color.new})}
+        it "should treat the object scope as the last thing in the chain" do
+          expect(generator.auth_root).to eq("authenticate_user!")
+        end
+      end
+
+      describe "When @auth_identifier has a . in it" do
+        let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--auth=current_user.family"], {:shell=> Thor::Shell::Color.new})}
+        it "should treat the object scope as the last thing in the chain" do
+          expect(generator.auth_root).to eq("authenticate_user!")
+        end
+
+
+
+      end
+
+
+
+    end
+
+
     describe "by default assumes current_user is --auth" do
       it "should generate code protected to current user" do
         response = Rails::Generators.invoke("hot_glue:scaffold",
@@ -280,6 +305,19 @@ describe HotGlue::ScaffoldGenerator do
           File.read("spec/dummy/app/controllers/dfgs_controller.rb") =~ /before_action :authenticate_cantelope!/
         ).to be_a(Numeric)
       end
+
+      describe "when passed an --auth flag with a ." do
+        it "should allow me to hawk a nonusual root using curly brace syntax { .. }, like anything that the current_user belongs to" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Visit",
+                                               "--auth=current_user.family"])
+
+
+          res = File.read("spec/dummy/app/controllers/visits_controller.rb")
+          expect(res).to include("before_action :authenticate_user!")
+        end
+      end
+
     end
 
     describe "#object_scope" do
@@ -505,16 +543,18 @@ describe HotGlue::ScaffoldGenerator do
   describe "self auth" do
     it "when run with auth as the same name as the object but without --no-create" do
       expect{ Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["User","--auth=user"])
+                                          ["User","--auth=current_user"])
       }.to raise_exception("This controller appears to be the same as the authentication object but in this context you cannot build a new/create action; please re-run with --no-create flag")
 
     end
 
-    it "when run with auth as the same name as the object but without --no-create" do
+    it "when run with auth as the same name as the object but without --no-create SELF AUTH" do
       res = Rails::Generators.invoke("hot_glue:scaffold",
-                                       ["User","--auth=user", "--no-create"])
+                                       ["User","--auth=current_user", "--no-create"])
+
+
       expect(
-        File.read("spec/dummy/app/controllers/users_controller.rb") =~ /User.where\(id: user.id/
+        File.read("spec/dummy/app/controllers/users_controller.rb") =~ /@user = \(current_user\)/
       ).to be_a(Numeric)
     end
   end
@@ -877,6 +917,25 @@ describe HotGlue::ScaffoldGenerator do
       res = File.read("spec/dummy/app/controllers/ghis_controller.rb")
       expect(res).to include("hawk_params( {dfg_id: [current_user, \"dfgs\"] , xyz_id: [current_user, \"xyzs\"] }, modified_params)")
 
+    end
+
+    it "should allow me to hawk a nonusual root using curly brace syntax { .. }, like anything that the current_user belongs to" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Visit",
+                                           "--hawk=user_id{current_user.family}",
+                                           "--auth=current_user.family"])
+
+
+      res = File.read("spec/dummy/app/controllers/visits_controller.rb")
+      expect(res).to include("@visit = (current_user.family.visits.find(params[:id]))")
+
+      expect(res).to include("modified_params = hawk_params( {user_id: [current_user.family, \"users\"] }, modified_params)")
+
+      expect(res).to include("def load_visit
+    @visit = (current_user.family.visits.find(params[:id]))
+  end")
+
+      expect(res).to include("@visits = ( current_user.family.visits.page(params[:page]).includes(:user))")
     end
   end
 

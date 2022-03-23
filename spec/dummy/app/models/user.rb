@@ -8,4 +8,6 @@ class User < ApplicationRecord
   has_many :xyzs
 
   has_many :ghis, through: :dfgs
+
+  belongs_to :family
 end

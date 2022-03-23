@@ -359,27 +359,46 @@ module HotGlue
 
       # OBJECT OWNERSHIP & NESTING
       @reference_name = HotGlue.derrive_reference_name(singular_class)
-      if @auth && ! @self_auth && @nested_set.none?
+      if @auth && @self_auth
+        # byebug
         @object_owner_sym = @auth.gsub("current_", "").to_sym
         @object_owner_eval = @auth
         @object_owner_optional = false
+        @object_owner_name = @auth.gsub("current_", "").to_s
+
+
+      elsif @auth && ! @self_auth && @nested_set.none? && !@auth.include?(".")
+        # byebug
+        @object_owner_sym = @auth.gsub("current_", "").to_sym
+        @object_owner_eval = @auth
+        @object_owner_optional = false
+        @object_owner_name = @auth.gsub("current_", "").to_s
+
+      elsif @auth && @auth.include?(".")
+        # byebug
+        @object_owner_sym = nil
+        @object_owner_eval = @auth
       else
+        # byebug
         if @nested_set.any?
           @object_owner_sym = @nested_set.last[:singular].to_sym
           @object_owner_eval = "@#{@nested_set.last[:singular]}"
           @object_owner_name = @nested_set.last[:singular]
           @object_owner_optional = @nested_set.last[:optional]
         else
-          @object_owner_sym = ""
+          @object_owner_sym = nil
           @object_owner_eval = ""
         end
       end
+
       identify_object_owner
+      setup_hawk_keys
+
 
 
       # SETUP FIELDS & LAYOUT
       setup_fields
-      if  (@columns - @show_only - (@object_owner_sym.empty? ? [] : [@ownership_field.to_sym])).empty?
+      if  (@columns - @show_only - (@ownership_field ?  [@ownership_field.to_sym] : [])).empty?
         @no_field_form = true
       end
 
@@ -396,20 +415,19 @@ module HotGlue
 
       @menu_file_exists = true if @nested_set.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
+
+    end
+
+    def setup_hawk_keys
       @hawk_keys = {}
 
       if options['hawk']
         options['hawk'].split(",").each do |hawk_entry|
           # format is: abc_id[thing]
 
-          if hawk_entry.include?("[")
-            # TODO: IMPLEMENT ME
-            # regexp_res =  hawk_entry =~ /$1[$2]/
-            # byebug
-            #
-            # key, hawk_to = $1, $2
-            #
-            # puts ""
+          if hawk_entry.include?("{")
+            hawk_entry =~ /(.*){(.*)}/
+            key, hawk_to = $1, $2
           else
             key = hawk_entry
             hawk_to = @auth
@@ -420,17 +438,15 @@ module HotGlue
 
         puts "HAWKING: #{@hawk_keys}"
       end
-
     end
 
     def identify_object_owner
       auth_assoc = @auth && @auth.gsub("current_","")
-
-      if !@object_owner_sym.empty?
+      
+      if @object_owner_sym && ! @self_auth
         auth_assoc_field = auth_assoc + "_id" unless @god
-
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
-
+        # byebug
         if assoc
           @ownership_field = assoc.name.to_s + "_id"
         elsif ! @nested_set.any?
@@ -446,11 +462,12 @@ module HotGlue
 
           raise(HotGlue::Error, exit_message)
         end
+      elsif  @object_owner_sym && ! @object_owner_eval.include?(".")
+        @ownership_field = @object_owner_name + "_id"
       end
     end
 
     def setup_fields
-      auth_assoc = @auth && @auth.gsub("current_","")
 
       if !@include_fields
         @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
@@ -459,7 +476,6 @@ module HotGlue
                              :confirmation_token, :confirmed_at,
                              :confirmation_sent_at, :unconfirmed_email
 
-        @exclude_fields.push( (auth_assoc + "_id").to_sym) if ! auth_assoc.nil?
         @exclude_fields.push( @ownership_field.to_sym ) if ! @ownership_field.nil?
 
 
@@ -514,6 +530,11 @@ module HotGlue
           end
         end
       end
+    end
+
+
+    def auth_root
+      "authenticate_" + @auth_identifier.split(".")[0] + "!"
     end
 
     def formats
@@ -1022,10 +1043,10 @@ module HotGlue
           "display_name"
         elsif me.column_names.include?("email") || me.instance_methods(false).include?(:email)
           "email"
-        # else
-        # UNREACHABLE
-          # exit_message = "*** Oops: Can't find any column to use as the display label on #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your #{singular_class} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
-          # raise(HotGlue::Error, exit_message)
+        else
+          # NOT UNREACHABLE BUT UNTESTED
+          exit_message = "*** Oops: Can't find any column to use as the display label on #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your #{singular_class} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+          raise(HotGlue::Error, exit_message)
         end
     end
 
