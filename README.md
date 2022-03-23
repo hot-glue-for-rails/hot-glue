@@ -811,7 +811,7 @@ Child portals have the headings omitted automatically (there is a heading identi
 
  - You can now protect your foreign keys from malicious input and also restrict the scope of drop downs to show only records within the specied access control scope. 
  - [Example #3](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38584014) in the Hot Glue Tutorial shows you how to use the hawk to limit the scope to the logged in user.
- - [Example #4](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38787505) in the Hot Glue Tutorial shows how to hawk to a non-usual scope, like an object that belong_to the current user.
+ - [Example #4](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38787505) in the Hot Glue Tutorial shows how to hawk to a non-usual scope, the inverse of the current user's belongs_to (that is, hawk the scope to X where current_user `belongs_to :x`)
  
 
 #### 2022-03-12  - v0.5.1 - Inline List Labels
