@@ -473,6 +473,25 @@ In this case a controller would be generated that would have NO before_action to
 Please note that this example would produce non-functional code, so you would need to manually fix your controllers to make sure `current_account` is available to the controller.
 
 
+### `--hawk=`
+
+Hawk a foreign key that is not the object's owner to within a specified scope. 
+
+Assuming a Pet belong_to a :human, when building an Appointments scaffold, you can hawk the `pet_id` to the current human's pets. (Whoever is the authentication object.)
+
+`--hawk=pet_id`
+
+This is covered in [Example #3 in the Hot Glue Tutorial](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38584014)
+
+To hawk to a scope that is not the currently authenticated user, use curly braces `{...}` to specify the scope.
+
+`--hawk=user_id{current_user.family}`
+
+This would hawk the Appointment's `user_id` key to any users who are within the scope of the current_user's family. 
+
+This is covered in [Example #4 in the Hot Glue Tutorial](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38787505)
+
+
 ### `--plural=`
 
 You don't need this if the pluralized version is just + "s" of the singular version.

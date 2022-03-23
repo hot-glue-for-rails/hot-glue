@@ -442,7 +442,7 @@ module HotGlue
 
     def identify_object_owner
       auth_assoc = @auth && @auth.gsub("current_","")
-      
+
       if @object_owner_sym && ! @self_auth
         auth_assoc_field = auth_assoc + "_id" unless @god
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
