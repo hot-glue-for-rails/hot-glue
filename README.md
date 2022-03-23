@@ -807,11 +807,12 @@ Child portals have the headings omitted automatically (there is a heading identi
 
 # VERSION HISTORY
 
-#### ???? - v0.5.2 - Hawked Foreign Keys
+#### 2022-03-23 - v0.5.2 - Hawked Foreign Keys
 
-
-
-
+ - You can now protect your foreign keys from malicious input and also restrict the scope of drop downs to show only records within the specied access control scope. 
+ - [Example #3](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38584014) in the Hot Glue Tutorial shows you how to use the hawk to limit the scope to the logged in user.
+ - [Example #4](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38787505) in the Hot Glue Tutorial shows how to hawk to a non-usual scope, like an object that belong_to the current user.
+ 
 
 #### 2022-03-12  - v0.5.1 - Inline List Labels
 
@@ -871,8 +872,6 @@ Omits the list heading. Note that the listing heading is omitted:
 2) if you set the `--no-list-heading` flag, 
 3) if the model has `@@table_label_plural = nil`, or 
 4) if you are constructing a nested child portal with only non-optionalized parents. 
-
-
 
 #### 2022-02-09 - v0.4.8.1 - Issue with Installer for v0.4.8
     - There was an issue for the installer for v0.4.8. This new version v0.4.8.1 correts it.
@@ -997,8 +996,8 @@ COVERGE=on rake spec
 --
 --
  
-Test coverage as of 2022-02-14 (v0.4.9)
+Internal Test coverage as of 2022-03-23 (v0.5.2)
 
-![Screen Shot 2022-02-14 at 8 33 29 PM](https://user-images.githubusercontent.com/59002/153975911-30fa9c84-c8d8-49e7-bd5c-e2b958d6f10e.png)
 
+![HG 84 89 coverage report](https://user-images.githubusercontent.com/59002/159719583-a956cfb3-1797-4186-b32c-237ed19e8e2b.png)
 
