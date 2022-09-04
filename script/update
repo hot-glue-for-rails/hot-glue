@@ -1,0 +1,1 @@
+rails db:create db:migrate

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+
+clean_generated_code() {
+  /bin/rm -rf app/controllers/*[^application_controller.rb]
+  /bin/rm -rf app/views/*
+  /bin/rm -rf spec/system/*
+}
+
+echo "test-on-test suite for Hot Glue..."
+
+cd spec/dummy
+clean_generated_code
+
+echo "Generating Abc..."
+rails generate hot_glue:scaffold Abc --gd
+rspec spec
+clean_generated_code
+
+
+
+cd ../..
