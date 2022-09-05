@@ -12,3 +12,14 @@ gem 'byebug'
 
 # for testing
 gem 'simplecov-rcov'
+
+
+gem "sprockets-rails"
+gem "importmap-rails"
+gem "stimulus-rails"
+gem "turbo-rails"
+
+
+gem "puma", "~> 5.0"
+
+gem "devise"
