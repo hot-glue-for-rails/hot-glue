@@ -19,9 +19,7 @@ echo "Generating Abcs with rails generate hot_glue:scaffold Abc --gd"
 rails generate hot_glue:scaffold Abc --gd
 
 
-rspec spec
+rspec spec || exit
 clean_generated_code
-
-
 
 cd ../..
