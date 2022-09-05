@@ -51,6 +51,7 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps
+      - bundle install
       # Here we make sure that the secondary container boots
       # up before we run operations on the database.
       - run:
