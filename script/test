@@ -3,8 +3,8 @@
 
 clean_generated_code() {
   /bin/rm app/controllers/abcs_controller.rb
-  /bin/rm -rf app/views/abcs/*
-  /bin/rm -rf spec/system/*
+  /bin/rm -rf app/views/abcs/
+  /bin/rm -rf spec/system/
 }
 
 
@@ -16,8 +16,10 @@ cd dummy
 
 clean_generated_code
 
-echo "Generating Abcs with `rails generate hot_glue:scaffold Abc --gd`"
+echo "Generating Abcs with rails generate hot_glue:scaffold Abc --gd"
 rails generate hot_glue:scaffold Abc --gd
+
+
 rspec spec
 clean_generated_code
 
