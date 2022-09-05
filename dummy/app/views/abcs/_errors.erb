@@ -1,0 +1,11 @@
+<%= turbo_frame_tag "errors" do %>
+  <% if resource.errors.any? %>
+    <div id="error_explanation">
+      <% resource.errors.full_messages.each do |message| %>
+        <div class="alert alert-danger">
+          <%= message %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

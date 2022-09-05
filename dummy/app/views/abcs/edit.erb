@@ -1,0 +1,20 @@
+<%= link_to "<i class='fa fa-arrow-circle-left  2x'></i> Back to list".html_safe, abcs_path %>
+
+<%= turbo_frame_tag "abc__#{@abc.id}" do  %>
+
+  <div class="cell editable" style="position: relative;">
+
+    <% if @abc.errors.any? %>
+      <%= render(partial: "errors", locals: {resource: @abc }) %>
+    <% end %>
+
+    <h2>Editing <%= @abc.name %></h2>
+    <%= form_with model: @abc, url: abc_path(@abc) do |f| %>
+    <%=  render partial: "form",  locals: {:abc => @abc, f: f} %>
+    <% end %>
+
+  </div>
+
+<% end %>
+
+

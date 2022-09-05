@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "abcs-list" + "" do %>
+  <%= render partial: "list", locals: {abcs: @abcs } %>
+<% end %>
