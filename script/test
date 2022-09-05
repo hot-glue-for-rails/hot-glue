@@ -15,9 +15,6 @@ echo "test-on-test suite for Hot Glue..."
 cd dummy
 bundle install
 
-
-clean_generated_code
-
 echo "Generating Abcs with rails generate hot_glue:scaffold Abc --gd"
 rails generate hot_glue:scaffold Abc --gd
 
