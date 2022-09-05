@@ -5,11 +5,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+
     steps:
+      - uses: actions/checkout@v3
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
+          # Not needed with a .ruby-version file
+          ruby-version: 2.7
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
-      - uses: actions/checkout@v3
       - run: script/test
