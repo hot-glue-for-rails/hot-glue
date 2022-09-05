@@ -4,6 +4,13 @@ on: [ pull_request, workflow_dispatch ]
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: true
       - uses: actions/checkout@v3
+      - uses:
       - run: script/test
