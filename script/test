@@ -3,7 +3,7 @@
 
 clean_generated_code() {
   /bin/rm -rf app/controllers/*[^application_controller.rb]
-  /bin/rm -rf app/views/*
+  /bin/rm -rf app/views/*[^application.html.erb]
   /bin/rm -rf spec/system/*
 }
 

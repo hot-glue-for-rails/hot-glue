@@ -29,8 +29,8 @@ Hot Glue generates functionality that is quick and dirty. It lets you be crafty.
 
 
 # Get Hot Glue
-## [Licence Only Option Now Available](https://heliosdev.shop/p/hot-glue/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $50 USD!**
-## [GET THE COURSE TODAY (includes Licence)](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
+
+## [GET THE COURSE TODAY](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
 
 |   |  |  
 | ------------- | ------------- |
@@ -40,17 +40,15 @@ Hot Glue generates functionality that is quick and dirty. It lets you be crafty.
 ---
 
 
-## NEW GETTING STARTED VIDEO
-The getting started video is newly updated with an explanation of the options for **`jsbundling-rails`/`cssbudling-rails`** when creating a new Rails 7 app.
+## GETTING STARTED VIDEO
 
-Check it out on Youtube at https://www.youtube.com/watch?v=bKjKHMTvzZc
 
-While you're over there could you give my Youtube channel a 'Subscribe'? (look for the RED SUBSCRIBE BUTTON) Thanks so much!
+~~Check it out on Youtube at https://www.youtube.com/watch?v=bKjKHMTvzZc~~
+
+While you're over there could you give my Youtube channel a 'Subscribe'? (look for the RED SUBSCRIBE BUTTON)
 
 
 ---
- 
-
 ## HOW EASY?
 
 ```
@@ -71,17 +69,27 @@ _If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github.com/jasonf
 
 ## 1. Rails 7 New App
 
-There are two ways to create new apps on Rails 7: With or Without ImportMap. These instructions prefer the **without Importmap** method using ESBuild as the bundler, but to help you choose [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-do-i-need-importmap-rails/)
+To run Turbo (which Hot Glue requires), you must either (1) be running an ImportMap-Rails app, or (2) be running a Node-compiled app using any of JSBundling, Shakapacker, or its alternatives. 
 
-`rails new --css=bootstrap --javascript=esbuild --database=postgresql`
+For reference, see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-do-i-need-importmap-rails/
 
-**If using JSBundling, make sure to use the new `./bin/dev` to start your server instead of the old `rails server` or else your Turbo interactions will not work correctly.** 
+(1) To use ImportMap Rails, start with
+`rails new`
 
-Confirm that both Stimulus and Turbo are working.
+If you want Bootstrap, install it following these instructions
 
-For the quick step-by-step guide to help you confirm that both Stimulus and Turbo are working for your new JSBundling-Rails/CSSBunlding-Rails setup [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-new-app-with-js-bundling-css-bundling/).
+(2) To use JSBundling, start with
+`rails new --javascript=jsbundling`
 
-(Note that Bootstrap is optional for Hot Glue. Here, I am just showing you the default installation for simplicity.)
+
+**If using JSBundling, make sure to use the new `./bin/dev` to start your server instead of the old `rails server` or else your Turbo interactions will not work correctly.**
+If you want Bootstrap, install it following these instructions
+
+(3) To use Shakapacker,
+`rails new --skip-javascript`
+
+If you want Bootstrap, install it following these instructions
+
 
 For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/)
 
@@ -89,21 +97,32 @@ Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https:/
 
 ## 2. ADD RSPEC, FACTORY-BOT, AND FFAKER
 
-add these 3 gems to your gemfile **inside a group for both :development and :test*. Do not add these gems to only the :test group or else your will have problems with the generators.
+add these 3 gems to your gemfile **inside a group for both :development and :test*. 
+Do not add these gems to *only* the :test group or else your Rspec installer and generators will not work correctly.
 ```
-gem 'rspec-rails'
-gem 'factory_bot_rails'
-gem 'ffaker'
+group :development, :test do 
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
+  gem 'ffaker'
+end 
 ```
 
+### Rspec Installer
 - run `rails generate rspec:install`
 
+- Because you are not using Minitest, you can delete the `test/` folder at the root of your repository.
+
+### Factory Bot Setup
+
+In `spec/rails_helper.rb`, add this line to anywhere within the `RSpec.configure do |config|` block. 
+
+```
+config.include FactoryBot::Syntax::Methods
+```
 
 
 ## 3. HOTGLUE INSTALLER
 Add `gem 'hot-glue'` to your Gemfile & `bundle install`
-
-Purchase a license at https://heliosdev.shop/p/hot-glue
 
 During in installation, you MUST supply a `--layout` flag.
 
