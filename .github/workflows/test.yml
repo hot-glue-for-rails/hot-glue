@@ -12,5 +12,4 @@ jobs:
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
       - uses: actions/checkout@v3
-      - uses:
       - run: script/test

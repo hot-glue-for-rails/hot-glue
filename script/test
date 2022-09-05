@@ -13,6 +13,8 @@ echo "test-on-test suite for Hot Glue..."
 # note that the dummy/ is in the root of the repository
 
 cd dummy
+bundle install
+
 
 clean_generated_code
 
