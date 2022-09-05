@@ -1,3 +1,11 @@
+PATH
+  remote: ..
+  specs:
+    hot-glue (0.5.2)
+      ffaker (~> 2.16)
+      kaminari (~> 1.2)
+      rails (> 5.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -89,6 +97,7 @@ GEM
       reline (>= 0.3.1)
     digest (3.1.0)
     erubi (1.11.0)
+    ffaker (2.21.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
     i18n (1.12.0)
@@ -102,6 +111,18 @@ GEM
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
+    kaminari (1.2.2)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.2.2)
+      kaminari-activerecord (= 1.2.2)
+      kaminari-core (= 1.2.2)
+    kaminari-actionview (1.2.2)
+      actionview
+      kaminari-core (= 1.2.2)
+    kaminari-activerecord (1.2.2)
+      activerecord
+      kaminari-core (= 1.2.2)
+    kaminari-core (1.2.2)
     loofah (2.18.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -218,6 +239,7 @@ DEPENDENCIES
   bootsnap
   capybara
   debug
+  hot-glue!
   importmap-rails
   jbuilder
   puma (~> 5.0)
