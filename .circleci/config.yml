@@ -21,6 +21,8 @@ jobs:
       - run:
           name: Which bundler?
           command: bundle -v
+      - run: sudo apt-get update
+      - run: sudo apt-get install rsync
   test:  # our next job, called "test"
     parallelism: 1
     # here we set TWO docker images.
