@@ -21,8 +21,7 @@ jobs:
       - run:
           name: Which bundler?
           command: bundle -v
-      - run: sudo apt-get update
-      - run: sudo apt-get install rsync
+
   test:  # our next job, called "test"
     parallelism: 1
     # here we set TWO docker images.
@@ -53,6 +52,7 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps
+      - run: sudo apt-get update && sudo apt-get install -y ruby-rspec
       # Here we make sure that the secondary container boots
       # up before we run operations on the database.
       - run:
