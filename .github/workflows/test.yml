@@ -15,5 +15,4 @@ jobs:
           ruby-version: 3.1
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
-      - run: script/setup
       - run: script/test
