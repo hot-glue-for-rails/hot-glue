@@ -8,11 +8,19 @@ clean_generated_code() {
 }
 
 
+
 echo "test-on-test suite for Hot Glue..."
 
 # note that the dummy/ is in the root of the repository
 
 cd dummy
+
+echo "setting up database..."
+
+rake db:create db:reset db:test:prepare
+
+../script/setup
+
 bundle install
 
 echo "Generating Abcs with rails generate hot_glue:scaffold Abc --gd"
