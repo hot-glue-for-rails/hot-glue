@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.email       = 'code@jasonfb.net'
 
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
-    files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)}) || f.match(%r{(gemspec|gem)$}) }
+    files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|dummy)}) || f.match(%r{(gemspec|gem)$}) }
     files
   end
 

@@ -14,6 +14,9 @@ gem 'byebug'
 gem 'simplecov-rcov'
 gem 'rake'
 gem "rspec-rails"
+gem "factory_bot_rails"
+gem "ffaker"
+
 gem "sprockets-rails"
 gem "importmap-rails"
 gem "stimulus-rails"

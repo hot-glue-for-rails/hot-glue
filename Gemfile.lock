@@ -89,6 +89,11 @@ GEM
     digest (3.1.0)
     docile (1.4.0)
     erubi (1.11.0)
+    factory_bot (6.2.1)
+      activesupport (>= 5.0.0)
+    factory_bot_rails (6.2.0)
+      factory_bot (~> 6.2.0)
+      railties (>= 5.0.0)
     ffaker (2.21.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
@@ -232,6 +237,8 @@ PLATFORMS
 DEPENDENCIES
   byebug
   devise
+  factory_bot_rails
+  ffaker
   hot-glue!
   importmap-rails
   puma (~> 5.0)
