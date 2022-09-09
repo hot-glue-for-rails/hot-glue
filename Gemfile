@@ -13,7 +13,7 @@ gem 'byebug'
 # for testing
 gem 'simplecov-rcov'
 gem 'rake'
-
+gem "rspec-rails"
 gem "sprockets-rails"
 gem "importmap-rails"
 gem "stimulus-rails"
