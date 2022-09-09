@@ -26,7 +26,6 @@ jobs:
     parallelism: 1
     # here we set TWO docker images.
     docker:
-
       - image: cimg/ruby:3.1.2-browsers # this is our primary docker image, where step commands run.
         auth:
           username: mydockerhub-user
@@ -53,6 +52,12 @@ jobs:
       - checkout
       - ruby/install-deps
       - run: sudo apt-get update && sudo apt-get install -y ruby-rspec
+      - run:
+          name: Setup Chrome
+          command: |
+            wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            sudo apt install ./google-chrome-stable_current_amd64.deb
+
       # Here we make sure that the secondary container boots
       # up before we run operations on the database.
       - run:
