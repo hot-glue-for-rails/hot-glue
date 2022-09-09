@@ -12,7 +12,7 @@ gem 'byebug'
 
 # for testing
 gem 'simplecov-rcov'
-
+gem 'rake'
 
 gem "sprockets-rails"
 gem "importmap-rails"

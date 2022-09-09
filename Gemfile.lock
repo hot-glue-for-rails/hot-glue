@@ -217,6 +217,7 @@ DEPENDENCIES
   hot-glue!
   importmap-rails
   puma (~> 5.0)
+  rake
   simplecov-rcov
   sprockets-rails
   sqlite3
