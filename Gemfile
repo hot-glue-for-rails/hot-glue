@@ -17,7 +17,8 @@ gem "rspec-rails"
 gem "factory_bot_rails"
 gem "ffaker"
 gem "capybara"
-gem 'selenium-webdriver'
+gem "selenium-webdriver"
+gem "webdrivers"
 
 gem "sprockets-rails"
 gem "importmap-rails"
