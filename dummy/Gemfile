@@ -29,6 +29,7 @@ gem "bootsnap", require: false
 
 
 # gem "sassc-rails"
+gem 'rake'
 
 
 group :development, :test do

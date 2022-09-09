@@ -283,6 +283,7 @@ DEPENDENCIES
   jbuilder
   puma (~> 5.0)
   rails (~> 7.0.3, >= 7.0.3.1)
+  rake
   redis (~> 4.0)
   rspec-rails
   selenium-webdriver
