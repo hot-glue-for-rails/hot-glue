@@ -26,5 +26,5 @@ rspec spec || exit
 
 cd ../
 
-clean_generated_code
+script/clean_generated_code
 
