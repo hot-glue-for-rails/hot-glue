@@ -1,5 +1,5 @@
 
-[![Hot Glue](https://circleci.com/gh/jasonfb/hot-glue.svg?style=shield)](https://circleci.com/gh/jasonfb/hot-glue)
+![Integrated Logo design-639x264](https://user-images.githubusercontent.com/59002/189544688-c1a8226f-9dbd-4758-bc0c-712fc2754cbd.png)
 
 Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of the admin-interface style scaffolding systems of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold)).
 
@@ -32,10 +32,8 @@ Hot Glue generates functionality that is quick and dirty. It lets you be crafty.
 
 ## [GET THE COURSE TODAY](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
 
-|   |  |  
-| ------------- | ------------- |
-| ![Teachable-225x225](https://user-images.githubusercontent.com/59002/147857335-a919e095-e6de-4718-8513-736d1f283a0b.png)  | Now avaiale on [Teachable](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page)  |
 
+[![Hot Glue Course](https://user-images.githubusercontent.com/59002/189544503-6edbcd40-1728-4b13-ac9a-c7772ccb8284.jpg)](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page)
 
 ---
 
