@@ -122,11 +122,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
 <% end %><% if @build_update_action %>  def update
-    modified_params = modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>)<%= controller_update_params_tap_away_magic_buttons %>
-<% if @hawk_keys.any? %>    modified_params = hawk_params( {<%= hawk_to_ruby %>}, modified_params)<% end %>
-      <%= controller_magic_button_update_actions %>    if @<%= singular_name %>.update(modified_params)
+    modified_params = modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>)<%= controller_update_params_tap_away_magic_buttons %><% if @hawk_keys.any? %>
+    modified_params = hawk_params( {<%= hawk_to_ruby %>}, modified_params)<% end %>
+      <%= controller_magic_button_update_actions %> if @<%= singular_name %>.update(modified_params)
       flash[:notice] = (flash[:notice] || "") << "Saved #{@<%= singular %>.<%= display_class %>}"
-      flash[:alert] = @hawk_alarm  if !@hawk_alarm.empty?
+      flash[:alert] = @hawk_alarm if @hawk_alarm
     else
       flash[:alert] = (flash[:alert] || "") << "<%= singular_name.titlecase %> could not be saved. #{@hawk_alarm}"
 

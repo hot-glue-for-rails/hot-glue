@@ -1,0 +1,18 @@
+name: Test
+on: [ pull_request, workflow_dispatch ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          # Not needed with a .ruby-version file
+          ruby-version: 3.1
+          # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: true
+      - run: script/test

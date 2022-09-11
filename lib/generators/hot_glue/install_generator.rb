@@ -26,58 +26,8 @@ module HotGlue
         puts "IMPORTANT: You have selected to install Hot Glue with Bootstrap layout (legacy). Be sure to always use ``--layout=bootstrap` when building your scaffold. No Hot Glue theme will be installed at this time.` "
       end
 
-      ### INTERACTIVE LICENSING
-
-
-      print "Do you have a license key (y/N)? "
-      do_you_have_a_license = STDIN.gets.strip || "N"
-
-      if do_you_have_a_license.downcase == "y"
-        print "Please enter the EMAIL you used to purchase a Hot Glue license, \nTeachable tutorial, or Helios Merch Shop product: "
-        license_email = STDIN.gets.strip
-        require 'open-uri'
-
-        # ask HeliosDev.shop if this email is good
-        stream = URI.open("https://heliosdev.shop/check_licenses/hot-glue?email=#{license_email}")
-        resp = JSON.parse(stream.read)
-
-        if resp['status'] == 'success'
-          if resp['redirect']
-            HotGlue::Helpers.open_page(resp['redirect'])
-          end
-          puts "\n" + "    * " + resp['response'] + " * \n\n"
-        else
-          puts "\n" + "    * " + resp['response'] + " * \n\n"
-
-          print "You can get a license in one of the follow ways: \n"
-          print "https://heliosdev.shop/hot-glue-license \n"
-          print "https://jfb.teachable.com/p/hot-glue-in-depth-tutorial \n"
-          print "https://shop.heliosdev.shop/ \n"
-          print "All purchases come with a Hot Glue lifetime license for individuals and hobbyists\n"
-          return
-        end
-      else
-        print "Please pick an option to get a Hot Glue license: \n"
-        print "1) Professional/Business with support (see heliosdev.shop/hot-glue-license for prices)  \n"
-        print "2) Individual/hobbyist: Get the tutorial on Teachable ($60) \n"
-        print "3) Individual/hobbyist: Get some merchandise ($5 and up) \n"
-        print "Please type 1, 2, or 3: "
-        choice = STDIN.gets.strip
-
-        if choice == "1"
-          HotGlue::Helpers.open_page("https://heliosdev.shop/hot-glue-license?utm_campaing=hotglue-installer")
-        elsif choice == "2"
-          HotGlue::Helpers.open_page("https://jfb.teachable.com/p/hot-glue-in-depth-tutorial?utm_source=hotglue-installer")
-          print "All purchases come with a Hot Glue lifetime license for individuals and hobbyists\n"
-
-        else
-          HotGlue::Helpers.open_page("https://shop.heliosdev.shop/?utm_source=hotglue-installer")
-          print "ALSO check out the HOT GLUE TUTORIAL here: \n"
-          print "https://jfb.teachable.com/p/hot-glue-in-depth-tutorial \n"
-          print "All purchases come with a Hot Glue lifetime license for individuals and hobbyists\n"
-        end
-        return
-      end
+      ## quick shameless plug for my own own store
+      Helpers.open_page("https://tekduds.com?utm_source=hotglue-installer")
 
       @markup = options['markup']
       if @markup == "haml"
@@ -171,11 +121,9 @@ module HotGlue
 
 
       begin
-
         if !File.exists?("config/hot_glue.yml")
           yaml = {layout: @layout,
-                  markup: @markup,
-                  license_email: license_email}.to_yaml
+                  markup: @markup}.to_yaml
           File.write("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml", yaml)
 
         end

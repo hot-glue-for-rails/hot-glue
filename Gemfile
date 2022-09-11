@@ -8,14 +8,24 @@ gemspec
 # not required for your app
 gem 'sqlite3'
 gem 'byebug'
-gem 'rails'
-gem 'devise', require: true
 # gem 'progress_formatter'
 
 # for testing
-gem "rails-controller-testing", group: [:test]
-gem "database_cleaner", group: [:test]
-gem "rspec-rails", group: [:test]
-gem "rspec_junit_formatter", group: [:test]
-gem "factory_bot", group: [:test]
 gem 'simplecov-rcov'
+gem 'rake'
+gem "rspec-rails"
+gem "factory_bot_rails"
+gem "ffaker"
+gem "capybara"
+gem "selenium-webdriver"
+gem "webdrivers"
+
+gem "sprockets-rails"
+gem "importmap-rails"
+gem "stimulus-rails"
+gem "turbo-rails"
+
+
+gem "puma", "~> 5.0"
+
+gem "devise"

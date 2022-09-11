@@ -1,0 +1,5 @@
+#!/bin/bash
+
+/bin/rm dummy/app/controllers/abcs_controller.rb
+/bin/rm -rf dummy/app/views/abcs/
+/bin/rm -rf dummy/spec/system/

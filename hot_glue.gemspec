@@ -2,7 +2,7 @@ $:.push File.expand_path("lib", __dir__)
 
 # Maintain your gem's version:
 require "hotglue/version"
-# require 'byebug'
+
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
   spec.name        = "hot-glue"
@@ -15,17 +15,21 @@ Gem::Specification.new do |spec|
   spec.email       = 'code@jasonfb.net'
 
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
-    files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)}) || f.match(%r{(gemspec|gem)$}) }
+    files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|dummy)}) || f.match(%r{(gemspec|gem)$}) }
     files
   end
 
   spec.add_runtime_dependency "rails",  '> 5.1'
   spec.homepage    = 'https://heliosdev.shop/p/hot-glue?utm_source=rubygems.org&utm_campaign=rubygems_link'
-  spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/hot-glue" }
+  spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/hot-glue",
+                       "homepage" => "https://heliosdev.shop/hot-glue",
+                       "funding" => "https://tekduds.com" }
+
   spec.add_runtime_dependency('kaminari', '~> 1.2')
   # spec.add_runtime_dependency('sass-rails')
 
   spec.add_dependency 'ffaker', "~> 2.16"
+  # spec.add_runtime_dependency "turbo-rails"
 
   spec.post_install_message = <<~MSG
     ---------------------------------------------
