@@ -1,6 +1,3 @@
-
-[![Hot Glue](https://circleci.com/gh/jasonfb/hot-glue.svg?style=shield)](https://circleci.com/gh/jasonfb/hot-glue)
-
 Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of the admin-interface style scaffolding systems of the 2010s ([activeadmin](https://github.com/activeadmin/activeadmin), [rails_admin](https://github.com/sferik/rails_admin), and [active_scaffold](https://github.com/activescaffold/active_scaffold)).
 
 Using Turbo-Rails and Hotwire (default in Rails 7) you get a lightning-fast out-of-the-box CRUD-building experience.
