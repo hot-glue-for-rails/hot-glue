@@ -267,5 +267,9 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       expect(<%= singular_class %>.where(id: <%= singular %>1.id).count).to eq(0)
     end
   end<% end %>
+
+  it "should fail" do
+    expect(false).to be(true)
+  end
 end
 
