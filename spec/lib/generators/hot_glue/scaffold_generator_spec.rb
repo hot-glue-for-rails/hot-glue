@@ -1103,15 +1103,14 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-  describe "for when a base controller already exists" do
-    it "should skip adding the base controller" do
-      response = Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Abc","--gd", "---namespace=fruits"])
-      res = File.read("spec/dummy/app/controllers/fruits/base_controller.rb")
-      expect(res).to include("# check: I should not be overwrittern")
-    end
-  end
-
+  # describe "for when a base controller already exists" do
+  #   it "should skip adding the base controller" do
+  #     response = Rails::Generators.invoke("hot_glue:scaffold",
+  #                                         ["Abc","--gd", "---namespace=fruits"])
+  #     res = File.read("spec/dummy/app/controllers/fruits/base_controller.rb")
+  #     expect(res).to include("# check: I should not be overwrittern")
+  #   end
+  # end
 
   describe "--downnest" do
 
