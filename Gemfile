@@ -20,6 +20,7 @@ gem "capybara"
 gem "selenium-webdriver"
 gem "webdrivers"
 
+gem 'rails', '7.0.4'
 gem "sprockets-rails"
 gem "importmap-rails"
 gem "stimulus-rails"

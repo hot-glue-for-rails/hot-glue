@@ -30,8 +30,6 @@ describe HotGlue::InstallGenerator do
     end
   end
 
-
-
   # describe "ERROR RESPONESES" do
   #   it "with missing object name should give error" do
   #     response = Rails::Generators.invoke("hot_glue:install --theme=dark_knight")

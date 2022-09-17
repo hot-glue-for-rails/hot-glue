@@ -1,5 +1,5 @@
 PATH
-  remote: ..
+  remote: ../..
   specs:
     hot-glue (0.5.2)
       ffaker (~> 2.16)
@@ -136,7 +136,7 @@ GEM
       activerecord
       kaminari-core (= 1.2.2)
     kaminari-core (1.2.2)
-    loofah (2.18.0)
+    loofah (2.19.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -209,7 +209,7 @@ GEM
     rexml (3.2.5)
     rspec-core (3.11.0)
       rspec-support (~> 3.11.0)
-    rspec-expectations (3.11.0)
+    rspec-expectations (3.11.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.11.0)
     rspec-mocks (3.11.1)
@@ -223,7 +223,7 @@ GEM
       rspec-expectations (~> 3.10)
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
-    rspec-support (3.11.0)
+    rspec-support (3.11.1)
     rubyzip (2.3.2)
     selenium-webdriver (4.4.0)
       childprocess (>= 0.5, < 5.0)
@@ -282,7 +282,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   puma (~> 5.0)
-  rails (~> 7.0.3, >= 7.0.3.1)
+  rails (~> 7.0.3.1, >= 7.0.3.1)
   rake
   redis (~> 4.0)
   rspec-rails

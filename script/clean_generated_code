@@ -1,5 +1,5 @@
 #!/bin/bash
 
-/bin/rm dummy/app/controllers/abcs_controller.rb
-/bin/rm -rf dummy/app/views/abcs/
-/bin/rm -rf dummy/spec/system/
+/bin/rm spec/dummy/app/controllers/abcs_controller.rb
+/bin/rm -rf spec/dummy/app/views/abcs/
+/bin/rm -rf spec/dummy/spec/system/
