@@ -22,7 +22,7 @@ rails generate hot_glue:scaffold Abc --gd
 # problem: I think I need to re-load the app here so that the newly generated code gets picked up
 
 
-rspec spec || exit
+bin/rake spec || exit
 
 cd ../
 
