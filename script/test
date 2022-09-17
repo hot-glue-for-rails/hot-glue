@@ -18,7 +18,8 @@ echo "Integration suite for Hot Glue..."
 cd dummy
 
 echo "setting up database..."
-#bundle install
+
+bundle install
 rake db:create db:reset db:test:prepare
 
 echo "Generating Abcs with rails generate hot_glue:scaffold Abc --gd"
