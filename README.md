@@ -977,44 +977,15 @@ Omits the list heading. Note that the listing heading is omitted:
 
 # HOW THIS GEM IS TESTED
 
-SETUP:
-• Run bundle install
-• if you can't get through see https://stackoverflow.com/questions/68050807/gem-install-mimemagic-v-0-3-10-fails-to-install-on-big-sur/68170982#68170982
+• run `script/test`
 
+This runs both the generated specs and also the internal specs. Examine this file for details.
 
-The dummy sandbox is found at `spec/dummy`
+To runonly the internal specs, use 
 
-The dummy sandbox lives as mostly checked- into the repository, **except** the folders where the generated code goes (`spec/dummy/app/views/`, `spec/dummy/app/controllers/`, `spec/dummy/specs/` are excluded from Git)
+`COVERGE=on rake spec`
 
-When you run the **internal specs**, which you can do **at the root of this repo** using the command `rspec`, a set of specs will run to assert the generators are erroring when they are supposed to and producing code when they are supposed to.
-
-The DUMMY testing DOES NOT test the actual functionality of the output code (it just tests the functionality of the generation process).
-
-
-# DATABASE
-being able to run `rake spec` at the root of this repo is achieved using
-```
-ln -s  spec/dummy/db/schema.rb db/schema.rb
-```
-
- 
-
-Run rspec as
-``` 
-rake spec
-```
-Or with test coverage report:
-
-```
-COVERGE=on rake spec
-
-```
-
---
---
- 
 Internal Test coverage as of 2022-03-23 (v0.5.2)
-
 
 ![HG 84 89 coverage report](https://user-images.githubusercontent.com/59002/159719583-a956cfb3-1797-4186-b32c-237ed19e8e2b.png)
 
