@@ -1,5 +1,6 @@
 #!/bin/bash
 
-/bin/rm dummy/app/controllers/abcs_controller.rb
-/bin/rm -rf dummy/app/views/abcs/
+
+find dummy/app/controllers/ -type f ! -name "application_controller.rb" -delete
+find dummy/app/views/ -type f ! -name "application.html.erb" -delete
 /bin/rm -rf dummy/spec/system/

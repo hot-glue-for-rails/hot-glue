@@ -142,7 +142,6 @@ describe HotGlue::ScaffoldGenerator do
     #   response = Rails::Generators.invoke("hot_glue:scaffold",
     #                                       ["Xyz"])
     # rescue StandardError => e
-    #   byebug
     #   expect(e.class).to eq(HotGlue::Error)
     #   expect(e.message).to eq(
     #                          "*** Oops: The model Xyz is missing an association for :nothing or the model Nothing doesn't exist. TODO: Please implement a model for Nothing; or add to Xyz `belongs_to :nothing`. To make a controller that can read all records, specify with --god."
@@ -263,30 +262,6 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "authorization and object ownership" do
-    describe "#auth_root" do
-      # @auth_identifier is passed in by user and
-      describe "When @auth_identifier has no . in it" do
-        let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--auth=current_user"], {:shell=> Thor::Shell::Color.new})}
-        it "should treat the object scope as the last thing in the chain" do
-          expect(generator.auth_root).to eq("authenticate_user!")
-        end
-      end
-
-      describe "When @auth_identifier has a . in it" do
-        let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--auth=current_user.family"], {:shell=> Thor::Shell::Color.new})}
-        it "should treat the object scope as the last thing in the chain" do
-          expect(generator.auth_root).to eq("authenticate_user!")
-        end
-
-
-
-      end
-
-
-
-    end
-
-
     describe "by default assumes current_user is --auth" do
       it "should generate code protected to current user" do
         response = Rails::Generators.invoke("hot_glue:scaffold",
@@ -995,12 +970,9 @@ describe HotGlue::ScaffoldGenerator do
         expect { Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Ghi"])
         }.to raise_exception("SLIM IS NOT IMPLEMENTED")
-
       end
     end
-
-
-
+    
     describe "for --layout=nonsense" do
       before(:each) do
         allow(YAML).to receive(:load).and_return(yaml_stub.merge(layout: "nonsense"))
