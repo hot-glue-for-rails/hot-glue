@@ -25,8 +25,9 @@ rake db:create db:reset db:test:prepare
 echo "Generating Abcs with rails generate hot_glue:scaffold Abc --gd"
 rails generate hot_glue:scaffold Abc --gd
 
-# problem: I think I need to re-load the app here so that the newly generated code gets picked up
+#rails generate hot_glue:scaffold Ghi --auth=current_user
 
+#rails generate hot_glue:scffold Ghi --auth=current_user.family
 
 rspec spec || exit
 

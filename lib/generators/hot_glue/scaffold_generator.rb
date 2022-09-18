@@ -130,8 +130,8 @@ module HotGlue
 
 
     # determines if the labels show up BEFORE or AFTER on the NEW/EDIT (form)
-    class_option :form_labels_position, default: 'after' #  choices are before, after, omit
-    class_option :form_placeholder_labels, default: false # puts the field names into the placeholder labels
+    class_option :form_labels_position, type: :string, default: 'after' #  choices are before, after, omit
+    class_option :form_placeholder_labels, type: :boolean,  default: false # puts the field names into the placeholder labels
 
 
     # NOT YET IMPLEMENTED
