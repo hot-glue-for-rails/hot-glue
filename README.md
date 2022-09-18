@@ -983,7 +983,7 @@ This runs both the generated specs and also the internal specs. Examine this fil
 
 To runonly the internal specs, use 
 
-`COVERGE=on rake spec`
+`COVERGE=on rspec spec`
 
 Internal Test coverage as of 2022-03-23 (v0.5.2)
 
