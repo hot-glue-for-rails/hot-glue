@@ -653,6 +653,10 @@ module HotGlue
       @singular
     end
 
+    def testing_name
+      singular_class_name.gsub("::","_").downcase
+    end
+
     def singular_class_name
       @singular_class
     end
@@ -664,6 +668,59 @@ module HotGlue
     def auth_identifier
       @auth_identifier
     end
+
+    def test_capybara_block
+      (@columns - @show_only).map { |col|
+        type = eval("#{singular_class}.columns_hash['#{col}']").type
+        case type
+        when :date
+          "      " + "new_#{col} = Date.current + (rand(100).days) \n" +
+            '      ' + "find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+        when :time
+          # "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
+          # '      ' + "find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+
+        when :datetime
+          "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
+            '      ' + "find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+
+        when :integer
+
+          if col.to_s.ends_with?("_id")
+            assoc = col.to_s.gsub('_id','')
+            "      #{col}_selector = find(\"[name='#{singular}[#{col}]']\").click \n" +
+              "      #{col}_selector.first('option', text: #{assoc}1.name).select_option"
+          else
+            "      new_#{col} = rand(10) \n" +
+              "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+
+          end
+
+        when :enum
+          "      list_of_#{col.to_s} = #{singular_class}.defined_enums['#{col.to_s}'].keys \n" +
+            "      " + "new_#{col.to_s} = list_of_#{col.to_s}[rand(list_of_#{col.to_s}.length)].to_s \n" +
+            '      find("select[name=\'' + singular + '[' + col.to_s + ']\']  option[value=\'#{new_' + col.to_s + '}\']").select_option'
+
+        when :boolean
+          "     new_#{col} = rand(2).floor \n" +
+            "     find(\"[name='#{testing_name}[#{col}]'][value='\#{new_" + col.to_s + "}']\").choose"
+        when :string
+          if col.to_s.include?("email")
+            "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
+              "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+
+          else
+            "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
+              "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+          end
+        when :text
+          "      " + "new_#{col} = FFaker::Lorem.paragraphs(1).join("") \n" +
+            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+        end
+
+      }.join("\n")
+    end
+
 
     def path_helper_args
       if @nested_set.any? && @nested

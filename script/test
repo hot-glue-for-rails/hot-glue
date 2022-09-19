@@ -4,32 +4,32 @@ clean_generated_code() {
 ./clean_generated_code
 }
 
-echo "running Hot Glue internal specs (install, basic commands)..."
+echo "Internal test suite for Hot Glue  (install, basic commands)..."
 # the internal specs test only Hot Glue's command line usage
 rspec spec
 
 script/clean_generated_code
 
-echo "Integration suite for Hot Glue..."
+echo "Integration test suite for Hot Glue..."
 # note that the dummy/ is in the root of the repository
 # these specs generate several controllers & specs and then run the generated
 # specs to test the generated code
 
 cd dummy
 
-echo "setting up database..."
+echo "Setting up database..."
 
 bundle install
 rake db:create db:reset db:test:prepare
 
-echo "Generating Abcs with rails generate hot_glue:scaffold Abc --gd"
+echo "Generating all code for testing..."
 rails generate hot_glue:scaffold Abc --gd
 
 rails generate hot_glue:scaffold Ghi --gd
 
 rails generate hot_glue:scaffold Dfg --auth=current_user
 
-#rails generate hot_glue:scffold Ghi --auth=current_user.family
+rails generate hot_glue:scaffold Fruits::Cantelope --gd
 
 rspec spec || exit
 
