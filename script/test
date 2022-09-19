@@ -25,7 +25,7 @@ rake db:create db:reset db:test:prepare
 echo "Generating Abcs with rails generate hot_glue:scaffold Abc --gd"
 rails generate hot_glue:scaffold Abc --gd
 
-#rails generate hot_glue:scaffold Ghi --auth=current_user
+rails generate hot_glue:scaffold Ghi --auth=current_user
 
 #rails generate hot_glue:scffold Ghi --auth=current_user.family
 

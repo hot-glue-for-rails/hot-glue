@@ -91,7 +91,7 @@ If you want Bootstrap, install it following these instructions
 
 For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/)
 
-Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/README2.md) before continuing. 
+Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/blob/main/README2.md) before continuing. 
 
 ## 2. ADD RSPEC, FACTORY-BOT, AND FFAKER
 
@@ -166,13 +166,8 @@ https://github.com/FortAwesome/font-awesome-sass
 
 
 ## 5. Devise
-!!! Warning: as of 2022-03-22, Devise is still not compatible out-of-the-box with Rails 7.
-
-please see https://github.com/heartcombo/devise/issues/5478 or check this README for updated information. 
-
-
 (If you are on Rails 6, you must do ALL of the steps in the Legacy Setup steps. Be sure not to skip **Legacy Step #5** below)
-
+https://github.com/jasonfb/hot-glue/blob/main/README2.md
 
 You MUST run the installer FIRST or else you will put your app into a non-workable state:
 ```
@@ -198,6 +193,20 @@ Remember, you don't need to tell Devise that your User has an email, an encrypte
 Those features come by default with Devise, and you'll find the fields for them in the newly generated migration file. 
 
 In this example above, you are creating all of those fields along with a simple 'name' (string) field for your User table.
+
+
+!!! Warning: as of 2022-09-19, Devise is still not compatible out-of-the-box with Rails Turbo.
+
+To fix this, run
+`rails generate devise:views`
+
+`views/devise/sessions/new.html.erb`, `views/devise/registrations/edit.html.erb`, 
+`views/devise/registrations/new.html.erb`, and  
+
+add the data-turbo false option in the html key:
+
+form_for(resource, as: resource_name, **html: {'data-turbo' => "false"},** url: session_path(resource_name) ) do |f|
+
 
 
 

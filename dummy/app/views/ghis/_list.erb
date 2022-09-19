@@ -1,0 +1,40 @@
+<%= turbo_frame_tag "ghis-list"   do %>
+  <div class="container-fluid scaffold-list">
+    
+      <h4>
+        GHIS
+      </h4>
+    
+
+    <%= render partial: "ghis/new_button", locals: {} %><br />
+
+    
+      
+        <div class="row scaffold-heading-row">
+          <div class='col-md-1'>Dfg</div>
+<div class='col-md-1'>Xyz</div>
+          
+
+          
+
+          <div class=' scaffold-col-heading scaffold-col-heading-buttons col-md-2' >
+
+          </div>
+        </div>
+      
+
+      <% if ghis.empty? %>
+    <div>
+        None
+    </div>
+      <% end %>
+      <% ghis.each do |ghi| %>
+        <%= render partial: 'ghis/line', locals: {ghi: ghi}
+            .merge(defined?(nested_for) ? {nested_for: nested_for} : {})
+      
+        %>
+      <% end %>
+    <% if ghis.respond_to?(:total_pages) %><%= paginate(ghis) %> <% end %>
+  
+  </div>
+<% end %>

@@ -627,7 +627,7 @@ module HotGlue
     end
 
     def objest_nest_factory_setup
-      res = ""
+      res = "  "
       if @auth
         last_parent = ", #{@auth_identifier}: #{@auth}"
       end

@@ -1,0 +1,9 @@
+<%= turbo_frame_tag "ghi-new" do %>
+<h3>
+  New GHI
+  </h3>
+  <%= form_with model:  ghi, url: ghis_path, method: :post do  |f| %>
+    <%=  render partial: "ghis/form",
+      locals: { ghi: ghi, f: f} %>
+  <% end %>
+<% end %>
