@@ -530,21 +530,21 @@ describe HotGlue::ScaffoldGenerator do
     #   ).to be(nil)
     # end
 
-    # it "should automatically add fields that begin with underscore (_) as show only" do
-    #   response = Rails::Generators.invoke("hot_glue:scaffold",
-    #                                       ["Fruits::Cantelope", "--gd"])
-    #   # this table has a field named _a_show_only_field
-    #
-    #   expect(
-    #     File.read("spec/dummy/app/views/cantelopes/_form.erb") =~ /f\.text_field :_a_show_only_field/
-    #   ).to be(nil)
-    #
-    #   res = File.read("spec/dummy/app/views/cantelopes/_form.erb")
-    #   expect(res).to include("<%= cantelope._a_show_only_field %>")
-    #   expect(
-    #     File.read("spec/dummy/app/controllers/cantelopes_controller.rb") =~ /:_a_show_only_field/
-    #   ).to be(nil)
-    # end
+    it "should automatically add fields that begin with underscore (_) as show only" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Fruits::Cantelope", "--gd"])
+      # this table has a field named _a_show_only_field
+
+      expect(
+        File.read("spec/dummy/app/views/cantelopes/_form.erb") =~ /f\.text_field :_a_show_only_field/
+      ).to be(nil)
+
+      res = File.read("spec/dummy/app/views/cantelopes/_form.erb")
+      expect(res).to include("<%= cantelope._a_show_only_field %>")
+      expect(
+        File.read("spec/dummy/app/controllers/cantelopes_controller.rb") =~ /:_a_show_only_field/
+      ).to be(nil)
+    end
   end
 
   describe "ujs syntax" do
@@ -570,17 +570,6 @@ describe HotGlue::ScaffoldGenerator do
       ).to_not be(nil)
     end
 
-  end
-
-  describe "can build a table name that has a nested model name" do
-    it "should generate scaffold for a model at a namespace" do
-      response = Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Fruits::Cantelope","--gd"])
-
-      expect(
-        File.read("spec/dummy/app/controllers/cantelopes_controller.rb") =~ /class CantelopesController < ApplicationController/
-      ).to be_a(Numeric)
-    end
   end
 
   describe "N+1 killer" do
