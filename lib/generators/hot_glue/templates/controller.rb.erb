@@ -152,7 +152,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
 
   def <%=singular_name%>_params
-    params.require(:<%=singular_name%>).permit( <%= (@columns - @show_only) + @magic_buttons.collect(&:to_sym) %> )
+    params.require(:<%= testing_name %>).permit( <%= (@columns - @show_only) + @magic_buttons.collect(&:to_sym) %> )
   end
 
   def namespace

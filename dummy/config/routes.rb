@@ -5,5 +5,5 @@ Rails.application.routes.draw do
   resources :abcs
   resources :ghis
   resources :dfgs
-
+  resources :cantelopes
 end
