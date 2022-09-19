@@ -33,6 +33,7 @@ group :development, :test do
   gem "factory_bot_rails"
   gem "ffaker"
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
+  gem "byebug"
 end
 
 group :development do
