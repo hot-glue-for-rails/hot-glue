@@ -4,13 +4,13 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   include HotGlue::ControllerHelper
   <%= @existing_content %>
   <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
-  <%= (@columns - @show_only).map { |col|
+<%= (@columns - @show_only).map { |col|
     type = eval("#{singular_class}.columns_hash['#{col}']").type
     case type
     when :integer
       if col.to_s.ends_with?("_id")
         assoc = "#{col.to_s.gsub('_id','')}"
-        "let!(:#{assoc}1) {create(:#{assoc}" +  (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")   + ")}"
+        "  let!(:#{assoc}1) {create(:#{assoc}" +  (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")   + ")}"
       end
     else
     end
@@ -46,10 +46,10 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
      "#{col}: rand(100)"
     end
   end
-}.compact.join(", \n      ")
+}.compact.join(", ")
   %>let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )}
   <%= objest_nest_factory_setup %> <% unless @god %>
-  before(:each) do
+  before do
     login_as(<%= @auth %>)
   end <% end %>
 
