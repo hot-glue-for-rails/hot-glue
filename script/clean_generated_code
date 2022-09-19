@@ -1,8 +1,10 @@
 #!/bin/bash
-rm -rf dummyapp/controllers/ghis_controller.rb
-rm -rf dummyapp/controllers/abcs_controller.rb
+rm dummy/app/controllers/ghis_controller.rb
+rm dummy/app/controllers/abcs_controller.rb
+rm dummy/app/controllers/dfgs_controller.rb
 rm -rf dummy/app/views/ghis/*
 rm -rf dummy/app/views/abcs/*
+rm -rf dummy/app/views/dfgs/*
 
 /bin/rm -rf dummy/spec/system/
 
