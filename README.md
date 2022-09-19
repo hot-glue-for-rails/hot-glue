@@ -200,15 +200,14 @@ In this example above, you are creating all of those fields along with a simple 
 To fix this, run
 `rails generate devise:views`
 
+
+Then manually add `html: {'data-turbo' => "false"}` to all of the Devise forms. You will need to edit the following forms:
 `views/devise/sessions/new.html.erb`, `views/devise/registrations/edit.html.erb`, 
 `views/devise/registrations/new.html.erb`, and  
 
-add the data-turbo false option in the html key:
+Add the data-turbo false option in the html key of the form, shown in bold here: 
 
 form_for(resource, as: resource_name, **html: {'data-turbo' => "false"},** url: session_path(resource_name) ) do |f|
-
-
-
 
 
 ### Hot Glue Installer Notes 
