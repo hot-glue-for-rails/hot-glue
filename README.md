@@ -74,7 +74,7 @@ For reference, see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rai
 (1) To use ImportMap Rails, start with
 `rails new`
 
-If you want Bootstrap, install it following these instructions
+If you want Bootstrap, install it following [these instructions](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/importmap-rails-with-bootstrap-sprockets-stimulus-and-turbo-long-tutorial/)
 
 (2) To use JSBundling, start with
 `rails new --javascript=jsbundling`
@@ -84,9 +84,6 @@ If you want Bootstrap, install it following these instructions
 If you want Bootstrap, install it following these instructions
 
 (3) To use Shakapacker, start with `rails new --skip-javascript` and [see this post](https://jasonfleetwoodboldt.com/courses/react-heart-rails/rails-7-shakapacker-and-reactonrails-quick-setup-part-1/)
-
-
-If you want Bootstrap, install it following [these instructions](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/importmap-rails-with-bootstrap-sprockets-stimulus-and-turbo-long-tutorial/)
 
 For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/)
 
