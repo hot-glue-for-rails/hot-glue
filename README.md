@@ -982,14 +982,29 @@ Omits the list heading. Note that the listing heading is omitted:
 #### 2021-02-24 - v0.0.1 - first proof of concept release -- basic CRUD works
 
 
-
 # HOW THIS GEM IS TESTED
 
-• run `script/test`
+The gem is tested against both generated specs and internal specs. The generated specs are regenerated with the test run, whereas the internal specs live as artifacts in the codebase as you would normally expected specs would.
 
-This runs both the generated specs and also the internal specs. Examine this file for details.
+The generated specs are created with a small set of 'starter seeds' that exercise the gem's featureset. You can examine the setup easily by looking at the contents of `script/test`
 
-To runonly the internal specs, use 
+• To setup for testing, start with
+```
+sudo gem install rails
+sudo gem install rspec
+```
+
+```
+sudo gem install minitest -v 5.1.0
+```
+
+Unfortunately because of the wrapped nature of the specs, these must be run from globally installed Rubies.
+
+• Once you've done the above, run `script/test`
+
+This runs both the **generated specs** and also the **internal specs**. Examine this file for details.
+
+To run only the internal specs, use 
 
 `COVERGE=on rspec spec`
 
