@@ -26,9 +26,7 @@ module HotGlue
         puts "IMPORTANT: You have selected to install Hot Glue with Bootstrap layout (legacy). Be sure to always use ``--layout=bootstrap` when building your scaffold. No Hot Glue theme will be installed at this time.` "
       end
 
-      ## quick shameless plug for my own own store
-      Helpers.open_page("https://tekduds.com?utm_source=hotglue-installer")
-
+    
       @markup = options['markup']
       if @markup == "haml"
         copy_file "haml/_flash_notices.haml", "#{'spec/dummy/' if Rails.env.test?}app/views/layouts/_flash_notices.haml"
