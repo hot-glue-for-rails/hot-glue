@@ -1,8 +1,5 @@
-
-
-
 ENV["RAILS_ENV"] ||= "test"
-require 'byebug'
+# require 'byebug'
 
 
 if( ENV['COVERAGE'] == 'on' )
