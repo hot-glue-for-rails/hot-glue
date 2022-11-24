@@ -110,13 +110,6 @@ end
 
 - Because you are not using Minitest, you can delete the `test/` folder at the root of your repository.
 
-### Factory Bot Setup
-
-In `spec/rails_helper.rb`, add this line to anywhere within the `RSpec.configure do |config|` block. 
-
-```
-config.include FactoryBot::Syntax::Methods
-```
 
 
 ## 3. HOTGLUE INSTALLER
