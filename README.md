@@ -93,7 +93,51 @@ For the old method of installing Bootstrap [see this post](https://jasonfleetwoo
 
 Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/blob/main/README2.md) before continuing. 
 
-## 2. ADD RSPEC, FACTORY-BOT, AND FFAKER
+
+## The Super-Quick Setup
+
+Be sure to do `git add .` and `git commit -m "initial commit"`
+
+```
+bundle add rspec-rails factory_bot_rails ffaker --group "development, test" && 
+git add . && git commit -m "adds gems" && 
+rails generate rspec:install && 
+git add . && git commit -m "adds rspec" && 
+rm app/assets/stylesheets/application.css &&
+echo "" > app/assets/stylesheets/application.scss && 
+sed -i '' -e  's/# gem "sassc-rails"//g' Gemfile && sed -i '' -e 's/# Use Sass to process CSS//g' Gemfile && 
+bundle install && bundle add sassc-rails && git add . && git commit -m "adds sassc-rails" && 
+rm -rf test/ && git add . && git commit -m "removes minitest" && 
+bundle add hot-glue && git add . && git commit -m "adds hot-glue" && 
+rails generate hot_glue:install --layout=bootstrap && 
+git add . && git commit -m "hot glue setup" &&
+bundle add font_awesome5_rails && 
+echo "*= require font_awesome5_webfont" > app/assets/stylesheets/application.scss && 
+git add . && git commit -m "adds fontawesome" &&  
+bundle add devise && bundle install && 
+git add . && git commit -m "adding devise gem" && 
+rails generate devise:install && 
+rails g devise:views && 
+sed -i '' -e  's/Rails.application.configure do/Rails.application.configure do\n  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }/g' config/environments/development.rb && 
+sed -i '' -e  's/# root "articles#index"//g' config/routes.rb && 
+sed -i '' -e  's/Rails.application.routes.draw do/Rails.application.routes.draw do\n  root to: "welcome#index"/g' config/routes.rb && 
+git add . && git commit -m 'devise view fixes' &&
+rails generate controller Welcome &&
+git add . && git commit -m "generates Welcome controller" &&
+sed -i '' -e 's/html: { method: :post }/html: { method: :post, 'data-turbo': false}/g' app/views/devise/confirmations/new.html.erb &&
+sed -i '' -e 's/ url: session_path(resource_name))/ url: session_path(resource_name), html: {"data-turbo": false})/g' app/views/devise/sessions/new.html.erb && 
+sed -i '' -e 's/ url: registration_path(resource_name))/ url: registration_path(resource_name), html: {"data-turbo": false})/g' app/views/devise/registrations/new.html.erb && 
+sed -i '' -e 's/, html: { method: :post })/, html: { method: :post, "data-turbo": false })/g' app/views/devise/passwords/new.html.erb && 
+git add . && git commit -m 'devise view fixes' &&
+rails generate model User name:string &&
+rails generate devise User && git add . && git commit -m "adds Users model with devise" && 
+rails db:migrate &&
+git add . && git commit -m "schema file"
+```
+
+## Step-By-Step Setup
+
+### 2. ADD RSPEC, FACTORY-BOT, AND FFAKER
 
 add these 3 gems to your gemfile **inside a group for both :development and :test*. 
 Do not add these gems to *only* the :test group or else your Rspec installer and generators will not work correctly.
@@ -105,19 +149,19 @@ group :development, :test do
 end 
 ```
 
-### Rspec Installer
+#### Rspec Installer
 - run `rails generate rspec:install`
 
 - Because you are not using Minitest, you can delete the `test/` folder at the root of your repository.
 
 
 
-## 3. HOTGLUE INSTALLER
+### 3. HOTGLUE INSTALLER
 Add `gem 'hot-glue'` to your Gemfile & `bundle install`
 
 During in installation, you MUST supply a `--layout` flag.
 
-### `--layout` flag (only two options: `hotglue` or `bootstrap`; default is `bootstrap`) 
+#### `--layout` flag (only two options: `hotglue` or `bootstrap`; default is `bootstrap`) 
 Here you will set up and install Hot Glue for the first time. 
 
 It will install a config file that will save two preferences: layout (`hotglue` or `bootstrap`)
@@ -125,7 +169,7 @@ It will install a config file that will save two preferences: layout (`hotglue` 
 The installer will create `config/hot_glue.yml`. 
 
 
-### `--theme` flag 
+#### `--theme` flag 
 During the installation, **if** your `--layout` flag is set to `hotglue` you must also pass `--theme` flag.
 
 the themes are:
@@ -136,21 +180,21 @@ the themes are:
 • like_cupertino (modern Apple-UX inspired)
 
 
-### `--markup` flag (NOTE: haml and slim are no longer supported at this time)
+#### `--markup` flag (NOTE: haml and slim are no longer supported at this time)
 
 default is `erb`. IMPORTANT: As of right now, HAML and SLIM are not currently supported so the only option is also the default `erb`.
 
 
-### example installing ERB using Bootstrap layout:
+#### example installing ERB using Bootstrap layout:
 `rails generate hot_glue:install --markup=erb --layout=bootstrap`
 
-### Example installing using Hot Glue layout and the 'like_mountain_view' (Gmail-inspired) theme:
+#### Example installing using Hot Glue layout and the 'like_mountain_view' (Gmail-inspired) theme:
 `rails generate hot_glue:install --markup=erb --layout=hotglue --theme=like_mountain_view`
 
 The Hot Glue installer did several things for you in this step. Examine the git diffs or see 'Hot Glue Installer Notes' below.
 
 
-## 4. install font-awesome (optional)
+### 4. Font-awesome (optional)
 
 I recommend
 https://github.com/tomkra/font_awesome5_rails
@@ -158,7 +202,7 @@ or
 https://github.com/FortAwesome/font-awesome-sass
 
 
-## 5. Devise
+### 5. Devise
 (If you are on Rails 6, you must do ALL of the steps in the Legacy Setup steps. Be sure not to skip **Legacy Step #5** below)
 https://github.com/jasonfb/hot-glue/blob/main/README2.md
 
@@ -203,11 +247,11 @@ Add the data-turbo false option in the html key of the form, shown in bold here:
 form_for(resource, as: resource_name, **html: {'data-turbo' => "false"},** url: session_path(resource_name) ) do |f|
 
 
-### Hot Glue Installer Notes 
+#### Hot Glue Installer Notes 
 
 These things were **done for you** in Step #3 (above). You don't need to think about them but if you are familiar with Capybara and/or adding Hot Glue to an existing app, you may want to:
 
-####  Hot Glue modified `application.html.erb`
+#####  Hot Glue modified `application.html.erb`
 Note: if you have some kind of non-standard application layout, like one at a different file
 or if you have modified your opening <body> tag, this may not have been automatically applied by the installer.
 
@@ -216,7 +260,7 @@ or if you have modified your opening <body> tag, this may not have been automati
   <%= render partial: 'layouts/flash_notices' %>
 ```
 
-#### Hot Glue modified `rails_helper.rb`
+##### Hot Glue modified `rails_helper.rb`
 Note: if you have some kind of non-standard rails_helper.rb, like one that does not use the standard ` do |config|` syntax after your `RSpec.configure`
 this may not have been automatically applied by the installer.
 
@@ -229,7 +273,7 @@ this may not have been automatically applied by the installer.
   ```  
 
 
-#### Hot Glue switched Capybara from RACK-TEST to HEADLESS CHROME
+##### Hot Glue switched Capybara from RACK-TEST to HEADLESS CHROME
 
 - By default Capybara is installed with :rack_test as its driver.
 - This does not support Javascript. Hot Glue is not targeted for fallback browsers.
@@ -269,7 +313,7 @@ Alternatively, you can define your own driver like so:
     
   ```
 
-#### Hot Glue Added a Quick (Old-School) Capybara Login For Devise
+##### Hot Glue Added a Quick (Old-School) Capybara Login For Devise
 
 - for a quick Capybara login, create a support helper in `spec/support/` and log-in as your user
 - in the default code, the devise login would be for an object called account and lives at the route `/accounts/sign_in`
@@ -287,7 +331,7 @@ Alternatively, you can define your own driver like so:
 
 ---
 ---
-
+---
 
 # HOT GLUE DOCS
 
