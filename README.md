@@ -563,14 +563,12 @@ An better alternative is to define the non-standard plurlizations globally in yo
 Make a file at `config/initializers/inflections.rb`
 
 # Add new inflection rules using the following format
+```
 ActiveSupport::Inflector.inflections do |inflect|
     inflect.irregular 'clothing', 'clothes'
     inflect.irregular 'human', 'humans'  
-
-
-    # the standard pluralization is pretty sexist and will pluralize `human` to `humen`
 end
-
+```
 
 ### `--form-labels-position` (default: `after`; options are **before**, **after**, and **omit**)
 By default form labels appear after the form inputs. To make them appear before or omit them, use this flag.
@@ -588,8 +586,6 @@ If you specify any exclude list, those excluded **and** the default exclude list
 
 
 `rails generate hot_glue:scaffold Account --exclude=password`
-
-(The default excluded list is:  If you want to edit any fields with the same name, you must use the include flag instead.)
 
 
 ### `--include=`
@@ -867,6 +863,14 @@ Child portals have the headings omitted automatically (there is a heading identi
 
 
 # VERSION HISTORY
+
+#### 2022-11-24 - v0.5.3 - New testing paradigm & removes license requirements
+
+New testing paradigm
+Code cleanup
+Testing on CircleCI
+License check has been removed (Hot Glue is now free to use for hobbyists and individuals. Business licenses are still available at https://heliosdev.shop/hot-glue-license)
+
 
 #### 2022-03-23 - v0.5.2 - Hawked Foreign Keys
 
