@@ -92,7 +92,7 @@ Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https:/
 
 ## The Super-Quick Setup
 
-Be sure to do `git add .` and `git commit -m "initial commit"`
+Be sure to do `git add .` and `git commit -m "initial commit"` after creating your new Rails 7 app.
 
 ```
 bundle add rspec-rails factory_bot_rails ffaker --group "development, test" && 
