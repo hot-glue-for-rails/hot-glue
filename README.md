@@ -336,6 +336,9 @@ Alternatively, you can define your own driver like so:
 
 TitleCase class name of the thing you want to build a scaffoling for.
 
+rails generate hot_glue:scaffold Thing
+
+(note: Your Thing object must belong_to an authenticated User or alternatively you must create a Gd controller, see below.)
 
 ## Options With Arguments
 
