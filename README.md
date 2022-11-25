@@ -100,7 +100,7 @@ git add . && git commit -m "hot glue setup" &&
 bundle add bootstrap &&
 echo "@import "bootstrap";" > app/assets/stylesheets/application.scss && 
 sed -i '' -e  's/# Rails.application.config.assets.precompile += %w( admin.js admin.css )/Rails.application.config.assets.precompile += %w( application.scss )/g' config/initializers/assets.rb &&
-sed -i '' -e 's/end/  config.sass.inline_source_maps = true\nend/g' config/environments/development.rb 
+sed -i '' -e 's/Rails.application.configure do/Rails.application.configure do\n  config.sass.inline_source_maps = true/g' config/environments/development.rb 
 git add . && git commit -m "bootstrap install" &&
 bundle add font_awesome5_rails && 
 echo "@import 'font_awesome5_webfont';" > app/assets/stylesheets/application.scss && 
