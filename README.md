@@ -128,6 +128,30 @@ rails db:migrate &&
 git add . && git commit -m "schema file"
 ```
 
+
+For Importmap apps:
+```
+pin "bootstrap", to: "https://ga.jspm.io/npm:bootstrap@5.1.3/dist/js/bootstrap.esm.js" &&
+pin "@popperjs/core", to: "https://ga.jspm.io/npm:@popperjs/core@2.11.2/lib/index.js" &&
+echo $(cat app/javascript/application.js) "\nimport "bootstrap"\n" > app/javascript/application.js &&
+git add . && git commit -m "pinning boostrap and popper js for bootstrap"
+```
+
+For JSBundling & Shakapacker:
+```
+echo $(cat Procfile.dev) "\ncss: yarn build:css --watch\n" > Procfile.dev &&
+yarn add @popperjs bootstrap bootstrap-icons sass &&
+sed -i '' -e 's/\/\/= link_directory ../stylesheets .css//g' app/assets/config/manifest.js &&
+git add . && git commit -m "adding bootstrap packages"
+```
+
+also
+"build:css": "sass ./app/assets/stylesheets/application.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules"
+
+
+
+
+
 ## Step-By-Step Setup
 
 ### 2. ADD RSPEC, FACTORY-BOT, AND FFAKER
