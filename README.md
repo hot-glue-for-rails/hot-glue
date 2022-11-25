@@ -145,9 +145,10 @@ sed -i '' -e 's/\/\/= link_directory ../stylesheets .css//g' app/assets/config/m
 git add . && git commit -m "adding bootstrap packages"
 ```
 
-also
+also add to package.json script
+```
 "build:css": "sass ./app/assets/stylesheets/application.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules"
-
+```
 
 
 
