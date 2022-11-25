@@ -98,7 +98,7 @@ bundle add hot-glue && git add . && git commit -m "adds hot-glue" &&
 rails generate hot_glue:install --layout=bootstrap && 
 git add . && git commit -m "hot glue setup" &&
 bundle add font_awesome5_rails && 
-echo "*= require font_awesome5_webfont" > app/assets/stylesheets/application.scss && 
+echo "@import 'font_awesome5_webfont';" > app/assets/stylesheets/application.scss && 
 git add . && git commit -m "adds fontawesome" &&  
 bundle add devise && bundle install && 
 git add . && git commit -m "adding devise gem" && 
