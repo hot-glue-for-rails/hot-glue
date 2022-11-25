@@ -98,12 +98,12 @@ bundle add hot-glue && git add . && git commit -m "adds hot-glue" &&
 rails generate hot_glue:install --layout=bootstrap && 
 git add . && git commit -m "hot glue setup" &&
 bundle add bootstrap &&
-echo "@import "bootstrap";" > app/assets/stylesheets/application.scss && 
+echo $(cat app/assets/stylesheets/application.scss) "\n@import 'bootstrap';\n" > app/assets/stylesheets/application.scss
 sed -i '' -e  's/# Rails.application.config.assets.precompile += %w( admin.js admin.css )/Rails.application.config.assets.precompile += %w( application.scss )/g' config/initializers/assets.rb &&
 sed -i '' -e 's/Rails.application.configure do/Rails.application.configure do\n  config.sass.inline_source_maps = true/g' config/environments/development.rb 
 git add . && git commit -m "bootstrap install" &&
 bundle add font_awesome5_rails && 
-echo "@import 'font_awesome5_webfont';" > app/assets/stylesheets/application.scss && 
+echo $(cat app/assets/stylesheets/application.scss) "\n@import 'font_awesome5_webfont';\n" > app/assets/stylesheets/application.scss
 git add . && git commit -m "adds fontawesome" &&  
 bundle add devise && bundle install && 
 git add . && git commit -m "adding devise gem" && 
