@@ -36,16 +36,6 @@ Hot Glue generates functionality that is quick and dirty. It lets you be crafty.
 [![Hot Glue Course](https://user-images.githubusercontent.com/59002/189544503-6edbcd40-1728-4b13-ac9a-c7772ccb8284.jpg)](https://jfbcodes.com/courses/hot-glue-in-depth-tutorial/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page)
 
 ---
-
-
-## GETTING STARTED VIDEO
-
-
-~~Check it out on Youtube at https://www.youtube.com/watch?v=bKjKHMTvzZc~~
-
-While you're over there could you give my Youtube channel a 'Subscribe'? (look for the RED SUBSCRIBE BUTTON)
-
-
 ---
 ## HOW EASY?
 
@@ -119,6 +109,8 @@ sed -i '' -e  's/# root "articles#index"//g' config/routes.rb &&
 sed -i '' -e  's/Rails.application.routes.draw do/Rails.application.routes.draw do\n  root to: "welcome#index"/g' config/routes.rb && 
 git add . && git commit -m 'devise view fixes' &&
 rails generate controller Welcome &&
+sed -i '' -e 's/class WelcomeController < ApplicationController/class WelcomeController < ApplicationController\n  def index\n\n  end/g' app/controllers/welcome_controller.rb &&
+echo "hello world" > app/views/welcome/index.erb &&
 git add . && git commit -m "generates Welcome controller" &&
 sed -i '' -e 's/html: { method: :post }/html: { method: :post, 'data-turbo': false}/g' app/views/devise/confirmations/new.html.erb &&
 sed -i '' -e 's/ url: session_path(resource_name))/ url: session_path(resource_name), html: {"data-turbo": false})/g' app/views/devise/sessions/new.html.erb && 
