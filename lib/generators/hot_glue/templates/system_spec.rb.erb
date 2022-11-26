@@ -2,6 +2,8 @@ require 'rails_helper'
 
 describe "interaction for <%= controller_class_name %>", type: :feature do
   include HotGlue::ControllerHelper
+  include ActionView::RecordIdentifier
+
   <%= @existing_content %>
   <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
 <%= (@columns - @show_only).map { |col|
@@ -118,7 +120,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       expect(page).to have_content("Editing #{<%= singular %>1.<%= @display_class %>.squish || "(no name)"}")
 <%= test_capybara_block %>
       click_button "Save"
-      within("turbo-frame#<%= singular %>__#{<%= singular %>1.id} ") do
+      within("turbo-frame#<%= @namespace %>__#{dom_id(<%= singular %>1)} ") do
 <%=
     (@columns - @show_only).map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
