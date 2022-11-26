@@ -153,7 +153,7 @@ For JSBundling & Shakapacker:
 echo "\ncss: yarn build:css --watch\n" >> Procfile.dev &&
 yarn add @popperjs/core bootstrap bootstrap-icons sass &&
 sed -i '' -e 's/\/\/= link_directory ..\/stylesheets .css//g' app/assets/config/manifest.js &&
-sed -i '' -e 's/  "scripts": {/  "scripts": {\n    "build:css": "sass ./app/assets/stylesheets/application.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules"/g' package.json &&
+sed -i '' -e 's/  "scripts": {/  "scripts": {\n    "build:css": "sass .\/app\/assets\/stylesheets\/application.scss:.\/app\/assets\/builds\/application.css --no-source-map --load-path=node_modules"/g' package.json &&
 yarn install &&
 git add . && git commit -m "adding bootstrap packages"
 ```
