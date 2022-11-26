@@ -109,12 +109,12 @@ bundle add hot-glue && git add . && git commit -m "adds hot-glue" &&
 rails generate hot_glue:install --layout=bootstrap && 
 git add . && git commit -m "hot glue setup" &&
 bundle add bootstrap &&
-echo $(cat app/assets/stylesheets/application.scss) "\n@import 'bootstrap';\n" > app/assets/stylesheets/application.scss
+echo "\n@import 'bootstrap';\n" >> app/assets/stylesheets/application.scss
 sed -i '' -e  's/# Rails.application.config.assets.precompile += %w( admin.js admin.css )/Rails.application.config.assets.precompile += %w( application.scss )/g' config/initializers/assets.rb &&
 sed -i '' -e 's/Rails.application.configure do/Rails.application.configure do\n  config.sass.inline_source_maps = true/g' config/environments/development.rb 
 git add . && git commit -m "bootstrap install" &&
 bundle add font_awesome5_rails && 
-echo $(cat app/assets/stylesheets/application.scss) "\n@import 'font_awesome5_webfont';\n" > app/assets/stylesheets/application.scss
+echo "\n@import 'font_awesome5_webfont';\n" >> app/assets/stylesheets/application.scss
 git add . && git commit -m "adds fontawesome" &&  
 bundle add devise && bundle install && 
 git add . && git commit -m "adding devise gem" && 
@@ -144,13 +144,13 @@ For Importmap apps:
 ```
 pin "bootstrap", to: "https://ga.jspm.io/npm:bootstrap@5.1.3/dist/js/bootstrap.esm.js" &&
 pin "@popperjs/core", to: "https://ga.jspm.io/npm:@popperjs/core@2.11.2/lib/index.js" &&
-echo $(cat app/javascript/application.js) "\nimport "bootstrap"\n" > app/javascript/application.js &&
+echo "\nimport "bootstrap"\n" >> app/javascript/application.js &&
 git add . && git commit -m "pinning boostrap and popper js for bootstrap"
 ```
 
 For JSBundling & Shakapacker:
 ```
-echo $(cat Procfile.dev) "\ncss: yarn build:css --watch\n" > Procfile.dev &&
+echo "\ncss: yarn build:css --watch\n" >> Procfile.dev &&
 yarn add @popperjs/core bootstrap bootstrap-icons sass &&
 sed -i '' -e 's/\/\/= link_directory ../stylesheets .css//g' app/assets/config/manifest.js &&
 sed -i '' -e 's/  "scripts": {/  "scripts": {\n    "build:css": "sass ./app/assets/stylesheets/application.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules"/g' package.json &&
