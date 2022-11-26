@@ -1,9 +1,9 @@
 <\% if @<%= singular %>.errors.none? %>
-  <\%= turbo_stream.replace "<%= plural %>-list" + <%= nested_for_turbo_nested_constructor %> do %>
+  <\%= turbo_stream.replace "<%= @namespace %>__<%= plural %>-list" + <%= nested_for_turbo_nested_constructor %> do %>
   <\%= render partial: "list", locals: {<%= plural %>: @<%= plural %>}<%= @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {nested_for: \"" + arg[:singular] + "-\#{@" + arg[:singular] + ".id}\"" + ", " + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> \%>
   <\% end %>
   <\% end %>
-  <\%= turbo_stream.replace "<%= singular %>-new" do %>
+  <\%= turbo_stream.replace "<%= @namespace %>__<%= singular %>__<%= singular %>-new" do %>
   <\% if @<%= singular %>.errors.none? %>
   <\%= render partial: "new_button", locals: {}<%=  @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {" + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> %>
   <\% else %>

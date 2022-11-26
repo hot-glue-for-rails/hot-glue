@@ -1,6 +1,6 @@
 <\%= link_to "<i class='fa fa-arrow-circle-left  2x'></i> Back to list".html_safe, <%= path_helper_plural %> %>
 
-<\%= turbo_frame_tag "<%= singular %>__#{<%= "@" + singular %>.id}" do  %>
+<\%= turbo_frame_tag "<%= @namespace %>__#{dom_id(@<%= singular %>)}" do  %>
 
   <div class="cell editable" style="position: relative;">
 

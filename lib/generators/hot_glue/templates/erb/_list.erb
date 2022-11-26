@@ -1,4 +1,4 @@
-<\%= turbo_frame_tag "<%= plural %>-list" <%= nested_for_turbo_id_list_constructor %>  do %>
+<\%= turbo_frame_tag "<%= @namespace %>__<%= plural %>-list" <%= nested_for_turbo_id_list_constructor %>  do %>
   <div class="<%= @container_name %> scaffold-list">
     <% unless @no_list  || @no_list_label || (@nested_set.any? && !@nested_set.collect{|x| x[:optional]}.any?)  %>
       <% unless list_label.nil? %><h4>

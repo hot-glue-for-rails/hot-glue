@@ -1,3 +1,3 @@
-<\%= turbo_stream.replace "<%= plural %>-list" + <%= nested_for_turbo_nested_constructor %> do %>
+<\%= turbo_stream.replace "<%= @namespace %>__<%= plural %>-list" + <%= nested_for_turbo_nested_constructor %> do %>
   <\%= render partial: "list", locals: {<%=plural%>: @<%=plural%> }<%= @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {nested_for: \"" + arg[:singular] + "-\#{@" + arg[:singular] + ".id}\"" + ", " + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> \%>
 <\% end %>
