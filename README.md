@@ -5,9 +5,7 @@ Hot Glue is a Rails scaffold builder for the Turbo era. It is an evolution of th
 
 Using Turbo-Rails and Hotwire (default in Rails 7) you get a lightning-fast out-of-the-box CRUD-building experience.
 
-Every page displays only a list view: new and edit operations happen as 'edit-in-place,' so the user never leaves the page.
-
-Because all page navigation is Turbo's responsibility, everything plugs & plays nicely into a Turbo-backed Rails app.
+Every page displays only a list view: new and edit operations happen as 'edit-in-place,' so the user never leaves the page. Because all page navigation is Turbo's responsibility, everything plugs & plays nicely into a Turbo-backed Rails app.
 
 Alternatively, you can use this tool to create a Turbo-backed *section* of your Rails app -- such as an admin interface -- while still treating the rest of the Rails app as an API or building out other features by hand.
 
@@ -27,6 +25,16 @@ Hot Glue generates functionality that is quick and dirty. It lets you be crafty.
 * Nest your routes model-by-model for built-in poor man's authentication.
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
+How is it different than Rails scaffolding?
+
+Although inspired by the Rails scaffold generators (built-in to Rails), Hot Glue does something similiar but has made opinionated decisions that deviate from the normal Rails scaffold: 
+
+1. The Hot Glue scaffolds are complete packages and pre-optimized for 'edit-in-place.' (the Rails scaffolds still generate views that make you flip between pages to do create/update operations)
+2. Hot Glue does not create your models along with your scaffolding. Instead, create them first using `rails model new`
+3. Hot Glue *reads* the fields on your database and the relationships defined on your models, so unlike the Rails scaffolding you must do that step before building your scaffolding.
+4. Hot Glue has many more features for making building layouts quickly (choosing which fields to show and where to put them), for stiching together related objects (nesting and child portals), and more. 
+
+Other than the opinionated differences and additional features, Hot Glue produces code that is fundamentally very similiar and works consistent with the Rails 7 ways of working. 
 
 # Get Hot Glue
 
