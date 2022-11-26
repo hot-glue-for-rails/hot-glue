@@ -32,7 +32,7 @@ Although inspired by the Rails scaffold generators (built-in to Rails), Hot Glue
 1. The Hot Glue scaffolds are complete packages and pre-optimized for 'edit-in-place.' (the Rails scaffolds still generate views that make you flip between pages to do create/update operations)
 2. Hot Glue does not create your models along with your scaffolding. Instead, create them first using `rails model new`
 3. Hot Glue *reads* the fields on your database and the relationships defined on your models, so unlike the Rails scaffolding you must do that step before building your scaffolding.
-4. Hot Glue has many more features for making building layouts quickly (choosing which fields to show and where to put them), for stiching together related objects (nesting and child portals), and more. 
+4. Hot Glue has many more features for building layouts quickly, like choosing which fields to include or exclude and how to lay them out on the page, for stiching together related objects (nesting and child portals), and more. 
 
 Other than the opinionated differences and additional features, Hot Glue produces code that is fundamentally very similiar and works consistent with the Rails 7 ways of working. 
 
