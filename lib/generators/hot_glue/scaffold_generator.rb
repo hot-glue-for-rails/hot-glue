@@ -123,7 +123,7 @@ module HotGlue
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # if used here it will override what is in the config
     class_option :hawk, type: :string, default: nil
-    class_option :turbo_model_callbacks, type: :boolean, default: false
+    class_option :with_turbo_streams, type: :boolean, default: false
 
     class_option :no_list_label, type: :boolean, default: false
 
@@ -941,7 +941,7 @@ module HotGlue
 
     def append_model_callbacks
       # somehow the generator invokes this
-      if options['turbo_model_callbacks'] == true
+      if options['with_turbo_streams'] == true
         dest_filename = cc_filename_with_extensions("#{singular_class.underscore}", "rb")
         dest_filepath = File.join("app/models", dest_filename)
 
