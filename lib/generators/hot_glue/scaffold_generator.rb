@@ -415,6 +415,8 @@ module HotGlue
       @layout_object = builder.construct
 
       @menu_file_exists = true if @nested_set.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
+
+      @turbo_streams = !!options['with_turbo_streams']
     end
 
     def setup_hawk_keys
@@ -943,7 +945,7 @@ module HotGlue
       # somehow the generator invokes this
       if options['with_turbo_streams'] == true
         dest_filename = cc_filename_with_extensions("#{singular_class.underscore}", "rb")
-        dest_filepath = File.join("app/models", dest_filename)
+        dest_filepath = File.join("#{'dummy/' if Rails.env.test?}app/models", dest_filename)
 
 
         puts "appending turbo callbacks to #{dest_filepath}"
