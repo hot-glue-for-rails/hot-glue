@@ -69,24 +69,27 @@ To run Turbo (which Hot Glue requires), you must either (1) be running an Import
 
 For reference, see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-do-i-need-importmap-rails/
 
+Once you create the new Rails app, you can skip to the 'Super-Quick Setup' below.
+
 (1) To use ImportMap Rails, start with
 `rails new`
 
-If you want Bootstrap, install it following [these instructions](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/importmap-rails-with-bootstrap-sprockets-stimulus-and-turbo-long-tutorial/)
+(For full instructions to install Bootstrap with Importmap, check out [these instructions](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/importmap-rails-with-bootstrap-sprockets-stimulus-and-turbo-long-tutorial/))
 
 (2) To use JSBundling, start with
 `rails new --javascript=jsbundling`
 
 
 **If using JSBundling, make sure to use the new `./bin/dev` to start your server instead of the old `rails server` or else your Turbo interactions will not work correctly.**
-If you want Bootstrap, install it following these instructions
+(If you want Bootstrap for a JSBundling app, install it following [these instructions](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-up-running-with-jsbundling-esbuild-stimulus-turbo-bootstrap-circleci/))
 
 (3) To use Shakapacker, start with `rails new --skip-javascript` and [see this post](https://jasonfleetwoodboldt.com/courses/react-heart-rails/rails-7-shakapacker-and-reactonrails-quick-setup-part-1/)
 
-For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/)
+(For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/))
 
-Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/blob/main/README2.md) before continuing. 
+(Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/blob/main/README2.md) before continuing.)
 
+If you doing the 'Super-Quick Setup', you can skip the additional blog posts linked above because the steps in them are covered in the shell script(s) below.
 
 ## The Super-Quick Setup
 
