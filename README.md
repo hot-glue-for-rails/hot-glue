@@ -151,7 +151,7 @@ git add . && git commit -m "pinning boostrap and popper js for bootstrap"
 For JSBundling & Shakapacker:
 ```
 echo $(cat Procfile.dev) "\ncss: yarn build:css --watch\n" > Procfile.dev &&
-yarn add @popperjs bootstrap bootstrap-icons sass &&
+yarn add @popperjs/core bootstrap bootstrap-icons sass &&
 sed -i '' -e 's/\/\/= link_directory ../stylesheets .css//g' app/assets/config/manifest.js &&
 sed -i '' -e 's/  "scripts": {/  "scripts": {\n    "build:css": "sass ./app/assets/stylesheets/application.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules"/g' package.json &&
 yarn install &&
