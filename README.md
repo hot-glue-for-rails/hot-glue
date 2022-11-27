@@ -853,8 +853,19 @@ Sometimes you might want to redisplay the entire list after you make an update (
 
 To do this, use flag `--display-list-after-update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
 
+### `--with-turbo-streams`
 
+If and only if you specify `--with-turbo-streams`, your views will contain `turbo_stream_from` directives. Whereas your views will always contain `turbo_frame_tags` (wether or not this flag is specified) and will use the Turbo stream replacement mechanism for non-idempotent actions (create & update). This flag just brings the magic of live-reload to the scaffold interfaces themselves.
 
+**_To test_**: Open the same interface in two separate browser windows. Make an edit in one window and watch your edit appear in the other window instantly.
+
+This happens using two interconnected mechanisms:
+
+1) by default, all Hot Glue scaffold is wrapped in `turbo_frame_tag`s. The id of these tags is your namespace + the Rails dom_id(...). That means all Hot Glue scaffold is namespaced to the namespaces you use and won't collide with other turbo_frame_tag you might be using elsewhere
+
+2) by appending **model callbacks**, we can automatically broadcast updates to the users who are using the Hot Glue scaffold. The model callbacks (after_update_commit and after_destroy_commit) get appended automatically to the top of your model file. Each model callback targets the scaffold being built (so just this scaffold), using its namespace, and renders the line partial (or destroys the content in the case of delete) from the scaffolding.
+
+please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
 
 
 ## Automatic Base Controller
@@ -893,6 +904,11 @@ Child portals have the headings omitted automatically (there is a heading identi
 
 
 # VERSION HISTORY
+
+#### 2022-11-27 - v0.5.4 - new flag --with-turbo-streams will append callbacks after_update_commit and after_destroy_commit to the MODEL you are building with to use turbo to target the scaffolding being built and programmatically update it
+
+Adds `--with-turbo-streams`. Use `--with-turbo-streams` to create hot (live reload) interfaces. See docs above.
+
 
 #### 2022-11-24 - v0.5.3 - New testing paradigm & removes license requirements
 
