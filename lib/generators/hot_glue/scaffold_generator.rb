@@ -122,7 +122,8 @@ module HotGlue
     class_option :smart_layout, type: :boolean, default: false
     class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
     class_option :layout, type: :string, default: nil # if used here it will override what is in the config
-    class_option :hawk, type: :string, default: nil #
+    class_option :hawk, type: :string, default: nil
+    class_option :with_turbo_streams, type: :boolean, default: false
 
     class_option :no_list_label, type: :boolean, default: false
 
@@ -415,7 +416,7 @@ module HotGlue
 
       @menu_file_exists = true if @nested_set.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
-
+      @turbo_streams = !!options['with_turbo_streams']
     end
 
     def setup_hawk_keys
@@ -938,6 +939,28 @@ module HotGlue
       #
       # end
 
+    end
+
+    def append_model_callbacks
+      # somehow the generator invokes this
+      if options['with_turbo_streams'] == true
+        dest_filename = cc_filename_with_extensions("#{singular_class.underscore}", "rb")
+        dest_filepath = File.join("#{'dummy/' if Rails.env.test?}app/models", dest_filename)
+
+
+        puts "appending turbo callbacks to #{dest_filepath}"
+
+        text = File.read(dest_filepath)
+
+        append_text = "class #{singular_class} < ApplicationRecord\n"
+        if !text.include?("include ActionView::RecordIdentifier")
+          append_text << "  include ActionView::RecordIdentifier\n"
+        end
+        append_text << "  after_update_commit lambda { broadcast_replace_to self, target: \"#{@namespace}__\#{dom_id(self)}\", partial: \"#{@namespace}/#{@plural}/line\" }\n  after_destroy_commit lambda { broadcast_remove_to self, target: \"#{@namespace}__\#{dom_id(self)}\"}\n"
+
+        replace = text.gsub(/class #{singular_class} < ApplicationRecord/, append_text)
+        File.open(dest_filepath, "w") {|file| file.puts replace}
+      end
     end
 
     def namespace_with_dash

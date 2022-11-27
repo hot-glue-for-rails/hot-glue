@@ -116,6 +116,9 @@ git add . && git commit -m "bootstrap install" &&
 bundle add font_awesome5_rails && 
 echo "\n@import 'font_awesome5_webfont';\n" >> app/assets/stylesheets/application.scss
 git add . && git commit -m "adds fontawesome" &&  
+bundle add kaminari && 
+rails generate kaminari:views bootstrap4 && 
+git add . && git commit -m "adding kaminari and views" &&
 bundle add devise && bundle install && 
 git add . && git commit -m "adding devise gem" && 
 rails generate devise:install && 
@@ -142,9 +145,8 @@ git add . && git commit -m "schema file"
 
 For Importmap apps:
 ```
-pin "bootstrap", to: "https://ga.jspm.io/npm:bootstrap@5.1.3/dist/js/bootstrap.esm.js" &&
-pin "@popperjs/core", to: "https://ga.jspm.io/npm:@popperjs/core@2.11.2/lib/index.js" &&
-echo "\nimport "bootstrap"\n" >> app/javascript/application.js &&
+./bin/importmap pin "bootstrap@5.1.3" &&
+./bin/importmap pin "@popperjs/core@2.11.2" &&
 git add . && git commit -m "pinning boostrap and popper js for bootstrap"
 ```
 

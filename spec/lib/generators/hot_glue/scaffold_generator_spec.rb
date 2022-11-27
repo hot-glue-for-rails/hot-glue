@@ -978,6 +978,22 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
+  describe "--with-turbo-streamd" do
+    it "should not include turbo_stream_from if not specified" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                         ["Abc", "--gd"])
+      res = File.read("spec/dummy/app/views/abcs/_line.erb")
+      expect(res).to_not include("<%= turbo_stream_from abc  %>")
+    end
+
+    it "should not include turbo_stream_from if not specified" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc", "--gd", "--with-turbo-streams"])
+      res = File.read("spec/dummy/app/views/abcs/_line.erb")
+      expect(res).to include("<%= turbo_stream_from abc  %>")
+    end
+  end
+
   # describe "for when a base controller already exists" do
   #   it "should skip adding the base controller" do
   #     response = Rails::Generators.invoke("hot_glue:scaffold",
