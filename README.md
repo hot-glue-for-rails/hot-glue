@@ -116,6 +116,9 @@ git add . && git commit -m "bootstrap install" &&
 bundle add font_awesome5_rails && 
 echo "\n@import 'font_awesome5_webfont';\n" >> app/assets/stylesheets/application.scss
 git add . && git commit -m "adds fontawesome" &&  
+bundle add kaminari && 
+rails generate kaminari:views bootstrap4 && 
+git add . && git commit -m "adding kaminari and views" &&
 bundle add devise && bundle install && 
 git add . && git commit -m "adding devise gem" && 
 rails generate devise:install && 
