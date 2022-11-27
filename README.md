@@ -145,8 +145,8 @@ git add . && git commit -m "schema file"
 
 For Importmap apps:
 ```
-pin "bootstrap", to: "https://ga.jspm.io/npm:bootstrap@5.1.3/dist/js/bootstrap.esm.js" &&
-pin "@popperjs/core", to: "https://ga.jspm.io/npm:@popperjs/core@2.11.2/lib/index.js" &&
+./bin/importmap pin "bootstrap@5.1.3" &&
+./bin/importmap pin "@popperjs/core@2.11.2" &&
 echo "\nimport "bootstrap"\n" >> app/javascript/application.js &&
 git add . && git commit -m "pinning boostrap and popper js for bootstrap"
 ```
