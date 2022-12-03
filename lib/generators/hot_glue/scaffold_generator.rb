@@ -599,7 +599,6 @@ module HotGlue
       @template_builder.list_column_headings(
         columns: @layout_object[:columns][:container],
         col_identifier: @layout_strategy.col_identifier_column_headings,
-        layout: @layout,
         column_width: @layout_strategy.column_width
       )
     end
@@ -1069,7 +1068,6 @@ module HotGlue
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
-        layout: @layout,
         col_identifier: @layout_strategy.col_identifier_line_fields,
         inline_list_labels: @inline_list_labels
       )
