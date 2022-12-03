@@ -5,5 +5,7 @@ module  HotGlue
       @layout_strategy = layout_strategy
     end
 
+
+
   end
 end
