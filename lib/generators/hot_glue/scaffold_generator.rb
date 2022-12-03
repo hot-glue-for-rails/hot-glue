@@ -95,7 +95,7 @@ module HotGlue
 
     source_root File.expand_path('templates', __dir__)
     attr_accessor :path, :singular, :plural, :singular_class, :nest_with
-    attr_accessor :columns, :downnest_children
+    attr_accessor :columns, :downnest_children, :layout_object
 
     class_option :singular, type: :string, default: nil
     class_option :plural, type: :string, default: nil
@@ -187,25 +187,12 @@ module HotGlue
       yaml_from_config = YAML.load(File.read("config/hot_glue.yml"))
       @markup =  yaml_from_config[:markup]
 
-      if  @markup == "erb"
-        @template_builder = HotGlue::ErbTemplate.new
-      elsif  @markup == "slim"
-        raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
-      elsif  @markup == "haml"
-        raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
-
-      end
-
-
       if !options['layout']
         layout = yaml_from_config[:layout]
 
         if !['hotglue', 'bootstrap', 'tailwind'].include? layout
           raise "Invalid option #{layout} in Hot glue config (config/hot_glue.yml). You must either use --layout= when generating or have a file config/hotglue.yml; specify layout as either 'hotglue' or 'bootstrap'"
         end
-      else
-
-
       end
 
       @layout_strategy =
@@ -216,6 +203,15 @@ module HotGlue
           LayoutStrategy::Tailwind.new(self)
         when 'hotglue'
           LayoutStrategy::HotGlue.new(self)
+        end
+
+
+      if  @markup == "erb"
+        @template_builder = HotGlue::ErbTemplate.new(layout_strategy: @layout_strategy)
+      elsif  @markup == "slim"
+        raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
+      elsif  @markup == "haml"
+        raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
       end
 
       args = meta_args[0]
@@ -1066,7 +1062,6 @@ module HotGlue
     end
 
     def all_line_fields
-      col_identifier = (@layout == "hotglue") ? "scaffold-cell" : "col-md-#{@layout_object[:columns][:size_each]}"
 
       @template_builder.all_line_fields(
         perc_width: @layout_strategy.each_col,
@@ -1075,7 +1070,7 @@ module HotGlue
         singular_class: singular_class,
         singular: singular,
         layout: @layout,
-        col_identifier: col_identifier,
+        col_identifier: @layout_strategy.col_identifier_line_fields,
         inline_list_labels: @inline_list_labels
       )
     end
