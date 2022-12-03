@@ -40,4 +40,16 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   def downnest_column_style
     ""
   end
+
+  def button_column_style
+    ""
+  end
+
+  def button_style
+    ""
+  end
+
+  def button_classes
+    " col-md-#{ @layout_object[:buttons][:size] }"
+  end
 end
