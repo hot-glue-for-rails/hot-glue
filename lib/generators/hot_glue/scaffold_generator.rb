@@ -7,6 +7,10 @@ require_relative './markup_templates/erb'
 # require_relative './markup_templates/slim'
 
 require_relative './layout/builder'
+require_relative './layout_strategy/bootstrap'
+require_relative './layout_strategy/hot_glue'
+require_relative './layout_strategy/tailwind'
+
 
 module HotGlue
   class Error < StandardError
@@ -191,20 +195,28 @@ module HotGlue
 
 
       if !options['layout']
-        @layout = yaml_from_config[:layout]
+        layout = yaml_from_config[:layout]
 
-        if !['hotglue', 'bootstrap'].include? @layout
-          raise "Invalid option #{@layout} in Hot glue config (config/hot_glue.yml). You must either use --layout= when generating or have a file config/hotglue.yml; specify layout as either 'hotglue' or 'bootstrap'"
+        if !['hotglue', 'bootstrap', 'tailwind'].include? layout
+          raise "Invalid option #{layout} in Hot glue config (config/hot_glue.yml). You must either use --layout= when generating or have a file config/hotglue.yml; specify layout as either 'hotglue' or 'bootstrap'"
         end
       else
-        @layout = options['layout']
+
+
+      end
+
+      @layout_strategy =
+        case layout
+        when 'bootstrap'
+          LayoutStrategy::Bootstrap.new
+        when 'tailwind'
+          LayoutStrategy::Tailwind.new
+        when 'hotglue'
+          LayoutStrategy::HotGlue.new
       end
 
       args = meta_args[0]
-
-
       @singular = args.first.tableize.singularize # should be in form hello_world
-
 
       if @singular.include?("/")
         @singular = @singular.split("/").last
@@ -292,8 +304,7 @@ module HotGlue
         raise HotGlue::Error, "You specified both --smart-layout and also specified grouping mode (there is a : character in your field include list); you must remove the colon(s) from your --include tag or remove the --smart-layout option"
       end
 
-
-      @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
+      @container_name = @layout_strategy.container_name
       @downnest = options['downnest'] || false
 
       @downnest_children = [] # TODO: defactor @downnest_children in favor of downnest_object
