@@ -5,8 +5,12 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
     "container-fluid"
   end
 
+  def col_identifier_form_fields
+    "col-md-#{@scaffold_builder.layout_object[:columns][:size_each]}"
+  end
 
-  def col_identifier
+  def col_identifier_column_headings
+
     "col-md-#{column_width}"
   end
 
