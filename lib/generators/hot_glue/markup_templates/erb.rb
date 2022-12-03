@@ -18,8 +18,6 @@ module  HotGlue
 
     def magic_button_output(*args)
       path = args[0][:path]
-      # path_helper_singular = args[0][:path_helper_singular]
-      # path_helper_args = args[0][:path_helper_args]
       singular = args[0][:singular]
       magic_buttons = args[0][:magic_buttons]
       small_buttons = args[0][:small_buttons]
