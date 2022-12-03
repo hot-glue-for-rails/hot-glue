@@ -58,4 +58,12 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
   def row_end
     '</div>'
   end
+
+  def downnest_column_style
+    'style="flex-basis: ' + each_downnest_width.to_s +  '%;'
+  end
+
+  def each_downnest_width
+    @scaffold_builder.downnest_children.count == 1 ? 33 : (53/@scaffold_builder.downnest_children.count).floor
+  end
 end

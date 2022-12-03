@@ -15,14 +15,14 @@ module HotGlue
 
     def initialize(*args) #:nodoc:
       super
-      @layout = options['layout'] || "hotglue"
+      layout = options['layout'] || "hotglue"
       @theme =  options['theme']
-      if @layout == "hotglue" && options['theme'].nil?
+      if layout == "hotglue" && options['theme'].nil?
         puts "You have selected to install Hot Glue without a theme. You can either use the --layout=bootstrap to install NO HOT GLUE THEME, or to use a Hot Glue theme please choose: like_boostrap, like_menlo_park, like_cupertino, like_mountain_view, dark_knight"
         return
       end
 
-      if @layout == 'boostrap'
+      if layout == 'boostrap'
         puts "IMPORTANT: You have selected to install Hot Glue with Bootstrap layout.` "
       end
 
@@ -96,7 +96,7 @@ module HotGlue
 
 
       begin
-        if @layout == "hotglue"
+        if layout == "hotglue"
           theme_location = "themes/hotglue_scaffold_#{@theme}.scss"
           theme_file = "hotglue_scaffold_#{@theme}.scss"
 
@@ -120,7 +120,7 @@ module HotGlue
 
       begin
         if !File.exists?("config/hot_glue.yml")
-          yaml = {layout: @layout,
+          yaml = {layout: layout,
                   markup: @markup}.to_yaml
           File.write("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml", yaml)
 

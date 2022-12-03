@@ -36,4 +36,8 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   def row_end
     '</div> </div>'
   end
+
+  def downnest_column_style
+    ""
+  end
 end
