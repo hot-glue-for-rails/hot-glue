@@ -16,6 +16,8 @@ module HotGlue
   class Error < StandardError
   end
 
+
+
   def self.construct_downnest_object(input)
     res = input.split(",").map { |child|
       child_name = child.gsub("+","")
@@ -93,6 +95,7 @@ module HotGlue
 
     source_root File.expand_path('templates', __dir__)
     attr_accessor :path, :singular, :plural, :singular_class, :nest_with
+    attr_accessor :columns, :downnest_children
 
     class_option :singular, type: :string, default: nil
     class_option :plural, type: :string, default: nil
@@ -208,11 +211,11 @@ module HotGlue
       @layout_strategy =
         case layout
         when 'bootstrap'
-          LayoutStrategy::Bootstrap.new
+          LayoutStrategy::Bootstrap.new(self)
         when 'tailwind'
-          LayoutStrategy::Tailwind.new
+          LayoutStrategy::Tailwind.new(self)
         when 'hotglue'
-          LayoutStrategy::HotGlue.new
+          LayoutStrategy::HotGlue.new(self)
       end
 
       args = meta_args[0]
@@ -597,13 +600,9 @@ module HotGlue
     end
 
     def list_column_headings
-      if @layout == "bootstrap"
-        column_width = @layout_object[:columns][:size_each]
-        col_identifier = "col-md-#{column_width}"
-      elsif @layout == "hotglue"
-        column_width = each_col * @columns.count
-        col_identifier = "scaffold-cell"
-      end
+
+      column_width =  @layout_strategy.column_width
+      col_identifier = @layout_strategy.col_identifier
 
       @template_builder.list_column_headings(
         columns: @layout_object[:columns][:container],
@@ -612,6 +611,8 @@ module HotGlue
         column_width: column_width
       )
     end
+
+
 
     def columns_spec_with_sample_data
       @columns.map { |c|
@@ -1053,9 +1054,6 @@ module HotGlue
       )
     end
 
-    def column_width
-      @each_col ||= each_col
-    end
 
     def list_label
       if(eval("#{class_name}.class_variable_defined?(:@@table_label_plural)"))
@@ -1073,31 +1071,11 @@ module HotGlue
       end
     end
 
-    def each_col
-      return col_width if @columns.count == 0
-      (col_width/(@columns.count)).to_i
-    end
-
-    def col_width
-      downnest_size = case (@downnest_children.count)
-
-                      when 0
-                        downnest_size = 0
-                      when 1
-                        downnest_size = 40
-
-                      else
-                        downnest_size = 60
-
-                      end
-      100 - downnest_size - 5
-    end
-
     def all_line_fields
       col_identifier = (@layout == "hotglue") ? "scaffold-cell" : "col-md-#{@layout_object[:columns][:size_each]}"
 
       @template_builder.all_line_fields(
-        perc_width: column_width,
+        perc_width: @layout_strategy.each_col,
         columns:  @layout_object[:columns][:container],
         show_only: @show_only,
         singular_class: singular_class,
