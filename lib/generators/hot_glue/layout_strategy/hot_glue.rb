@@ -1,9 +1,35 @@
 
 class LayoutStrategy::HotGlue < LayoutStrategy::Base
 
+  def each_col
+    return col_width if @scaffold_builder.columns.count == 0
+    (col_width/(@scaffold_builder.columns.count)).to_i
+  end
+
+  def column_width
+    each_col * @scaffold_builder.columns.count
+  end
 
   def container_name
     "scaffold-container"
   end
 
+
+  def col_identifier
+    "scaffold-cell"
+  end
+
+  def col_width
+    downnest_size = case (@scaffold_builder.downnest_children.count)
+        when 0
+          downnest_size = 0
+        when 1
+          downnest_size = 40
+
+        else
+          downnest_size = 60
+
+        end
+    100 - downnest_size - 5
+  end
 end
