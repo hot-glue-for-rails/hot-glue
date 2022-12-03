@@ -2,20 +2,20 @@ ENV["RAILS_ENV"] ||= "test"
 # require 'byebug'
 
 
-if( ENV['COVERAGE'] == 'on' )
-  require 'simplecov'
-  require 'simplecov-rcov'
-  class SimpleCov::Formatter::MergedFormatter
-    def format(result)
-      SimpleCov::Formatter::HTMLFormatter.new.format(result)
-      SimpleCov::Formatter::RcovFormatter.new.format(result)
-    end
+
+require 'simplecov'
+require 'simplecov-rcov'
+class SimpleCov::Formatter::MergedFormatter
+  def format(result)
+    SimpleCov::Formatter::HTMLFormatter.new.format(result)
+    SimpleCov::Formatter::RcovFormatter.new.format(result)
   end
-  SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
-  SimpleCov.start 'rails' do
-    add_filter "/vendor/"
-    add_filter "/test/"
-  end
+end
+SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
+SimpleCov.start 'rails' do
+  add_filter "/vendor/"
+  add_filter "/test/"
+  add_filter "/dummy/"
 end
 
 # require rails first

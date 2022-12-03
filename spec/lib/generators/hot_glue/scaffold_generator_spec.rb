@@ -978,7 +978,7 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-  describe "--with-turbo-streamd" do
+  describe "--with-turbo-streams" do
     it "should not include turbo_stream_from if not specified" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                          ["Abc", "--gd"])
@@ -987,10 +987,19 @@ describe HotGlue::ScaffoldGenerator do
     end
 
     it "should not include turbo_stream_from if not specified" do
+      dest_filepath = "spec/dummy/app/models/abc.rb"
+      original_abc_model = File.read(dest_filepath)
+      
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Abc", "--gd", "--with-turbo-streams"])
       res = File.read("spec/dummy/app/views/abcs/_line.erb")
       expect(res).to include("<%= turbo_stream_from abc  %>")
+
+      res = File.read(dest_filepath)
+      expect(res).to include('include ActionView::RecordIdentifier')
+      expect(res).to include('after_update_commit lambda { broadcast_replace_to self, target: "__#{dom_id(self)}", partial: "/abcs/line" }')
+      expect(res).to include('after_destroy_commit lambda { broadcast_remove_to self, target: "__#{dom_id(self)}')
+      File.open(dest_filepath, "w") {|file| file.puts original_abc_model}
     end
   end
 

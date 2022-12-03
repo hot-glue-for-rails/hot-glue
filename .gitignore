@@ -16,11 +16,16 @@ Gemfile.lock
 
 db/*.sqlite3
 
-spec/dummy/app/views/
-spec/dummy/app/controllers/
-spec/dummy/specs/
+dummy/app/views/
+dummy/app/controllers/
+dummy/specs/
 
-spec/dummy/node_modules/
-spec/dummy/log/
+dummy/node_modules/
+dummy/log/
+dummy/Gemfile.lock
 
 coverage/
+
+
+spec/dummy/
+dummy/spec/system/

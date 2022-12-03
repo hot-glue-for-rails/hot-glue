@@ -943,9 +943,10 @@ module HotGlue
 
     def append_model_callbacks
       # somehow the generator invokes this
+
       if options['with_turbo_streams'] == true
         dest_filename = cc_filename_with_extensions("#{singular_class.underscore}", "rb")
-        dest_filepath = File.join("#{'dummy/' if Rails.env.test?}app/models", dest_filename)
+        dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/models", dest_filename)
 
 
         puts "appending turbo callbacks to #{dest_filepath}"
