@@ -10,12 +10,26 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
     each_col * @scaffold_builder.columns.count
   end
 
+
+  def column_headings_col_style
+    " style='flex-basis: #{column_width}%'"
+  end
+
+
+  def style_with_flex_basis(perc_width)
+    " style='flex-basis: #{perc_width}%'"
+  end
+
   def container_name
     "scaffold-container"
   end
 
 
   def col_identifier_form_fields
+    "scaffold-cell"
+  end
+
+  def col_identifier_line_fields
     "scaffold-cell"
   end
 

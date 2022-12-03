@@ -1,6 +1,8 @@
 module  HotGlue
   class TemplateBase
-    def initialize()
+    def initialize(layout_strategy: )
+
+      @layout_strategy = layout_strategy
     end
 
   end

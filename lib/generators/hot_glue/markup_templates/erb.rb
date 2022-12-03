@@ -3,7 +3,7 @@ module  HotGlue
 
     attr_accessor :path, :singular, :singular_class,
                   :magic_buttons, :small_buttons,
-                  :show_only, :column_width, :layout, :perc_width,
+                  :show_only, :column_width, :layout_strategy, :perc_width,
                   :ownership_field, :form_labels_position,
                   :inline_list_labels,
                   :columns, :column_width, :col_identifier, :singular,
@@ -36,13 +36,8 @@ module  HotGlue
       @columns = args[0][:columns]
       @column_width = args[0][:column_width]
       @col_identifier = args[0][:col_identifier]
-      @layout = args[0][:layout]
 
-      if layout == "hotglue"
-        col_style = " style='flex-basis: #{column_width}%'"
-      else
-        col_style = ""
-      end
+      col_style = @layout_strategy.column_headings_col_style
 
       result = columns.map{ |column|
         "<div class='#{col_identifier}'" + col_style + ">" +  column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
@@ -216,18 +211,14 @@ module  HotGlue
       @singular_class = args[0][:singular_class]
       @singular = args[0][:singular]
       @perc_width = args[0][:perc_width]
-      @layout = args[0][:layout]
-      @col_identifier =   args[0][:col_identifier]  || (layout == "bootstrap" ? "col-md-2" :  "scaffold-cell")
+      @col_identifier =  @layout_strategy.col_identifier_line_fields
+
       @inline_list_labels = args[0][:inline_list_labels] || 'omit'
 
       columns_count = columns.count + 1
       perc_width = (@perc_width).floor
 
-      if layout == "bootstrap"
-        style_with_flex_basis = ""
-      else
-        style_with_flex_basis = " style='flex-basis: #{perc_width}%'"
-      end
+      style_with_flex_basis = @layout_strategy.style_with_flex_basis(perc_width)
 
       result = columns.map{ |column|
         "<div class='#{col_identifier}'#{style_with_flex_basis}>" +
