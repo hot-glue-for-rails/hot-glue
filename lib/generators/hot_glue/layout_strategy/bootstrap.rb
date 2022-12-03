@@ -28,4 +28,12 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   def style_with_flex_basis
     ""
   end
+
+  def row_begin
+    '<div class="row"> <div class="col-md-12">'
+  end
+
+  def row_end
+    '</div> </div>'
+  end
 end
