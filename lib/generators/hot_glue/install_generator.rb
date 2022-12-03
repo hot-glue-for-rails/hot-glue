@@ -1,5 +1,5 @@
 require 'rails/generators/erb/scaffold/scaffold_generator'
-require_relative './helpers'
+
 require 'ffaker'
 
 module HotGlue
