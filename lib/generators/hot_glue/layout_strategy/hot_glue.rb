@@ -15,7 +15,11 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
   end
 
 
-  def col_identifier
+  def col_identifier_form_fields
+    "scaffold-cell"
+  end
+
+  def col_identifier_column_headings
     "scaffold-cell"
   end
 

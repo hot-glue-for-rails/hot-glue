@@ -600,15 +600,11 @@ module HotGlue
     end
 
     def list_column_headings
-
-      column_width =  @layout_strategy.column_width
-      col_identifier = @layout_strategy.col_identifier
-
       @template_builder.list_column_headings(
         columns: @layout_object[:columns][:container],
-        col_identifier: col_identifier,
+        col_identifier: @layout_strategy.col_identifier_column_headings,
         layout: @layout,
-        column_width: column_width
+        column_width: @layout_strategy.column_width
       )
     end
 
@@ -1039,15 +1035,13 @@ module HotGlue
     end
 
     def all_form_fields
-      col_identifier = (@layout == "hotglue") ? "scaffold-cell" : "col-md-#{@layout_object[:columns][:size_each]}"
-
       @template_builder.all_form_fields(
         columns: @layout_object[:columns][:container],
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
         hawk_keys: @hawk_keys,
-        col_identifier:  col_identifier,
+        col_identifier:  @layout_strategy.col_identifier_form_fields,
         ownership_field: @ownership_field,
         form_labels_position: @form_labels_position,
         form_placeholder_labels: @form_placeholder_labels
@@ -1083,7 +1077,6 @@ module HotGlue
         layout: @layout,
         col_identifier: col_identifier,
         inline_list_labels: @inline_list_labels
-
       )
     end
 
