@@ -23,10 +23,7 @@
             <% end %>
           <% end %>
 
-          <% button_column_style = @layout == "hotglue" ? 'style="flex-basis: 150px' : ""  %>
-
-          <div class=' scaffold-col-heading scaffold-col-heading-buttons<%= " col-md-#{ @layout_object[:buttons][:size] }" if @layout=="bootstrap" %>' <%= button_column_style %>>
-
+          <div class=' scaffold-col-heading scaffold-col-heading-buttons<%= " col-md-#{ @layout_object[:buttons][:size] }" if @layout=="bootstrap" %>' <%= @layout_strategy.button_column_style %>>
           </div>
         </div>
       <% end %>

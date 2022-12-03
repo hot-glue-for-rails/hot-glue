@@ -22,8 +22,9 @@
   <% end %>
 <% end %>
 
-<% button_style = @layout == "hotglue" ? 'style="flex-basis: ' +  (100 - (column_width * @columns.count)).floor.to_s +  '%;"' : "" %>
-<div class="<%= @col_identifier %> scaffold-line-buttons <%= " col-md-#{ @layout_object[:buttons][:size] }" if @layout == "bootstrap" %>" <%= button_style %>>
+<%= @layout_strategy.button_style %>
+<%# button_style = @layout == "hotglue" ? 'style="flex-basis: ' +  (100 - (column_width * @columns.count)).floor.to_s +  '%;"' : "" %>
+<div class="<%= @col_identifier %> scaffold-line-buttons <%= @layout_strategy.button_classes %>" <%= @layout_strategy.button_style %>>
   <%= magic_button_output %>
 
   <% if destroy_action %>

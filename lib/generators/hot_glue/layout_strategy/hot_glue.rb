@@ -66,4 +66,16 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
   def each_downnest_width
     @scaffold_builder.downnest_children.count == 1 ? 33 : (53/@scaffold_builder.downnest_children.count).floor
   end
+
+  def button_column_style
+    'style="flex-basis: 150px'
+  end
+
+  def button_classes
+    ""
+  end
+
+  def button_style
+    'style="flex-basis: ' +  (100 - (column_width * @scaffold_builder.columns.count)).floor.to_s +  '%;"'
+  end
 end
