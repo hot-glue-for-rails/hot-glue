@@ -23,7 +23,7 @@ module HotGlue
       end
 
       if @layout == 'boostrap'
-        puts "IMPORTANT: You have selected to install Hot Glue with Bootstrap layout (legacy). Be sure to always use ``--layout=bootstrap` when building your scaffold. No Hot Glue theme will be installed at this time.` "
+        puts "IMPORTANT: You have selected to install Hot Glue with Bootstrap layout.` "
       end
 
 
