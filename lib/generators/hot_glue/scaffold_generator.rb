@@ -1065,7 +1065,7 @@ module HotGlue
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
-        col_identifier: @layout_strategy.col_identifier_line_fields,
+        col_identifier: @layout_strategy.column_classes_for_line_fields,
         inline_list_labels: @inline_list_labels
       )
     end

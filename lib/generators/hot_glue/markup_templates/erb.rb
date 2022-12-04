@@ -205,7 +205,7 @@ module  HotGlue
       @singular_class = args[0][:singular_class]
       @singular = args[0][:singular]
       @perc_width = args[0][:perc_width]
-      @col_identifier =  @layout_strategy.col_identifier_line_fields
+      @col_identifier =  @layout_strategy.column_classes_for_line_fields
 
       @inline_list_labels = args[0][:inline_list_labels] || 'omit'
 

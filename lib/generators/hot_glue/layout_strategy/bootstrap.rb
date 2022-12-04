@@ -15,7 +15,7 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
     "col-sm-#{ builder.layout_object[:portals][downnest][:size] }"
   end
 
-  def col_identifier_line_fields
+  def column_classes_for_line_fields
     "col-sm-#{builder.layout_object[:columns][:size_each]}"
   end
 
@@ -32,10 +32,10 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   end
 
   def col_identifier_column_headings
-    col_identifier_line_fields
+    column_classes_for_line_fields
   end
 
   def button_classes
-    " " + col_identifier_line_fields
+    " " + column_classes_for_line_fields
   end
 end
