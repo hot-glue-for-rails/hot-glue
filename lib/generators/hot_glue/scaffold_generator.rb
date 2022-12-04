@@ -598,7 +598,7 @@ module HotGlue
     def list_column_headings
       @template_builder.list_column_headings(
         columns: @layout_object[:columns][:container],
-        col_identifier: @layout_strategy.col_identifier_column_headings,
+        col_identifier: @layout_strategy.column_classes_for_column_headings,
         column_width: @layout_strategy.column_width
       )
     end
