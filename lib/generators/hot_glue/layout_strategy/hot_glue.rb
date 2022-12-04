@@ -1,13 +1,8 @@
 
 class LayoutStrategy::HotGlue < LayoutStrategy::Base
 
-  def each_col
-    return col_width if @scaffold_builder.columns.count == 0
-    (col_width/(@scaffold_builder.columns.count)).to_i
-  end
-
   def column_width
-    each_col * @scaffold_builder.columns.count
+    each_col * builder.columns.count
   end
 
 
@@ -38,7 +33,7 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
   end
 
   def col_width
-    downnest_size = case (@scaffold_builder.downnest_children.count)
+    downnest_size = case (builder.downnest_children.count)
         when 0
           downnest_size = 0
         when 1
@@ -68,7 +63,7 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
   end
 
   def each_downnest_width
-    @scaffold_builder.downnest_children.count == 1 ? 33 : (53/@scaffold_builder.downnest_children.count).floor
+    builder.downnest_children.count == 1 ? 33 : (53/builder.downnest_children.count).floor
   end
 
   def button_column_style
@@ -77,6 +72,6 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
 
 
   def button_style
-    'style="flex-basis: ' +  (100 - (column_width * @scaffold_builder.columns.count)).floor.to_s +  '%;"'
+    'style="flex-basis: ' +  (100 - (column_width * builder.columns.count)).floor.to_s +  '%;"'
   end
 end
