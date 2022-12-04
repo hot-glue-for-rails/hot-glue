@@ -7,6 +7,7 @@ require_relative './markup_templates/erb'
 # require_relative './markup_templates/slim'
 
 require_relative './layout/builder'
+require_relative './layout_strategy/base'
 require_relative './layout_strategy/bootstrap'
 require_relative './layout_strategy/hot_glue'
 require_relative './layout_strategy/tailwind'
@@ -1061,9 +1062,8 @@ module HotGlue
     end
 
     def all_line_fields
-
       @template_builder.all_line_fields(
-        perc_width: @layout_strategy.each_col,
+        perc_width: @layout_strategy.each_col,     #undefined method `each_col'
         columns:  @layout_object[:columns][:container],
         show_only: @show_only,
         singular_class: singular_class,
