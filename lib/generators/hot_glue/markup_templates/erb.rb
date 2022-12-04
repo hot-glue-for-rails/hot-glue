@@ -47,16 +47,17 @@ module  HotGlue
       @columns = args[0][:columns]
       @show_only = args[0][:show_only]
       @singular_class = args[0][:singular_class]
-      @col_identifier = args[0][:col_identifier]
       @ownership_field  = args[0][:ownership_field]
       @form_labels_position = args[0][:form_labels_position]
       @form_placeholder_labels = args[0][:form_placeholder_labels]
       @hawk_keys = args[0][:hawk_keys]
-
       @singular = args[0][:singular]
+
+      column_classes = args[0][:col_identifier]
+
       singular = @singular
       result = columns.map{ |column|
-        "  <div class='#{col_identifier}' >" +
+        "  <div class='#{column_classes}' >" +
           column.map { |col|
             field_result =
               if show_only.include?(col.to_sym)
@@ -74,7 +75,7 @@ module  HotGlue
                 when :text
                   text_result(col, sql_type, limit)
                 when :float
-                  field_output(col, nil, 5, col_identifier)
+                  field_output(col, nil, 5, column_classes)
                 when :datetime
                   "<%= datetime_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
                 when :date

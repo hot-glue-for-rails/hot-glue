@@ -402,7 +402,7 @@ describe HotGlue::ScaffoldGenerator do
                                                 ["User","--gd", "--layout=bootstrap"])
 
             expect(
-               File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-md-1'>Email<\/div>/
+               File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-sm-1'>Email<\/div>/
             ).to be_a(Numeric)
 
             file = File.read("spec/dummy/app/views/users/_show.erb")
@@ -428,10 +428,10 @@ describe HotGlue::ScaffoldGenerator do
               file = File.read("spec/dummy/app/views/users/_show.erb")
 
               expect(
-                File.read("spec/dummy/app/views/users/_show.erb") =~ /<div class='col-md-2'><%= user.email %><\/div>/
+                File.read("spec/dummy/app/views/users/_show.erb") =~ /<div class='col-sm-2'><%= user.email %><\/div>/
               ).to be_a(Numeric)
               expect(
-                File.read("spec/dummy/app/views/users/_show.erb") =~ /<div class='col-md-2'><%= user.family.try(:email) || '<span class="content alert-danger">MISSING<\/span>'.html_safe %><\/div>/
+                File.read("spec/dummy/app/views/users/_show.erb") =~ /<div class='col-sm-2'><%= user.family.try(:email) || '<span class="content alert-danger">MISSING<\/span>'.html_safe %><\/div>/
               ).to be_a(Numeric)
 
 
@@ -446,7 +446,7 @@ describe HotGlue::ScaffoldGenerator do
                                                    "--smart-layout",
                                                    "--downnest=dfgs", "--layout=bootstrap"])
               expect(
-                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-md-2'>Email<\/div>/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-sm-2'>Email<\/div>/
               ).to be_a(Numeric)
               expect(
                 File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4 ">/
@@ -468,8 +468,9 @@ describe HotGlue::ScaffoldGenerator do
             end
 
             it "produces two columns for the fields" do
+
               expect(
-                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-md-2'>Email<br \/>Family<\/div>/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-sm-2'>Email<br \/>Family<\/div>/
               ).to be_a(Numeric)
             end
 
@@ -481,7 +482,7 @@ describe HotGlue::ScaffoldGenerator do
 
             it "produces two columns for the buttons" do
               expect(
-                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=' scaffold-col-heading scaffold-col-heading-buttons col-md-2' >/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=' scaffold-col-heading scaffold-col-heading-buttons col-sm-2' >/
               ).to be_a(Numeric)
             end
 
