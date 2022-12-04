@@ -15,6 +15,8 @@ module LayoutStrategy
       ""
     end
 
+
+
     def each_col
       return col_width if builder.columns.count == 0
       (col_width/(builder.columns.count)).to_i
