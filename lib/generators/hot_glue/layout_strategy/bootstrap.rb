@@ -31,7 +31,7 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
     '</div> </div>'
   end
 
-  def col_identifier_column_headings
+  def column_classes_for_column_headings
     column_classes_for_line_fields
   end
 
