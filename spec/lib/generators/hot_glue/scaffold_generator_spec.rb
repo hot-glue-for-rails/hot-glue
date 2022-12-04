@@ -307,7 +307,7 @@ describe HotGlue::ScaffoldGenerator do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Jkl","--god","--layout=tailwind"])
 
-    
+
 
     end
 
