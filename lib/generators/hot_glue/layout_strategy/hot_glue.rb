@@ -1,4 +1,12 @@
 class LayoutStrategy::HotGlue < LayoutStrategy::Base
+  def button_column_style
+    'style="flex-basis: 150px'
+  end
+
+  def button_style
+    'style="flex-basis: ' +  (100 - (column_width * builder.columns.count)).floor.to_s +  '%;"'
+  end
+
   def column_width
     each_col * builder.columns.count
   end
@@ -7,12 +15,20 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
     " style='flex-basis: #{column_width}%'"
   end
 
-  def style_with_flex_basis(perc_width)
-    " style='flex-basis: #{perc_width}%'"
-  end
-
   def container_name
     "scaffold-container"
+  end
+
+  def downnest_column_style
+    'style="flex-basis: ' + each_downnest_width.to_s +  '%;'
+  end
+
+  def downnest_style
+    'style="flex-basis: ' +  each_downnest_width.to_s + '%"'
+  end
+
+  def each_downnest_width
+    builder.downnest_children.count == 1 ? 33 : (53/builder.downnest_children.count).floor
   end
 
   def list_classes
@@ -60,23 +76,7 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
     '</div>'
   end
 
-  def downnest_column_style
-    'style="flex-basis: ' + each_downnest_width.to_s +  '%;'
-  end
-
-  def downnest_style
-    'style="flex-basis: ' +  each_downnest_width.to_s + '%"'
-  end
-
-  def each_downnest_width
-    builder.downnest_children.count == 1 ? 33 : (53/builder.downnest_children.count).floor
-  end
-
-  def button_column_style
-    'style="flex-basis: 150px'
-  end
-
-  def button_style
-    'style="flex-basis: ' +  (100 - (column_width * builder.columns.count)).floor.to_s +  '%;"'
+  def style_with_flex_basis(perc_width)
+    " style='flex-basis: #{perc_width}%'"
   end
 end
