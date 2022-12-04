@@ -6,7 +6,7 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   end
 
 
-  def col_identifier_form_fields
+  def column_classes_for_form_fields
     "col-md-#{builder.layout_object[:columns][:size_each]}"
   end
 

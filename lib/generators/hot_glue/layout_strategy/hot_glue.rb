@@ -20,7 +20,7 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
   end
 
 
-  def col_identifier_form_fields
+  def column_classes_for_form_fields
     "scaffold-cell"
   end
 
