@@ -24,7 +24,7 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
     "scaffold-cell"
   end
 
-  def col_identifier_line_fields
+  def column_classes_for_line_fields
     "scaffold-cell"
   end
 
