@@ -87,8 +87,6 @@ module HotGlue
       display_column = "display_name"
     elsif assoc_class.new.respond_to?("email")
       display_column = "email"
-    # else # SHOULD BE UNREACHABLE
-    #   raise("this should have been caught by the checker in the initializer")
     end
     display_column
   end
@@ -366,7 +364,6 @@ module HotGlue
             plural: arg.pluralize,
             optional: is_optional
           }
-
         }
         puts "NESTING: #{@nested_set}"
       end
@@ -603,8 +600,6 @@ module HotGlue
         column_width: @layout_strategy.column_width
       )
     end
-
-
 
     def columns_spec_with_sample_data
       @columns.map { |c|
@@ -1128,15 +1123,6 @@ module HotGlue
      @template_builder.paginate(plural: plural)
     end
 
-    # def delete_confirmation_syntax
-    #   if !@stimulus_syntax
-    #    "{confirm: 'Are you sure?'}"
-    #   else
-    #    "{controller: 'confirmable', 'confirm-message': \"Are you sure you want to delete \#{ #{@singular}.#{ display_class } } \", 'action': 'confirmation#confirm'}"
-    #   end
-    # end
-
-
     def controller_magic_button_update_actions
       @magic_buttons.collect{ |magic_button|
         "    if #{singular}_params[:#{magic_button}]
@@ -1167,7 +1153,6 @@ module HotGlue
         ""
       end
     end
-
 
     def n_plus_one_includes
       if @associations.any?
@@ -1212,6 +1197,3 @@ module HotGlue
     end
   end
 end
-
-
-
