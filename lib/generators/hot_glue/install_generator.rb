@@ -119,7 +119,7 @@ module HotGlue
 
 
       begin
-        if !File.exists?("config/hot_glue.yml")
+        if !File.exists?("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml")
           yaml = {layout: layout,
                   markup: @markup}.to_yaml
           File.write("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml", yaml)

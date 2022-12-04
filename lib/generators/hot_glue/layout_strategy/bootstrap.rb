@@ -6,7 +6,7 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   end
 
   def col_identifier_form_fields
-    "col-md-#{@scaffold_builder.layout_object[:columns][:size_each]}"
+    "col-md-#{builder.layout_object[:columns][:size_each]}"
   end
 
   def col_identifier_column_headings
@@ -14,13 +14,12 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   end
 
   def col_identifier_line_fields
-    "col-md-#{@scaffold_builder.layout_object[:columns][:size_each]}"
+    "col-md-#{builder.layout_object[:columns][:size_each]}"
   end
 
   def column_width
-    @scaffold_builder.layout_object[:columns][:size_each]
+    builder.layout_object[:columns][:size_each]
   end
-
 
   def row_begin
     '<div class="row"> <div class="col-md-12">'
@@ -31,6 +30,6 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   end
 
   def button_classes
-    " col-md-#{ @layout_object[:buttons][:size] }"
+    " col-md-#{ builder.layout_object[:buttons][:size] }"
   end
 end
