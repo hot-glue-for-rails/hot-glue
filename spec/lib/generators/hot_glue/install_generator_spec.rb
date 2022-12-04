@@ -10,16 +10,24 @@ describe HotGlue::InstallGenerator do
   end
 
   def teardown
+
+
     # $LOAD_PATH.delete(@path)
   end
 
 
-  describe "with bootstrap" do
-    it "should install correctly with bootstrap " do
-      # not sure how how I can invoke this
-      # # alternative: do rake here?
+  describe "css strategies" do
+    # it "with no layout " do
+    #   expect {Rails::Generators.invoke("hot_glue:install", ["Ghi", ""])}.to raise_exception(/You have selected to install Hot Glue without a theme/)
+    #   expect(nil).to be(nil)
+    # end
 
-      # generator = HotGlue::InstallGenerator.new("layout=bootstrap")
+    it "should install correctly with bootstrap " do
+      Rails::Generators.invoke("hot_glue:install", ["Ghi", "--layout=bootstrap"])
+      expect(nil).to be(nil)
+    end
+    it "should install correctly with tailwind " do
+      Rails::Generators.invoke("hot_glue:install", ["Ghi", "--layout=tailwind"])
     end
   end
 
