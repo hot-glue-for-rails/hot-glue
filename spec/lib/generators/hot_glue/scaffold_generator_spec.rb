@@ -458,25 +458,42 @@ describe HotGlue::ScaffoldGenerator do
           end
 
           describe "with 2 downnested portals" do
-            # it "builds 2 columns for fields, 4 for each of the the downnested portals, and 2 for the buttons" do
-            #   response = Rails::Generators.invoke("hot_glue:scaffold",
-            #                                       ["User","--gd",
-            #                                        "--smart-layout",
-            #                                        "--downnest=dfgs,xyzs",
-            #                                        "--layout=bootstrap"])
-            #   expect(
-            #     File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4" >/
-            #   ).to be_a(Numeric)
-            #
-            #
-            #   expect(
-            #     File.read("spec/dummy/app/views/users/_list.erb") =~ /Dfgs/
-            #   ).to be_a(Numeric)
-            #
-            #   expect(
-            #     File.read("spec/dummy/app/views/users/_list.erb") =~ /Xyzs/
-            #   ).to be_a(Numeric)
-            # end
+            before do
+              response = Rails::Generators.invoke("hot_glue:scaffold",
+                                                  ["User","--gd",
+                                                   "--smart-layout",
+                                                   "--downnest=dfgs,xyzs",
+                                                   "--layout=bootstrap"])
+
+            end
+
+            it "produces two columns for the fields" do
+              expect(
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-md-2'>Email<br \/>Family<\/div>/
+              ).to be_a(Numeric)
+            end
+
+            it "has 4 columns for the Dfgs downnnest" do
+              expect(
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4 ">/
+              ).to be_a(Numeric)
+            end
+            
+            it "produces two columns for the buttons" do
+              expect(
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=' scaffold-col-heading scaffold-col-heading-buttons col-md-2' >/
+              ).to be_a(Numeric)
+            end
+
+            it "produces label" do
+              expect(
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /Dfgs/
+              ).to be_a(Numeric)
+
+              expect(
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /Xyzs/
+              ).to be_a(Numeric)
+            end
           end
         end
       end
