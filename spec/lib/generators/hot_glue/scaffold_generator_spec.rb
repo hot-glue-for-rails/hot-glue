@@ -448,9 +448,8 @@ describe HotGlue::ScaffoldGenerator do
               expect(
                 File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-md-2'>Email<\/div>/
               ).to be_a(Numeric)
-
               expect(
-                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4" >/
+                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4 ">/
               ).to be_a(Numeric)
               expect(
                 File.read("spec/dummy/app/views/users/_list.erb") =~ /Dfgs/

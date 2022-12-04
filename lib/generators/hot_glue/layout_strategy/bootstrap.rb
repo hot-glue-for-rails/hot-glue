@@ -13,6 +13,9 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
     "col-md-#{column_width}"
   end
 
+  def downnest_portal_column_width(downnest)
+    "col-sm-#{ builder.layout_object[:portals][downnest][:size] }"
+  end
   def col_identifier_line_fields
     "col-md-#{builder.layout_object[:columns][:size_each]}"
   end

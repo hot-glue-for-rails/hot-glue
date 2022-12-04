@@ -15,7 +15,7 @@
           <% if @downnest_object.any? %>
             <%= @layout_strategy.downnest_column_style  %>
             <% @downnest_object.each do |downnest,i| %>
-              <div class=" scaffold-col-heading<%= " col-sm-#{ @layout_object[:portals][downnest][:size] }" if @layout=="bootstrap" %>" <%= downnest_column_style %>>
+              <div class=" scaffold-col-heading <%= @layout_strategy.downnest_portal_column_width(downnest) %> <%= @layout_strategy.downnest_column_style %>">
                 <strong>
                   <%=  downnest.titleize  %>
                 </strong>
