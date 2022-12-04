@@ -188,7 +188,9 @@ module HotGlue
       yaml_from_config = YAML.load(File.read("config/hot_glue.yml"))
       @markup =  yaml_from_config[:markup]
 
-      if !options['layout']
+      if options['layout']
+        layout = options['layout']
+      else
         layout = yaml_from_config[:layout]
 
         if !['hotglue', 'bootstrap', 'tailwind'].include? layout
