@@ -16,12 +16,7 @@ module  HotGlue
       text.lines.collect{|line| add_spaces + line}.join("")
     end
 
-    def magic_button_output(*args)
-      path = args[0][:path]
-      singular = args[0][:singular]
-      magic_buttons = args[0][:magic_buttons]
-      small_buttons = args[0][:small_buttons]
-
+    def magic_button_output(path:, singular:, magic_buttons:, small_buttons: )
       magic_buttons.collect{ |button_name|
         "<%= form_with model: #{singular}, url: #{path}, html: {style: 'display: inline', data: {\"turbo-confirm\": 'Are you sure you want to #{button_name} this #{singular}?'}} do |f| %>
       <%= f.hidden_field :#{button_name}, value: \"#{button_name}\" %>
