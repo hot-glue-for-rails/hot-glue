@@ -478,7 +478,7 @@ describe HotGlue::ScaffoldGenerator do
                 File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4 ">/
               ).to be_a(Numeric)
             end
-            
+
             it "produces two columns for the buttons" do
               expect(
                 File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=' scaffold-col-heading scaffold-col-heading-buttons col-md-2' >/
@@ -1030,12 +1030,27 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-  # describe "for when a base controller already exists" do
-  #   it "should skip adding the base controller" do
-  #     response = Rails::Generators.invoke("hot_glue:scaffold",
-  #                                         ["Abc","--gd", "---namespace=fruits"])
-  #     res = File.read("spec/dummy/app/controllers/fruits/base_controller.rb")
-  #     expect(res).to include("# check: I should not be overwrittern")
-  #   end
-  # end
+  describe "base controller" do
+    let(:bc_path) {"spec/dummy/app/controllers/fruits/base_controller.rb"}
+    before(:each) do
+      File.delete(bc_path) if File.exist?(bc_path)
+    end
+    after(:each) do
+      File.delete(bc_path) if File.exist?(bc_path)
+    end
+
+    it "should add a base controller if it doesn't already exist" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Abc","--gd", "--namespace=fruits"])
+
+      res = File.read("spec/dummy/app/controllers/fruits/base_controller.rb")
+      expect(res).to include("class Fruits::BaseController < ApplicationController")
+    end
+
+    it "should skiping adding a base controller if it already exists" do
+      File.open("spec/dummy/app/controllers/fruits/base_controller.rb", "w") {|file| file.puts "don't replace me"}
+      res = File.read("spec/dummy/app/controllers/fruits/base_controller.rb")
+      expect(res).to include("don't replace me")
+    end
+  end
 end
