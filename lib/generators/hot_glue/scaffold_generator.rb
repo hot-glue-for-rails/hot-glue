@@ -28,18 +28,14 @@ module HotGlue
     Hash[*res.collect{|hash| hash.collect{|key,value| [key,value].flatten}.flatten}.flatten]
   end
 
-  def self.optionalized_ternary(params)
-    namespace = params[:namespace] || nil
-    target = params[:target]
-    nested_set = params[:nested_set]
-    modifier = params[:modifier] || ""
-    with_params = params[:with_params] || false
-    top_level = params[:top_level] || false
-
+  def self.optionalized_ternary(namespace: nil,
+                                target:,
+                                nested_set:,
+                                modifier: "",
+                                with_params: false,
+                                top_level: false,
+                                put_form: false)
     instance_sym = top_level ? "@" : ""
-
-    put_form =  params[:put_form] || false
-
     if nested_set.nil? || nested_set.empty?
       return modifier + "#{(namespace + '_') if namespace}#{target}_path" + (("(#{instance_sym}#{target})" if put_form) || "")
     elsif nested_set[0][:optional] == false
@@ -57,17 +53,23 @@ module HotGlue
       nonoptional[:optional] = false
       rest_of_nest = nested_set[1..-1]
 
-      all_params = {namespace: namespace,
-                    target: target,
-                    modifier: modifier,
-                    top_level: top_level,
-                    with_params: with_params,
-                    put_form: put_form}
-      is_present_path = HotGlue.optionalized_ternary(all_params.merge({  nested_set: [nonoptional, *rest_of_nest]})       )
+      is_present_path = HotGlue.optionalized_ternary(
+        namespace: namespace,
+         target: target,
+         modifier: modifier,
+         top_level: top_level,
+         with_params: with_params,
+         put_form: put_form,
+         nested_set: [nonoptional, *rest_of_nest])
 
-      is_missing_path = HotGlue.optionalized_ternary(all_params.merge({  nested_set: rest_of_nest})       )
-
-
+      is_missing_path = HotGlue.optionalized_ternary(
+        namespace: namespace,
+        target: target,
+        modifier: modifier,
+        top_level: top_level,
+        with_params: with_params,
+        put_form: put_form,
+        nested_set: rest_of_nest  )
       return "defined?(#{instance_sym + nested_set[0][:singular]}) ? #{is_present_path} : #{is_missing_path}"
     end
   end
