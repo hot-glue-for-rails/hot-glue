@@ -24,7 +24,8 @@ describe HotGlue::InstallGenerator do
 
     it "should install correctly with bootstrap " do
       Rails::Generators.invoke("hot_glue:install", ["Ghi", "--layout=bootstrap"])
-      expect(nil).to be(nil)
+      res = File.read("spec/dummy/config/hot_glue.yml")
+
     end
     it "should install correctly with tailwind " do
       Rails::Generators.invoke("hot_glue:install", ["Ghi", "--layout=tailwind"])
