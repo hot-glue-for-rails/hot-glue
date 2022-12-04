@@ -1034,7 +1034,7 @@ module HotGlue
         singular_class: singular_class,
         singular: singular,
         hawk_keys: @hawk_keys,
-        col_identifier:  @layout_strategy.col_identifier_form_fields,
+        col_identifier:  @layout_strategy.column_classes_for_form_fields,
         ownership_field: @ownership_field,
         form_labels_position: @form_labels_position,
         form_placeholder_labels: @form_placeholder_labels
