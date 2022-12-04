@@ -8,15 +8,18 @@ module HotGlue
                   :buttons_width, :columns,
                   :smart_layout, :specified_grouping_mode
 
-      def initialize(params)
-        @include_setting = params[:include_setting]
-        @downnest_object = params[:downnest_object]
-
-        @buttons_width = params[:buttons_width]
+      def initialize(include_setting: nil,
+                     downnest_object: nil,
+                     buttons_width: nil,
+                     smart_layout: nil,
+                     columns: nil)
+        @include_setting = include_setting
+        @downnest_object = downnest_object
+        @buttons_width = buttons_width
+        @columns = columns
+        @smart_layout = smart_layout
 
         @no_buttons = @buttons_width == 0
-        @columns = params[:columns]
-        @smart_layout = params[:smart_layout]
         @specified_grouping_mode = include_setting.include?(":")
       end
 

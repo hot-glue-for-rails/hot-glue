@@ -416,13 +416,11 @@ module HotGlue
 
       buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
-      builder = HotGlue::Layout::Builder.new({
-                                              include_setting: options['include'],
+      builder = HotGlue::Layout::Builder.new(include_setting: options['include'],
                                               downnest_object: @downnest_object,
                                               buttons_width: buttons_width,
                                               columns: @columns,
-                                              smart_layout: @smart_layout
-                                            })
+                                              smart_layout: @smart_layout )
       @layout_object = builder.construct
 
       @menu_file_exists = true if @nested_set.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
