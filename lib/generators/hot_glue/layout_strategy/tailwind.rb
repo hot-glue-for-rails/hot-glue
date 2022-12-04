@@ -1,6 +1,6 @@
 
 
-class LayoutStrategy::HotGlue < LayoutStrategy::Base
+class LayoutStrategy::Tailwind < LayoutStrategy::Base
 
 
 end

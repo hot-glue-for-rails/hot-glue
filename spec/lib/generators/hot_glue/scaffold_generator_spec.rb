@@ -299,17 +299,17 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-  describe "--plural" do
-
-  end
-
-  describe "bootstrap" do
-    # TODO: TEST BOOTSTRAP
-
-  end
-
   describe "tailwind" do
-    # TODO: TEST TAILWIND
+    before(:each) do
+
+    end
+    it "should generate" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Jkl","--god","--layout=tailwind"])
+
+    
+
+    end
 
   end
 
@@ -918,7 +918,7 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-  describe "for --plural that doesn't end with an s (?should the be supported?)" do
+  describe "for --plural that doesn't end with an S" do
     it "should tell me no no " do
       expect { Rails::Generators.invoke("hot_glue:scaffold",
                                         ["Ghi", "--plural=thing"])

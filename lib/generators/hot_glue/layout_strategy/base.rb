@@ -15,7 +15,31 @@ module LayoutStrategy
       ""
     end
 
+    def column_width
 
+    end
+
+    def column_classes_for_line_fields
+      ""
+    end
+
+    def column_classes_for_form_fields
+      ""
+    end
+    def column_classes_for_column_headings
+      ""
+    end
+
+    def container_name
+      ""
+    end
+
+    def row_begin
+      '<div> '
+    end
+    def row_end
+      '</div> '
+    end
 
     def each_col
       return col_width if builder.columns.count == 0

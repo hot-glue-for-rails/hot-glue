@@ -373,7 +373,6 @@ module HotGlue
       # OBJECT OWNERSHIP & NESTING
       @reference_name = HotGlue.derrive_reference_name(singular_class)
       if @auth && @self_auth
-        # byebug
         @object_owner_sym = @auth.gsub("current_", "").to_sym
         @object_owner_eval = @auth
         @object_owner_optional = false
@@ -381,18 +380,15 @@ module HotGlue
 
 
       elsif @auth && ! @self_auth && @nested_set.none? && !@auth.include?(".")
-        # byebug
         @object_owner_sym = @auth.gsub("current_", "").to_sym
         @object_owner_eval = @auth
         @object_owner_optional = false
         @object_owner_name = @auth.gsub("current_", "").to_s
 
       elsif @auth && @auth.include?(".")
-        # byebug
         @object_owner_sym = nil
         @object_owner_eval = @auth
       else
-        # byebug
         if @nested_set.any?
           @object_owner_sym = @nested_set.last[:singular].to_sym
           @object_owner_eval = "@#{@nested_set.last[:singular]}"
@@ -457,7 +453,6 @@ module HotGlue
       if @object_owner_sym && ! @self_auth
         auth_assoc_field = auth_assoc + "_id" unless @god
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
-        # byebug
         if assoc
           @ownership_field = assoc.name.to_s + "_id"
         elsif ! @nested_set.any?
