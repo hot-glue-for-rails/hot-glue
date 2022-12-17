@@ -24,8 +24,8 @@ module LayoutStrategy
     def list_classes; ""; end
     def row_classes; ""; end
     def row_heading_classes; ""; end
-    def row_begin; '<div> '; end
-    def row_end ; '</div> '; end
+    def page_begin; '<div> '; end
+    def page_end ; '</div> '; end
     def style_with_flex_basis(x); "" ; end
   end
 end

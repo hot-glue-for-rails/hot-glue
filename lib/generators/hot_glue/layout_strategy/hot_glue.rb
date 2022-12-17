@@ -68,11 +68,11 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
     100 - downnest_size - 5
   end
 
-  def row_begin
+  def page_begin
     '<div class=" scaffold-index-<%= plural %>">'
   end
 
-  def row_end
+  def page_end
     '</div>'
   end
 
