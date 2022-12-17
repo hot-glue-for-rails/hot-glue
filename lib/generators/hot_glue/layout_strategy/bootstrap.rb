@@ -27,7 +27,7 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
     "col-sm-#{ builder.layout_object[:portals][downnest][:size] }"
   end
 
-  def row_begin
+  def page_begin
     '<div class="row"> <div class="col-md-12">'
   end
 
@@ -35,7 +35,7 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
     "row"
   end
 
-  def row_end
+  def page_end
     '</div> </div>'
   end
 end
