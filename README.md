@@ -138,7 +138,7 @@ sed -i '' -e 's/, html: { method: :post })/, html: { method: :post, "data-turbo"
 git add . && git commit -m 'devise view fixes' &&
 rails generate model User name:string &&
 rails generate devise User && git add . && git commit -m "adds Users model with devise" && 
-rails db:migrate &&
+&& ./bin/setup && rails db:migrate &&
 git add . && git commit -m "schema file"
 ```
 
