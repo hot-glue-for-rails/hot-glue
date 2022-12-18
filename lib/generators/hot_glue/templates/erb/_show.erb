@@ -9,7 +9,7 @@
     <% if downnest_object.nil?; raise "no relationship for downnested portal `#{downnest}` found on `#{singular_class}`; please check relationship for has_many :#{downnest}"; end; %>
     <% downnest_class = downnest_object.class_name %>
     <% downnest_object_name = eval("#{downnest_class}.table_name") %>
-    <% downnest_style =  @layout == "hotglue" ? 'style="flex-basis: ' +  each_downnest_width.to_s + '%"' : "" %>
+    <% downnest_style = @layout_strategy.downnest_style %>
     <div class="<%= " col-md-#{@layout_object[:portals][downnest][:size]}" if @layout == "bootstrap" %> scaffold-downnest" <%= downnest_style  %> >
   <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest_object_name %>/list", locals: {
         <%= @singular %>: <%= @singular %>,
@@ -22,8 +22,8 @@
   <% end %>
 <% end %>
 
-<% button_style = @layout == "hotglue" ? 'style="flex-basis: ' +  (100 - (column_width * @columns.count)).floor.to_s +  '%;"' : "" %>
-<div class="<%= @col_identifier %> scaffold-line-buttons <%= " col-md-#{ @layout_object[:buttons][:size] }" if @layout == "bootstrap" %>" <%= button_style %>>
+<%= @layout_strategy.button_style %>
+<div class="<%= @col_identifier %> scaffold-line-buttons <%= @layout_strategy.button_classes %>" <%= @layout_strategy.button_style %>>
   <%= magic_button_output %>
 
   <% if destroy_action %>

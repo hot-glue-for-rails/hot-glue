@@ -7,10 +7,17 @@ require_relative './markup_templates/erb'
 # require_relative './markup_templates/slim'
 
 require_relative './layout/builder'
+require_relative './layout_strategy/base'
+require_relative './layout_strategy/bootstrap'
+require_relative './layout_strategy/hot_glue'
+require_relative './layout_strategy/tailwind'
+
 
 module HotGlue
   class Error < StandardError
   end
+
+
 
   def self.construct_downnest_object(input)
     res = input.split(",").map { |child|
@@ -21,18 +28,14 @@ module HotGlue
     Hash[*res.collect{|hash| hash.collect{|key,value| [key,value].flatten}.flatten}.flatten]
   end
 
-  def self.optionalized_ternary(params)
-    namespace = params[:namespace] || nil
-    target = params[:target]
-    nested_set = params[:nested_set]
-    modifier = params[:modifier] || ""
-    with_params = params[:with_params] || false
-    top_level = params[:top_level] || false
-
+  def self.optionalized_ternary(namespace: nil,
+                                target:,
+                                nested_set:,
+                                modifier: "",
+                                with_params: false,
+                                top_level: false,
+                                put_form: false)
     instance_sym = top_level ? "@" : ""
-
-    put_form =  params[:put_form] || false
-
     if nested_set.nil? || nested_set.empty?
       return modifier + "#{(namespace + '_') if namespace}#{target}_path" + (("(#{instance_sym}#{target})" if put_form) || "")
     elsif nested_set[0][:optional] == false
@@ -50,17 +53,23 @@ module HotGlue
       nonoptional[:optional] = false
       rest_of_nest = nested_set[1..-1]
 
-      all_params = {namespace: namespace,
-                    target: target,
-                    modifier: modifier,
-                    top_level: top_level,
-                    with_params: with_params,
-                    put_form: put_form}
-      is_present_path = HotGlue.optionalized_ternary(all_params.merge({  nested_set: [nonoptional, *rest_of_nest]})       )
+      is_present_path = HotGlue.optionalized_ternary(
+        namespace: namespace,
+         target: target,
+         modifier: modifier,
+         top_level: top_level,
+         with_params: with_params,
+         put_form: put_form,
+         nested_set: [nonoptional, *rest_of_nest])
 
-      is_missing_path = HotGlue.optionalized_ternary(all_params.merge({  nested_set: rest_of_nest})       )
-
-
+      is_missing_path = HotGlue.optionalized_ternary(
+        namespace: namespace,
+        target: target,
+        modifier: modifier,
+        top_level: top_level,
+        with_params: with_params,
+        put_form: put_form,
+        nested_set: rest_of_nest  )
       return "defined?(#{instance_sym + nested_set[0][:singular]}) ? #{is_present_path} : #{is_missing_path}"
     end
   end
@@ -78,8 +87,6 @@ module HotGlue
       display_column = "display_name"
     elsif assoc_class.new.respond_to?("email")
       display_column = "email"
-    # else # SHOULD BE UNREACHABLE
-    #   raise("this should have been caught by the checker in the initializer")
     end
     display_column
   end
@@ -89,6 +96,7 @@ module HotGlue
 
     source_root File.expand_path('templates', __dir__)
     attr_accessor :path, :singular, :plural, :singular_class, :nest_with
+    attr_accessor :columns, :downnest_children, :layout_object
 
     class_option :singular, type: :string, default: nil
     class_option :plural, type: :string, default: nil
@@ -180,31 +188,37 @@ module HotGlue
       yaml_from_config = YAML.load(File.read("config/hot_glue.yml"))
       @markup =  yaml_from_config[:markup]
 
+      if options['layout']
+        layout = options['layout']
+      else
+        layout = yaml_from_config[:layout]
+
+        if !['hotglue', 'bootstrap', 'tailwind'].include? layout
+          raise "Invalid option #{layout} in Hot glue config (config/hot_glue.yml). You must either use --layout= when generating or have a file config/hotglue.yml; specify layout as either 'hotglue' or 'bootstrap'"
+        end
+      end
+
+      @layout_strategy =
+        case layout
+        when 'bootstrap'
+          LayoutStrategy::Bootstrap.new(self)
+        when 'tailwind'
+          LayoutStrategy::Tailwind.new(self)
+        when 'hotglue'
+          LayoutStrategy::HotGlue.new(self)
+        end
+
+
       if  @markup == "erb"
-        @template_builder = HotGlue::ErbTemplate.new
+        @template_builder = HotGlue::ErbTemplate.new(layout_strategy: @layout_strategy)
       elsif  @markup == "slim"
         raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
       elsif  @markup == "haml"
         raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
-
-      end
-
-
-      if !options['layout']
-        @layout = yaml_from_config[:layout]
-
-        if !['hotglue', 'bootstrap'].include? @layout
-          raise "Invalid option #{@layout} in Hot glue config (config/hot_glue.yml). You must either use --layout= when generating or have a file config/hotglue.yml; specify layout as either 'hotglue' or 'bootstrap'"
-        end
-      else
-        @layout = options['layout']
       end
 
       args = meta_args[0]
-
-
       @singular = args.first.tableize.singularize # should be in form hello_world
-
 
       if @singular.include?("/")
         @singular = @singular.split("/").last
@@ -292,8 +306,7 @@ module HotGlue
         raise HotGlue::Error, "You specified both --smart-layout and also specified grouping mode (there is a : character in your field include list); you must remove the colon(s) from your --include tag or remove the --smart-layout option"
       end
 
-
-      @container_name = @layout == "hotglue" ? "scaffold-container" : "container-fluid"
+      @container_name = @layout_strategy.container_name
       @downnest = options['downnest'] || false
 
       @downnest_children = [] # TODO: defactor @downnest_children in favor of downnest_object
@@ -353,7 +366,6 @@ module HotGlue
             plural: arg.pluralize,
             optional: is_optional
           }
-
         }
         puts "NESTING: #{@nested_set}"
       end
@@ -361,7 +373,6 @@ module HotGlue
       # OBJECT OWNERSHIP & NESTING
       @reference_name = HotGlue.derrive_reference_name(singular_class)
       if @auth && @self_auth
-        # byebug
         @object_owner_sym = @auth.gsub("current_", "").to_sym
         @object_owner_eval = @auth
         @object_owner_optional = false
@@ -369,18 +380,15 @@ module HotGlue
 
 
       elsif @auth && ! @self_auth && @nested_set.none? && !@auth.include?(".")
-        # byebug
         @object_owner_sym = @auth.gsub("current_", "").to_sym
         @object_owner_eval = @auth
         @object_owner_optional = false
         @object_owner_name = @auth.gsub("current_", "").to_s
 
       elsif @auth && @auth.include?(".")
-        # byebug
         @object_owner_sym = nil
         @object_owner_eval = @auth
       else
-        # byebug
         if @nested_set.any?
           @object_owner_sym = @nested_set.last[:singular].to_sym
           @object_owner_eval = "@#{@nested_set.last[:singular]}"
@@ -405,13 +413,11 @@ module HotGlue
 
       buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
-      builder = HotGlue::Layout::Builder.new({
-                                              include_setting: options['include'],
+      builder = HotGlue::Layout::Builder.new(include_setting: options['include'],
                                               downnest_object: @downnest_object,
                                               buttons_width: buttons_width,
                                               columns: @columns,
-                                              smart_layout: @smart_layout
-                                            })
+                                              smart_layout: @smart_layout )
       @layout_object = builder.construct
 
       @menu_file_exists = true if @nested_set.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
@@ -447,7 +453,6 @@ module HotGlue
       if @object_owner_sym && ! @self_auth
         auth_assoc_field = auth_assoc + "_id" unless @god
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
-        # byebug
         if assoc
           @ownership_field = assoc.name.to_s + "_id"
         elsif ! @nested_set.any?
@@ -586,19 +591,10 @@ module HotGlue
     end
 
     def list_column_headings
-      if @layout == "bootstrap"
-        column_width = @layout_object[:columns][:size_each]
-        col_identifier = "col-md-#{column_width}"
-      elsif @layout == "hotglue"
-        column_width = each_col * @columns.count
-        col_identifier = "scaffold-cell"
-      end
-
       @template_builder.list_column_headings(
         columns: @layout_object[:columns][:container],
-        col_identifier: col_identifier,
-        layout: @layout,
-        column_width: column_width
+        col_identifier: @layout_strategy.column_classes_for_column_headings,
+        column_width: @layout_strategy.column_width
       )
     end
 
@@ -1027,24 +1023,19 @@ module HotGlue
     end
 
     def all_form_fields
-      col_identifier = (@layout == "hotglue") ? "scaffold-cell" : "col-md-#{@layout_object[:columns][:size_each]}"
-
       @template_builder.all_form_fields(
         columns: @layout_object[:columns][:container],
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
         hawk_keys: @hawk_keys,
-        col_identifier:  col_identifier,
+        col_identifier:  @layout_strategy.column_classes_for_form_fields,
         ownership_field: @ownership_field,
         form_labels_position: @form_labels_position,
         form_placeholder_labels: @form_placeholder_labels
       )
     end
 
-    def column_width
-      @each_col ||= each_col
-    end
 
     def list_label
       if(eval("#{class_name}.class_variable_defined?(:@@table_label_plural)"))
@@ -1062,39 +1053,15 @@ module HotGlue
       end
     end
 
-    def each_col
-      return col_width if @columns.count == 0
-      (col_width/(@columns.count)).to_i
-    end
-
-    def col_width
-      downnest_size = case (@downnest_children.count)
-
-                      when 0
-                        downnest_size = 0
-                      when 1
-                        downnest_size = 40
-
-                      else
-                        downnest_size = 60
-
-                      end
-      100 - downnest_size - 5
-    end
-
     def all_line_fields
-      col_identifier = (@layout == "hotglue") ? "scaffold-cell" : "col-md-#{@layout_object[:columns][:size_each]}"
-
       @template_builder.all_line_fields(
-        perc_width: column_width,
+        perc_width: @layout_strategy.each_col,     #undefined method `each_col'
         columns:  @layout_object[:columns][:container],
         show_only: @show_only,
         singular_class: singular_class,
         singular: singular,
-        layout: @layout,
-        col_identifier: col_identifier,
+        col_identifier: @layout_strategy.column_classes_for_line_fields,
         inline_list_labels: @inline_list_labels
-
       )
     end
 
@@ -1153,15 +1120,6 @@ module HotGlue
      @template_builder.paginate(plural: plural)
     end
 
-    # def delete_confirmation_syntax
-    #   if !@stimulus_syntax
-    #    "{confirm: 'Are you sure?'}"
-    #   else
-    #    "{controller: 'confirmable', 'confirm-message': \"Are you sure you want to delete \#{ #{@singular}.#{ display_class } } \", 'action': 'confirmation#confirm'}"
-    #   end
-    # end
-
-
     def controller_magic_button_update_actions
       @magic_buttons.collect{ |magic_button|
         "    if #{singular}_params[:#{magic_button}]
@@ -1192,7 +1150,6 @@ module HotGlue
         ""
       end
     end
-
 
     def n_plus_one_includes
       if @associations.any?
@@ -1237,6 +1194,3 @@ module HotGlue
     end
   end
 end
-
-
-

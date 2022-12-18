@@ -3,7 +3,7 @@ module  HotGlue
 
     attr_accessor :path, :singular, :singular_class,
                   :magic_buttons, :small_buttons,
-                  :show_only, :column_width, :layout, :perc_width,
+                  :show_only, :column_width, :layout_strategy, :perc_width,
                   :ownership_field, :form_labels_position,
                   :inline_list_labels,
                   :columns, :column_width, :col_identifier, :singular,
@@ -16,14 +16,7 @@ module  HotGlue
       text.lines.collect{|line| add_spaces + line}.join("")
     end
 
-    def magic_button_output(*args)
-      path = args[0][:path]
-      # path_helper_singular = args[0][:path_helper_singular]
-      # path_helper_args = args[0][:path_helper_args]
-      singular = args[0][:singular]
-      magic_buttons = args[0][:magic_buttons]
-      small_buttons = args[0][:small_buttons]
-
+    def magic_button_output(path:, singular:, magic_buttons:, small_buttons: )
       magic_buttons.collect{ |button_name|
         "<%= form_with model: #{singular}, url: #{path}, html: {style: 'display: inline', data: {\"turbo-confirm\": 'Are you sure you want to #{button_name} this #{singular}?'}} do |f| %>
       <%= f.hidden_field :#{button_name}, value: \"#{button_name}\" %>
@@ -36,13 +29,8 @@ module  HotGlue
       @columns = args[0][:columns]
       @column_width = args[0][:column_width]
       @col_identifier = args[0][:col_identifier]
-      @layout = args[0][:layout]
 
-      if layout == "hotglue"
-        col_style = " style='flex-basis: #{column_width}%'"
-      else
-        col_style = ""
-      end
+      col_style = @layout_strategy.column_headings_col_style
 
       result = columns.map{ |column|
         "<div class='#{col_identifier}'" + col_style + ">" +  column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
@@ -59,16 +47,17 @@ module  HotGlue
       @columns = args[0][:columns]
       @show_only = args[0][:show_only]
       @singular_class = args[0][:singular_class]
-      @col_identifier = args[0][:col_identifier]
       @ownership_field  = args[0][:ownership_field]
       @form_labels_position = args[0][:form_labels_position]
       @form_placeholder_labels = args[0][:form_placeholder_labels]
       @hawk_keys = args[0][:hawk_keys]
-
       @singular = args[0][:singular]
+
+      column_classes = args[0][:col_identifier]
+
       singular = @singular
       result = columns.map{ |column|
-        "  <div class='#{col_identifier}' >" +
+        "  <div class='#{column_classes}' >" +
           column.map { |col|
             field_result =
               if show_only.include?(col.to_sym)
@@ -86,7 +75,7 @@ module  HotGlue
                 when :text
                   text_result(col, sql_type, limit)
                 when :float
-                  field_output(col, nil, 5, col_identifier)
+                  field_output(col, nil, 5, column_classes)
                 when :datetime
                   "<%= datetime_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
                 when :date
@@ -216,18 +205,14 @@ module  HotGlue
       @singular_class = args[0][:singular_class]
       @singular = args[0][:singular]
       @perc_width = args[0][:perc_width]
-      @layout = args[0][:layout]
-      @col_identifier =   args[0][:col_identifier]  || (layout == "bootstrap" ? "col-md-2" :  "scaffold-cell")
+      @col_identifier =  @layout_strategy.column_classes_for_line_fields
+
       @inline_list_labels = args[0][:inline_list_labels] || 'omit'
 
       columns_count = columns.count + 1
       perc_width = (@perc_width).floor
 
-      if layout == "bootstrap"
-        style_with_flex_basis = ""
-      else
-        style_with_flex_basis = " style='flex-basis: #{perc_width}%'"
-      end
+      style_with_flex_basis = @layout_strategy.style_with_flex_basis(perc_width)
 
       result = columns.map{ |column|
         "<div class='#{col_identifier}'#{style_with_flex_basis}>" +

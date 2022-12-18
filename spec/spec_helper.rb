@@ -1,8 +1,6 @@
 ENV["RAILS_ENV"] ||= "test"
 # require 'byebug'
 
-
-
 require 'simplecov'
 require 'simplecov-rcov'
 class SimpleCov::Formatter::MergedFormatter
@@ -16,14 +14,11 @@ SimpleCov.start 'rails' do
   add_filter "/vendor/"
   add_filter "/test/"
   add_filter "/dummy/"
+  add_filter "lib/generators/hot_glue/templates/capybara_login.rb"
 end
 
-# require rails first
 require "rails/all"
-
-
 require 'rails/generators'
-
 require './lib/hot-glue.rb'
 
 # require the gem's core code
@@ -31,11 +26,8 @@ Dir["./lib/**/*.rb"].each do |x|
   require(x)
 end
 
-
 require_relative "../dummy/config/application.rb"
-
 require "rspec/rails"
-
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 Dummy::Application.initialize!
@@ -54,24 +46,9 @@ RSpec.configure do |config|
   end
 
   config.before {
-    # note that because the object persist in memory accross test runs
-    # (unlike database transactions), it must be reset for each
-    # test run in order for the tests that disable any given feature
-    # not to affect the tests after them
-    # any testing for disabled should be done in-test, after this hook has run
-    #
-
     restore_default_warning_free_config
   }
-
-  # require 'rails-controller-testing'
-  # config.include Rails::Controller::Testing::TestProcess
-  # config.include Rails::Controller::Testing::TemplateAssertions
-  # config.include Rails::Controller::Testing::Integration
 end
-
-
-
 
 def restore_default_warning_free_config
 

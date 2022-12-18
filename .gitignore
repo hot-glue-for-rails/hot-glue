@@ -23,6 +23,8 @@ dummy/specs/
 dummy/node_modules/
 dummy/log/
 dummy/Gemfile.lock
+dummy/config/hot_glue.yml
+
 
 coverage/
 

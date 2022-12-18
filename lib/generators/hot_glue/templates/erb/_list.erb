@@ -1,5 +1,5 @@
 <\%= turbo_frame_tag "<%= @namespace %>__<%= plural %>-list" <%= nested_for_turbo_id_list_constructor %>  do %>
-  <div class="<%= @container_name %> scaffold-list">
+  <div class="<%= @container_name %> <%= @layout_strategy.list_classes %>">
     <% unless @no_list  || @no_list_label || (@nested_set.any? && !@nested_set.collect{|x| x[:optional]}.any?)  %>
       <% unless list_label.nil? %><h4>
         <%= list_label %>
@@ -10,14 +10,12 @@
 
     <% unless @no_list %>
       <% unless @no_list_heading %>
-        <div class="row scaffold-heading-row">
+        <div class="<%= @layout_strategy.row_classes %> <%= @layout_strategy.row_heading_classes %>">
           <%= list_column_headings %>
           <% if @downnest_object.any? %>
-            <%# each_downnest_width = @downnest_object.count == 1 ? 40 : (60/@downnest_object.count).floor %>
-            <% downnest_column_style = @layout == "hotglue" ? 'style="flex-basis: ' + each_downnest_width.to_s +  '%;' : "" %>
-
+            <%= @layout_strategy.downnest_column_style  %>
             <% @downnest_object.each do |downnest,i| %>
-              <div class=" scaffold-col-heading<%= " col-sm-#{ @layout_object[:portals][downnest][:size] }" if @layout=="bootstrap" %>" <%= downnest_column_style %>>
+              <div class=" scaffold-col-heading <%= @layout_strategy.downnest_portal_column_width(downnest) %> <%= @layout_strategy.downnest_column_style %>">
                 <strong>
                   <%=  downnest.titleize  %>
                 </strong>
@@ -25,10 +23,7 @@
             <% end %>
           <% end %>
 
-          <% button_column_style = @layout == "hotglue" ? 'style="flex-basis: 150px' : ""  %>
-
-          <div class=' scaffold-col-heading scaffold-col-heading-buttons<%= " col-md-#{ @layout_object[:buttons][:size] }" if @layout=="bootstrap" %>' <%= button_column_style %>>
-
+          <div class=' scaffold-col-heading scaffold-col-heading-buttons <%= @layout_strategy.column_classes_for_column_headings %>' <%= @layout_strategy.button_column_style %>>
           </div>
         </div>
       <% end %>

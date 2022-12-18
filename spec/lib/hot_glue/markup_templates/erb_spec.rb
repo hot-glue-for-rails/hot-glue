@@ -17,7 +17,7 @@ describe HotGlue::ErbTemplate do
 
 
   before(:each) do
-    @template_builder = HotGlue::ErbTemplate.new
+    @template_builder = HotGlue::ErbTemplate.new(layout_strategy: LayoutStrategy::HotGlue.new(OpenStruct.new({})))
   end
 
   def factory_all_form_fields(options)

@@ -1,5 +1,5 @@
 require 'rails/generators/erb/scaffold/scaffold_generator'
-require_relative './helpers'
+
 require 'ffaker'
 
 module HotGlue
@@ -15,15 +15,15 @@ module HotGlue
 
     def initialize(*args) #:nodoc:
       super
-      @layout = options['layout'] || "hotglue"
+      layout = options['layout'] || "hotglue"
       @theme =  options['theme']
-      if @layout == "hotglue" && options['theme'].nil?
+      if layout == "hotglue" && options['theme'].nil?
         puts "You have selected to install Hot Glue without a theme. You can either use the --layout=bootstrap to install NO HOT GLUE THEME, or to use a Hot Glue theme please choose: like_boostrap, like_menlo_park, like_cupertino, like_mountain_view, dark_knight"
         return
       end
 
-      if @layout == 'boostrap'
-        puts "IMPORTANT: You have selected to install Hot Glue with Bootstrap layout (legacy). Be sure to always use ``--layout=bootstrap` when building your scaffold. No Hot Glue theme will be installed at this time.` "
+      if layout == 'boostrap'
+        puts "IMPORTANT: You have selected to install Hot Glue with Bootstrap layout.` "
       end
 
 
@@ -56,7 +56,7 @@ module HotGlue
 
 
       begin
-        rails_helper_contents = File.read("spec/rails_helper.rb")
+        rails_helper_contents = File.read("#{'spec/dummy/' if Rails.env.test?}spec/rails_helper.rb")
         if !rails_helper_contents.include?("Capybara.default_driver =")
           rails_helper_contents << "\nCapybara.default_driver = :selenium_chrome_headless "
           puts "  HOTGLUE --> added to spec/rails_helper.rb: `Capybara.default_driver = :selenium_chrome_headless`  "
@@ -66,14 +66,14 @@ module HotGlue
           rails_helper_contents.gsub!("RSpec.configure do |config|", "RSpec.configure do |config| \n
     config.include FactoryBot::Syntax::Methods
   ")
-          puts "  HOTGLUE --> added to spec/rails_helper.rb: `config.include FactoryBot::Syntax::Methods`  "
+          puts "  HOTGLUE --> added to #{'spec/dummy/' if Rails.env.test?}spec/rails_helper.rb: `config.include FactoryBot::Syntax::Methods`  "
         end
 
         if ! rails_helper_contents.include?("require 'support/capybara_login.rb'")
           rails_helper_contents.gsub!("require 'rspec/rails'","require 'rspec/rails' \nrequire 'support/capybara_login.rb'")
           puts "  HOTGLUE --> added to spec/rails_helper.rb: `require 'support/capybara_login.rb'`  "
         end
-        File.write("spec/rails_helper.rb", rails_helper_contents)
+        File.write("#{'spec/dummy/' if Rails.env.test?}spec/rails_helper.rb", rails_helper_contents)
 
       rescue StandardError => e
         puts "WARNING: error writing to spec/rails_helper --- #{e.message}"
@@ -96,7 +96,7 @@ module HotGlue
 
 
       begin
-        if @layout == "hotglue"
+        if layout == "hotglue"
           theme_location = "themes/hotglue_scaffold_#{@theme}.scss"
           theme_file = "hotglue_scaffold_#{@theme}.scss"
 
@@ -119,8 +119,8 @@ module HotGlue
 
 
       begin
-        if !File.exists?("config/hot_glue.yml")
-          yaml = {layout: @layout,
+        if !File.exists?("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml")
+          yaml = {layout: layout,
                   markup: @markup}.to_yaml
           File.write("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml", yaml)
 
@@ -131,11 +131,11 @@ module HotGlue
 
 
       begin
-        if !File.exists?("spec/support/capybara_login.rb")
+        if !File.exists?("#{'spec/dummy/' if Rails.env.test?}spec/support/capybara_login.rb")
           copy_file "capybara_login.rb", "#{'spec/dummy/' if Rails.env.test?}spec/support/capybara_login.rb"
         end
       rescue StandardError => e
-        puts "WARNING: error writing to spec/support/capybara_login.rb --- #{e.message}"
+        puts "WARNING: error writing to #{Rails.env.test? ? 'spec/dummmy/' : ''}spec/support/capybara_login.rb --- #{e.message}"
       end
     end
   end

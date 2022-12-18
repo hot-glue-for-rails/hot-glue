@@ -1,14 +1,10 @@
 <% if @menu_file_exists %><\%= render partial: "<%= namespace_with_trailing_dash %>menu", locals: {active: '<%= plural %>'} %><% end %>
 
 <div class="<%= @container_name %>">
-  <% if @layout == "bootstrap" %><div class="row"> <div class="col-md-12">
-  <% else %>
-    <div class=' scaffold-index-<%= plural %>'>
-  <% end %>
+  <%= @layout_strategy.page_begin %>
 
-  <div class="clearfix"></div>
   <\%= render partial: '<%= list_path_partial %>',
     locals: {<%= plural %>: @<%= plural %>}<%= @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {nested_for: \"" + arg[:singular] + "-\#{@" + arg[:singular] + ".id}\"" + ", " + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> \%>
 
-  <% if @layout == "bootstrap" %></div></div><% else  %></div><% end %>
+  <%= @layout_strategy.page_end %>
 </div>
