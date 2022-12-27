@@ -70,6 +70,8 @@ module  HotGlue
                 case type
                 when :integer
                   integer_result(col)
+                when :uuid
+                  uuid_result(col)
                 when :string
                   string_result(col, sql_type, limit)
                 when :text
@@ -111,34 +113,44 @@ module  HotGlue
     def integer_result(col)
       # look for a belongs_to on this object
       if col.to_s.ends_with?("_id")
-        assoc_name = col.to_s.gsub("_id","")
-        assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-        if assoc.nil?
-          exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-          exit
-        end
-
-        is_owner = col == ownership_field
-        assoc_class_name = assoc.active_record.name
-        display_column = HotGlue.derrive_reference_name(assoc_class_name)
-
-        if @hawk_keys[assoc.foreign_key.to_sym]
-          hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
-          hawk_root = hawk_definition[0]
-          hawk_scope = hawk_definition[1]
-          hawked_association = "#{hawk_root}.#{hawk_scope}"
-        else
-          hawked_association = "#{assoc.class_name}.all"
-        end
-
-        (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
-          "  <%= f.collection_select(:#{col}, #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col} }, class: 'form-control') %>\n" +
-          (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
-          (is_owner ? "\n<% end %>" : "")
-
+        association_result(col)
       else
         "  <%= f.text_field :#{col}, value: #{@singular}.#{col}, autocomplete: 'off', size: 4, class: 'form-control', type: 'number'"  + (@form_placeholder_labels ? ", placeholder: '#{col.to_s.humanize}'" : "")  +  " %>\n " + "\n"
       end
+    end
+
+
+    def uuid_result(col)
+      association_result(col)
+    end
+
+
+    def association_result(col)
+      assoc_name = col.to_s.gsub("_id","")
+      assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+      if assoc.nil?
+        exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+        exit
+      end
+
+      is_owner = col == ownership_field
+      assoc_class_name = assoc.active_record.name
+      display_column = HotGlue.derrive_reference_name(assoc_class_name)
+
+      if @hawk_keys[assoc.foreign_key.to_sym]
+        hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
+        hawk_root = hawk_definition[0]
+        hawk_scope = hawk_definition[1]
+        hawked_association = "#{hawk_root}.#{hawk_scope}"
+      else
+        hawked_association = "#{assoc.class_name}.all"
+      end
+
+      (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
+        "  <%= f.collection_select(:#{col}, #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col} }, class: 'form-control') %>\n" +
+        (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
+        (is_owner ? "\n<% end %>" : "")
+
     end
 
     def string_result(col, sql_type, limit)
@@ -223,14 +235,30 @@ module  HotGlue
           limit = eval("#{singular_class}.columns_hash['#{col}']").limit
           sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
 
-          field_output = case type
-          when :integer
-            # look for a belongs_to on this object
-            if col.ends_with?("_id")
+          field_output =
+            case type
+              when :integer
+                # look for a belongs_to on this object
+                if col.ends_with?("_id")
+                  assoc_name = col.to_s.gsub("_id","")
+                  assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
+                  if assoc.nil?
+                    exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+                    puts exit_message
+                    exit
+                    # raise(HotGlue::Error,exit_message)
+                  end
+                  assoc_class_name = assoc.active_record.name
+                  display_column =  HotGlue.derrive_reference_name(assoc_class_name)
+                  "<%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
+
+                else
+                  "<%= #{singular}.#{col}%>"
+                end
+
+            when :uuid
               assoc_name = col.to_s.gsub("_id","")
-
-
               assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
               if assoc.nil?
@@ -243,37 +271,34 @@ module  HotGlue
               display_column =  HotGlue.derrive_reference_name(assoc_class_name)
               "<%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
 
-            else
+            when :float
+              width = (limit && limit < 40) ? limit : (40)
               "<%= #{singular}.#{col}%>"
-            end
-          when :float
-            width = (limit && limit < 40) ? limit : (40)
-            "<%= #{singular}.#{col}%>"
-          when :string
-            width = (limit && limit < 40) ? limit : (40)
-            "<%= #{singular}.#{col} %>"
-          when :text
-            "<%= #{singular}.#{col} %>"
-          when :datetime
-            "<% unless #{singular}.#{col}.nil? %>
+            when :string
+              width = (limit && limit < 40) ? limit : (40)
+              "<%= #{singular}.#{col} %>"
+            when :text
+              "<%= #{singular}.#{col} %>"
+            when :datetime
+              "<% unless #{singular}.#{col}.nil? %>
   <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
   <% else %>
   <span class='alert-danger'>MISSING</span>
   <% end %>"
-          when :date
-            "<% unless #{singular}.#{col}.nil? %>
+            when :date
+              "<% unless #{singular}.#{col}.nil? %>
       <%= #{singular}.#{col} %>
     <% else %>
     <span class='alert-danger'>MISSING</span>
     <% end %>"
-          when :time
-            "<% unless #{singular}.#{col}.nil? %>
+            when :time
+              "<% unless #{singular}.#{col}.nil? %>
       <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone) %>
      <% else %>
     <span class='alert-danger'>MISSING</span>
     <% end %>"
-          when :boolean
-            "
+            when :boolean
+              "
     <% if #{singular}.#{col}.nil? %>
         <span class='alert-danger'>MISSING</span>
     <% elsif #{singular}.#{col} %>
@@ -282,8 +307,9 @@ module  HotGlue
       NO
     <% end %>
 
-  "        when :enum
-             enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
+  "
+            when :enum
+              enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
 
                        "
     <% if #{singular}.#{col}.nil? %>
@@ -293,8 +319,7 @@ module  HotGlue
     <% end %>
 
 "
-                         end #end of switch
-
+          end #end of switch
 
           label = "<br/><label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
