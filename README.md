@@ -568,17 +568,24 @@ Please note that this example would produce non-functional code, so you would ne
 
 Hawk a foreign key that is not the object's owner to within a specified scope. 
 
-Assuming a Pet belong_to a :human, when building an Appointments scaffold, you can hawk the `pet_id` to the current human's pets. (Whoever is the authentication object.)
+Assuming a Pet belong_to a :human, when building an Appointments scaffold,
+you can hawk the `pet_id` to the current human's pets. (Whoever is the authentication object.)
 
+The hawk has two forms: a short-form (`--hawk=key`) and long form (`--hawk=key{scope})
+
+The short form looks like this:
 `--hawk=pet_id`
+
+(The long form equavlent of this would be `--hawk=pet_id{current_user.pets}`)
 
 This is covered in [Example #3 in the Hot Glue Tutorial](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38584014)
 
-To hawk to a scope that is not the currently authenticated user, use curly braces `{...}` to specify the scope.
+To hawk to a scope that is not the currently authenticated user, use the long form with `{...}` 
+to specify the scope. Be sure to note to add the association name itself, like `users`: 
 
-`--hawk=user_id{current_user.family}`
+`--hawk=user_id{current_user.family.users}`
 
-This would hawk the Appointment's `user_id` key to any users who are within the scope of the current_user's family. 
+This would hawk the Appointment's `user_id` key to any users who are within the scope of the current_user's `family.users` association (so, for any other member of my family). 
 
 This is covered in [Example #4 in the Hot Glue Tutorial](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38787505)
 
