@@ -905,6 +905,33 @@ Child portals have the headings omitted automatically (there is a heading identi
 
 # VERSION HISTORY
 
+#### 2022-12-27 - v0.5.5 
+
+- Experimental support for Tailwind. Note I was not able to get Tailwind actually working in my app, and I'm not sure about how to think about the many flavors of Tailwind (all of which seem to be paid?). If anyone can lend a hand, the objects are now cleanly refactored so that the CSS logic is separated.
+
+- Support for UUIDs. Database UUIDs are treated as foreign keys and behave like integers ending with _id (they are treated as foreign keys whether or not they end with _id where as integers are treated as foreign keys only if they end with _id)
+
+- At the namespace level, you can now have a file called `_nav.html.erb` like this example for a two-tab bootstrap nav (you'll need to create this file manually). 
+- Here, our two tabs are called "Domains" and "Widgets"
+
+```
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <%= link_to "Domains", domains_path, class: "nav-link #{'active' if nav == 'domains'}" %>
+  </li>
+  <li class="nav-item">
+  	<%= link_to "Widgets", widgets_path, class: "nav-link #{'active' if nav == 'widget'}" %>	
+  </li>
+</ul>
+```
+
+If the file is present, Hot Glue will automatically add this to the top of, for example, the "domains" index page:
+
+```
+<%= render partial: "owner/nav", locals: {nav: "domains"} %>
+```
+Use this to build a Bootstrap nav that correctly turns each tab active when navigated to.
+
 #### 2022-11-27 - v0.5.4 - new flag --with-turbo-streams will append callbacks after_update_commit and after_destroy_commit to the MODEL you are building with to use turbo to target the scaffolding being built and programmatically update it
 
 Adds `--with-turbo-streams`. Use `--with-turbo-streams` to create hot (live reload) interfaces. See docs above.
