@@ -440,8 +440,9 @@ module HotGlue
             key = hawk_entry
             hawk_to = @auth
           end
-          hawk_scope = key.gsub("_id", "").pluralize
-          @hawk_keys[key.to_sym] = [hawk_to, hawk_scope]
+
+          hawk_scope = key.gsub("_id", "").pluralize  # TODO: use or remove me
+          @hawk_keys[key.to_sym] = [hawk_to]
         end
 
         puts "HAWKING: #{@hawk_keys}"

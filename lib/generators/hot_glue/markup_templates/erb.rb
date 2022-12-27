@@ -140,8 +140,8 @@ module  HotGlue
       if @hawk_keys[assoc.foreign_key.to_sym]
         hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
         hawk_root = hawk_definition[0]
-        hawk_scope = hawk_definition[1]
-        hawked_association = "#{hawk_root}.#{hawk_scope}"
+        # hawk_scope = hawk_definition[1]
+        hawked_association = "#{hawk_root}" # .#{hawk_scope}
       else
         hawked_association = "#{assoc.class_name}.all"
       end

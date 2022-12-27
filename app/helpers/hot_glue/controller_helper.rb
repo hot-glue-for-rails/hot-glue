@@ -78,9 +78,9 @@ module HotGlue
       @hawk_alarm = ""
       hawk_schema.each do |hawk_key,hawk_definition|
         hawk_root = hawk_definition[0]
-        hawk_scope = hawk_definition[1]
+        # hawk_scope = hawk_definition[1]
         begin
-          eval("hawk_root.#{hawk_scope}").find(modified_params[hawk_key.to_s])
+          eval("hawk_root").find(modified_params[hawk_key.to_s])
         rescue ActiveRecord::RecordNotFound => e
           @hawk_alarm << "You aren't allowed to set #{hawk_key.to_s} to #{modified_params[hawk_key.to_s]}. "
           modified_params.tap { |hs| hs.delete(hawk_key.to_s) }
