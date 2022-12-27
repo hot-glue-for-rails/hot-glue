@@ -158,6 +158,7 @@ module HotGlue
         raise(HotGlue::Error, message)
       end
 
+      @meta_args = meta_args
 
       if options['specs_only'] && options['no_specs']
         raise(HotGlue::Error,  "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. Aborting.")
@@ -615,6 +616,11 @@ module HotGlue
       }.join(", ")
     end
 
+
+    def regenerate_me_code
+      "rails generate hot_glue:scaffold #{ @meta_args[0][0] } #{@meta_args[1].join(" ")}"
+    end
+
     def object_parent_mapping_as_argument_for_specs
       if @nested_set.any?
         ", " + @nested_set.last[:singular] + ": " + @nested_set.last[:singular]
@@ -893,6 +899,15 @@ module HotGlue
         magic_buttons: @magic_buttons,
         small_buttons: @small_buttons
       )
+    end
+
+    def nav_template
+      "#{namespace_with_trailing_dash}nav"
+    end
+
+
+    def include_nav_template
+      File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}")
     end
 
     def copy_view_files
