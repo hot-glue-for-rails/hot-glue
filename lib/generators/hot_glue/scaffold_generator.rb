@@ -225,7 +225,7 @@ module HotGlue
         @singular = @singular.split("/").last
       end
 
-      @plural = options['plural'] || @singular + "s" # supply to override; leave blank to use default
+      @plural = options['plural'] || @singular.pluralize
       @namespace = options['namespace'] || nil
 
 
@@ -235,9 +235,9 @@ module HotGlue
       @controller_build_folder = use_controller_name.underscore
       @controller_build_folder_singular = singular
 
-      if ! @controller_build_folder.ends_with?("s")
-        raise HotGlue::Error, "can't build with controller name #{@controller_build_folder} because it doesn't end with an 's'"
-      end
+      # if ! @controller_build_folder.ends_with?("s")
+      #   raise HotGlue::Error, "can't build with controller name #{@controller_build_folder} because it doesn't end with an 's'"
+      # end
 
       @auth = options['auth'] || "current_user"
       @auth_identifier = options['auth_identifier'] || (! @god && @auth.gsub("current_", "")) || nil
@@ -437,12 +437,16 @@ module HotGlue
             hawk_entry =~ /(.*){(.*)}/
             key, hawk_to = $1, $2
           else
+            @use_shorthand = true
             key = hawk_entry
             hawk_to = @auth
           end
 
-          hawk_scope = key.gsub("_id", "").pluralize  # TODO: use or remove me
+          hawk_scope = key.gsub("_id", "").pluralize
           @hawk_keys[key.to_sym] = [hawk_to]
+          if @use_shorthand # only include the hawk scope if using the shorthand
+            @hawk_keys[key.to_sym] << hawk_scope
+          end
         end
 
         puts "HAWKING: #{@hawk_keys}"
