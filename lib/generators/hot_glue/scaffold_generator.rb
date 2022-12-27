@@ -437,7 +437,6 @@ module HotGlue
             hawk_entry =~ /(.*){(.*)}/
             key, hawk_to = $1, $2
           else
-            @use_shorthand = true
             key = hawk_entry
             hawk_to = @auth
           end
