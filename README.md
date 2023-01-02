@@ -573,10 +573,10 @@ you can hawk the `pet_id` to the current human's pets. (Whoever is the authentic
 
 The hawk has two forms: a short-form (`--hawk=key`) and long form (`--hawk=key{scope})
 
-The short form looks like this:
+The short form looks like this. It presumes there is a 'pets' association from `current_user`
 `--hawk=pet_id`
 
-(The long form equavlent of this would be `--hawk=pet_id{current_user.pets}`)
+(The long form equivalent of this would be `--hawk=pet_id{current_user.pets}`)
 
 This is covered in [Example #3 in the Hot Glue Tutorial](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38584014)
 
@@ -585,7 +585,8 @@ to specify the scope. Be sure to note to add the association name itself, like `
 
 `--hawk=user_id{current_user.family.users}`
 
-This would hawk the Appointment's `user_id` key to any users who are within the scope of the current_user's `family.users` association (so, for any other member of my family). 
+This would hawk the Appointment's `user_id` key to any users who are within the scope of the 
+current_user's has_many association (so, for any other "my" family, would be `current_user.family.users`). 
 
 This is covered in [Example #4 in the Hot Glue Tutorial](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38787505)
 
