@@ -225,7 +225,7 @@ module HotGlue
         @singular = @singular.split("/").last
       end
 
-      @plural = options['plural'] || @singular.pluralize
+      @plural = options['plural'] || @singular.pluralize # respects what you set in inflections.rb, to override, use plural option
       @namespace = options['namespace'] || nil
 
 
@@ -437,7 +437,6 @@ module HotGlue
             hawk_entry =~ /(.*){(.*)}/
             key, hawk_to = $1, $2
           else
-            @use_shorthand = true
             key = hawk_entry
             hawk_to = @auth
           end
