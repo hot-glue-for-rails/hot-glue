@@ -913,6 +913,12 @@ Child portals have the headings omitted automatically (there is a heading identi
 
 # VERSION HISTORY
 
+#### 2023-01-02 - v0.5.6
+- Changes the long-form of the hawk specifier to require you to use the has_many of the relationship you are hawking (previously, it was assumed). See Hawk for details
+- Adds "Regenerate me" comment to top of all generated controllers
+- Change behavior of pluralization. Now, you can use an `inflections.rb` file and non-standard pluralization will be respected.
+
+
 #### 2022-12-27 - v0.5.5 
 
 - Experimental support for Tailwind. Note I was not able to get Tailwind actually working in my app, and I'm not sure about how to think about the many flavors of Tailwind (all of which seem to be paid?). If anyone can lend a hand, the objects are now cleanly refactored so that the CSS logic is separated.
