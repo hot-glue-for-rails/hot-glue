@@ -774,6 +774,46 @@ Can now be created with more space (wider) by adding a `+` to the end of the dow
 The 'Abcs' portal will display as 5 bootstrap columns instead of the typical 4. (You may use multiple ++ to keep making it wider but the inverse with minus is not supported
 
 
+### `--factory-creation={ ... }`
+
+The code you specify inside of `{` and `}` will be used to generate a new object. The factory should instantiate with any arguments (I suggest Ruby keyword arguments) and must provide a method that is the name of the thing.
+
+For example, a user Factory might be called like so:
+
+`rails generate hot_glue:scaffold User --factory-creation={UserFactory.new(params: user_params)} --gd`
+
+(Note we are relying on the `user_params` method provided by the controller.)
+
+Hot Glue will generate a create action with this code
+```ruby
+factory = UserFactory.new(params: user_params)
+@user = factory.user
+```
+
+Your `UserFactory`'s only requirement is that it provide a method named the thing that returns the newly created thing. 
+
+Here's a sample UserFactory that will create a new user only if one with a matching email address doesn't exist. (Otherwise, it will update the existing record.)
+Your initialize method can take any params you need it to, and using this pattern your business logic is applied consistently throughout your app. (You must, of course, use your Factory everywhere else in your app too.)
+
+
+```
+class UserFactory
+    attr_reader :user
+    attr_accessor :email
+
+    def initialize(params: {})
+        user = User.find_or_create_by(email: params[:email])
+    
+        user.update(params)
+        if user.new_record?
+            # do special new user logic here, like sending an email
+        end
+    end
+end
+```
+
+
+
 
 ## FLAGS (Options with no values)
 These options (flags) also uses `--` syntax but do not take any values. Everything is assumed (default) to be false unless specified.
