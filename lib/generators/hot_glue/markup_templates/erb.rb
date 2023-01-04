@@ -134,7 +134,7 @@ module  HotGlue
       end
 
       is_owner = col == ownership_field
-      assoc_class_name = assoc.active_record.name
+      assoc_class_name = assoc.class_name.to_s
       display_column = HotGlue.derrive_reference_name(assoc_class_name)
 
       if @hawk_keys[assoc.foreign_key.to_sym]
@@ -265,8 +265,8 @@ module  HotGlue
                 exit
                 # raise(HotGlue::Error,exit_message)
               end
-              assoc_class_name = assoc.active_record.name
-              display_column =  HotGlue.derrive_reference_name(assoc_class_name)
+
+              display_column =  HotGlue.derrive_reference_name(assoc.class_name.to_s)
               "<%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
 
             when :float

@@ -142,10 +142,12 @@ module HotGlue
     class_option :form_labels_position, type: :string, default: 'after' #  choices are before, after, omit
     class_option :form_placeholder_labels, type: :boolean,  default: false # puts the field names into the placeholder labels
 
-
-    # NOT YET IMPLEMENTED
     # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
     class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
+
+    class_option :factory_creation, default: ''
+
+
 
     def initialize(*meta_args)
       super
@@ -404,7 +406,7 @@ module HotGlue
       identify_object_owner
       setup_hawk_keys
 
-
+      @factory_creation = options['factory_creation']
 
       # SETUP FIELDS & LAYOUT
       setup_fields
@@ -586,7 +588,14 @@ module HotGlue
           end
           existing_file.rewind
         else
-          @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
+          if @god && @auth_identifier
+            @existing_content = "#HOTGLUE-SAVESTART\n  let!(:#{@auth_identifier}) {create(:#{@auth_identifier})}
+  before do
+    login_as(#{@auth_identifier})
+  end\n  #HOTGLUE-END"
+          else
+            @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
+          end
         end
 
         template "system_spec.rb.erb", dest_file
@@ -622,11 +631,13 @@ module HotGlue
 
 
     def regenerate_me_code
-      "rails generate hot_glue:scaffold #{ @meta_args[0][0] } #{@meta_args[1].join(" ")}"
+      "rails generate hot_glue:scaffold #{ @meta_args[0][0] } #{@meta_args[1].collect{|x| x.gsub(/\s*=\s*([\S\s]+)/, '=\'\1\'')}.join(" ")}"
     end
 
     def object_parent_mapping_as_argument_for_specs
-      if @nested_set.any?
+      if @self_auth
+        ""
+      elsif @nested_set.any?
         ", " + @nested_set.last[:singular] + ": " + @nested_set.last[:singular]
       elsif @auth
         ", #{@auth_identifier}: #{@auth}"
@@ -692,16 +703,21 @@ module HotGlue
             '      ' + "find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
 
         when :integer
-
           if col.to_s.ends_with?("_id")
             assoc = col.to_s.gsub('_id','')
             "      #{col}_selector = find(\"[name='#{singular}[#{col}]']\").click \n" +
-              "      #{col}_selector.first('option', text: #{assoc}1.name).select_option"
+            "      #{col}_selector.first('option', text: #{assoc}1.name).select_option"
           else
             "      new_#{col} = rand(10) \n" +
-              "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-
+            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
           end
+
+        when :uuid
+          assoc_name = col.to_s.gsub('_id','')
+          "      #{col}_selector = find(\"[name='#{singular}[#{col}]']\").click \n" +
+            "      #{col}_selector.first('option', text: #{assoc_name}1.name).select_option\n" +
+            "      " + "new_#{col.to_s} = #{assoc_name}1.name \n"
+
 
         when :enum
           "      list_of_#{col.to_s} = #{singular_class}.defined_enums['#{col.to_s}'].keys \n" +
@@ -709,17 +725,21 @@ module HotGlue
             '      find("select[name=\'' + singular + '[' + col.to_s + ']\']  option[value=\'#{new_' + col.to_s + '}\']").select_option'
 
         when :boolean
-          "     new_#{col} = rand(2).floor \n" +
-            "     find(\"[name='#{testing_name}[#{col}]'][value='\#{new_" + col.to_s + "}']\").choose"
+          "      new_#{col} = 1 \n" +
+            "      find(\"[name='#{testing_name}[#{col}]'][value='\#{new_" + col.to_s + "}']\").choose"
         when :string
-          if col.to_s.include?("email")
-            "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
-              "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-
-          else
-            "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
-              "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-          end
+          faker_string =
+            if col.to_s.include?('email')
+              "FFaker::Internet.email"
+            elsif  col.to_s.include?('domain')
+              "FFaker::Internet.domain_name"
+            elsif col.to_s.include?('ip_address') || col.to_s.ends_with?('_ip')
+              "FFaker::Internet.ip_v4_address"
+            else
+              "FFaker::Movie.title"
+            end
+            "      " + "new_#{col} = #{faker_string} \n" +
+            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
         when :text
           "      " + "new_#{col} = FFaker::Lorem.paragraphs(1).join("") \n" +
             "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
