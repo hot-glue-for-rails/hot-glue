@@ -406,7 +406,7 @@ module HotGlue
       identify_object_owner
       setup_hawk_keys
 
-      @factory_creation = options['factory_creation']
+      @factory_creation = options['factory_creation'].gsub(";", "\n")
 
       # SETUP FIELDS & LAYOUT
       setup_fields
@@ -672,7 +672,7 @@ module HotGlue
     end
 
     def testing_name
-      singular_class_name.gsub("::","_").downcase
+      singular_class_name.gsub("::","_").underscore
     end
 
     def singular_class_name
