@@ -134,9 +134,7 @@ module HotGlue
     class_option :with_turbo_streams, type: :boolean, default: false
 
     class_option :no_list_label, type: :boolean, default: false
-
     class_option :no_list_heading, type: :boolean, default: false
-
 
     # determines if the labels show up BEFORE or AFTER on the NEW/EDIT (form)
     class_option :form_labels_position, type: :string, default: 'after' #  choices are before, after, omit
@@ -144,9 +142,9 @@ module HotGlue
 
     # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
     class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
-
     class_option :factory_creation, default: ''
-
+    class_option :foreign_key_email_lookup, default: '' # if present, we use look up related record using email only; use commas to separate multiple foreign keys
+    class_option :foreign_key_email_lookup_auto_create, default: "" # positional to option above; use commas to separate multiple foreign keys
 
 
     def initialize(*meta_args)
@@ -408,6 +406,8 @@ module HotGlue
 
       @factory_creation = options['factory_creation'].gsub(";", "\n")
 
+
+
       # SETUP FIELDS & LAYOUT
       setup_fields
       if  (@columns - @show_only - (@ownership_field ?  [@ownership_field.to_sym] : [])).empty?
@@ -426,6 +426,13 @@ module HotGlue
       @menu_file_exists = true if @nested_set.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
       @turbo_streams = !!options['with_turbo_streams']
+
+      @foreign_key_email_lookups = options['foreign_key_email_lookup'].split(",")
+      @foreign_key_email_lookup_auto_create = options['foreign_key_email_lookup_auto_create'].split(",")
+      @foreign_key_email_lookups.each_with_index do |k,i|
+        @foreign_key_email_lookup_auto_create[i] ||= true
+      end
+
     end
 
     def setup_hawk_keys

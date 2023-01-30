@@ -784,7 +784,7 @@ For example, a user Factory might be called like so:
 
 (Note we are relying on the `user_params` method provided by the controller.)
 
-Your you must to do one of two things:
+You must do one of two things:
 1) In the code you specify, set an instance variable `@user` to be the newly created thing. (Your code should contain something like `@thing = ` to trigger this option.)
 2) Make a local variable called `factory` **and** have a method of the name of the object (`user`) on a local variable called `factory` that your code created
 
