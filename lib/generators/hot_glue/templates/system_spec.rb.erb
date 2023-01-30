@@ -100,8 +100,8 @@ describe 'interaction for <%= controller_class_name %>', type: :feature do
 <% unless @no_create %>  describe "new & create" do
     it "should create a new <%= singular.titlecase %>" do
       visit <%= path_helper_plural %>
-      click_link "New <%= thing_label %>"
-      expect(page).to have_selector(:xpath, './/h3[contains(., "New <%= thing_label %>")]')
+      click_link "New <%= @label %>"
+      expect(page).to have_selector(:xpath, './/h3[contains(., "New <%= @label %>")]')
 <%= test_capybara_block %>
       click_button "Save"
       expect(page).to have_content("Successfully created")

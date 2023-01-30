@@ -133,6 +133,11 @@ module HotGlue
     class_option :hawk, type: :string, default: nil
     class_option :with_turbo_streams, type: :boolean, default: false
 
+    class_option :label, default: nil
+    class_option :list_label_heading, default: nil
+    class_option :new_button_label, default: nil
+    class_option :new_form_heading, default: nil
+
     class_option :no_list_label, type: :boolean, default: false
     class_option :no_list_heading, type: :boolean, default: false
 
@@ -144,7 +149,8 @@ module HotGlue
     class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
     class_option :factory_creation, default: ''
     class_option :foreign_key_email_lookup, default: '' # if present, we use look up related record using email only; use commas to separate multiple foreign keys
-    class_option :foreign_key_email_lookup_auto_create, default: "" # positional to option above; use commas to separate multiple foreign keys
+    # class_option :foreign_key_email_lookup_auto_create, default: "" # positional to option above; use commas to separate multiple foreign keys
+
 
 
     def initialize(*meta_args)
@@ -428,12 +434,28 @@ module HotGlue
       @turbo_streams = !!options['with_turbo_streams']
 
       @foreign_key_email_lookups = options['foreign_key_email_lookup'].split(",")
-      @foreign_key_email_lookup_auto_create = options['foreign_key_email_lookup_auto_create'].split(",")
-      @foreign_key_email_lookups.each_with_index do |k,i|
-        @foreign_key_email_lookup_auto_create[i] ||= true
-      end
+      # @foreign_key_email_lookup_auto_create = options['foreign_key_email_lookup_auto_create'].split(",")
+      # @foreign_key_email_lookups.each_with_index do |k,i|
+      #   @foreign_key_email_lookup_auto_create[i] ||= true
+      # end
+
+      @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").upcase )
+      @list_label_heading =  options['list_label_heading'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase )
+
+      @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").upcase )
+      @new_form_heading = options['new_form_heading'] || "New #{@label}"
 
     end
+
+
+    def fields_filtered_for_email_lookups
+      # remove any feilds listed in foreign_key_email_lookup (should all end with _id)
+      # and add cooresponding fields ending with _email to be used as lookup field
+      @columns.reject{|c| @foreign_key_email_lookups.include?(c) } +
+        @foreign_key_email_lookups.map{|c| c.gsub('_id', '_email').to_sym}
+    end
+
+
 
     def setup_hawk_keys
       @hawk_keys = {}
@@ -1084,19 +1106,11 @@ module HotGlue
 
 
     def list_label
-      if(eval("#{class_name}.class_variable_defined?(:@@table_label_plural)"))
-        eval("#{class_name}.class_variable_get(:@@table_label_plural)")
-      else
-        plural.gsub("_", " ").upcase
-      end
+      @list_label_heading
     end
 
-    def thing_label
-      if(eval("#{class_name}.class_variable_defined?(:@@table_label_singular)"))
-        eval("#{class_name}.class_variable_get(:@@table_label_singular)")
-      else
-        singular.gsub("_", " ").upcase
-      end
+    def new_thing_label
+      @new_thing_label
     end
 
     def all_line_fields

@@ -125,7 +125,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
 
   def <%=singular_name%>_params
-    params.require(:<%= testing_name %>).permit( <%= (@columns - @show_only) + @magic_buttons.collect(&:to_sym) %> )
+    params.require(:<%= testing_name %>).permit(<%= (fields_filtered_for_email_lookups - @show_only) + @magic_buttons.collect(&:to_sym) %>)
   end
 
   def namespace
