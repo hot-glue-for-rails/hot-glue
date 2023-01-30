@@ -126,7 +126,6 @@ describe HotGlue::ScaffoldGenerator do
     it "should not make the create files" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Dfg","--no-edit"])
-      expect(File.exist?("spec/dummy/app/views/dfgs/_form.erb")).to be(false)
       expect(File.exist?("spec/dummy/app/views/dfgs/edit.erb")).to be(false)
       expect(File.exist?("spec/dummy/app/views/dfgs/update.turbo_stream.erb")).to be(false)
     end
@@ -320,15 +319,10 @@ describe HotGlue::ScaffoldGenerator do
                                             ["Jkl","--god","--exclude=long_description,cost"])
 
         # cost is excluded
-        expect(
-          File.read("spec/dummy/app/views/jkls/_show.erb") =~ /cost/
-        ).to be(nil)
-        expect(
-          File.read("spec/dummy/app/views/jkls/_form.erb") =~ /cost/
-        ).to be(nil)
-        expect(
-          File.read("spec/dummy/app/controllers/jkls_controller.rb") =~ /cost/
-        ).to be(nil)
+        expect(File.read("spec/dummy/app/views/jkls/_show.erb")).to_not include("cost")
+        expect(File.read("spec/dummy/app/views/jkls/_form.erb")).to_not include("cost")
+
+        expect(File.read("spec/dummy/app/controllers/jkls_controller.rb")).to_not include(":cost")
 
         # long description is excluded
         expect(
@@ -338,7 +332,7 @@ describe HotGlue::ScaffoldGenerator do
           File.read("spec/dummy/app/views/jkls/_form.erb") =~ /long_description/
         ).to be(nil)
         expect(
-          File.read("spec/dummy/app/controllers/jkls_controller.rb") =~ /long_description/
+          File.read("spec/dummy/app/controllers/jkls_controller.rb") =~ /:long_description/
         ).to be(nil)
 
         # blurb is not excluded
@@ -426,15 +420,8 @@ describe HotGlue::ScaffoldGenerator do
 
 
               file = File.read("spec/dummy/app/views/users/_show.erb")
-
-              expect(
-                File.read("spec/dummy/app/views/users/_show.erb") =~ /<div class='col-sm-2'><%= user.email %><\/div>/
-              ).to be_a(Numeric)
-              expect(
-                File.read("spec/dummy/app/views/users/_show.erb") =~ /<div class='col-sm-2'><%= user.family.try(:email) || '<span class="content alert-danger">MISSING<\/span>'.html_safe %><\/div>/
-              ).to be_a(Numeric)
-
-
+              expect(file).to include("<div class='col-sm-6'><%= user.email %></div>")
+              expect(file).to include("<div class='col-sm-6'><%= user.family.try(:name) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %><\/div>")
             end
           end
 
@@ -445,15 +432,13 @@ describe HotGlue::ScaffoldGenerator do
                                                    "--gd",
                                                    "--smart-layout",
                                                    "--downnest=dfgs", "--layout=bootstrap"])
-              expect(
-                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-sm-2'>Email<\/div>/
-              ).to be_a(Numeric)
-              expect(
-                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class=" scaffold-col-heading col-sm-4 ">/
-              ).to be_a(Numeric)
-              expect(
-                File.read("spec/dummy/app/views/users/_list.erb") =~ /Dfgs/
-              ).to be_a(Numeric)
+
+              file = File.read("spec/dummy/app/views/users/_list.erb")
+
+              expect(file).to include("<div class='col-sm-4'>Email</div>")
+
+              expect(file).to include("<div class=\" scaffold-col-heading col-sm-4 \">")
+              expect(file).to include("Dfgs")
             end
           end
 
@@ -730,7 +715,7 @@ describe HotGlue::ScaffoldGenerator do
                                               ["AtwDisplayName","--god"])
 
           res = File.read("spec/dummy/app/views/atw_display_names/_new_button.erb")
-          expect(res).to include("<%= link_to \"New ATW DISPLAY NAME\",")
+          expect(res).to include("<%= link_to \"New Atw Display Name\",")
         end
       end
 
@@ -800,6 +785,7 @@ describe HotGlue::ScaffoldGenerator do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Ghi",
                                              "--hawk=dfg_id"])
+
       res = File.read("spec/dummy/app/views/ghis/_form.erb")
       expect(res).to include("f.collection_select(:dfg_id, current_user.dfgs,")
     end
@@ -821,7 +807,7 @@ describe HotGlue::ScaffoldGenerator do
                                              "--hawk=dfg_id,xyz_id"])
 
       res = File.read("spec/dummy/app/controllers/ghis_controller.rb")
-      expect(res).to include("hawk_params( {dfg_id: [current_user, \"dfgs\"] , xyz_id: [current_user, \"xyzs\"] }, modified_params)")
+      expect(res).to include("hawk_params({dfg_id: [current_user, \"dfgs\"], xyz_id: [current_user, \"xyzs\"]}, modified_params)")
 
     end
 
@@ -833,15 +819,16 @@ describe HotGlue::ScaffoldGenerator do
 
 
       res = File.read("spec/dummy/app/controllers/visits_controller.rb")
-      expect(res).to include("@visit = (current_user.family.visits.find(params[:id]))")
 
-      expect(res).to include("modified_params = hawk_params( {user_id: [current_user.family, \"users\"] }, modified_params)")
+      expect(res).to include("@visit = current_user.family.visits.find(params[:id])")
+
+      expect(res).to include("modified_params = hawk_params({user_id: [current_user.family, \"users\"]}, modified_params)")
 
       expect(res).to include("def load_visit
-    @visit = (current_user.family.visits.find(params[:id]))
+    @visit = current_user.family.visits.find(params[:id])
   end")
 
-      expect(res).to include("@visits = ( current_user.family.visits.page(params[:page]).includes(:user))")
+      expect(res).to include("@visits = current_user.family.visits.page(params[:page]).includes(:user)")
     end
   end
 

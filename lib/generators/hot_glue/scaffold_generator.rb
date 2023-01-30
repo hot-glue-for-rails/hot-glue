@@ -480,7 +480,9 @@ module HotGlue
 
           hawk_scope = key.gsub("_id", "").pluralize
           @hawk_keys[key.to_sym] = [hawk_to]
-          if @use_shorthand # only include the hawk scope if using the shorthand
+          use_shorthand = !hawk_scope.include?("{")
+
+          if use_shorthand # only include the hawk scope if using the shorthand
             @hawk_keys[key.to_sym] << hawk_scope
           end
         end
@@ -1265,9 +1267,10 @@ module HotGlue
     end
 
     def hawk_to_ruby
-      @hawk_keys.collect{ |k,v|
-        "#{k}: [#{v[0]}, \"#{v[1]}\"] "
+      res = @hawk_keys.collect{ |k,v|
+        "#{k}: [#{v[0]}, \"#{v[1]}\"]"
       }.join(", ")
+      res
     end
   end
 end
