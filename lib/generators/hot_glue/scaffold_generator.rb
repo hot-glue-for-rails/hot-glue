@@ -442,9 +442,12 @@ module HotGlue
       @alt_foreign_key_lookup = alt_lookups_entry.each do |setting|
         setting =~ /(.*){(.*)}/
         key, lookup_as = $1, $2
-
         assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
-        @alt_lookups[key] = {lookup_as: lookup_as, assoc: assoc}
+
+        data = {lookup_as: lookup_as.gsub("+",""),
+                assoc: assoc,
+                with_create: lookup_as.include?("+")}
+        @alt_lookups[key] = data
       end
 
       puts "------ ALT LOOKUPS for #{@alt_lookups}"
@@ -462,11 +465,21 @@ module HotGlue
     end
 
 
+    def creation_syntax
+      if @factory_creation == ''
+        "@#{singular_name } = #{ class_name }.create(modified_params#{ controller_update_params_tap_away_alt_lookups }) "
+      else
+        "#{@factory_creation}\n" +
+        "    @#{singular_name } = #{ class_name }.create(modified_params#{ controller_update_params_tap_away_alt_lookups }) "
+      end
+    end
+
+
 
     def setup_hawk_keys
       @hawk_keys = {}
 
-      if options['hawk']
+      if options["hawk"]
         options['hawk'].split(",").each do |hawk_entry|
           # format is: abc_id[thing]
 

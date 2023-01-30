@@ -420,8 +420,8 @@ describe HotGlue::ScaffoldGenerator do
 
 
               file = File.read("spec/dummy/app/views/users/_show.erb")
-              expect(file).to include("<div class='col-sm-6'><%= user.email %></div>")
-              expect(file).to include("<div class='col-sm-6'><%= user.family.try(:name) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %><\/div>")
+              expect(file).to include("<div class='col-sm-2'><%= user.email %></div>")
+              expect(file).to include("<div class='col-sm-2'><%= user.family.try(:name) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %><\/div>")
             end
           end
 
@@ -435,7 +435,7 @@ describe HotGlue::ScaffoldGenerator do
 
               file = File.read("spec/dummy/app/views/users/_list.erb")
 
-              expect(file).to include("<div class='col-sm-4'>Email</div>")
+              expect(file).to include("<div class='col-sm-2'>Email</div>")
 
               expect(file).to include("<div class=\" scaffold-col-heading col-sm-4 \">")
               expect(file).to include("Dfgs")
