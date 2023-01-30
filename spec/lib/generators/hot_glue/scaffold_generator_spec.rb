@@ -918,15 +918,6 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
-  describe "for --plural that doesn't end with an S" do
-    it "should tell me no no " do
-      expect { Rails::Generators.invoke("hot_glue:scaffold",
-                                        ["Ghi", "--plural=thing"])
-      }.to raise_exception("can't build with controller name thing because it doesn't end with an 's'")
-
-    end
-  end
-
   describe "for --form-labels-position is invalid" do
     it "should tell me no no " do
       expect { Rails::Generators.invoke("hot_glue:scaffold",

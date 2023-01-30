@@ -780,17 +780,18 @@ The code you specify inside of `{` and `}` will be used to generate a new object
 
 For example, a user Factory might be called like so:
 
-`rails generate hot_glue:scaffold User --factory-creation={UserFactory.new(params: user_params)} --gd`
+`rails generate hot_glue:scaffold User --factory-creation={factory = UserFactory.new(params: user_params)\n  @user = factory.user} --gd`
 
 (Note we are relying on the `user_params` method provided by the controller.)
 
-Hot Glue will generate a create action with this code
+Hot Glue will generate a create action with the code you specified. 
 ```ruby
 factory = UserFactory.new(params: user_params)
 @user = factory.user
 ```
-
-Your `UserFactory`'s only requirement is that it provide a method named the thing that returns the newly created thing. 
+Your you must to do one of two things:
+1) In the code you specify, set an instance variable `@user` to be the newly created thing
+2) Have a method of the same name (`user`) on a local variable called `factory` that your code created
 
 Here's a sample UserFactory that will create a new user only if one with a matching email address doesn't exist. (Otherwise, it will update the existing record.)
 Your initialize method can take any params you need it to, and using this pattern your business logic is applied consistently throughout your app. (You must, of course, use your Factory everywhere else in your app too.)
@@ -937,8 +938,10 @@ Child portals have the headings omitted automatically (there is a heading identi
 ## Field Types Supported
 
 - Integers that don't end with `_id`: displayed as input fields with type="number"
-- Foreign keys: Integers that do end with `_id` will be treated automatically as associations. You should have a Rails association defined. (Hot Glue will warn you if it can't find one.)
+- Foreign key integers: Integers that do end with `_id` will be treated automatically as associations. You should have a Rails association defined. (Hot Glue will warn you if it can't find one.)
   - Note:  if your foreign key has a nonusual class name, it should be using the `class_name:` in the model definition
+- UUIDs (as primary key): Works seamlessly for the `id` field to make your primary key a UUID (Be sure to specify UUID in your model's migration). 
+- UUIDs (as foreign key): All UUIDs that are not named `id` are assumed to be foreign keys and will be treated as associations.
 - String: displayed as small input box 
 - Text: displayed as large textarea
 - Float: displayed as input box
@@ -950,8 +953,11 @@ Child portals have the headings omitted automatically (there is a heading identi
   - For Rails 6 see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
   - AFAIK, you must specify the enum definition both in your model and also in your database migration for both Rails 6 + Rails 7
 
-
 # VERSION HISTORY
+#### 2023-01-29 - v0.5.7 - factory-creation
+see `--factory-creation` section or 
+- [Example #10](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/) in the Hot Glue Tutorial shows you how to use the hawk to limit the scope to the logged in user.
+
 
 #### 2023-01-02 - v0.5.6
 - Changes the long-form of the hawk specifier to require you to use the has_many of the relationship you are hawking (previously, it was assumed). See Hawk for details
