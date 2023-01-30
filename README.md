@@ -568,17 +568,25 @@ Please note that this example would produce non-functional code, so you would ne
 
 Hawk a foreign key that is not the object's owner to within a specified scope. 
 
-Assuming a Pet belong_to a :human, when building an Appointments scaffold, you can hawk the `pet_id` to the current human's pets. (Whoever is the authentication object.)
+Assuming a Pet belong_to a :human, when building an Appointments scaffold,
+you can hawk the `pet_id` to the current human's pets. (Whoever is the authentication object.)
 
+The hawk has two forms: a short-form (`--hawk=key`) and long form (`--hawk=key{scope})
+
+The short form looks like this. It presumes there is a 'pets' association from `current_user`
 `--hawk=pet_id`
+
+(The long form equivalent of this would be `--hawk=pet_id{current_user.pets}`)
 
 This is covered in [Example #3 in the Hot Glue Tutorial](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38584014)
 
-To hawk to a scope that is not the currently authenticated user, use curly braces `{...}` to specify the scope.
+To hawk to a scope that is not the currently authenticated user, use the long form with `{...}` 
+to specify the scope. Be sure to note to add the association name itself, like `users`: 
 
-`--hawk=user_id{current_user.family}`
+`--hawk=user_id{current_user.family.users}`
 
-This would hawk the Appointment's `user_id` key to any users who are within the scope of the current_user's family. 
+This would hawk the Appointment's `user_id` key to any users who are within the scope of the 
+current_user's has_many association (so, for any other "my" family, would be `current_user.family.users`). 
 
 This is covered in [Example #4 in the Hot Glue Tutorial](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/38787505)
 
@@ -904,6 +912,12 @@ Child portals have the headings omitted automatically (there is a heading identi
 
 
 # VERSION HISTORY
+
+#### 2023-01-02 - v0.5.6
+- Changes the long-form of the hawk specifier to require you to use the has_many of the relationship you are hawking (previously, it was assumed). See Hawk for details
+- Adds "Regenerate me" comment to top of all generated controllers
+- Change behavior of pluralization. Now, you can use an `inflections.rb` file and non-standard pluralization will be respected.
+
 
 #### 2022-12-27 - v0.5.5 
 
