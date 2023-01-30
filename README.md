@@ -780,22 +780,24 @@ The code you specify inside of `{` and `}` will be used to generate a new object
 
 For example, a user Factory might be called like so:
 
-`rails generate hot_glue:scaffold User --factory-creation={factory = UserFactory.new(params: user_params)\n  @user = factory.user} --gd`
+`rails generate hot_glue:scaffold User --factory-creation={factory = UserFactory.new(params: user_params)} --gd`
 
 (Note we are relying on the `user_params` method provided by the controller.)
 
-Hot Glue will generate a create action with the code you specified. 
-```ruby
-factory = UserFactory.new(params: user_params)
+Your you must to do one of two things:
+1) In the code you specify, set an instance variable `@user` to be the newly created thing. (Your code should contain something like `@thing = ` to trigger this option.)
+2) Make a local variable called `factory` **and** have a method of the name of the object (`user`) on a local variable called `factory` that your code created
+
+(The code example above is the option for #2 because it does not contain `@user =`)
+
+If using number #2, Hot Glue will append this to the code specified:
+```
 @user = factory.user
 ```
-Your you must to do one of two things:
-1) In the code you specify, set an instance variable `@user` to be the newly created thing
-2) Have a method of the same name (`user`) on a local variable called `factory` that your code created
+
 
 Here's a sample UserFactory that will create a new user only if one with a matching email address doesn't exist. (Otherwise, it will update the existing record.)
 Your initialize method can take any params you need it to, and using this pattern your business logic is applied consistently throughout your app. (You must, of course, use your Factory everywhere else in your app too.)
-
 
 ```
 class UserFactory
