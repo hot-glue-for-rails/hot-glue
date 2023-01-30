@@ -148,8 +148,7 @@ module HotGlue
     # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
     class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
     class_option :factory_creation, default: ''
-    class_option :foreign_key_email_lookup, default: '' # if present, we use look up related record using email only; use commas to separate multiple foreign keys
-    # class_option :foreign_key_email_lookup_auto_create, default: "" # positional to option above; use commas to separate multiple foreign keys
+    class_option :alt_foreign_key_lookup, default: '' #
 
 
 
@@ -433,26 +432,33 @@ module HotGlue
 
       @turbo_streams = !!options['with_turbo_streams']
 
-      @foreign_key_email_lookups = options['foreign_key_email_lookup'].split(",")
-      # @foreign_key_email_lookup_auto_create = options['foreign_key_email_lookup_auto_create'].split(",")
-      # @foreign_key_email_lookups.each_with_index do |k,i|
-      #   @foreign_key_email_lookup_auto_create[i] ||= true
-      # end
 
-      @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").upcase )
+      # syntax should be xyz_id{xyz_email},abc_id{abc_email}
+      # instead of a drop-down for the foreign entity, a text field will be presented
+      # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
+
+      alt_lookups_entry = options['alt_foreign_key_lookup'].split(",")
+      @alt_lookups = {}
+      @alt_foreign_key_lookup = alt_lookups_entry.each do |setting|
+        setting =~ /(.*){(.*)}/
+        key, lookup_as = $1, $2
+
+        assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
+        @alt_lookups[key] = {lookup_as: lookup_as, assoc: assoc}
+      end
+
+      puts "------ ALT LOOKUPS for #{@alt_lookups}"
+
+      @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").titleize )
       @list_label_heading =  options['list_label_heading'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase )
 
-      @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").upcase )
+      @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") : "New " + singular.gsub("_", " ").titleize )
       @new_form_heading = options['new_form_heading'] || "New #{@label}"
-
     end
 
 
     def fields_filtered_for_email_lookups
-      # remove any feilds listed in foreign_key_email_lookup (should all end with _id)
-      # and add cooresponding fields ending with _email to be used as lookup field
-      @columns.reject{|c| @foreign_key_email_lookups.include?(c) } +
-        @foreign_key_email_lookups.map{|c| c.gsub('_id', '_email').to_sym}
+      @columns.reject{|c| @alt_lookups.keys.include?(c) } + @alt_lookups.values.map{|v| ("__lookup_#{v[:lookup_as]}").to_sym}
     end
 
 
@@ -1053,6 +1059,9 @@ module HotGlue
 
       unless @no_edit
         res << 'edit'
+      end
+
+      unless @no_edit && @no_create
         res << '_form'
       end
 
@@ -1100,7 +1109,8 @@ module HotGlue
         col_identifier:  @layout_strategy.column_classes_for_form_fields,
         ownership_field: @ownership_field,
         form_labels_position: @form_labels_position,
-        form_placeholder_labels: @form_placeholder_labels
+        form_placeholder_labels: @form_placeholder_labels,
+        alt_lookups: @alt_lookups
       )
     end
 
@@ -1196,9 +1206,16 @@ module HotGlue
      }.join("\n") + "\n"
     end
 
+
     def controller_update_params_tap_away_magic_buttons
       @magic_buttons.collect{ |magic_button|
         ".tap{ |ary| ary.delete('#{magic_button}') }"
+      }.join("")
+    end
+
+    def controller_update_params_tap_away_alt_lookups
+      @alt_lookups.collect{ |key, data|
+        ".tap{ |ary| ary.delete('__lookup_#{data[:lookup_as]}') }"
       }.join("")
     end
 

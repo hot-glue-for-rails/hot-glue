@@ -843,8 +843,26 @@ This happens using two interconnected mechanisms:
 
 please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
 
+### `--alt-foreign-key-lookup` (Foriegn Key Lookups)
 
-## The Label of the Thing
+`--alt-foreign-key-lookup=user_id{email}`
+
+Let's assume a `Company` `has_many :company_users` and also a `Company` `has_many :users, through: :company_users`
+
+Normally, you would be constructing a CompanyUsers downnest portal on the Company page. (Showing you only CompanyUsers associated with that company.)
+
+A drop down of _all users in the_ database will be display on the screen where you create a new CompanyUser (join) record.
+
+Let's say instead you don't want to expose the full list of all users to this controller, but instead make your user enter the full email address of the user to identify them.
+
+Instead of a drop-down, the interface will present an input box for the user to supply an email.
+
+
+TODO: Auto-add
+
+
+
+## "Thing" Label
 
 Note that on a per model basis, you can also globally omit the label or set a unique label value using
 `@@table_label_singular` and `@@table_label_plural` on your model objects.
@@ -855,27 +873,26 @@ If no `--label` is specified, it will be inferred to be the Capitalized version 
 
 ### `--label`
 
-The general name of the thing, will be applied as "New ___", etc to any of the 3 below if they are not specified. 
+The general name of the thing, will be applied as "New ___" for the new button & form. Will be *pluralized* for list label heading, so if the word has a non-standard pluralization, be sure to specify it in `config/inflictions.rb`
 
 If you specify anything explicitly, it will be used.
 If not, a specification that exists as `@@tabel_label_singular` from the Model will be used.
-If this does not exist, the Capitalised version of the model name. 
+If this does not exist, the Titleized (capitalized) version of the model name. 
 
 ### `--list-label-heading`
 The plural of the list of things at the top of the list.
-(Follows same rules as above excepting using `@@tabel_label_plural` from the Model)
+If not, a specification that exists as `@@tabel_label_plural` from the Model will be used.
+If this does not exist, the UPCASE (all-uppercase) version of the model name.
 
 ### `--new-button-label`
 The button on the list that the user clicks onto to create a new record.
-(Follows same rules as above and uses "New ___".)
+(Follows same rules described in the `--label` option but with the word "New" prepended.)
 
 ### `--new-form-heading`
 The text at the top of the new form that appears when the new input entry is displayed.
-(Follows same rules as above and uses "New ___".)
-
+(Follows same rules described in the `--label` option but with the word "New" prepended.)
 
 ### `--no-list-label`
-
 Omits list LABEL itself above the list. (Do not confuse with the list heading which contains the field labels.)
 
 Note that list labels may  be automatically omitted on downnested scaffolds.

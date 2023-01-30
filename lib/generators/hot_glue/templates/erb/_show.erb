@@ -10,7 +10,7 @@
     <% downnest_class = downnest_object.class_name %>
     <% downnest_object_name = eval("#{downnest_class}.table_name") %>
     <% downnest_style = @layout_strategy.downnest_style %>
-    <div class="<%= " col-md-#{@layout_object[:portals][downnest][:size]}" if @layout == "bootstrap" %> scaffold-downnest" <%= downnest_style  %> >
+    <div class="<%= @layout_strategy.downnest_portal_column_width(downnest)  %> scaffold-downnest" <%= downnest_style  %> >
   <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest_object_name %>/list", locals: {
         <%= @singular %>: <%= @singular %>,
         <%= downnest_object_name %>: <%= @singular %>.<%= downnest %>
@@ -23,7 +23,7 @@
 <% end %>
 
 <%= @layout_strategy.button_style %>
-<div class="<%= @col_identifier %> scaffold-line-buttons <%= @layout_strategy.button_classes %>" <%= @layout_strategy.button_style %>>
+<div class=" scaffold-line-buttons <%= @layout_strategy.button_classes %>" <%= @layout_strategy.button_style %>>
   <%= magic_button_output %>
 
   <% if destroy_action %>

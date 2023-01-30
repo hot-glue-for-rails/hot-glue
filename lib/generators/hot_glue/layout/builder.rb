@@ -62,6 +62,7 @@ module HotGlue
         if smart_layout
           # automatic control
           #
+          layout_object[:columns][:button_columns] = 2
 
           if columns.size > available_columns
             if available_columns == 0
@@ -76,10 +77,11 @@ module HotGlue
             layout_object[:columns][:container].last.append *columns.slice(0+(available_columns*each_col_can_have),each_col_can_have)
 
           else
-            layout_object[:columns][:container] = (0..available_columns-1).collect { |x|
-              [ columns[x]]
-            }
+            each_col_can_multiply = (available_columns.to_f / columns.size.to_f).round
+
+            layout_object[:columns][:container] = (0..available_columns-1).collect { |x|  [columns[x]] }
             layout_object[:columns][:container].reject!{|x| x == [nil]}
+            layout_object[:columns][:size_each] = 2*each_col_can_multiply
           end
         elsif ! specified_grouping_mode
           # not smart and no specified grouping
@@ -129,7 +131,7 @@ module HotGlue
         #   # give some space back to the downnest
         # end
 
-        puts "*** constructed layout columns #{layout_object.inspect}"
+        puts "*** constructed smart layout columns #{layout_object.inspect}"
         layout_object
       end
 

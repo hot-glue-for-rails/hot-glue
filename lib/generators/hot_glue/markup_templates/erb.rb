@@ -53,6 +53,8 @@ module  HotGlue
       @hawk_keys = args[0][:hawk_keys]
       @singular = args[0][:singular]
 
+      @alt_lookups = args[0][:alt_lookups]
+
       column_classes = args[0][:col_identifier]
 
       singular = @singular
@@ -128,27 +130,33 @@ module  HotGlue
     def association_result(col)
       assoc_name = col.to_s.gsub("_id","")
       assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-      if assoc.nil?
-        exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-        exit
-      end
 
-      is_owner = col == ownership_field
-      assoc_class_name = assoc.class_name.to_s
-      display_column = HotGlue.derrive_reference_name(assoc_class_name)
 
-      if @hawk_keys[assoc.foreign_key.to_sym]
-        hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
-        hawked_association = hawk_definition.join(".")
+      if @alt_lookups.keys.include?(col.to_s)
+        alt = @alt_lookups[col.to_s][:lookup_as]
+        "<%= f.text_field :__lookup_#{alt}, placeholder: \"#{'email@domain.com' if alt.include?('email')}\" %>"
       else
-        hawked_association = "#{assoc.class_name}.all"
+        if assoc.nil?
+          exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+          exit
+        end
+
+        is_owner = col == ownership_field
+        assoc_class_name = assoc.class_name.to_s
+        display_column = HotGlue.derrive_reference_name(assoc_class_name)
+
+        if @hawk_keys[assoc.foreign_key.to_sym]
+          hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
+          hawked_association = hawk_definition.join(".")
+        else
+          hawked_association = "#{assoc.class_name}.all"
+        end
+
+        (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
+          "  <%= f.collection_select(:#{col}, #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col} }, class: 'form-control') %>\n" +
+          (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
+          (is_owner ? "\n<% end %>" : "")
       end
-
-      (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
-        "  <%= f.collection_select(:#{col}, #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col} }, class: 'form-control') %>\n" +
-        (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
-        (is_owner ? "\n<% end %>" : "")
-
     end
 
     def string_result(col, sql_type, limit)
@@ -247,7 +255,8 @@ module  HotGlue
                     exit
                     # raise(HotGlue::Error,exit_message)
                   end
-                  assoc_class_name = assoc.active_record.name
+                  assoc_class_name = assoc.class_name
+
                   display_column =  HotGlue.derrive_reference_name(assoc_class_name)
                   "<%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
 
