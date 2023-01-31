@@ -134,7 +134,7 @@ module  HotGlue
 
       if @alt_lookups.keys.include?(col.to_s)
         alt = @alt_lookups[col.to_s][:lookup_as]
-        "<%= f.text_field :__lookup_#{alt}, placeholder: \"#{'email@domain.com' if alt.include?('email')}\" %>"
+        "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" %>"
       else
         if assoc.nil?
           exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
