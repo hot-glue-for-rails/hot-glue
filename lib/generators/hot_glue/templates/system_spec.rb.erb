@@ -10,9 +10,7 @@ describe 'interaction for <%= controller_class_name %>', type: :feature do
     type = eval("#{singular_class}.columns_hash['#{col}']").type
     if (type == :integer && col.to_s.ends_with?("_id") || type == :uuid)
         assoc = "#{col.to_s.gsub('_id','')}"
-
-
-        the_foreign_class = eval(@singular_class + ".reflect_on_association(:" + assoc + ")").class_name.underscore
+        the_foreign_class = eval(@singular_class + ".reflect_on_association(:" + assoc + ")").class_name.split("::").last.underscore
         "  let!(:#{assoc}1) {create(:#{the_foreign_class}" + (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")   + ")}"
     end
   }.compact.join("\n")
