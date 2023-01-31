@@ -5,6 +5,7 @@ module LayoutStrategy
       @builder = scaffold_builder
     end
 
+    def column_classes_for_button_column; ""; end
     def button_classes; ""; end
     def button_column_style; "" ; end
     def button_style ; ""; end

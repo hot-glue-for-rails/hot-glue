@@ -1,7 +1,7 @@
 <div class="row">
 <%= all_form_fields %>
 
-  <div class="<%= @layout_strategy.column_classes_for_form_fields %>">
+  <div class="<%= @layout_strategy.column_classes_for_button_column %>">
     <\%= link_to "Cancel", <%= path_helper_plural %>,  {class: "btn btn-secondary"} %><% if @no_field_form %>
     <\%= f.hidden_field "_________" %><% end %>
     <\%= f.submit "Save", class: "btn btn-primary pull-right" %>

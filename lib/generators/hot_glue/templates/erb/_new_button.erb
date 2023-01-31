@@ -1,5 +1,5 @@
 <\%= turbo_frame_tag "<%= @namespace %>__<%= singular %>-new" do %>
   <div>
-    <\%= link_to "New <%= thing_label %>",  <%= new_path_name %>, disable_with: "Loading...", class: "new-<%= singular %>-button btn btn-primary pull-right <%= 'btn-sm' if @nested_set.any? %> " %>
+    <\%= link_to "<%= @new_button_label %>",  <%= new_path_name %>, disable_with: "Loading...", class: "new-<%= singular %>-button btn btn-primary pull-right <%= 'btn-sm' if @nested_set.any? %> " %>
   </div>
 <\% end %>

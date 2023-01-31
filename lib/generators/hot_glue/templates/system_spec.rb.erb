@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "interaction for <%= controller_class_name %>", type: :feature do
+describe 'interaction for <%= controller_class_name %>', type: :feature do
   include HotGlue::ControllerHelper
   include ActionView::RecordIdentifier
 
@@ -8,13 +8,10 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
 <%= (@columns - @show_only).map { |col|
     type = eval("#{singular_class}.columns_hash['#{col}']").type
-    case type
-    when :integer
-      if col.to_s.ends_with?("_id")
+    if (type == :integer && col.to_s.ends_with?("_id") || type == :uuid)
         assoc = "#{col.to_s.gsub('_id','')}"
-        "  let!(:#{assoc}1) {create(:#{assoc}" +  (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")   + ")}"
-      end
-    else
+        the_foreign_class = eval(@singular_class + ".reflect_on_association(:" + assoc + ")").class_name.split("::").last.underscore
+        "  let!(:#{assoc}1) {create(:#{the_foreign_class}" + (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")   + ")}"
     end
   }.compact.join("\n")
         %>
@@ -27,7 +24,16 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
   type = eval("#{singular_class}.columns_hash['#{col}']").type
   case type
   when :string
-    (col.to_s.include?('email') ? "#{col}: FFaker::Internet.email" : "#{col}: FFaker::Movie.title")
+    faker_string =
+    if col.to_s.include?('email')
+      "#{col}: FFaker::Internet.email"
+    elsif  col.to_s.include?('domain')
+      "#{col}: FFaker::Internet.domain_name"
+    elsif col.to_s.include?('ip_address') || col.to_s.ends_with?('_ip')
+      "#{col}: FFaker::Internet.ip_v4_address"
+    else
+      "#{col}: FFaker::Movie.title"
+    end
   when :text
     "#{col}:  FFaker::Lorem.paragraphs(10).join("  ")"
 
@@ -47,6 +53,8 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     else
      "#{col}: rand(100)"
     end
+  when :uuid
+    "#{col.to_s.gsub('_id','')}: #{col.to_s.gsub('_id','')}1"
   end
 }.compact.join(", ")
   %>let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )}
@@ -61,6 +69,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
 <%=
 @columns.map { |col|
   type = eval("#{singular_class}.columns_hash['#{col}']").type
+
   case type
   when :datetime
     "      " + ["expect(page).to have_content(#{singular}#{1}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(current_timezone)  )"].join("\n      ")
@@ -68,6 +77,15 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
     if !col.ends_with?("_id")
       "      " + ["expect(page).to have_content(#{singular}#{1}.#{col})"].join("\n      ")
     end
+  when :uuid
+    assoc_name = col.to_s.gsub('_id','')
+    association = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+
+
+    "      " + ["expect(page).to have_content(#{singular}#{1}.#{assoc_name}.#{HotGlue.derrive_reference_name(association.class_name)})"].join("\n      ")
+
+  when :boolean
+    "      " + ["expect(page).to have_content(#{singular}#{1}.#{col} ? 'YES' : 'NO')"].join("\n      ")
   else
         "      " + ["expect(page).to have_content(#{singular}#{1}.#{col})"].join("\n      ")
   end
@@ -80,8 +98,8 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
 <% unless @no_create %>  describe "new & create" do
     it "should create a new <%= singular.titlecase %>" do
       visit <%= path_helper_plural %>
-      click_link "New <%= thing_label %>"
-      expect(page).to have_selector(:xpath, './/h3[contains(., "New <%= thing_label %>")]')
+      click_link "New <%= @label %>"
+      expect(page).to have_selector(:xpath, './/h3[contains(., "New <%= @label %>")]')
 <%= test_capybara_block %>
       click_button "Save"
       expect(page).to have_content("Successfully created")
@@ -92,7 +110,7 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
 
     case type
     when :datetime
-      #    "      expect(page).to have_content(new_#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y')  + \" @ \" +
+      #    "      expect(page).to have_content(#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y')  + \" @ \" +
       # new_#{col}.in_time_zone(current_timezone).strftime('%l').strip + \":\" +
       # new_#{col}.in_time_zone(current_timezone).strftime('%M %p').strip + \" \" +
       # timezonize(current_timezone))"
@@ -102,6 +120,10 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
       else
          "expect(page).to have_content(new_#{col})"
       end
+
+    when :boolean
+        ["expect(page).to have_content(#{singular}#{1}.#{col} ? 'YES' : 'NO')"].join("\n      ")
+
     else
       "expect(page).to have_content(new_#{col})"
     end
@@ -124,19 +146,18 @@ describe "interaction for <%= controller_class_name %>", type: :feature do
 <%=
     (@columns - @show_only).map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
-      case type
-      when :datetime
-        # TODO: implement me
-      when :time
-        # TODO: implement me
-      when :date
-        # TODO: implement me
-      when :boolean
-        # TODO: implement me
+
+      if type == :uuid || (type == :integer && col.to_s.ends_with?("_id"))
+        assoc = col.to_s.gsub('_id', '')
+        class_name = eval("#{@singular_class}.reflect_on_association(:#{assoc})").class_name
+      "        expect(page).to have_content(#{assoc}1.#{HotGlue.derrive_reference_name(class_name)})"
+
+      elsif type == :boolean
+      '        expect(page).to have_content(new_' + col.to_s + ' ? "YES" : "NO")'
+
       else
-        unless type==:integer && col.to_s.ends_with?("_id")
-        '        expect(page).to have_content(new_' + col.to_s + ')'
-        end
+      '        expect(page).to have_content(new_' + col.to_s + ')'
+
       end
     }.compact.join("\n")
     %>

@@ -608,10 +608,6 @@ ActiveSupport::Inflector.inflections do |inflect|
 end
 ```
 
-### `--form-labels-position` (default: `after`; options are **before**, **after**, and **omit**)
-By default form labels appear after the form inputs. To make them appear before or omit them, use this flag.
-
-See also `--form-placeholder-labels` to use placeolder labels. 
 
 
 
@@ -812,14 +808,105 @@ Omits pagination. (All list views have pagination by default.)
 Omits list action. Only makes sense to use this if want to create a view where you only want the create button or to navigate to the update screen alternative ways. (The new/create still appears, as well the edit, update & destroy actions are still created even though there is no natural way to navigate to them.)
 
 
-### `--no-list-label`
 
+### `--no-create`
+
+Omits new & create actions.
+
+### `--no-delete`
+
+Omits delete button & destroy action.
+
+### `--big-edit`
+
+If you do not want inline editing of your list items but instead want to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
+
+### `--display-list-after-update`
+
+After an update-in-place normally only the edit view is swapped out for the show view of the record you just edited.
+
+Sometimes you might want to redisplay the entire list after you make an update (for example, if your action removes that record from the result set).
+
+To do this, use flag `--display-list-after-update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
+
+### `--with-turbo-streams`
+
+If and only if you specify `--with-turbo-streams`, your views will contain `turbo_stream_from` directives. Whereas your views will always contain `turbo_frame_tags` (wether or not this flag is specified) and will use the Turbo stream replacement mechanism for non-idempotent actions (create & update). This flag just brings the magic of live-reload to the scaffold interfaces themselves.
+
+**_To test_**: Open the same interface in two separate browser windows. Make an edit in one window and watch your edit appear in the other window instantly.
+
+This happens using two interconnected mechanisms:
+
+1) by default, all Hot Glue scaffold is wrapped in `turbo_frame_tag`s. The id of these tags is your namespace + the Rails dom_id(...). That means all Hot Glue scaffold is namespaced to the namespaces you use and won't collide with other turbo_frame_tag you might be using elsewhere
+
+2) by appending **model callbacks**, we can automatically broadcast updates to the users who are using the Hot Glue scaffold. The model callbacks (after_update_commit and after_destroy_commit) get appended automatically to the top of your model file. Each model callback targets the scaffold being built (so just this scaffold), using its namespace, and renders the line partial (or destroys the content in the case of delete) from the scaffolding.
+
+please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
+
+### `--alt-foreign-key-lookup` (Foriegn Key Lookups)
+
+`--alt-foreign-key-lookup=user_id{email}`
+
+Let's assume a `Company` `has_many :company_users` and also a `Company` `has_many :users, through: :company_users`
+
+Normally, you would be constructing a CompanyUsers downnest portal on the Company page. (Showing you only CompanyUsers associated with that company.)
+
+A drop down of _all users in the_ database will be display on the screen where you create a new CompanyUser (join) record.
+
+Let's say instead you don't want to expose the full list of all users to this controller, but instead make your user enter the full email address of the user to identify them.
+
+Instead of a drop-down, the interface will present an input box for the user to supply an email.
+
+
+TODO: Auto-add
+
+
+
+## "Thing" Label
+
+Note that on a per model basis, you can also globally omit the label or set a unique label value using
+`@@table_label_singular` and `@@table_label_plural` on your model objects.
+
+You have three options to specify labels explicitly with a string, and 1 option to specify a global name for which the words "Delete ___" and "New ___" will be added.
+
+If no `--label` is specified, it will be inferred to be the Capitalized version of the name of the thing you are building, with spaces for two or more words.
+
+### `--label`
+
+The general name of the thing, will be applied as "New ___" for the new button & form. Will be *pluralized* for list label heading, so if the word has a non-standard pluralization, be sure to specify it in `config/inflictions.rb`
+
+If you specify anything explicitly, it will be used.
+If not, a specification that exists as `@@tabel_label_singular` from the Model will be used.
+If this does not exist, the Titleized (capitalized) version of the model name. 
+
+### `--list-label-heading`
+The plural of the list of things at the top of the list.
+If not, a specification that exists as `@@tabel_label_plural` from the Model will be used.
+If this does not exist, the UPCASE (all-uppercase) version of the model name.
+
+### `--new-button-label`
+The button on the list that the user clicks onto to create a new record.
+(Follows same rules described in the `--label` option but with the word "New" prepended.)
+
+### `--new-form-heading`
+The text at the top of the new form that appears when the new input entry is displayed.
+(Follows same rules described in the `--label` option but with the word "New" prepended.)
+
+### `--no-list-label`
 Omits list LABEL itself above the list. (Do not confuse with the list heading which contains the field labels.)
 
-(Note that on a per model basis, you can also globally omit the label or set a unique label value using
-`@@table_label_singular` and `@@table_label_plural` on your model objects.)
-
 Note that list labels may  be automatically omitted on downnested scaffolds.
+
+
+
+
+## Field Labels
+
+### `--form-labels-position` (default: `after`; options are **before**, **after**, and **omit**)
+By default form labels appear after the form inputs. To make them appear before or omit them, use this flag.
+
+See also `--form-placeholder-labels` to use placeolder labels.
+
 
 ### `--form-placeholder-labels` (default: false)
 
@@ -841,39 +928,56 @@ Use `before` to make the labels come before or `after` to make them come after. 
 
 Omits the heading of column names that appears above the 1st row of data.
 
-### `--no-create`
 
-Omits new & create actions.
 
-### `--no-delete`
 
-Omits delete button & destroy action.
 
-### `--big-edit`
+## Special Features
 
-If you do not want inline editing of your list items but instead want to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
 
-### `--display-list-after-update` 
+### `--factory-creation={ ... }`
 
-After an update-in-place normally only the edit view is swapped out for the show view of the record you just edited.
+The code you specify inside of `{` and `}` will be used to generate a new object. The factory should instantiate with any arguments (I suggest Ruby keyword arguments) and must provide a method that is the name of the thing.
 
-Sometimes you might want to redisplay the entire list after you make an update (for example, if your action removes that record from the result set).
+For example, a user Factory might be called like so:
 
-To do this, use flag `--display-list-after-update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
+`rails generate hot_glue:scaffold User --factory-creation={factory = UserFactory.new(params: user_params)} --gd`
 
-### `--with-turbo-streams`
+(Note we are relying on the `user_params` method provided by the controller.)
 
-If and only if you specify `--with-turbo-streams`, your views will contain `turbo_stream_from` directives. Whereas your views will always contain `turbo_frame_tags` (wether or not this flag is specified) and will use the Turbo stream replacement mechanism for non-idempotent actions (create & update). This flag just brings the magic of live-reload to the scaffold interfaces themselves.
+You must do one of two things:
+1) In the code you specify, set an instance variable `@user` to be the newly created thing. (Your code should contain something like `@thing = ` to trigger this option.)
+2) Make a local variable called `factory` **and** have a method of the name of the object (`user`) on a local variable called `factory` that your code created
 
-**_To test_**: Open the same interface in two separate browser windows. Make an edit in one window and watch your edit appear in the other window instantly.
+(The code example above is the option for #2 because it does not contain `@user =`)
 
-This happens using two interconnected mechanisms:
+If using number #2, Hot Glue will append this to the code specified:
+```
+@user = factory.user
+```
 
-1) by default, all Hot Glue scaffold is wrapped in `turbo_frame_tag`s. The id of these tags is your namespace + the Rails dom_id(...). That means all Hot Glue scaffold is namespaced to the namespaces you use and won't collide with other turbo_frame_tag you might be using elsewhere
 
-2) by appending **model callbacks**, we can automatically broadcast updates to the users who are using the Hot Glue scaffold. The model callbacks (after_update_commit and after_destroy_commit) get appended automatically to the top of your model file. Each model callback targets the scaffold being built (so just this scaffold), using its namespace, and renders the line partial (or destroys the content in the case of delete) from the scaffolding.
+Here's a sample UserFactory that will create a new user only if one with a matching email address doesn't exist. (Otherwise, it will update the existing record.)
+Your initialize method can take any params you need it to, and using this pattern your business logic is applied consistently throughout your app. (You must, of course, use your Factory everywhere else in your app too.)
 
-please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
+```
+class UserFactory
+    attr_reader :user
+    attr_accessor :email
+
+    def initialize(params: {})
+        user = User.find_or_create_by(email: params[:email])
+    
+        user.update(params)
+        if user.new_record?
+            # do special new user logic here, like sending an email
+        end
+    end
+end
+```
+
+
+
 
 
 ## Automatic Base Controller
@@ -897,8 +1001,10 @@ Child portals have the headings omitted automatically (there is a heading identi
 ## Field Types Supported
 
 - Integers that don't end with `_id`: displayed as input fields with type="number"
-- Foreign keys: Integers that do end with `_id` will be treated automatically as associations. You should have a Rails association defined. (Hot Glue will warn you if it can't find one.)
+- Foreign key integers: Integers that do end with `_id` will be treated automatically as associations. You should have a Rails association defined. (Hot Glue will warn you if it can't find one.)
   - Note:  if your foreign key has a nonusual class name, it should be using the `class_name:` in the model definition
+- UUIDs (as primary key): Works seamlessly for the `id` field to make your primary key a UUID (Be sure to specify UUID in your model's migration). 
+- UUIDs (as foreign key): All UUIDs that are not named `id` are assumed to be foreign keys and will be treated as associations.
 - String: displayed as small input box 
 - Text: displayed as large textarea
 - Float: displayed as input box
@@ -910,8 +1016,11 @@ Child portals have the headings omitted automatically (there is a heading identi
   - For Rails 6 see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
   - AFAIK, you must specify the enum definition both in your model and also in your database migration for both Rails 6 + Rails 7
 
-
 # VERSION HISTORY
+#### 2023-01-29 - v0.5.7 - factory-creation
+see `--factory-creation` section or 
+- [Example #10](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/) in the Hot Glue Tutorial shows you how to use the hawk to limit the scope to the logged in user.
+
 
 #### 2023-01-02 - v0.5.6
 - Changes the long-form of the hawk specifier to require you to use the has_many of the relationship you are hawking (previously, it was assumed). See Hawk for details

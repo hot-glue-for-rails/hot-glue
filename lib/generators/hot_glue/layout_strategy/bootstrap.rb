@@ -1,7 +1,12 @@
 class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   def button_classes
-    " " + column_classes_for_line_fields
+    " " + "col-sm-#{builder.layout_object[:columns][:button_columns]}"
   end
+
+  def column_classes_for_button_column
+    "col-md-#{builder.layout_object[:columns][:button_columns]}"
+  end
+
 
   def column_classes_for_form_fields
     "col-md-#{builder.layout_object[:columns][:size_each]}"

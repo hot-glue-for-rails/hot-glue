@@ -133,19 +133,24 @@ module HotGlue
     class_option :hawk, type: :string, default: nil
     class_option :with_turbo_streams, type: :boolean, default: false
 
+    class_option :label, default: nil
+    class_option :list_label_heading, default: nil
+    class_option :new_button_label, default: nil
+    class_option :new_form_heading, default: nil
+
     class_option :no_list_label, type: :boolean, default: false
-
     class_option :no_list_heading, type: :boolean, default: false
-
 
     # determines if the labels show up BEFORE or AFTER on the NEW/EDIT (form)
     class_option :form_labels_position, type: :string, default: 'after' #  choices are before, after, omit
     class_option :form_placeholder_labels, type: :boolean,  default: false # puts the field names into the placeholder labels
 
-
-    # NOT YET IMPLEMENTED
     # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
     class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
+    class_option :factory_creation, default: ''
+    class_option :alt_foreign_key_lookup, default: '' #
+
+
 
     def initialize(*meta_args)
       super
@@ -404,6 +409,8 @@ module HotGlue
       identify_object_owner
       setup_hawk_keys
 
+      @factory_creation = options['factory_creation'].gsub(";", "\n")
+
 
 
       # SETUP FIELDS & LAYOUT
@@ -424,12 +431,55 @@ module HotGlue
       @menu_file_exists = true if @nested_set.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
       @turbo_streams = !!options['with_turbo_streams']
+
+
+      # syntax should be xyz_id{xyz_email},abc_id{abc_email}
+      # instead of a drop-down for the foreign entity, a text field will be presented
+      # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
+
+      alt_lookups_entry = options['alt_foreign_key_lookup'].split(",")
+      @alt_lookups = {}
+      @alt_foreign_key_lookup = alt_lookups_entry.each do |setting|
+        setting =~ /(.*){(.*)}/
+        key, lookup_as = $1, $2
+        assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
+
+        data = {lookup_as: lookup_as.gsub("+",""),
+                assoc: assoc,
+                with_create: lookup_as.include?("+")}
+        @alt_lookups[key] = data
+      end
+
+      puts "------ ALT LOOKUPS for #{@alt_lookups}"
+
+      @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").titleize )
+      @list_label_heading =  options['list_label_heading'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase )
+
+      @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? "New " + eval("#{class_name}.class_variable_get(:@@table_label_singular)") : "New " + singular.gsub("_", " ").titleize )
+      @new_form_heading = options['new_form_heading'] || "New #{@label}"
     end
+
+
+    def fields_filtered_for_email_lookups
+      @columns.reject{|c| @alt_lookups.keys.include?(c) } + @alt_lookups.values.map{|v| ("__lookup_#{v[:lookup_as]}").to_sym}
+    end
+
+
+    def creation_syntax
+      if @factory_creation == ''
+        "@#{singular_name } = #{ class_name }.create(modified_params#{ controller_update_params_tap_away_alt_lookups }) "
+      else
+        "#{@factory_creation}\n" +
+        "    @#{singular_name } = #{ class_name }.create(modified_params#{ controller_update_params_tap_away_alt_lookups }) "
+      end
+    end
+
+
 
     def setup_hawk_keys
       @hawk_keys = {}
 
-      if options['hawk']
+      if options["hawk"]
         options['hawk'].split(",").each do |hawk_entry|
           # format is: abc_id[thing]
 
@@ -443,7 +493,9 @@ module HotGlue
 
           hawk_scope = key.gsub("_id", "").pluralize
           @hawk_keys[key.to_sym] = [hawk_to]
-          if @use_shorthand # only include the hawk scope if using the shorthand
+          use_shorthand = !hawk_scope.include?("{")
+
+          if use_shorthand # only include the hawk scope if using the shorthand
             @hawk_keys[key.to_sym] << hawk_scope
           end
         end
@@ -586,7 +638,14 @@ module HotGlue
           end
           existing_file.rewind
         else
-          @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
+          if @god && @auth_identifier
+            @existing_content = "#HOTGLUE-SAVESTART\n  let!(:#{@auth_identifier}) {create(:#{@auth_identifier})}
+  before do
+    login_as(#{@auth_identifier})
+  end\n  #HOTGLUE-END"
+          else
+            @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
+          end
         end
 
         template "system_spec.rb.erb", dest_file
@@ -622,11 +681,13 @@ module HotGlue
 
 
     def regenerate_me_code
-      "rails generate hot_glue:scaffold #{ @meta_args[0][0] } #{@meta_args[1].join(" ")}"
+      "rails generate hot_glue:scaffold #{ @meta_args[0][0] } #{@meta_args[1].collect{|x| x.gsub(/\s*=\s*([\S\s]+)/, '=\'\1\'')}.join(" ")}"
     end
 
     def object_parent_mapping_as_argument_for_specs
-      if @nested_set.any?
+      if @self_auth
+        ""
+      elsif @nested_set.any?
         ", " + @nested_set.last[:singular] + ": " + @nested_set.last[:singular]
       elsif @auth
         ", #{@auth_identifier}: #{@auth}"
@@ -661,7 +722,7 @@ module HotGlue
     end
 
     def testing_name
-      singular_class_name.gsub("::","_").downcase
+      singular_class_name.gsub("::","_").underscore
     end
 
     def singular_class_name
@@ -692,16 +753,21 @@ module HotGlue
             '      ' + "find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
 
         when :integer
-
           if col.to_s.ends_with?("_id")
             assoc = col.to_s.gsub('_id','')
             "      #{col}_selector = find(\"[name='#{singular}[#{col}]']\").click \n" +
-              "      #{col}_selector.first('option', text: #{assoc}1.name).select_option"
+            "      #{col}_selector.first('option', text: #{assoc}1.name).select_option"
           else
             "      new_#{col} = rand(10) \n" +
-              "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-
+            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
           end
+
+        when :uuid
+          assoc_name = col.to_s.gsub('_id','')
+          "      #{col}_selector = find(\"[name='#{singular}[#{col}]']\").click \n" +
+            "      #{col}_selector.first('option', text: #{assoc_name}1.name).select_option\n" +
+            "      " + "new_#{col.to_s} = #{assoc_name}1.name \n"
+
 
         when :enum
           "      list_of_#{col.to_s} = #{singular_class}.defined_enums['#{col.to_s}'].keys \n" +
@@ -709,17 +775,21 @@ module HotGlue
             '      find("select[name=\'' + singular + '[' + col.to_s + ']\']  option[value=\'#{new_' + col.to_s + '}\']").select_option'
 
         when :boolean
-          "     new_#{col} = rand(2).floor \n" +
-            "     find(\"[name='#{testing_name}[#{col}]'][value='\#{new_" + col.to_s + "}']\").choose"
+          "      new_#{col} = 1 \n" +
+            "      find(\"[name='#{testing_name}[#{col}]'][value='\#{new_" + col.to_s + "}']\").choose"
         when :string
-          if col.to_s.include?("email")
-            "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
-              "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-
-          else
-            "      " + "new_#{col} = 'new_test-email@nowhere.com' \n" +
-              "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-          end
+          faker_string =
+            if col.to_s.include?('email')
+              "FFaker::Internet.email"
+            elsif  col.to_s.include?('domain')
+              "FFaker::Internet.domain_name"
+            elsif col.to_s.include?('ip_address') || col.to_s.ends_with?('_ip')
+              "FFaker::Internet.ip_v4_address"
+            else
+              "FFaker::Movie.title"
+            end
+            "      " + "new_#{col} = #{faker_string} \n" +
+            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
         when :text
           "      " + "new_#{col} = FFaker::Lorem.paragraphs(1).join("") \n" +
             "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
@@ -1004,6 +1074,9 @@ module HotGlue
 
       unless @no_edit
         res << 'edit'
+      end
+
+      unless @no_edit && @no_create
         res << '_form'
       end
 
@@ -1051,25 +1124,18 @@ module HotGlue
         col_identifier:  @layout_strategy.column_classes_for_form_fields,
         ownership_field: @ownership_field,
         form_labels_position: @form_labels_position,
-        form_placeholder_labels: @form_placeholder_labels
+        form_placeholder_labels: @form_placeholder_labels,
+        alt_lookups: @alt_lookups
       )
     end
 
 
     def list_label
-      if(eval("#{class_name}.class_variable_defined?(:@@table_label_plural)"))
-        eval("#{class_name}.class_variable_get(:@@table_label_plural)")
-      else
-        plural.gsub("_", " ").upcase
-      end
+      @list_label_heading
     end
 
-    def thing_label
-      if(eval("#{class_name}.class_variable_defined?(:@@table_label_singular)"))
-        eval("#{class_name}.class_variable_get(:@@table_label_singular)")
-      else
-        singular.gsub("_", " ").upcase
-      end
+    def new_thing_label
+      @new_thing_label
     end
 
     def all_line_fields
@@ -1155,9 +1221,16 @@ module HotGlue
      }.join("\n") + "\n"
     end
 
+
     def controller_update_params_tap_away_magic_buttons
       @magic_buttons.collect{ |magic_button|
         ".tap{ |ary| ary.delete('#{magic_button}') }"
+      }.join("")
+    end
+
+    def controller_update_params_tap_away_alt_lookups
+      @alt_lookups.collect{ |key, data|
+        ".tap{ |ary| ary.delete('__lookup_#{data[:lookup_as]}') }"
       }.join("")
     end
 
@@ -1207,9 +1280,10 @@ module HotGlue
     end
 
     def hawk_to_ruby
-      @hawk_keys.collect{ |k,v|
-        "#{k}: [#{v[0]}, \"#{v[1]}\"] "
+      res = @hawk_keys.collect{ |k,v|
+        "#{k}: [#{v[0]}, \"#{v[1]}\"]"
       }.join(", ")
+      res
     end
   end
 end

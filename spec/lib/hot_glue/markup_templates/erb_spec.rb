@@ -237,6 +237,7 @@ describe HotGlue::ErbTemplate do
 
     it "should hawk the dfg_id to the current user" do
       res = factory_all_form_fields({columns: [[:dfg_id]],
+                                     alt_lookups: {},
                                      singular_class: Ghi,
                                      singular: "ghi",
                                      hawk_keys: {dfg_id: ["current_user", "dfgs"] }})
