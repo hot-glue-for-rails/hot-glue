@@ -86,10 +86,12 @@ module HotGlue
           end
         elsif ! specified_grouping_mode
           # not smart and no specified grouping
-          #
+          layout_object[:columns][:button_columns] = 2
+
           layout_object[:columns][:container] = columns.collect{|col| [col]}
 
         else # specified grouping mode -- the builder is given control
+          layout_object[:columns][:button_columns] = 2
 
           (0..available_columns-1).each do |int|
             layout_object[:columns][:container][int] = []

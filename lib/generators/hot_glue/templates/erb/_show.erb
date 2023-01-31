@@ -23,7 +23,7 @@
 <% end %>
 
 <%= @layout_strategy.button_style %>
-<div class=" scaffold-line-buttons <%= @layout_strategy.button_classes %>" <%= @layout_strategy.button_style %>>
+<div class=" scaffold-line-buttons <%= @layout_strategy.column_classes_for_button_column %>" <%= @layout_strategy.button_style %>>
   <%= magic_button_output %>
 
   <% if destroy_action %>
