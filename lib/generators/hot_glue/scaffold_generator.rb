@@ -455,7 +455,7 @@ module HotGlue
       @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").titleize )
       @list_label_heading =  options['list_label_heading'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase )
 
-      @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") : "New " + singular.gsub("_", " ").titleize )
+      @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? "New " + eval("#{class_name}.class_variable_get(:@@table_label_singular)") : "New " + singular.gsub("_", " ").titleize )
       @new_form_heading = options['new_form_heading'] || "New #{@label}"
     end
 
