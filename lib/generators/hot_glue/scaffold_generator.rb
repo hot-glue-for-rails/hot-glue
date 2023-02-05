@@ -653,8 +653,9 @@ module HotGlue
           end
           existing_file.rewind
         else
-          if @god && @auth_identifier
-            @existing_content = "#HOTGLUE-SAVESTART\n  let!(:#{@auth_identifier}) {create(:#{@auth_identifier})}
+
+          if !@god && @auth_identifier
+            @existing_content = "#HOTGLUE-SAVESTART\n  let!(:#{@auth_identifier}) {create(:#{@auth_identifier} #{spec_foreign_association_merge_hash} )}
   before do
     login_as(#{@auth_identifier})
   end\n  #HOTGLUE-END"
@@ -663,10 +664,28 @@ module HotGlue
           end
         end
 
+
         template "system_spec.rb.erb", dest_file
       end
 
       template "#{@markup}/_errors.#{@markup}", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.#{@markup}")
+    end
+
+    def spec_foreign_association_merge_hash
+      ", #{testing_name}: #{testing_name}1"
+    end
+
+    def spec_related_column_lets
+      (@columns - @show_only).map { |col|
+        type = eval("#{singular_class}.columns_hash['#{col}']").type
+        if (type == :integer && col.to_s.ends_with?("_id") || type == :uuid)
+          assoc = "#{col.to_s.gsub('_id','')}"
+          the_foreign_class = eval(@singular_class + ".reflect_on_association(:" + assoc + ")").class_name.split("::").last.underscore
+          hawk_keys_on_lets = (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")
+
+          "  let!(:#{assoc}1) {create(:#{the_foreign_class}" +  hawk_keys_on_lets + ")}"
+        end
+      }.compact.join("\n")
     end
 
     def list_column_headings
@@ -716,7 +735,7 @@ module HotGlue
       end
 
       @nested_set.each do |arg|
-        res << "  let(:#{arg[:singular]}) {create(:#{arg[:singular]} #{last_parent} )}\n"
+        res << "let(:#{arg[:singular]}) {create(:#{arg[:singular]} #{last_parent} )}\n"
         last_parent = ", #{arg[:singular]}: #{arg[:singular]}"
       end
       res
@@ -752,8 +771,8 @@ module HotGlue
       @auth_identifier
     end
 
-    def test_capybara_block
-      (@columns - @show_only).map { |col|
+    def test_capybara_block(which_partial = :create)
+      (@columns - (which_partial == :create ? @show_only : @update_show_only)).map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         case type
         when :date
