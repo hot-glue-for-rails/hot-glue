@@ -121,6 +121,7 @@ module HotGlue
     class_option :no_paginate, type: :boolean, default: false
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
+    class_option :update_show_only, type: :string, default: ""
 
     class_option :ujs_syntax, type: :boolean, default: nil
     class_option :downnest, type: :string, default: nil
@@ -273,6 +274,13 @@ module HotGlue
       if !options['show_only'].empty?
         @show_only += options['show_only'].split(",").collect(&:to_sym)
       end
+
+      @update_show_only = []
+      if !options['update_show_only'].empty?
+        @update_show_only += options['update_show_only'].split(",").collect(&:to_sym)
+      end
+
+
 
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs_only'] || false
@@ -451,6 +459,11 @@ module HotGlue
       end
 
       puts "------ ALT LOOKUPS for #{@alt_lookups}"
+
+      @update_alt_lookups = @alt_lookups.collect{|key, value|
+                                              @update_show_only.include?(key) ?
+                                                    {  key: value }
+                                                      : nil}.compact
 
       @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").titleize )
       @list_label_heading =  options['list_label_heading'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase )
@@ -1076,10 +1089,9 @@ module HotGlue
         res << 'edit'
       end
 
-      unless @no_edit && @no_create
-        res << '_form'
+      if !( @no_edit && @no_create)
+          res << '_form'
       end
-
       res
     end
 
@@ -1114,10 +1126,11 @@ module HotGlue
       []
     end
 
-    def all_form_fields
+    def form_fields_html
       @template_builder.all_form_fields(
         columns: @layout_object[:columns][:container],
         show_only: @show_only,
+        update_show_only: @update_show_only,
         singular_class: singular_class,
         singular: singular,
         hawk_keys: @hawk_keys,
@@ -1128,7 +1141,6 @@ module HotGlue
         alt_lookups: @alt_lookups
       )
     end
-
 
     def list_label
       @list_label_heading
@@ -1234,6 +1246,12 @@ module HotGlue
       }.join("")
     end
 
+
+    def controller_update_params_tap_away_alt_lookups_for_update_alt_lookups
+      @update_alt_lookups.collect{ |key, data|
+        ".tap{ |ary| ary.delete('__lookup_#{data[:lookup_as]}') }"
+      }.join("")
+    end
 
     def nested_for_turbo_id_list_constructor
       if @nested_set.any?

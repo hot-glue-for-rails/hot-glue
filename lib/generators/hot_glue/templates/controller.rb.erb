@@ -89,7 +89,6 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
    }.join("/n") %><% end %>
 <% if @alt_lookups.any? %><%= @alt_lookups.collect{|key, data|
  "    @#{ singular_name }.#{key.gsub("_id", "")} = #{key.gsub("_id", "")}"
-# "    modified_params[:#{key}] = #{data[:assoc].downcase} ? #{data[:assoc].downcase}.id : nil"
  }.join("/n") %><% end %>
     if @<%= singular_name %>.save
       flash[:notice] = "Successfully created #{@<%= singular %>.<%= display_class %>}"
@@ -114,9 +113,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     unless @factory_creation.include?("#{data[:assoc].downcase} = ")
 "    #{data[:assoc].downcase} = #{data[:assoc]}.#{data[:with_create] ? "find_or_create_by" : "find_by"}(#{data[:lookup_as]}: #{ singular_name }_params[:__lookup_#{data[:lookup_as]}])\n"
     end
-   }.join("/n") %><% end %><% if  @alt_lookups.any? %>
-    modified_params.merge!(<%= @alt_lookups.collect{|key, data| "#{key.gsub("_id", "")}: #{key.gsub("_id", "")}" }.join(", ") %>) <% end %>
-    if @<%= singular_name %>.update(modified_params<%= controller_update_params_tap_away_alt_lookups %>)
+   }.join("/n") %><% end %><% if (@update_alt_lookups).any? %>
+      <%= @update_alt_lookups.collect{|key, data|
+   "    @#{ singular_name }.#{key.gsub("_id", "")} = #{key.gsub("_id", "")}"
+   }.join("/n") %><% end %>
+    if @<%= singular_name %>.update(modified_params<%= controller_update_params_tap_away_alt_lookups_for_update_alt_lookups  %>)
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
       flash[:notice] = (flash[:notice] || "") << "Saved #{@<%= singular %>.<%= display_class %>}"
       flash[:alert] = @hawk_alarm if @hawk_alarm
