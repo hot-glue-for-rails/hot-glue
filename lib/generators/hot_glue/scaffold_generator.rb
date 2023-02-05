@@ -265,8 +265,9 @@ module HotGlue
 
       if !options['include'].empty?
         @include_fields = []
+
         # semicolon to denote layout columns; commas separate fields
-        @include_fields += options['include'].gsub(":","").split(",").collect(&:to_sym)
+        @include_fields += options['include'].split(":").collect{|x|x.split(",")}.flatten.collect(&:to_sym)
       end
 
 
@@ -560,6 +561,7 @@ module HotGlue
       else
         @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
       end
+
 
       @associations = []
       @columns.each do |col|
