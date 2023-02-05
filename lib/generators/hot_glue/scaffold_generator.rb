@@ -788,20 +788,14 @@ module HotGlue
 
         when :integer
           if col.to_s.ends_with?("_id")
-            assoc = col.to_s.gsub('_id','')
-            "      #{col}_selector = find(\"[name='#{singular}[#{col}]']\").click \n" +
-            "      #{col}_selector.first('option', text: #{assoc}1.name).select_option"
+            capybara_block_for_association(col_name: col, which_partial: which_partial)
           else
             "      new_#{col} = rand(10) \n" +
             "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
           end
 
         when :uuid
-          assoc_name = col.to_s.gsub('_id','')
-          "      #{col}_selector = find(\"[name='#{singular}[#{col}]']\").click \n" +
-            "      #{col}_selector.first('option', text: #{assoc_name}1.name).select_option\n" +
-            "      " + "new_#{col.to_s} = #{assoc_name}1.name \n"
-
+          capybara_block_for_association(col_name: col, which_partial: which_partial)
 
         when :enum
           "      list_of_#{col.to_s} = #{singular_class}.defined_enums['#{col.to_s}'].keys \n" +
@@ -830,6 +824,20 @@ module HotGlue
         end
 
       }.join("\n")
+    end
+
+
+    def capybara_block_for_association(col_name: nil , which_partial: nil )
+      assoc = col_name.to_s.gsub('_id','')
+      if which_partial == :update && @update_show_only.include?(col_name)
+        # do not update tests
+      elsif @alt_lookups.keys.include?(col_name.to_s)
+        lookup = @alt_lookups[col_name.to_s][:lookup_as]
+        "      find(\"[name='#{singular}[__lookup_#{lookup}]']\").fill_in( with: #{assoc}1.#{lookup} )"
+      else
+        "      #{col_name}_selector = find(\"[name='#{singular}[#{col_name}]']\").click \n" +
+          "      #{col_name}_selector.first('option', text: #{assoc}1.name).select_option"
+      end
     end
 
 
