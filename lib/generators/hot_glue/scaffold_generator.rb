@@ -480,10 +480,10 @@ module HotGlue
 
     def creation_syntax
       if @factory_creation == ''
-        "@#{singular_name } = #{ class_name }.create(modified_params#{ controller_update_params_tap_away_alt_lookups }) "
+        "@#{singular_name } = #{ class_name }.create(modified_params) "
       else
         "#{@factory_creation}\n" +
-        "    @#{singular_name } = #{ class_name }.create(modified_params#{ controller_update_params_tap_away_alt_lookups }) "
+        "    @#{singular_name } = #{ class_name }.create(modified_params) "
       end
     end
 
@@ -1242,13 +1242,6 @@ module HotGlue
 
     def controller_update_params_tap_away_alt_lookups
       @alt_lookups.collect{ |key, data|
-        ".tap{ |ary| ary.delete('__lookup_#{data[:lookup_as]}') }"
-      }.join("")
-    end
-
-
-    def controller_update_params_tap_away_alt_lookups_for_update_alt_lookups
-      @update_alt_lookups.collect{ |key, data|
         ".tap{ |ary| ary.delete('__lookup_#{data[:lookup_as]}') }"
       }.join("")
     end

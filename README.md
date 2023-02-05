@@ -711,11 +711,31 @@ This is what would happen if 9 fields, specified in the order A,B,C,D,E,F,G,H,I,
 ### `--show-only=`
 (separate field names by COMMA)
 
-Any fields only the 'show-only' list will appear as non-editable on the generate form. (visible only)
+Any fields only the 'show-only' list will appear as non-editable on the generated form for both new & edit actions. (visible only)
 
 IMPORTANT: By default, all fields that begin with an underscore (`_`) are automatically show-only.
 
-I would recommend this for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
+This is for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
+
+
+### `--update-show-only`
+(separate field names by COMMA)
+
+Fields on the `update show only`  (and not on the `show only` list) will appear as non-editible only for the **edit** action, but will still allow entry for the **create** action.
+
+Note that Hot Glue still generates a singular partial (`_form`) for both actions, but your form will now contain statements like:
+
+```
+ <% if action_name == 'edit' %>
+    <%= xyz.name %><
+ <% else %>
+    <%= f.text_field :name %>
+ <% end %>
+```
+
+This works for both regular fields, association fields, and alt lookup fields.
+
+
 
 ### `--ujs_syntax=true` (Default is set automatically based on whether you have turbo-rails installed)
 
@@ -843,7 +863,8 @@ This happens using two interconnected mechanisms:
 
 please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
 
-### `--alt-foreign-key-lookup` (Foriegn Key Lookups)
+
+### `--alt-foreign-key-lookup` (Foreign Key Lookups)
 
 `--alt-foreign-key-lookup=user_id{email}`
 
@@ -855,11 +876,10 @@ A drop down of _all users in the_ database will be display on the screen where y
 
 Let's say instead you don't want to expose the full list of all users to this controller, but instead make your user enter the full email address of the user to identify them.
 
-Instead of a drop-down, the interface will present an input box for the user to supply an email.
+Instead of a drop-down, the interface will present an input box for the user to supply an *search by* email.
 
-
-TODO: Auto-add
-
+** Note: Current implementation does not work in conjunction with hawked associations to protect against users from accessing associated records not within scope.**
+TODO: make it work with hawked associations to protect against users from accessing associated records not within scope
 
 
 ## "Thing" Label
