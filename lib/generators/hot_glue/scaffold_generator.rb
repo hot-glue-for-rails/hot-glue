@@ -436,7 +436,7 @@ module HotGlue
                                               smart_layout: @smart_layout )
       @layout_object = builder.construct
 
-      @menu_file_exists = true if @nested_set.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
+      @menu_file_exists = true if @nested_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
       @turbo_streams = !!options['with_turbo_streams']
 
@@ -638,7 +638,7 @@ module HotGlue
       unless @no_specs
         dest_file = File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
 
-        if  File.exists?(dest_file)
+        if  File.exist?(dest_file)
           existing_file = File.open(dest_file)
           existing_content = existing_file.read
           if existing_content =~ /\#HOTGLUE-SAVESTART/
@@ -994,7 +994,7 @@ module HotGlue
 
 
     def include_nav_template
-      File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}")
+      File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}")
     end
 
     def copy_view_files
@@ -1031,7 +1031,7 @@ module HotGlue
 
       # menu_file = "app/views#{namespace_with_dash}/menu.erb"
       #
-      # if File.exists?(menu_file)
+      # if File.exist?(menu_file)
       #   # TODO: can I insert the new menu item into the menu programatically here?
       #   # not sure how i would achieve this without nokogiri
       #
