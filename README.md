@@ -1080,9 +1080,17 @@ Now, your labels will show up as defined in the `_labels` ("Is Pending", etc) in
 
 
 # VERSION HISTORY
-#### 2023-01-29 - v0.5.7 - factory-creation
-see `--factory-creation` section or 
+
+#### TBR - v0.5.7 - factory-creation, alt lookups, fixes to Enums, support for Ruby 3.2
+• See `--factory-creation` section or 
 - [Example #10](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/) in the Hot Glue Tutorial shows you how to use the hawk to limit the scope to the logged in user.
+
+• `--alt-lookup-foreign_keys`
+Allows you to specify that a foreign key should act as a search field, allowing the user to input a unique value (like an email) to search for a related record.
+
+• Syntax fix to support Ruby 3.2.0 
+
+• Tweaks to how Enums are display (see "Note about Enums")
 
 
 #### 2023-01-02 - v0.5.6
