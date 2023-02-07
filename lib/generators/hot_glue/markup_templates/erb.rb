@@ -233,7 +233,14 @@ module  HotGlue
 
     def enum_result(col)
       enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
-      "<%= f.collection_select(:#{col},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {selected: @#{singular}.#{col} }, class: 'form-control') %>"
+
+      if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
+        enum_definer = "#{singular_class}.#{enum_type}_labels"
+      else
+        enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
+      end
+
+      "<%= f.collection_select(:#{col},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: @#{singular}.#{col} }, class: 'form-control') %>"
     end
 
     ################################################################
@@ -351,11 +358,16 @@ module  HotGlue
             when :enum
               enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
 
+              if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
+                enum_definer = "#{singular_class}.#{enum_type}_labels"
+              else
+                enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
+              end
                        "
     <% if #{singular}.#{col}.nil? %>
         <span class='alert-danger'>MISSING</span>
     <% else %>
-      <%=  #{singular_class}.defined_enums['#{enum_type}'][#{singular}.#{col}] %>
+      <%=  #{enum_definer}[#{singular}.#{col}.to_sym] %>
     <% end %>
 
 "

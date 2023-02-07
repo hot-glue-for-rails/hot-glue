@@ -1034,7 +1034,50 @@ Child portals have the headings omitted automatically (there is a heading identi
 - Boolean: displayed radio buttons yes/ no
 - Enum - displayed as a drop-down list (defined the enum values on your model). 
   - For Rails 6 see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
-  - AFAIK, you must specify the enum definition both in your model and also in your database migration for both Rails 6 + Rails 7
+  - You must specify the enum definition both in your model and also in your database migration for both Rails 6 + Rails 7
+
+# Note about enums
+
+The Rails 7 enum implementation for Postgres is very slick but has a counter-intuitive facet.
+Define your Enums in Postgres as strings:
+(database migration)
+```
+    create_enum :status, ["pending", "active", "archived"]
+
+    create_table :users, force: true do |t|
+      t.enum :status, enum_type: "status", default: "pending", null: false
+      t.timestamps
+    end
+```
+
+Then define your `enum` ActiveRecord declaration with duplicate keys & strings:
+(model definition)
+```
+enum status: {
+    pending: "pending",
+    active: "active",
+    archived: "archived",
+    disabled: "disabled",
+    waiting: "waiting"
+  }
+```
+
+To set the labels, use another class-level method that is a hash of keys-to-labels using a method named the same name as the enum method but with `_labels`
+
+If no `_labels` method exists, Hot Glue will fallback to using the Postgres-defined names.
+```
+def self.status_labels
+    {
+      pending: 'Is Pending',
+      active: 'Is active',
+      archived: 'Is Archived',
+      disabled: 'Is Disabled',
+      waiting: 'Is Waiting'
+    }
+```
+
+Now, your labels will show up as defined in the `_labels` ("Is Pending", etc) instead of the database-values.
+
 
 # VERSION HISTORY
 #### 2023-01-29 - v0.5.7 - factory-creation
