@@ -11,16 +11,16 @@ Alternatively, you can use this tool to create a Turbo-backed *section* of your 
 
 It will read your relationships and field types to generate your code for you, leaving you with a 'sourdough starter' to work from. If you modify the generated code, you're on your own if you want to preserve your changes and also re-generate scaffolding after adding fields.
 
-By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields.
+By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields. (Handily, Hot Glue leaves the command you used in a comment at the top of your generated controller so you can regenerate it again in the future.)
 
 Hot Glue generates functionality that is quick and dirty. It lets you be crafty. As with a real glue gun, use it with caution.
 
 * Build plug-and-play scaffolding mixing generated ERB with the power of Hotwire and Turbo-Rails
 * Everything edits-in-place (unless you use `--big-edit`)
-* Automatically reads your models (make them AND migrate your database before building your scaffolding!)
+* Automatically reads your models (make them, add relationships, **and** migrate your database before building your scaffolding!)
 * Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination
 * Great for prototyping, but you should learn Rails fundamentals first.
-* 'Packaged' with Devise, Kaminari, Rspec, FontAwesome
+* 'Packaged' with Devise, Kaminari, Rspec, FontAwesome (optional)
 * Create system specs automatically along with the generated code.
 * Nest your routes model-by-model for built-in poor man's authentication.
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
