@@ -29,12 +29,12 @@ How is it different than Rails scaffolding?
 
 Although inspired by the Rails scaffold generators (built-in to Rails), Hot Glue does something similiar but has made opinionated decisions that deviate from the normal Rails scaffold: 
 
-1. The Hot Glue scaffolds are complete packages and pre-optimized for 'edit-in-place.' (the Rails scaffolds still generates views that make you flip between pages to do create/update operations)
+1. The Hot Glue scaffolds are complete packages and pre-optimized for 'edit-in-place.' (the Rails scaffolding still generates views that make you flip between pages to do create/update operations)
 2. Hot Glue does not create your models along with your scaffolding. Instead, create them first using `rails generate model X`
-3. Hot Glue *reads* the fields on your database *and* the relationships defined on your models. Unlike the Rails scaffolding you must add relationships and migration your DB before building your scaffolding.
+3. Hot Glue *reads* the fields on your database *and* the relationships defined on your models. Unlike the Rails scaffolding you must add relationships and migrate your DB before building your scaffolding.
 4. Hot Glue has many more features for building layouts quickly, like choosing which fields to include or exclude and how to lay them out on the page, for stitching together related objects (nesting and child portals), and more. 
 
-Other than the opinionated differences and additional features, Hot Glue produces code that is fundamentally very similiar and works consistent with the Rails 7 ways of working. 
+Other than the opinionated differences and additional features, Hot Glue produces code that is fundamentally very similiar and works consistent with the Rails 7 Hotwire & Turbo paradigms.
 
 # Get Hot Glue
 
@@ -366,13 +366,15 @@ Alternatively, you can define your own driver like so:
 
 TitleCase class name of the thing you want to build a scaffoling for.
 
+```
 rails generate hot_glue:scaffold Thing
+```
 
-(note: Your Thing object must belong_to an authenticated User or alternatively you must create a Gd controller, see below.)
+(note: Your `Thing` object must `belong_to` an authenticated `User` or alternatively you must create a Gd controller, see below.)
 
 ## Options With Arguments
 
-All options two dashes (--) and these take an `=` and a value
+All options begin with two dashes (`--`) and a followed by an `=` and a value
 
 ### `--namespace=`
 
