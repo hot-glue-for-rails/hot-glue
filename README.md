@@ -1319,9 +1319,9 @@ This runs both the **generated specs** and also the **internal specs**. Examine 
 
 To run only the internal specs, use 
 
-`COVERGE=on rspec spec`
+`rspec spec`
 
-Internal Test coverage as of 2022-03-23 (v0.5.2)
+Internal Test coverage as of 2023-02-10 (v0.5.7)
 
-![HG 84 89 coverage report](https://user-images.githubusercontent.com/59002/159719583-a956cfb3-1797-4186-b32c-237ed19e8e2b.png)
+<img width="1202" alt="Screen Shot 2023-02-10 at 4 43 59 PM" src="https://user-images.githubusercontent.com/59002/218204736-5740505b-1ec8-456f-b0fb-9c359f6f7037.png">
 
