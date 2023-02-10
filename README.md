@@ -1081,12 +1081,16 @@ Now, your labels will show up as defined in the `_labels` ("Is Pending", etc) in
 
 # VERSION HISTORY
 
-#### TBR - v0.5.7 - factory-creation, alt lookups, fixes to Enums, support for Ruby 3.2
+#### TBR - v0.5.7 - factory-creation, alt lookups, update show only, fixes to Enums, support for Ruby 3.2
 • See `--factory-creation` section or 
 - [Example #10](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/) in the Hot Glue Tutorial shows you how to use the hawk to limit the scope to the logged in user.
 
 • `--alt-lookup-foreign_keys`
 Allows you to specify that a foreign key should act as a search field, allowing the user to input a unique value (like an email) to search for a related record.
+
+• `--update-show-only`
+Allows you to specify a list fields that should be show-only (non-editable) on the **edit** page but remain inputable on the **create** page. 
+Note that a singular partial `_form` is still used for new & edit, but now contains `if` statements that check the action and display the show-only version only on the edit action. 
 
 • Syntax fix to support Ruby 3.2.0 
 
