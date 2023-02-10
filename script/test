@@ -33,13 +33,14 @@ rails generate hot_glue:scaffold Fruits::Cantelope --gd
 
 rails generate hot_glue:scaffold Pet --gd
 
+rails generate hot_glue:scaffold Human --gd
+
 #rails generate hot_glue:scaffold User --no-create --self-auth
 #rails generate hot_glue:scaffold Jkl --gd
-#
 #rails generate hot_glue:scaffold Appointment --hawk=pets --gd
-#rails generate hot_glue:scaffold Humen --gd
 #rails generate hot_glue:scaffold Family --gd
 
+# TODO: test these
 # --update-show-only
 # --alt-lookup-foreign-keys
 # --factory-creation

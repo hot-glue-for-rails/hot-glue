@@ -1094,7 +1094,7 @@ Allows you to specify that a foreign key should act as a search field, allowing 
 Allows you to specify a list fields that should be show-only (non-editable) on the **edit** page but remain inputable on the **create** page. 
 Note that a singular partial `_form` is still used for new & edit, but now contains `if` statements that check the action and display the show-only version only on the edit action. 
 
-• Syntax fix to support Ruby 3.2.0 
+• Syntax fix to support Ruby 3.2.0 (the installer was broken if you used Ruby 3.2)
 
 • Tweaks to how Enums are display (see "Note about Enums")
 
