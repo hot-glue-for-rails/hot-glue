@@ -11,16 +11,16 @@ Alternatively, you can use this tool to create a Turbo-backed *section* of your 
 
 It will read your relationships and field types to generate your code for you, leaving you with a 'sourdough starter' to work from. If you modify the generated code, you're on your own if you want to preserve your changes and also re-generate scaffolding after adding fields.
 
-By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields.
+By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields. (Handily, Hot Glue leaves the command you used in a comment at the top of your generated controller so you can regenerate it again in the future.)
 
 Hot Glue generates functionality that is quick and dirty. It lets you be crafty. As with a real glue gun, use it with caution.
 
 * Build plug-and-play scaffolding mixing generated ERB with the power of Hotwire and Turbo-Rails
 * Everything edits-in-place (unless you use `--big-edit`)
-* Automatically reads your models (make them AND migrate your database before building your scaffolding!)
+* Automatically reads your models (make them, add relationships, **and** migrate your database before building your scaffolding!)
 * Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination
 * Great for prototyping, but you should learn Rails fundamentals first.
-* 'Packaged' with Devise, Kaminari, Rspec, FontAwesome
+* 'Packaged' with Devise, Kaminari, Rspec, FontAwesome (optional)
 * Create system specs automatically along with the generated code.
 * Nest your routes model-by-model for built-in poor man's authentication.
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
@@ -29,12 +29,12 @@ How is it different than Rails scaffolding?
 
 Although inspired by the Rails scaffold generators (built-in to Rails), Hot Glue does something similiar but has made opinionated decisions that deviate from the normal Rails scaffold: 
 
-1. The Hot Glue scaffolds are complete packages and pre-optimized for 'edit-in-place.' (the Rails scaffolds still generates views that make you flip between pages to do create/update operations)
+1. The Hot Glue scaffolds are complete packages and pre-optimized for 'edit-in-place.' (the Rails scaffolding still generates views that make you flip between pages to do create/update operations)
 2. Hot Glue does not create your models along with your scaffolding. Instead, create them first using `rails generate model X`
-3. Hot Glue *reads* the fields on your database *and* the relationships defined on your models. Unlike the Rails scaffolding you must add relationships and migration your DB before building your scaffolding.
+3. Hot Glue *reads* the fields on your database *and* the relationships defined on your models. Unlike the Rails scaffolding you must add relationships and migrate your DB before building your scaffolding.
 4. Hot Glue has many more features for building layouts quickly, like choosing which fields to include or exclude and how to lay them out on the page, for stitching together related objects (nesting and child portals), and more. 
 
-Other than the opinionated differences and additional features, Hot Glue produces code that is fundamentally very similiar and works consistent with the Rails 7 ways of working. 
+Other than the opinionated differences and additional features, Hot Glue produces code that is fundamentally very similiar and works consistent with the Rails 7 Hotwire & Turbo paradigms.
 
 # Get Hot Glue
 
@@ -366,13 +366,15 @@ Alternatively, you can define your own driver like so:
 
 TitleCase class name of the thing you want to build a scaffoling for.
 
+```
 rails generate hot_glue:scaffold Thing
+```
 
-(note: Your Thing object must belong_to an authenticated User or alternatively you must create a Gd controller, see below.)
+(note: Your `Thing` object must `belong_to` an authenticated `User` or alternatively you must create a Gd controller, see below.)
 
 ## Options With Arguments
 
-All options two dashes (--) and these take an `=` and a value
+All options begin with two dashes (`--`) and a followed by an `=` and a value
 
 ### `--namespace=`
 
