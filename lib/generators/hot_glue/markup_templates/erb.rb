@@ -44,8 +44,10 @@ module  HotGlue
     # THE FORM
 
     def all_form_fields(*args)
+
       @columns = args[0][:columns]
       @show_only = args[0][:show_only]
+
       @singular_class = args[0][:singular_class]
       @ownership_field  = args[0][:ownership_field]
       @form_labels_position = args[0][:form_labels_position]
@@ -56,24 +58,25 @@ module  HotGlue
       @alt_lookups = args[0][:alt_lookups]
 
       column_classes = args[0][:col_identifier]
-
+      update_show_only = args[0][:update_show_only] || []
       singular = @singular
+
       result = columns.map{ |column|
         "  <div class='#{column_classes}' >" +
           column.map { |col|
+            type = eval("#{singular_class}.columns_hash['#{col}']").type
+            limit = eval("#{singular_class}.columns_hash['#{col}']").limit
+            sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
+
             field_result =
               if show_only.include?(col.to_sym)
-                "<%= #{singular}.#{col} %>"
+                show_only_result(type: type, col: col, singular: singular)
               else
-                type = eval("#{singular_class}.columns_hash['#{col}']").type
-                limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-                sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
-
                 case type
                 when :integer
                   integer_result(col)
                 when :uuid
-                  uuid_result(col)
+                  association_result(col)
                 when :string
                   string_result(col, sql_type, limit)
                 when :text
@@ -98,11 +101,18 @@ module  HotGlue
             else
               field_error_name = col
             end
-
+            show_only_open = ""
+            show_only_close = ""
+            if update_show_only.include?(col)
+              show_only_open = "<% if action_name == 'edit' %>" +
+                show_only_result(type: type, col: col, singular: singular) + "<% else %>"
+              show_only_close = "<% end %>"
+            end
             the_label = "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
             add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
                                     add_spaces_each_line( (@form_labels_position == 'before' ? the_label : "") +
-                                      field_result + (@form_labels_position == 'after' ? the_label : "")   , 4) +
+                                    show_only_open +  field_result + show_only_close +
+                                    (@form_labels_position == 'after' ? the_label : "")   , 4) +
                                     "\n  </span>\n  <br />", 2)
 
 
@@ -111,6 +121,14 @@ module  HotGlue
       return result
     end
 
+
+    def show_only_result(type:, col: , singular: )
+      if type == :uuid || (type == :integer && col.ends_with?("_id"))
+        association_read_only_result(col)
+      else
+        "<%= #{singular}.#{col} %>"
+      end
+    end
 
     def integer_result(col)
       # look for a belongs_to on this object
@@ -121,11 +139,26 @@ module  HotGlue
       end
     end
 
+    def association_read_only_result(col)
+      assoc_name = col.to_s.gsub("_id","")
+      assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+      if assoc.nil?
+        exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+        exit
+      end
 
-    def uuid_result(col)
-      association_result(col)
+      is_owner = col == ownership_field
+      assoc_class_name = assoc.class_name.to_s
+      display_column = HotGlue.derrive_reference_name(assoc_class_name)
+
+      if @hawk_keys[assoc.foreign_key.to_sym]
+        hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
+        hawked_association = hawk_definition.join(".")
+      else
+        hawked_association = "#{assoc.class_name}.all"
+      end
+      "<%= #{@singular}.#{assoc_name}.#{display_column} %>"
     end
-
 
     def association_result(col)
       assoc_name = col.to_s.gsub("_id","")
@@ -200,7 +233,14 @@ module  HotGlue
 
     def enum_result(col)
       enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
-      "<%= f.collection_select(:#{col},  enum_to_collection_select( #{singular_class}.defined_enums['#{enum_type}']), :key, :value, {selected: @#{singular}.#{col} }, class: 'form-control') %>"
+
+      if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
+        enum_definer = "#{singular_class}.#{enum_type}_labels"
+      else
+        enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
+      end
+
+      "<%= f.collection_select(:#{col},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: @#{singular}.#{col} }, class: 'form-control') %>"
     end
 
     ################################################################
@@ -318,11 +358,16 @@ module  HotGlue
             when :enum
               enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
 
+              if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
+                enum_definer = "#{singular_class}.#{enum_type}_labels"
+              else
+                enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
+              end
                        "
     <% if #{singular}.#{col}.nil? %>
         <span class='alert-danger'>MISSING</span>
     <% else %>
-      <%=  #{singular_class}.defined_enums['#{enum_type}'][#{singular}.#{col}] %>
+      <%=  #{enum_definer}[#{singular}.#{col}.to_sym] %>
     <% end %>
 
 "

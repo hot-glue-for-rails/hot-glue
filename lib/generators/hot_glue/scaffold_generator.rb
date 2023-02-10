@@ -121,6 +121,7 @@ module HotGlue
     class_option :no_paginate, type: :boolean, default: false
     class_option :big_edit, type: :boolean, default: false
     class_option :show_only, type: :string, default: ""
+    class_option :update_show_only, type: :string, default: ""
 
     class_option :ujs_syntax, type: :boolean, default: nil
     class_option :downnest, type: :string, default: nil
@@ -264,8 +265,9 @@ module HotGlue
 
       if !options['include'].empty?
         @include_fields = []
+
         # semicolon to denote layout columns; commas separate fields
-        @include_fields += options['include'].gsub(":","").split(",").collect(&:to_sym)
+        @include_fields += options['include'].split(":").collect{|x|x.split(",")}.flatten.collect(&:to_sym)
       end
 
 
@@ -273,6 +275,13 @@ module HotGlue
       if !options['show_only'].empty?
         @show_only += options['show_only'].split(",").collect(&:to_sym)
       end
+
+      @update_show_only = []
+      if !options['update_show_only'].empty?
+        @update_show_only += options['update_show_only'].split(",").collect(&:to_sym)
+      end
+
+
 
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs_only'] || false
@@ -428,7 +437,7 @@ module HotGlue
                                               smart_layout: @smart_layout )
       @layout_object = builder.construct
 
-      @menu_file_exists = true if @nested_set.none? && File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
+      @menu_file_exists = true if @nested_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
       @turbo_streams = !!options['with_turbo_streams']
 
@@ -452,6 +461,11 @@ module HotGlue
 
       puts "------ ALT LOOKUPS for #{@alt_lookups}"
 
+      @update_alt_lookups = @alt_lookups.collect{|key, value|
+                                              @update_show_only.include?(key) ?
+                                                    {  key: value }
+                                                      : nil}.compact
+
       @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").titleize )
       @list_label_heading =  options['list_label_heading'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase )
 
@@ -467,10 +481,10 @@ module HotGlue
 
     def creation_syntax
       if @factory_creation == ''
-        "@#{singular_name } = #{ class_name }.create(modified_params#{ controller_update_params_tap_away_alt_lookups }) "
+        "@#{singular_name } = #{ class_name }.create(modified_params) "
       else
         "#{@factory_creation}\n" +
-        "    @#{singular_name } = #{ class_name }.create(modified_params#{ controller_update_params_tap_away_alt_lookups }) "
+        "    @#{singular_name } = #{ class_name }.create(modified_params) "
       end
     end
 
@@ -547,6 +561,7 @@ module HotGlue
       else
         @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
       end
+
 
       @associations = []
       @columns.each do |col|
@@ -625,7 +640,7 @@ module HotGlue
       unless @no_specs
         dest_file = File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
 
-        if  File.exists?(dest_file)
+        if  File.exist?(dest_file)
           existing_file = File.open(dest_file)
           existing_content = existing_file.read
           if existing_content =~ /\#HOTGLUE-SAVESTART/
@@ -638,20 +653,31 @@ module HotGlue
           end
           existing_file.rewind
         else
-          if @god && @auth_identifier
-            @existing_content = "#HOTGLUE-SAVESTART\n  let!(:#{@auth_identifier}) {create(:#{@auth_identifier})}
-  before do
-    login_as(#{@auth_identifier})
-  end\n  #HOTGLUE-END"
-          else
-            @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
-          end
+          @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
         end
+
 
         template "system_spec.rb.erb", dest_file
       end
 
       template "#{@markup}/_errors.#{@markup}", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.#{@markup}")
+    end
+
+    def spec_foreign_association_merge_hash
+      ", #{testing_name}: #{testing_name}1"
+    end
+
+    def spec_related_column_lets
+      (@columns - @show_only).map { |col|
+        type = eval("#{singular_class}.columns_hash['#{col}']").type
+        if (type == :integer && col.to_s.ends_with?("_id") || type == :uuid)
+          assoc = "#{col.to_s.gsub('_id','')}"
+          the_foreign_class = eval(@singular_class + ".reflect_on_association(:" + assoc + ")").class_name.split("::").last.underscore
+          hawk_keys_on_lets = (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")
+
+          "  let!(:#{assoc}1) {create(:#{the_foreign_class}" +  hawk_keys_on_lets + ")}"
+        end
+      }.compact.join("\n")
     end
 
     def list_column_headings
@@ -701,7 +727,7 @@ module HotGlue
       end
 
       @nested_set.each do |arg|
-        res << "  let(:#{arg[:singular]}) {create(:#{arg[:singular]} #{last_parent} )}\n"
+        res << "let(:#{arg[:singular]}) {create(:#{arg[:singular]} #{last_parent} )}\n"
         last_parent = ", #{arg[:singular]}: #{arg[:singular]}"
       end
       res
@@ -737,8 +763,8 @@ module HotGlue
       @auth_identifier
     end
 
-    def test_capybara_block
-      (@columns - @show_only).map { |col|
+    def test_capybara_block(which_partial = :create)
+      (@columns - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         case type
         when :date
@@ -754,20 +780,14 @@ module HotGlue
 
         when :integer
           if col.to_s.ends_with?("_id")
-            assoc = col.to_s.gsub('_id','')
-            "      #{col}_selector = find(\"[name='#{singular}[#{col}]']\").click \n" +
-            "      #{col}_selector.first('option', text: #{assoc}1.name).select_option"
+            capybara_block_for_association(col_name: col, which_partial: which_partial)
           else
             "      new_#{col} = rand(10) \n" +
             "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
           end
 
         when :uuid
-          assoc_name = col.to_s.gsub('_id','')
-          "      #{col}_selector = find(\"[name='#{singular}[#{col}]']\").click \n" +
-            "      #{col}_selector.first('option', text: #{assoc_name}1.name).select_option\n" +
-            "      " + "new_#{col.to_s} = #{assoc_name}1.name \n"
-
+          capybara_block_for_association(col_name: col, which_partial: which_partial)
 
         when :enum
           "      list_of_#{col.to_s} = #{singular_class}.defined_enums['#{col.to_s}'].keys \n" +
@@ -796,6 +816,20 @@ module HotGlue
         end
 
       }.join("\n")
+    end
+
+
+    def capybara_block_for_association(col_name: nil , which_partial: nil )
+      assoc = col_name.to_s.gsub('_id','')
+      if which_partial == :update && @update_show_only.include?(col_name)
+        # do not update tests
+      elsif @alt_lookups.keys.include?(col_name.to_s)
+        lookup = @alt_lookups[col_name.to_s][:lookup_as]
+        "      find(\"[name='#{singular}[__lookup_#{lookup}]']\").fill_in( with: #{assoc}1.#{lookup} )"
+      else
+        "      #{col_name}_selector = find(\"[name='#{singular}[#{col_name}]']\").click \n" +
+          "      #{col_name}_selector.first('option', text: #{assoc}1.name).select_option"
+      end
     end
 
 
@@ -981,7 +1015,7 @@ module HotGlue
 
 
     def include_nav_template
-      File.exists?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}")
+      File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}")
     end
 
     def copy_view_files
@@ -1018,7 +1052,7 @@ module HotGlue
 
       # menu_file = "app/views#{namespace_with_dash}/menu.erb"
       #
-      # if File.exists?(menu_file)
+      # if File.exist?(menu_file)
       #   # TODO: can I insert the new menu item into the menu programatically here?
       #   # not sure how i would achieve this without nokogiri
       #
@@ -1076,10 +1110,9 @@ module HotGlue
         res << 'edit'
       end
 
-      unless @no_edit && @no_create
-        res << '_form'
+      if !( @no_edit && @no_create)
+          res << '_form'
       end
-
       res
     end
 
@@ -1114,10 +1147,11 @@ module HotGlue
       []
     end
 
-    def all_form_fields
+    def form_fields_html
       @template_builder.all_form_fields(
         columns: @layout_object[:columns][:container],
         show_only: @show_only,
+        update_show_only: @update_show_only,
         singular_class: singular_class,
         singular: singular,
         hawk_keys: @hawk_keys,
@@ -1128,7 +1162,6 @@ module HotGlue
         alt_lookups: @alt_lookups
       )
     end
-
 
     def list_label
       @list_label_heading
@@ -1233,7 +1266,6 @@ module HotGlue
         ".tap{ |ary| ary.delete('__lookup_#{data[:lookup_as]}') }"
       }.join("")
     end
-
 
     def nested_for_turbo_id_list_constructor
       if @nested_set.any?

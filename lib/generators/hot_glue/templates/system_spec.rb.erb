@@ -6,15 +6,7 @@ describe 'interaction for <%= controller_class_name %>', type: :feature do
 
   <%= @existing_content %>
   <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
-<%= (@columns - @show_only).map { |col|
-    type = eval("#{singular_class}.columns_hash['#{col}']").type
-    if (type == :integer && col.to_s.ends_with?("_id") || type == :uuid)
-        assoc = "#{col.to_s.gsub('_id','')}"
-        the_foreign_class = eval(@singular_class + ".reflect_on_association(:" + assoc + ")").class_name.split("::").last.underscore
-        "  let!(:#{assoc}1) {create(:#{the_foreign_class}" + (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")   + ")}"
-    end
-  }.compact.join("\n")
-        %>
+<%= spec_related_column_lets %>
   <% item1_addOns = ""
    if (eval(@singular_class).instance_methods.include?(display_class.to_s))
     item1_addOns << "#{display_class}: FFaker::Name.name"
@@ -58,7 +50,7 @@ describe 'interaction for <%= controller_class_name %>', type: :feature do
   end
 }.compact.join(", ")
   %>let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )}
-  <%= objest_nest_factory_setup %> <% unless @god %>
+<%= objest_nest_factory_setup %> <% unless @god || @existing_content.include?("login_as")%>
   before do
     login_as(<%= @auth %>)
   end <% end %>
@@ -98,9 +90,9 @@ describe 'interaction for <%= controller_class_name %>', type: :feature do
 <% unless @no_create %>  describe "new & create" do
     it "should create a new <%= singular.titlecase %>" do
       visit <%= path_helper_plural %>
-      click_link "New <%= @label %>"
-      expect(page).to have_selector(:xpath, './/h3[contains(., "New <%= @label %>")]')
-<%= test_capybara_block %>
+      click_link "<%= @new_button_label %>"
+      expect(page).to have_selector(:xpath, './/h3[contains(., "<%= @new_button_label %>")]')
+<%= test_capybara_block(:create) %>
       click_button "Save"
       expect(page).to have_content("Successfully created")
 <%="      " +
@@ -140,11 +132,10 @@ describe 'interaction for <%= controller_class_name %>', type: :feature do
       find("a.edit-<%= singular %>-button[href='/<%= namespace_with_slash %><%= plural %>/#{<%= singular %>1.id}/edit']").click
 
       expect(page).to have_content("Editing #{<%= singular %>1.<%= @display_class %>.squish || "(no name)"}")
-<%= test_capybara_block %>
+<%= test_capybara_block(:update) %>
       click_button "Save"
       within("turbo-frame#<%= @namespace %>__#{dom_id(<%= singular %>1)} ") do
-<%=
-    (@columns - @show_only).map { |col|
+<%= (@columns - @show_only).map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
 
       if type == :uuid || (type == :integer && col.to_s.ends_with?("_id"))

@@ -7,4 +7,8 @@ Rails.application.routes.draw do
   resources :dfgs
   resources :jkls
   resources :cantelopes
+
+  resources :pets
+
+  resources :users
 end

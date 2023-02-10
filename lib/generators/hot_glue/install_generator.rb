@@ -119,7 +119,7 @@ module HotGlue
 
 
       begin
-        if !File.exists?("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml")
+        if !File.exist?("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml")
           yaml = {layout: layout,
                   markup: @markup}.to_yaml
           File.write("#{'spec/dummy/' if Rails.env.test?}config/hot_glue.yml", yaml)
@@ -131,7 +131,7 @@ module HotGlue
 
 
       begin
-        if !File.exists?("#{'spec/dummy/' if Rails.env.test?}spec/support/capybara_login.rb")
+        if !File.exist?("#{'spec/dummy/' if Rails.env.test?}spec/support/capybara_login.rb")
           copy_file "capybara_login.rb", "#{'spec/dummy/' if Rails.env.test?}spec/support/capybara_login.rb"
         end
       rescue StandardError => e

@@ -713,11 +713,31 @@ This is what would happen if 9 fields, specified in the order A,B,C,D,E,F,G,H,I,
 ### `--show-only=`
 (separate field names by COMMA)
 
-Any fields only the 'show-only' list will appear as non-editable on the generate form. (visible only)
+Any fields only the 'show-only' list will appear as non-editable on the generated form for both new & edit actions. (visible only)
 
 IMPORTANT: By default, all fields that begin with an underscore (`_`) are automatically show-only.
 
-I would recommend this for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
+This is for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
+
+
+### `--update-show-only`
+(separate field names by COMMA)
+
+Fields on the `update show only`  (and not on the `show only` list) will appear as non-editible only for the **edit** action, but will still allow entry for the **create** action.
+
+Note that Hot Glue still generates a singular partial (`_form`) for both actions, but your form will now contain statements like:
+
+```
+ <% if action_name == 'edit' %>
+    <%= xyz.name %><
+ <% else %>
+    <%= f.text_field :name %>
+ <% end %>
+```
+
+This works for both regular fields, association fields, and alt lookup fields.
+
+
 
 ### `--ujs_syntax=true` (Default is set automatically based on whether you have turbo-rails installed)
 
@@ -845,7 +865,8 @@ This happens using two interconnected mechanisms:
 
 please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
 
-### `--alt-foreign-key-lookup` (Foriegn Key Lookups)
+
+### `--alt-foreign-key-lookup` (Foreign Key Lookups)
 
 `--alt-foreign-key-lookup=user_id{email}`
 
@@ -857,11 +878,10 @@ A drop down of _all users in the_ database will be display on the screen where y
 
 Let's say instead you don't want to expose the full list of all users to this controller, but instead make your user enter the full email address of the user to identify them.
 
-Instead of a drop-down, the interface will present an input box for the user to supply an email.
+Instead of a drop-down, the interface will present an input box for the user to supply an *search by* email.
 
-
-TODO: Auto-add
-
+** Note: Current implementation does not work in conjunction with hawked associations to protect against users from accessing associated records not within scope.**
+TODO: make it work with hawked associations to protect against users from accessing associated records not within scope
 
 
 ## "Thing" Label
@@ -1016,12 +1036,67 @@ Child portals have the headings omitted automatically (there is a heading identi
 - Boolean: displayed radio buttons yes/ no
 - Enum - displayed as a drop-down list (defined the enum values on your model). 
   - For Rails 6 see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
-  - AFAIK, you must specify the enum definition both in your model and also in your database migration for both Rails 6 + Rails 7
+  - You must specify the enum definition both in your model and also in your database migration for both Rails 6 + Rails 7
+
+# Note about enums
+
+The Rails 7 enum implementation for Postgres is very slick but has a counter-intuitive facet.
+Define your Enums in Postgres as strings:
+(database migration)
+```
+    create_enum :status, ["pending", "active", "archived"]
+
+    create_table :users, force: true do |t|
+      t.enum :status, enum_type: "status", default: "pending", null: false
+      t.timestamps
+    end
+```
+
+Then define your `enum` ActiveRecord declaration with duplicate keys & strings:
+(model definition)
+```
+enum status: {
+    pending: "pending",
+    active: "active",
+    archived: "archived",
+    disabled: "disabled",
+    waiting: "waiting"
+  }
+```
+
+To set the labels, use another class-level method that is a hash of keys-to-labels using a method named the same name as the enum method but with `_labels`
+
+If no `_labels` method exists, Hot Glue will fallback to using the Postgres-defined names.
+```
+def self.status_labels
+    {
+      pending: 'Is Pending',
+      active: 'Is active',
+      archived: 'Is Archived',
+      disabled: 'Is Disabled',
+      waiting: 'Is Waiting'
+    }
+```
+
+Now, your labels will show up as defined in the `_labels` ("Is Pending", etc) instead of the database-values.
+
 
 # VERSION HISTORY
-#### 2023-01-29 - v0.5.7 - factory-creation
-see `--factory-creation` section or 
+
+#### TBR - v0.5.7 - factory-creation, alt lookups, update show only, fixes to Enums, support for Ruby 3.2
+• See `--factory-creation` section or 
 - [Example #10](https://jfb.teachable.com/courses/hot-glue-in-depth-tutorial/lectures/) in the Hot Glue Tutorial shows you how to use the hawk to limit the scope to the logged in user.
+
+• `--alt-lookup-foreign-keys`
+Allows you to specify that a foreign key should act as a search field, allowing the user to input a unique value (like an email) to search for a related record.
+
+• `--update-show-only`
+Allows you to specify a list fields that should be show-only (non-editable) on the **edit** page but remain inputable on the **create** page. 
+Note that a singular partial `_form` is still used for new & edit, but now contains `if` statements that check the action and display the show-only version only on the edit action. 
+
+• Syntax fix to support Ruby 3.2.0 
+
+• Tweaks to how Enums are display (see "Note about Enums")
 
 
 #### 2023-01-02 - v0.5.6
