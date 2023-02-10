@@ -9,6 +9,6 @@ Rails.application.routes.draw do
   resources :cantelopes
 
   resources :pets
-
+  resources :humans
   resources :users
 end

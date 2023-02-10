@@ -87,7 +87,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_03_23_000410) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "humen", force: :cascade do |t|
+  create_table "humans", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -147,4 +147,5 @@ ActiveRecord::Schema[7.0].define(version: 2022_03_23_000410) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
 end

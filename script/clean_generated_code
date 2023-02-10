@@ -5,6 +5,9 @@ rm dummy/app/controllers/dfgs_controller.rb
 rm dummy/app/controllers/cantelopes_controller.rb
 rm dummy/app/controllers/jkls_controller.rb
 rm dummy/app/controllers/users_controller.rb
+rm dummy/app/controllers/humans_controller.rb
+rm dummy/app/controllers/pets_controller.rb
+
 
 rm -rf dummy/app/views/cantelopes/*
 rm -rf dummy/app/views/jkls/*
@@ -12,6 +15,8 @@ rm -rf dummy/app/views/ghis/*
 rm -rf dummy/app/views/abcs/*
 rm -rf dummy/app/views/dfgs/*
 rm -rf dummy/app/views/users/*
+rm -rf dummy/app/views/humans/*
+rm -rf dummy/app/views/pets/*
 
 /bin/rm -rf dummy/spec/system/
 
