@@ -653,15 +653,7 @@ module HotGlue
           end
           existing_file.rewind
         else
-
-          if !@god && @auth_identifier
-            @existing_content = "#HOTGLUE-SAVESTART\n  let!(:#{@auth_identifier}) {create(:#{@auth_identifier} #{spec_foreign_association_merge_hash} )}
-  before do
-    login_as(#{@auth_identifier})
-  end\n  #HOTGLUE-END"
-          else
-            @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
-          end
+          @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
         end
 
 
@@ -772,7 +764,7 @@ module HotGlue
     end
 
     def test_capybara_block(which_partial = :create)
-      (@columns - (which_partial == :create ? @show_only : @update_show_only)).map { |col|
+      (@columns - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         case type
         when :date

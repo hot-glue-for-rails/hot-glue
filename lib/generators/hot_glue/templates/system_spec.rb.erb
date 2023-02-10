@@ -135,8 +135,7 @@ describe 'interaction for <%= controller_class_name %>', type: :feature do
 <%= test_capybara_block(:update) %>
       click_button "Save"
       within("turbo-frame#<%= @namespace %>__#{dom_id(<%= singular %>1)} ") do
-<%=
-    (@columns - @show_only).map { |col|
+<%= (@columns - @show_only).map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
 
       if type == :uuid || (type == :integer && col.to_s.ends_with?("_id"))
