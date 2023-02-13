@@ -481,10 +481,10 @@ module HotGlue
 
     def creation_syntax
       if @factory_creation == ''
-        "@#{singular_name } = #{ class_name }.create(modified_params) "
+        "@#{singular_name } = #{ class_name }.create(modified_params)"
       else
         "#{@factory_creation}\n" +
-        "    @#{singular_name } = #{ class_name }.create(modified_params) "
+        "    @#{singular_name } = #{ class_name }.create(modified_params)"
       end
     end
 
@@ -785,7 +785,9 @@ module HotGlue
             "      new_#{col} = rand(10) \n" +
             "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
           end
-
+        when :float
+          "      " + "new_#{col} = rand(10) \n" +
+            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
         when :uuid
           capybara_block_for_association(col_name: col, which_partial: which_partial)
 
