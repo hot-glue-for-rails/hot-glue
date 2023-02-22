@@ -480,16 +480,19 @@ module HotGlue
 
 
     def creation_syntax
+
+      merge_with = @alt_lookups.collect{ |key, data|
+        "#{data[:assoc].downcase}: #{data[:assoc].downcase}_factory.#{data[:assoc].downcase}"
+      }.join(", ")
+
       if @factory_creation == ''
         "@#{singular_name } = #{ class_name }.create(modified_params)"
       else
         "#{@factory_creation}\n" +
-        "    @#{singular_name } = #{ class_name }.create(modified_params)"
+        "    @#{singular_name } = #{ class_name }.create(modified_params#{'.merge(' + merge_with + ')' if !merge_with.empty?})"
       end
     end
-
-
-
+    
     def setup_hawk_keys
       @hawk_keys = {}
 
@@ -1259,7 +1262,7 @@ module HotGlue
 
     def controller_update_params_tap_away_magic_buttons
       @magic_buttons.collect{ |magic_button|
-        ".tap{ |ary| ary.delete('#{magic_button}') }"
+        ".tap{ |ary| ary.delete('__#{magic_button}') }"
       }.join("")
     end
 

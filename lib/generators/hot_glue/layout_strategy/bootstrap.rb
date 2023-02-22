@@ -1,10 +1,19 @@
 class LayoutStrategy::Bootstrap < LayoutStrategy::Base
-  def button_classes
+  def button_classes # column classes
     " " + "col-sm-#{builder.layout_object[:columns][:button_columns]}"
   end
 
+  def button_applied_classes
+    "btn btn-sm"
+  end
+
+  def magic_button_classes
+    "btn-secondary"
+  end
+
+
   def column_classes_for_button_column
-    "col-md-#{builder.layout_object[:columns][:button_columns]}"
+    "col-md-#{builder.layout_object[:buttons][:size]}"
   end
 
 
@@ -17,7 +26,7 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   end
 
   def container_name
-    "container-fluid"
+    "container"
   end
 
   def column_classes_for_line_fields

@@ -62,7 +62,6 @@ module HotGlue
         if smart_layout
           # automatic control
           #
-          layout_object[:columns][:button_columns] = 2
 
           if columns.size > available_columns
             if available_columns == 0

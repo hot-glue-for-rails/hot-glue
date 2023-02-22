@@ -774,7 +774,7 @@ The bang (`!`) methods can respond in one of four ways:
 
 This means you can be a somewhat lazy about your bang methods, but keep in mind the truth operator compares boolean true NOT any object is truth. So your return object must either be actually true (boolean), or an object that is string or string-like (responds to .to_s). Want to just say it didn’t work? Return false. Want to just say it was OK? Return true. Want to say it was successful but provide a more detailed response? Return a string.
 
-Finally, you can raise an ActiveRecord error which will also get passed to the user, but in the flash alert area
+Finally, you can raise an ActiveRecord error which will also get passed to the user in the flash alert area.
 
 For more information see Example 5 in the Tutorial
 
@@ -956,6 +956,21 @@ Omits the heading of column names that appears above the 1st row of data.
 
 ## Special Features
 
+### `--alt-lookup-foreign-keys`
+
+Allows you to specify that a foreign key should act as a search field, allowing the user to input a unique value (like an email) to search for a related record.
+
+Example:
+```
+--alt-foreign-key-lookup='agent_id{email+}'
+```
+
+First, assume the current able has a `belongs_to` association for `agent_id` to a foreign model, `Agent`
+
+Here, we would build a scaffold that would treat the foreign key `agent_id` as an alt lookup, allowing the user to search for foreign records by email (the agent's email).
+
+The `+` symbol indicates to automatically make a new `agent` record (without it, the agent_id will be set to nil if there is no associated agent record found -- this may cause the update to fail, unless `optional: true` is on the belongs_to association.)
+
 
 ### `--factory-creation={ ... }`
 
@@ -996,6 +1011,20 @@ class UserFactory
         end
     end
 end
+```
+
+
+If you are using factory creation along with with alt lookups, be sure your factory code creates a local variable that follows this name
+
+**<downcase association name>**_factory.<downcase association name>
+
+Thus, your factory object must have a method of the same name as the factory being created which returns the thing that got created.
+(It can do the creation either on instantiation or when calling that method)
+
+For example, assuming the example from above, we are going to do the lookup ourselves inside of our own `AgentFactory` object.)
+
+```
+agent_factory = AgentFactory.new(find_or_create_by_email: agent_company_params[:__lookup_email])
 ```
 
 
