@@ -223,12 +223,13 @@ module  HotGlue
     end
 
     def boolean_result(col)
-      " <br />"  +
+      (form_labels_position == 'before' ?  " <br />"  : "") +
         "  <%= f.radio_button(:#{col},  '0', checked: #{singular}.#{col}  ? '' : 'checked') %>\n" +
         "  <%= f.label(:#{col}, value: 'No', for: '#{singular}_#{col}_0') %>\n" +
         "  <%= f.radio_button(:#{col}, '1',  checked: #{singular}.#{col}  ? 'checked' : '') %>\n" +
         "  <%= f.label(:#{col}, value: 'Yes', for: '#{singular}_#{col}_1') %>\n" +
-        ""
+      (form_labels_position == 'after' ?  " <br />"  : "")
+
     end
 
     def enum_result(col)
