@@ -1111,6 +1111,17 @@ Now, your labels will show up as defined in the `_labels` ("Is Pending", etc) in
 
 
 # VERSION HISTORY
+#### TBR - v0.5.8 -
+
+• fixes spec assertions for enum to work with _label field 
+• fixes form-label-position (before/after) to put a carriage return correctly between the label & field
+• all spec files are now created in spec/features/ folder (previously was system/)
+
+• BEM (block element modifier)-style has been added list headings, show cells, edit cells; format is {singular}--{field name} 
+   use this to globally style different fields by object & field name. 
+   using css `::before` and `::after` you can almost eliminate the need to customize the views entirely
+
+
 
 #### 2023-02-13 - v0.5.7 - factory-creation, alt lookups, update show only, fixes to Enums, support for Ruby 3.2
 • See `--factory-creation` section.
