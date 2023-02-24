@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'interaction for <%= controller_class_name %>', type: :feature do
+describe 'interaction for <%= controller_class_name %>' do
   include HotGlue::ControllerHelper
   include ActionView::RecordIdentifier
 
@@ -72,9 +72,13 @@ describe 'interaction for <%= controller_class_name %>', type: :feature do
   when :uuid
     assoc_name = col.to_s.gsub('_id','')
     association = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-
-
     "      " + ["expect(page).to have_content(#{singular}#{1}.#{assoc_name}.#{HotGlue.derrive_reference_name(association.class_name)})"].join("\n      ")
+  when :enum
+    if(eval("#{singular_class}.respond_to?(:#{col}_labels)"))
+     "      " + "expect(page).to have_content(#{singular_class}.#{col}_labels[#{singular}#{1}.#{col}])"
+    else
+     "      " + "expect(page).to have_content(new_#{col})"
+    end
 
   when :boolean
     "      " + ["expect(page).to have_content(#{singular}#{1}.#{col} ? 'YES' : 'NO')"].join("\n      ")
@@ -115,7 +119,12 @@ describe 'interaction for <%= controller_class_name %>', type: :feature do
 
     when :boolean
         ["expect(page).to have_content(#{singular}#{1}.#{col} ? 'YES' : 'NO')"].join("\n      ")
-
+    when :enum
+      if(eval("#{singular_class}.respond_to?(:#{col}_labels)"))
+        "expect(page).to have_content(#{singular_class}.#{col}_labels[new_#{col}])"
+      else
+        "expect(page).to have_content(new_#{col})"
+      end
     else
       "expect(page).to have_content(new_#{col})"
     end
@@ -146,9 +155,10 @@ describe 'interaction for <%= controller_class_name %>', type: :feature do
       elsif type == :boolean
       '        expect(page).to have_content(new_' + col.to_s + ' ? "YES" : "NO")'
 
+      elsif type == :enum && eval("#{singular_class}.respond_to?(:#{col}_labels)")
+       "        expect(page).to have_content(#{singular_class}.#{col}_labels[new_#{col}])"
       else
       '        expect(page).to have_content(new_' + col.to_s + ')'
-
       end
     }.compact.join("\n")
     %>
