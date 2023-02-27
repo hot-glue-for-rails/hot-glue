@@ -641,7 +641,7 @@ module HotGlue
       end
 
       unless @no_specs
-        dest_file = File.join("#{'spec/dummy/' if Rails.env.test?}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
+        dest_file = File.join("#{'spec/dummy/' if Rails.env.test?}spec/features#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
 
         if  File.exist?(dest_file)
           existing_file = File.open(dest_file)
@@ -687,7 +687,8 @@ module HotGlue
       @template_builder.list_column_headings(
         columns: @layout_object[:columns][:container],
         col_identifier: @layout_strategy.column_classes_for_column_headings,
-        column_width: @layout_strategy.column_width
+        column_width: @layout_strategy.column_width,
+        singular: @singular
       )
     end
 

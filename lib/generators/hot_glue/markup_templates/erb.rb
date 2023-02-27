@@ -25,15 +25,16 @@ module  HotGlue
       }.join("\n")
     end
 
-    def list_column_headings(*args)
-      @columns = args[0][:columns]
-      @column_width = args[0][:column_width]
-      @col_identifier = args[0][:col_identifier]
+    def list_column_headings(col_identifier: , columns: , column_width:, singular: )
+      # @columns = args[0][:columns]
+      # @column_width = args[0][:column_width]
+      # @col_identifier = args[0][:col_identifier]
 
       col_style = @layout_strategy.column_headings_col_style
 
       result = columns.map{ |column|
-        "<div class='#{col_identifier}'" + col_style + ">" +  column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
+        "<div class='#{col_identifier}' #{singular}--#{column.join("-")} " + col_style + ">" +
+          column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
       }.join("\n")
       return result
     end
@@ -62,7 +63,7 @@ module  HotGlue
       singular = @singular
 
       result = columns.map{ |column|
-        "  <div class='#{column_classes}' >" +
+        "  <div class='#{column_classes} #{singular}--#{column.join("-")}' >" +
           column.map { |col|
             type = eval("#{singular_class}.columns_hash['#{col}']").type
             limit = eval("#{singular_class}.columns_hash['#{col}']").limit
@@ -223,12 +224,13 @@ module  HotGlue
     end
 
     def boolean_result(col)
-      " <br />"  +
+      (form_labels_position == 'before' ?  " <br />"  : "") +
         "  <%= f.radio_button(:#{col},  '0', checked: #{singular}.#{col}  ? '' : 'checked') %>\n" +
         "  <%= f.label(:#{col}, value: 'No', for: '#{singular}_#{col}_0') %>\n" +
         "  <%= f.radio_button(:#{col}, '1',  checked: #{singular}.#{col}  ? 'checked' : '') %>\n" +
         "  <%= f.label(:#{col}, value: 'Yes', for: '#{singular}_#{col}_1') %>\n" +
-        ""
+      (form_labels_position == 'after' ?  " <br />"  : "")
+
     end
 
     def enum_result(col)
@@ -273,7 +275,7 @@ module  HotGlue
       style_with_flex_basis = @layout_strategy.style_with_flex_basis(perc_width)
 
       result = columns.map{ |column|
-        "<div class='#{col_identifier}'#{style_with_flex_basis}>" +
+        "<div class='#{col_identifier} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
 
 
         column.map { |col|
