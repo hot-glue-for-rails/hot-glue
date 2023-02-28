@@ -279,6 +279,9 @@ module  HotGlue
 
 
         column.map { |col|
+          if eval("#{singular_class}.columns_hash['#{col}']").nil?
+            raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
+          end
           type = eval("#{singular_class}.columns_hash['#{col}']").type
           limit = eval("#{singular_class}.columns_hash['#{col}']").limit
           sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
