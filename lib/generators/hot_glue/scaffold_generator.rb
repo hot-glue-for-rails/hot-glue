@@ -150,8 +150,7 @@ module HotGlue
     class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
     class_option :factory_creation, default: ''
     class_option :alt_foreign_key_lookup, default: '' #
-
-
+    class_option :attachments, default: ''
 
     def initialize(*meta_args)
       super
@@ -420,6 +419,8 @@ module HotGlue
 
       @factory_creation = options['factory_creation'].gsub(";", "\n")
 
+      @attachments = options['attachments'].split(",")
+
 
 
       # SETUP FIELDS & LAYOUT
@@ -471,6 +472,10 @@ module HotGlue
 
       @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? "New " + eval("#{class_name}.class_variable_get(:@@table_label_singular)") : "New " + singular.gsub("_", " ").titleize )
       @new_form_heading = options['new_form_heading'] || "New #{@label}"
+
+
+
+
     end
 
 
@@ -565,50 +570,63 @@ module HotGlue
         @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
       end
 
+      if @attachments.any?
+        puts "adding attachments-as-columns: #{@attachments}"
+        @columns.concat @attachments.collect(&:to_sym)
+      end
+
+
 
       @associations = []
+
       @columns.each do |col|
         if col.to_s.starts_with?("_")
           @show_only << col
         end
 
-        if @the_object.columns_hash[col.to_s].type == :integer
-          if col.to_s.ends_with?("_id")
-            # guess the association name label
-            assoc_name = col.to_s.gsub("_id","")
+        if @the_object.columns_hash.keys.include?(col.to_s)
+          if @the_object.columns_hash[col.to_s].type == :integer
+            if col.to_s.ends_with?("_id")
+              # guess the association name label
+              assoc_name = col.to_s.gsub("_id","")
 
 
-            assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+              assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
-            if assoc_model.nil?
-              exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; or add to #{singular_class} `belongs_to :#{assoc_name}`.  To make a controller that can read all records, specify with --god."
-              puts exit_message
-              raise(HotGlue::Error, exit_message)
-            end
+              if assoc_model.nil?
+                exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; or add to #{singular_class} `belongs_to :#{assoc_name}`.  To make a controller that can read all records, specify with --god."
+                puts exit_message
+                raise(HotGlue::Error, exit_message)
+              end
 
-            begin
-              assoc_class = eval(assoc_model.try(:class_name))
-              @associations << assoc_name.to_sym
-              name_list = [:name, :to_label, :full_name, :display_name, :email]
+              begin
+                assoc_class = eval(assoc_model.try(:class_name))
+                @associations << assoc_name.to_sym
+                name_list = [:name, :to_label, :full_name, :display_name, :email]
 
-            rescue
-              # unreachable(?)
-              # if eval("#{singular_class}.reflect_on_association(:#{assoc_name.singularize})")
-              #   raise(HotGlue::Error,"*** Oops: #{singular_class} has no association for #{assoc_name.singularize}")
-              # else
-              #   raise(HotGlue::Error,"*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god.")
-              # end
-            end
+              rescue
+                # unreachable(?)
+                # if eval("#{singular_class}.reflect_on_association(:#{assoc_name.singularize})")
+                #   raise(HotGlue::Error,"*** Oops: #{singular_class} has no association for #{assoc_name.singularize}")
+                # else
+                #   raise(HotGlue::Error,"*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god.")
+                # end
+              end
 
-            if assoc_class && name_list.collect{ |field|
-              assoc_class.column_names.include?(field.to_s) ||  assoc_class.instance_methods.include?(field)
-            }.any?
-              # do nothing here
-            else
-              exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
-              raise(HotGlue::Error,exit_message)
+              if assoc_class && name_list.collect{ |field|
+                assoc_class.column_names.include?(field.to_s) ||  assoc_class.instance_methods.include?(field)
+              }.any?
+                # do nothing here
+              else
+                exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
+                raise(HotGlue::Error,exit_message)
+              end
             end
           end
+        elsif @attachments.include?(col.to_s)
+
+        else
+          raise "couldn't find #{col} in either field list or attachments list"
         end
       end
     end
@@ -671,7 +689,7 @@ module HotGlue
     end
 
     def spec_related_column_lets
-      (@columns - @show_only).map { |col|
+      (@columns - @show_only - @attachments.collect(&:to_sym)).map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         if (type == :integer && col.to_s.ends_with?("_id") || type == :uuid)
           assoc = "#{col.to_s.gsub('_id','')}"
@@ -693,7 +711,7 @@ module HotGlue
     end
 
     def columns_spec_with_sample_data
-      @columns.map { |c|
+      (@columns - @attachments.collect(&:to_sym)).map { |c|
         type = eval("#{singular_class}.columns_hash['#{c}']").type
         random_data = case type
                       when :integer
@@ -768,7 +786,7 @@ module HotGlue
     end
 
     def test_capybara_block(which_partial = :create)
-      (@columns - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
+      ((@columns - @attachments.collect(&:to_sym)) - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         case type
         when :date
@@ -1165,7 +1183,8 @@ module HotGlue
         ownership_field: @ownership_field,
         form_labels_position: @form_labels_position,
         form_placeholder_labels: @form_placeholder_labels,
-        alt_lookups: @alt_lookups
+        alt_lookups: @alt_lookups,
+        attachments: @attachments
       )
     end
 
@@ -1185,7 +1204,8 @@ module HotGlue
         singular_class: singular_class,
         singular: singular,
         col_identifier: @layout_strategy.column_classes_for_line_fields,
-        inline_list_labels: @inline_list_labels
+        inline_list_labels: @inline_list_labels,
+        attachments: @attachments
       )
     end
 
