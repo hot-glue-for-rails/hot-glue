@@ -510,7 +510,7 @@ module HotGlue
 
           hawk_scope = key.gsub("_id", "").pluralize
           @hawk_keys[key.to_sym] = [hawk_to]
-          use_shorthand = !hawk_scope.include?("{")
+          use_shorthand = !options["hawk"].include?("{")
 
           if use_shorthand # only include the hawk scope if using the shorthand
             @hawk_keys[key.to_sym] << hawk_scope
