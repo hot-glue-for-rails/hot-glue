@@ -1132,7 +1132,7 @@ For cells:
     `cell--{singular}--{field name}-{field name}-{field name}`
    use this to globally style different fields by object & field name
 
-Note that if you have multiple fields inside one cell (for example, with specified grouping or smart layout), your fields names get concatinated using single-hyphens:
+Note that if you have multiple fields inside one cell (for example, with specified grouping or smart layout), your fields names get concatenated using single-hyphens:
 For example, consider a customer scaffold with a first name & last name appearing in one cell. The cell itself will have a class of:
 `cell--customer--first_name-last_name`
 
