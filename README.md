@@ -1111,15 +1111,19 @@ Now, your labels will show up as defined in the `_labels` ("Is Pending", etc) in
 
 
 # VERSION HISTORY
-#### TBR - v0.5.8 -
+#### 2023-03-01 - v0.5.8 
 
-• fixes spec assertions for enums to work with the enum `_label` field 
+• Fixes spec assertions for enums to work with the enum `_label` field (when provided).
 
-• fixes form-label-position (before/after) so that a carriage return is placed between the label & field
+• Fixes `--form-label-position` (before/after) so that a carriage return is placed between the label & field correctly for either choice
 
-• all spec files are now created in `spec/features/` folder (previously was `spec/system/`)
+• All spec files are now created in `spec/features/` folder (previously was `spec/system/` with `type: :feature`; they no longer have `type: :feature` as this is not necessary when they are in the `spec/features` folder)
 
-• BEM (block element modifier)-style has been added list headings, show cells, edit cells; format is 
+• Corrects the hawk scope to only add the plural related entity when NOT using the shorthand `{ ... }`
+
+• BEM (block element modifier)-style has been added list headings, show cells, edit cells. These class names will get added to the `<div>` tags for both the heading and cells. 
+
+The format is as follows:
 
 For headings
     `heading--{singular}--{field name}-{field name}-{field name}`
@@ -1132,16 +1136,22 @@ Note that if you have multiple fields inside one cell (for example, with specifi
 For example, consider a customer scaffold with a first name & last name appearing in one cell. The cell itself will have a class of:
 `cell--customer--first_name-last_name`
 
-If, on the other hand, your cell contains only a phone number, it might have this as a class
+If your cell contains only one field, for example, a phone number, it would look like this:
 `cell--customer--phone_number`
 
-Remember the CSS ends with and starts with selectors, which can be used to find classes that end with the field names.
+Tip: Use the _ends with_ and _starts with_ selectors, which can be used like this:.
 
 ```
 div[class$="--phone_number"] {
     text-decoration: underline; 
 }
 ```
+
+
+```
+
+```
+
 
 #### 2023-02-13 - v0.5.7 - factory-creation, alt lookups, update show only, fixes to Enums, support for Ruby 3.2
 • See `--factory-creation` section.
