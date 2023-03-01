@@ -1113,15 +1113,35 @@ Now, your labels will show up as defined in the `_labels` ("Is Pending", etc) in
 # VERSION HISTORY
 #### TBR - v0.5.8 -
 
-• fixes spec assertions for enum to work with _label field 
-• fixes form-label-position (before/after) to put a carriage return correctly between the label & field
-• all spec files are now created in spec/features/ folder (previously was system/)
+• fixes spec assertions for enums to work with the enum `_label` field 
 
-• BEM (block element modifier)-style has been added list headings, show cells, edit cells; format is {singular}--{field name} 
-   use this to globally style different fields by object & field name. 
-   using css `::before` and `::after` you can almost eliminate the need to customize the views entirely
+• fixes form-label-position (before/after) so that a carriage return is placed between the label & field
 
+• all spec files are now created in `spec/features/` folder (previously was `spec/system/`)
 
+• BEM (block element modifier)-style has been added list headings, show cells, edit cells; format is 
+
+For headings
+    `heading--{singular}--{field name}-{field name}-{field name}`
+
+For cells:
+    `cell--{singular}--{field name}-{field name}-{field name}`
+   use this to globally style different fields by object & field name
+
+Note that if you have multiple fields inside one cell (for example, with specified grouping or smart layout), your fields names get concatinated using single-hyphens:
+For example, consider a customer scaffold with a first name & last name appearing in one cell. The cell itself will have a class of:
+`cell--customer--first_name-last_name`
+
+If, on the other hand, your cell contains only a phone number, it might have this as a class
+`cell--customer--phone_number`
+
+Remember the CSS ends with and starts with selectors, which can be used to find classes that end with the field names.
+
+```
+div[class$="--phone_number"] {
+    text-decoration: underline; 
+}
+```
 
 #### 2023-02-13 - v0.5.7 - factory-creation, alt lookups, update show only, fixes to Enums, support for Ruby 3.2
 • See `--factory-creation` section.

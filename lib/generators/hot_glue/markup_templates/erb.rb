@@ -26,14 +26,10 @@ module  HotGlue
     end
 
     def list_column_headings(col_identifier: , columns: , column_width:, singular: )
-      # @columns = args[0][:columns]
-      # @column_width = args[0][:column_width]
-      # @col_identifier = args[0][:col_identifier]
-
       col_style = @layout_strategy.column_headings_col_style
 
       result = columns.map{ |column|
-        "<div class='#{col_identifier}' #{singular}--#{column.join("-")} " + col_style + ">" +
+        "<div class='#{col_identifier}' heading--#{singular}--#{column.join("-")} " + col_style + ">" +
           column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
       }.join("\n")
       return result
@@ -41,8 +37,8 @@ module  HotGlue
 
 
     ################################################################
-
     # THE FORM
+    ################################################################
 
     def all_form_fields(*args)
 
@@ -63,7 +59,7 @@ module  HotGlue
       singular = @singular
 
       result = columns.map{ |column|
-        "  <div class='#{column_classes} #{singular}--#{column.join("-")}' >" +
+        "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
             type = eval("#{singular_class}.columns_hash['#{col}']").type
             limit = eval("#{singular_class}.columns_hash['#{col}']").limit
