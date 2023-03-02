@@ -118,10 +118,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       <%= @update_alt_lookups.collect{|key, data|
    "    @#{ singular_name }.#{key.gsub("_id", "")} = #{key.gsub("_id", "")}"
    }.join("/n") %><% end %>
-<%= @attachments.collect{|attachment|
-    "@#{singular}.#{attachment}.attach(params[:#{attachment}])"
-  }.collect{|x| "    #{x}"}.join('\n'
-  ) %>
+
     if @<%= singular_name %>.update(modified_params)
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
       flash[:notice] = (flash[:notice] || "") << "Saved #{@<%= singular %>.<%= display_class %>}"
