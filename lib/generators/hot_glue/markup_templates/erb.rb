@@ -3,23 +3,41 @@ module  HotGlue
 
     attr_accessor :path, :singular, :singular_class,
                   :magic_buttons, :small_buttons,
-                  :show_only, :column_width, :layout_strategy, :perc_width,
+                  :show_only, :layout_strategy, :perc_width,
                   :ownership_field, :form_labels_position,
-                  :inline_list_labels,
-                  :columns, :column_width, :col_identifier, :singular,
-                  :form_placeholder_labels, :hawk_keys
+                  :inline_list_labels, :layout_object,
+                  :columns,  :col_identifier, :singular,
+                  :form_placeholder_labels, :hawk_keys, :update_show_only,
+                  :alt_lookups, :attachments, :show_only
 
 
-    # def initialize(path: , singular:, singular_class: ,
-    #                layout_strategy: , magic_buttons: ,
-    #                small_buttons: , show_only: , column_width:,
-    #                perc_width: ,
-    #                ownership_field: , form_labels_position: ,
-    #                inline_list_labels: ,
-    #                columns: , col_identifier: ,
-    #                form_placeholder_labels:, hawk_keys:)
-    #
-    # end
+    def initialize(singular:, singular_class: ,
+                   layout_strategy: , magic_buttons: ,
+                   small_buttons: , show_only: ,
+                   ownership_field: , form_labels_position: ,
+                   inline_list_labels: ,
+                   form_placeholder_labels:, hawk_keys:,
+                   update_show_only:, alt_lookups: , attachments: )
+
+      @singular = singular
+      @singular_class = singular_class
+
+      @magic_buttons = magic_buttons
+      @small_buttons = small_buttons
+      @layout_strategy = layout_strategy
+      @show_only = show_only
+      @ownership_field = ownership_field
+      @form_labels_position = form_labels_position
+      @inline_list_labels = inline_list_labels
+      @singular = singular
+      @form_placeholder_labels = form_placeholder_labels
+      @hawk_keys = hawk_keys
+      @update_show_only = update_show_only
+      @alt_lookups = alt_lookups
+      @attachments = attachments
+
+
+    end
 
     def add_spaces_each_line(text, num_spaces)
       add_spaces = " " * num_spaces
@@ -35,9 +53,12 @@ module  HotGlue
       }.join("\n")
     end
 
-    def list_column_headings(col_identifier: , columns: , column_width:, singular: )
+    def list_column_headings(layout_object: ,
+                             col_identifier: ,
+                             column_width:, singular: )
       col_style = @layout_strategy.column_headings_col_style
 
+      columns = layout_object[:columns][:container]
       result = columns.map{ |column|
         "<div class='#{col_identifier}' heading--#{singular}--#{column.join("-")} " + col_style + ">" +
           column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
@@ -50,30 +71,31 @@ module  HotGlue
     # THE FORM
     ################################################################
 
-    def all_form_fields(*args)
 
-      @show_only = args[0][:show_only]
+    def all_form_fields(layout_strategy: , layout_object: )
 
-      @singular_class = args[0][:singular_class]
-      @ownership_field  = args[0][:ownership_field]
-      @form_labels_position = args[0][:form_labels_position]
-      @form_placeholder_labels = args[0][:form_placeholder_labels]
-      @hawk_keys = args[0][:hawk_keys]
-      @singular = args[0][:singular]
-      attachments = args[0][:attachments]
+      # @show_only = args[0][:show_only]
+      #
+      # @singular_class = args[0][:singular_class]
+      # @ownership_field  = args[0][:ownership_field]
+      # @form_labels_position = args[0][:form_labels_position]
+      # @form_placeholder_labels = args[0][:form_placeholder_labels]
+      # @hawk_keys = args[0][:hawk_keys]
+      # @singular = args[0][:singular]
+      # attachments = args[0][:attachments]
+      #
+      # @alt_lookups = args[0][:alt_lookups]
+      #
+      # column_classes = args[0][:col_identifier]
+      # update_show_only = args[0][:update_show_only] || []
+      # singular = @singular
 
-      @alt_lookups = args[0][:alt_lookups]
-
-      column_classes = args[0][:col_identifier]
-      update_show_only = args[0][:update_show_only] || []
-      singular = @singular
-
-
+      column_classes = layout_strategy.column_classes_for_form_fields
+      columns = layout_object[:columns][:container]
 
       result = columns.map{ |column|
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
-
             if attachments.keys.include?(col)
               field_result =  "<%= f.file_field :#{col} %>"
             else
@@ -271,22 +293,25 @@ module  HotGlue
     ################################################################
 
 
-    def all_line_fields(columns:, show_only: , singular_class:, singular:, perc_width:, attachments:,
-                        col_identifier: nil, inline_list_labels: nil)
+    def all_line_fields(layout_strategy:,
+                        layout_object: ,
+                        perc_width:,
+                        col_identifier: nil,
+                        inline_list_labels: nil)
 
-      @col_identifier =  @layout_strategy.column_classes_for_line_fields
+      @col_identifier =  layout_strategy.column_classes_for_line_fields
 
       inline_list_labels = inline_list_labels || 'omit'
+      columns = layout_object[:columns][:container]
 
       columns_count = columns.count + 1
       perc_width = (perc_width).floor
 
-      style_with_flex_basis = @layout_strategy.style_with_flex_basis(perc_width)
+      style_with_flex_basis = layout_strategy.style_with_flex_basis(perc_width)
 
       result = columns.map{ |column|
+
         "<div class='#{col_identifier} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
-
-
         column.map { |col|
           if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"

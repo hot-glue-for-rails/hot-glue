@@ -214,15 +214,6 @@ module HotGlue
           LayoutStrategy::HotGlue.new(self)
         end
 
-
-      if  @markup == "erb"
-        @template_builder = HotGlue::ErbTemplate.new(layout_strategy: @layout_strategy)
-      elsif  @markup == "slim"
-        raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
-      elsif  @markup == "haml"
-        raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
-      end
-
       args = meta_args[0]
       @singular = args.first.tableize.singularize # should be in form hello_world
 
@@ -232,32 +223,21 @@ module HotGlue
 
       @plural = options['plural'] || @singular.pluralize # respects what you set in inflections.rb, to override, use plural option
       @namespace = options['namespace'] || nil
-
-
       use_controller_name =  plural.titleize.gsub(" ", "")
-
       @controller_build_name = (( @namespace.titleize.gsub(" ","") + "::" if @namespace) || "") + use_controller_name + "Controller"
       @controller_build_folder = use_controller_name.underscore
       @controller_build_folder_singular = singular
 
-      # if ! @controller_build_folder.ends_with?("s")
-      #   raise HotGlue::Error, "can't build with controller name #{@controller_build_folder} because it doesn't end with an 's'"
-      # end
-
       @auth = options['auth'] || "current_user"
       @auth_identifier = options['auth_identifier'] || (! @god && @auth.gsub("current_", "")) || nil
 
-
-
       if options['nest']
         raise HotGlue::Error, "STOP: the flag --nest has been replaced with --nested; please re-run using the --nested flag"
-
       end
-
       @nested = (!options['nested'].empty? && options['nested']) || nil
-
       @singular_class = args.first # note this is the full class name with a model namespace
 
+      setup_attachments
 
       @exclude_fields = []
       @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
@@ -269,7 +249,6 @@ module HotGlue
         @include_fields += options['include'].split(":").collect{|x|x.split(",")}.flatten.collect(&:to_sym)
       end
 
-
       @show_only = []
       if !options['show_only'].empty?
         @show_only += options['show_only'].split(",").collect(&:to_sym)
@@ -279,6 +258,36 @@ module HotGlue
       if !options['update_show_only'].empty?
         @update_show_only += options['update_show_only'].split(",").collect(&:to_sym)
       end
+
+
+      if  @markup == "erb"
+        @template_builder = HotGlue::ErbTemplate.new(
+          layout_strategy: @layout_strategy,
+          magic_buttons: @magic_buttons,
+          small_buttons: @small_buttons,
+          inline_list_labels: @inline_list_labels,
+          show_only: @show_only,
+          update_show_only: @update_show_only,
+          singular_class: singular_class,
+          singular: singular,
+          hawk_keys: @hawk_keys,
+          ownership_field: @ownership_field,
+          form_labels_position: @form_labels_position,
+          form_placeholder_labels: @form_placeholder_labels,
+          alt_lookups: @alt_lookups,
+          attachments: @attachments,
+        )
+      elsif  @markup == "slim"
+        raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
+      elsif  @markup == "haml"
+        raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
+      end
+      identify_object_owner
+      setup_hawk_keys
+
+
+
+
 
 
 
@@ -414,9 +423,7 @@ module HotGlue
         end
       end
 
-      identify_object_owner
-      setup_hawk_keys
-      setup_attachments
+
       @factory_creation = options['factory_creation'].gsub(";", "\n")
 
 
@@ -437,6 +444,8 @@ module HotGlue
                                               columns: @columns,
                                               smart_layout: @smart_layout )
       @layout_object = builder.construct
+
+
 
       @menu_file_exists = true if @nested_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
@@ -731,7 +740,7 @@ module HotGlue
 
     def list_column_headings
       @template_builder.list_column_headings(
-        columns: @layout_object[:columns][:container],
+        layout_object: @layout_object,
         col_identifier: @layout_strategy.column_classes_for_column_headings,
         column_width: @layout_strategy.column_width,
         singular: @singular
@@ -1200,20 +1209,8 @@ module HotGlue
     end
 
     def form_fields_html
-      @template_builder.all_form_fields(
-        columns: @layout_object[:columns][:container],
-        show_only: @show_only,
-        update_show_only: @update_show_only,
-        singular_class: singular_class,
-        singular: singular,
-        hawk_keys: @hawk_keys,
-        col_identifier:  @layout_strategy.column_classes_for_form_fields,
-        ownership_field: @ownership_field,
-        form_labels_position: @form_labels_position,
-        form_placeholder_labels: @form_placeholder_labels,
-        alt_lookups: @alt_lookups,
-        attachments: @attachments
-      )
+      @template_builder.all_form_fields(layout_strategy: @layout_strategy,
+                                        layout_object: @layout_object)
     end
 
     def list_label
@@ -1226,14 +1223,16 @@ module HotGlue
 
     def all_line_fields
       @template_builder.all_line_fields(
-        perc_width: @layout_strategy.each_col,     #undefined method `each_col'
-        columns:  @layout_object[:columns][:container],
-        show_only: @show_only,
-        singular_class: singular_class,
-        singular: singular,
         col_identifier: @layout_strategy.column_classes_for_line_fields,
         inline_list_labels: @inline_list_labels,
-        attachments: @attachments
+        perc_width: @layout_strategy.each_col,     #undefined method `each_col'
+        layout_strategy: @layout_strategy,
+        layout_object: @layout_object
+        # columns:  @layout_object[:columns][:container],
+        # show_only: @show_only,
+        # singular_class: singular_class,
+        # singular: singular,
+        # attachments: @attachments
       )
     end
 
