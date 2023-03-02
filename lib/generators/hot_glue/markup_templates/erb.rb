@@ -10,6 +10,16 @@ module  HotGlue
                   :form_placeholder_labels, :hawk_keys
 
 
+    # def initialize(path: , singular:, singular_class: ,
+    #                layout_strategy: , magic_buttons: ,
+    #                small_buttons: , show_only: , column_width:,
+    #                perc_width: ,
+    #                ownership_field: , form_labels_position: ,
+    #                inline_list_labels: ,
+    #                columns: , col_identifier: ,
+    #                form_placeholder_labels:, hawk_keys:)
+    #
+    # end
 
     def add_spaces_each_line(text, num_spaces)
       add_spaces = " " * num_spaces
@@ -42,7 +52,6 @@ module  HotGlue
 
     def all_form_fields(*args)
 
-      @columns = args[0][:columns]
       @show_only = args[0][:show_only]
 
       @singular_class = args[0][:singular_class]
@@ -65,7 +74,7 @@ module  HotGlue
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
 
-            if attachments.include?(col.to_s)
+            if attachments.keys.include?(col)
               field_result =  "<%= f.file_field :#{col} %>"
             else
               type = eval("#{singular_class}.columns_hash['#{col}']").type
@@ -264,11 +273,7 @@ module  HotGlue
 
     def all_line_fields(columns:, show_only: , singular_class:, singular:, perc_width:, attachments:,
                         col_identifier: nil, inline_list_labels: nil)
-      # @columns = args[0][:columns]
-      # @show_only = args[0][:show_only]
-      # @singular_class = args[0][:singular_class]
-      # @singular = args[0][:singular]
-      # @perc_width = args[0][:perc_width]
+
       @col_identifier =  @layout_strategy.column_classes_for_line_fields
 
       inline_list_labels = inline_list_labels || 'omit'
@@ -283,12 +288,14 @@ module  HotGlue
 
 
         column.map { |col|
-          if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.include?(col.to_s)
+          if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
           end
 
-          if attachments.include?(col.to_s)
-            field_output = "<%= #{singular}.#{col}.attached? && #{singular}.#{col}.variable? ? image_tag(#{singular}.#{col}.variant(:thumb)) : \"\" %>"
+          if attachments.keys.include?(col)
+            this_attachment  = attachments[col]
+            thumbnail = this_attachment[:thumbnail]
+            field_output = "<%= #{singular}.#{col}.attached? && #{singular}.#{col}.variable? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>"
           else
             type = eval("#{singular_class}.columns_hash['#{col}']").type
             limit = eval("#{singular_class}.columns_hash['#{col}']").limit

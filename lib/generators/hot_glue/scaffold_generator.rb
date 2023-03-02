@@ -416,10 +416,10 @@ module HotGlue
 
       identify_object_owner
       setup_hawk_keys
-
+      setup_attachments
       @factory_creation = options['factory_creation'].gsub(";", "\n")
 
-      @attachments = options['attachments'].split(",")
+
 
 
 
@@ -526,6 +526,32 @@ module HotGlue
       end
     end
 
+
+    def setup_attachments
+      @attachments = {}
+
+      if options["attachments"]
+        options['attachments'].split(",").each do |attachment_entry|
+          # format is: avatar{thumbnail|field_for_original_filename}
+
+          if attachment_entry.include?("{")
+            attachment_entry =~ /(.*){(.*)\|(.*)}/
+            key, thumbnail, field_for_original_filename = $1, $2, $3
+            thumbnail.gsub!("}","")
+          else
+            key = attachment_entry
+            thumbnail = "thumb"
+            field_for_original_filename = nil
+          end
+
+          @attachments[key.to_sym] = {thumbnail: thumbnail,
+                                      field_for_original_filename: field_for_original_filename}
+        end
+
+        puts "ATTACHMENTS: #{@attachments}"
+      end
+    end
+
     def identify_object_owner
       auth_assoc = @auth && @auth.gsub("current_","")
 
@@ -572,7 +598,9 @@ module HotGlue
 
       if @attachments.any?
         puts "adding attachments-as-columns: #{@attachments}"
-        @columns.concat @attachments.collect(&:to_sym)
+        @attachments.keys.each do |attachment|
+          @columns << attachment if !@columns.include?(attachment)
+        end
       end
 
 
@@ -623,7 +651,7 @@ module HotGlue
               end
             end
           end
-        elsif @attachments.include?(col.to_s)
+        elsif @attachments.keys.include?(col)
 
         else
           raise "couldn't find #{col} in either field list or attachments list"
@@ -689,7 +717,7 @@ module HotGlue
     end
 
     def spec_related_column_lets
-      (@columns - @show_only - @attachments.collect(&:to_sym)).map { |col|
+      (@columns - @show_only - @attachments.keys).map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         if (type == :integer && col.to_s.ends_with?("_id") || type == :uuid)
           assoc = "#{col.to_s.gsub('_id','')}"
@@ -711,7 +739,7 @@ module HotGlue
     end
 
     def columns_spec_with_sample_data
-      (@columns - @attachments.collect(&:to_sym)).map { |c|
+      (@columns - @attachments.keys).map { |c|
         type = eval("#{singular_class}.columns_hash['#{c}']").type
         random_data = case type
                       when :integer
@@ -786,7 +814,7 @@ module HotGlue
     end
 
     def test_capybara_block(which_partial = :create)
-      ((@columns - @attachments.collect(&:to_sym)) - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
+      ((@columns - @attachments.keys) - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         case type
         when :date
@@ -1343,5 +1371,11 @@ module HotGlue
       }.join(", ")
       res
     end
+
+    def controller_attachment_orig_filename_pickup_syntax
+      @attachments.collect{ |key, attachment|  "\n" + "    modified_params[:#{ attachment[:field_for_original_filename] }] = #{singular_name}_params['#{ key }'].original_filename" if attachment[:field_for_original_filename] }.compact.join("\n")
+    end
   end
+
+
 end

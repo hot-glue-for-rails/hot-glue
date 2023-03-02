@@ -12,7 +12,7 @@ describe 'interaction for <%= controller_class_name %>' do
     item1_addOns << "#{display_class}: FFaker::Name.name"
    end
 
-  item1_addOns << ", " + (@columns - @attachments.collect(&:to_sym)).map { |col|
+  item1_addOns << ", " + (@columns - @attachments.keys.collect(&:to_sym)).map { |col|
   type = eval("#{singular_class}.columns_hash['#{col}']").type
   case type
   when :string
@@ -59,7 +59,7 @@ describe 'interaction for <%= controller_class_name %>' do
     it "should show me the list" do
       visit <%= path_helper_plural %>
 <%=
-(@columns - @attachments.collect(&:to_sym)).map { |col|
+(@columns - @attachments.keys.collect(&:to_sym)).map { |col|
   type = eval("#{singular_class}.columns_hash['#{col}']").type
 
   case type
@@ -101,7 +101,7 @@ describe 'interaction for <%= controller_class_name %>' do
       expect(page).to have_content("Successfully created")
 <%="      " +
 
-  ((@columns - @attachments.collect(&:to_sym)) - @show_only).map { |col|
+  ((@columns - @attachments.keys.collect(&:to_sym)) - @show_only).map { |col|
     type = eval("#{singular_class}.columns_hash['#{col}']").type
 
     case type
@@ -144,7 +144,7 @@ describe 'interaction for <%= controller_class_name %>' do
 <%= test_capybara_block(:update) %>
       click_button "Save"
       within("turbo-frame#<%= @namespace %>__#{dom_id(<%= singular %>1)} ") do
-<%= ((@columns - @attachments.collect(&:to_sym)) - @show_only).map { |col|
+<%= ((@columns - @attachments.keys.collect(&:to_sym)) - @show_only).map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
 
       if type == :uuid || (type == :integer && col.to_s.ends_with?("_id"))
