@@ -97,7 +97,10 @@ module  HotGlue
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
             if attachments.keys.include?(col)
-              field_result =  "<%= f.file_field :#{col} %>"
+              this_attachment  = attachments[col]
+              thumbnail = this_attachment[:thumbnail]
+              field_result =  "<%= #{singular}.#{col}.attached? && #{singular}.#{col}.variable? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %><br /><%= f.file_field :#{col} %>"
+              field_error_name = col
             else
 
               type = eval("#{singular_class}.columns_hash['#{col}']").type
@@ -137,21 +140,23 @@ module  HotGlue
               else
                 field_error_name = col
               end
-              show_only_open = ""
-              show_only_close = ""
-              if update_show_only.include?(col)
-                show_only_open = "<% if action_name == 'edit' %>" +
-                  show_only_result(type: type, col: col, singular: singular) + "<% else %>"
-                show_only_close = "<% end %>"
-              end
-              the_label = "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
-              add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
-                                      add_spaces_each_line( (@form_labels_position == 'before' ? the_label : "") +
-                                                              show_only_open +  field_result + show_only_close +
-                                                              (@form_labels_position == 'after' ? the_label : "")   , 4) +
-                                      "\n  </span>\n  <br />", 2)
 
             end
+            the_label = "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+            show_only_open = ""
+            show_only_close = ""
+            if update_show_only.include?(col)
+              show_only_open = "<% if action_name == 'edit' %>" +
+                show_only_result(type: type, col: col, singular: singular) + "<% else %>"
+              show_only_close = "<% end %>"
+            end
+
+            add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
+                                    add_spaces_each_line( (form_labels_position == 'before' ? the_label : "") +
+                                                            show_only_open +  field_result + show_only_close +
+                                                            (form_labels_position == 'after' ? the_label : "")   , 4) +
+                                    "\n  </span>\n  <br />", 2)
+
           }.join("") + "\n  </div>"
       }.join("\n")
       return result

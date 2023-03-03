@@ -38,7 +38,6 @@ describe HotGlue::Layout::Builder do
                                               [:time_of_day, :selected, :genre]]
                                             }, :portals=>{}, :buttons=>{:size=>2}})
 
-          #
         end
       end
 
