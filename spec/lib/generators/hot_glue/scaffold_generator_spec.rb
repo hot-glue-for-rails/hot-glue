@@ -647,7 +647,8 @@ describe HotGlue::ScaffoldGenerator do
     it "should make placeholder labels" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc","--god",
-                                             "--form-placeholder-labels"])
+                                             "--form-placeholder-labels=true"])
+
       expect(
         File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '', placeholder: 'Name' %>/
       ).to_not be(nil)

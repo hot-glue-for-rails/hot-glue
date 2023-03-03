@@ -260,6 +260,42 @@ module HotGlue
       end
 
 
+      # syntax should be xyz_id{xyz_email},abc_id{abc_email}
+      # instead of a drop-down for the foreign entity, a text field will be presented
+      # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
+
+      alt_lookups_entry = options['alt_foreign_key_lookup'].split(",")
+      @alt_lookups = {}
+      @alt_foreign_key_lookup = alt_lookups_entry.each do |setting|
+        setting =~ /(.*){(.*)}/
+        key, lookup_as = $1, $2
+        assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
+
+        data = {lookup_as: lookup_as.gsub("+",""),
+                assoc: assoc,
+                with_create: lookup_as.include?("+")}
+        @alt_lookups[key] = data
+      end
+
+      puts "------ ALT LOOKUPS for #{@alt_lookups}"
+
+      @update_alt_lookups = @alt_lookups.collect{|key, value|
+        @update_show_only.include?(key) ?
+          {  key: value }
+          : nil}.compact
+
+      @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").titleize )
+      @list_label_heading =  options['list_label_heading'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase )
+
+      @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? "New " + eval("#{class_name}.class_variable_get(:@@table_label_singular)") : "New " + singular.gsub("_", " ").titleize )
+      @new_form_heading = options['new_form_heading'] || "New #{@label}"
+
+
+      identify_object_owner
+      setup_hawk_keys
+      @form_placeholder_labels = options['form_placeholder_labels'] # true or false
+      @inline_list_labels = options['inline_list_labels']  || 'omit' # 'before','after','omit'
+
       if  @markup == "erb"
         @template_builder = HotGlue::ErbTemplate.new(
           layout_strategy: @layout_strategy,
@@ -282,14 +318,6 @@ module HotGlue
       elsif  @markup == "haml"
         raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
       end
-      identify_object_owner
-      setup_hawk_keys
-
-
-
-
-
-
 
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs_only'] || false
@@ -312,8 +340,6 @@ module HotGlue
         raise HotGlue::Error, "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
       end
 
-      @form_placeholder_labels = options['form_placeholder_labels'] # true or false
-      @inline_list_labels = options['inline_list_labels']  || 'omit' # 'before','after','omit'
 
 
       if !['before','after','omit'].include?(@inline_list_labels)
@@ -452,35 +478,6 @@ module HotGlue
       @turbo_streams = !!options['with_turbo_streams']
 
 
-      # syntax should be xyz_id{xyz_email},abc_id{abc_email}
-      # instead of a drop-down for the foreign entity, a text field will be presented
-      # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
-
-      alt_lookups_entry = options['alt_foreign_key_lookup'].split(",")
-      @alt_lookups = {}
-      @alt_foreign_key_lookup = alt_lookups_entry.each do |setting|
-        setting =~ /(.*){(.*)}/
-        key, lookup_as = $1, $2
-        assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
-
-        data = {lookup_as: lookup_as.gsub("+",""),
-                assoc: assoc,
-                with_create: lookup_as.include?("+")}
-        @alt_lookups[key] = data
-      end
-
-      puts "------ ALT LOOKUPS for #{@alt_lookups}"
-
-      @update_alt_lookups = @alt_lookups.collect{|key, value|
-                                              @update_show_only.include?(key) ?
-                                                    {  key: value }
-                                                      : nil}.compact
-
-      @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").titleize )
-      @list_label_heading =  options['list_label_heading'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase )
-
-      @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? "New " + eval("#{class_name}.class_variable_get(:@@table_label_singular)") : "New " + singular.gsub("_", " ").titleize )
-      @new_form_heading = options['new_form_heading'] || "New #{@label}"
 
 
 

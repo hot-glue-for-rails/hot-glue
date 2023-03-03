@@ -211,7 +211,6 @@ module  HotGlue
         is_owner = col == ownership_field
         assoc_class_name = assoc.class_name.to_s
         display_column = HotGlue.derrive_reference_name(assoc_class_name)
-
         if @hawk_keys[assoc.foreign_key.to_sym]
           hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
           hawked_association = hawk_definition.join(".")
