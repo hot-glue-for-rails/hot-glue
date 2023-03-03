@@ -35,8 +35,6 @@ module  HotGlue
       @update_show_only = update_show_only
       @alt_lookups = alt_lookups
       @attachments = attachments
-
-
     end
 
     def add_spaces_each_line(text, num_spaces)
@@ -99,6 +97,7 @@ module  HotGlue
             if attachments.keys.include?(col)
               field_result =  "<%= f.file_field :#{col} %>"
             else
+
               type = eval("#{singular_class}.columns_hash['#{col}']").type
               limit = eval("#{singular_class}.columns_hash['#{col}']").limit
               sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
@@ -296,12 +295,11 @@ module  HotGlue
     def all_line_fields(layout_strategy:,
                         layout_object: ,
                         perc_width:,
-                        col_identifier: nil,
-                        inline_list_labels: nil)
+                        col_identifier: nil)
 
       @col_identifier =  layout_strategy.column_classes_for_line_fields
 
-      inline_list_labels = inline_list_labels || 'omit'
+      inline_list_labels = @inline_list_labels  || 'omit'
       columns = layout_object[:columns][:container]
 
       columns_count = columns.count + 1

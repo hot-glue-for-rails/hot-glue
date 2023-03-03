@@ -18,7 +18,7 @@ rm -rf dummy/app/views/users/*
 rm -rf dummy/app/views/humans/*
 rm -rf dummy/app/views/pets/*
 
-/bin/rm -rf dummy/spec/system/
+/bin/rm -rf dummy/spec/features/
 
 
 # !("application_controller.rb"|"welcome_controller.rb")

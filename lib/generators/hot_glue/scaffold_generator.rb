@@ -1224,7 +1224,6 @@ module HotGlue
     def all_line_fields
       @template_builder.all_line_fields(
         col_identifier: @layout_strategy.column_classes_for_line_fields,
-        inline_list_labels: @inline_list_labels,
         perc_width: @layout_strategy.each_col,     #undefined method `each_col'
         layout_strategy: @layout_strategy,
         layout_object: @layout_object
