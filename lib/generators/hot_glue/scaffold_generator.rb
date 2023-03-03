@@ -296,6 +296,18 @@ module HotGlue
       @form_placeholder_labels = options['form_placeholder_labels'] # true or false
       @inline_list_labels = options['inline_list_labels']  || 'omit' # 'before','after','omit'
 
+
+      @form_labels_position = options['form_labels_position']
+      if !['before','after','omit'].include?(@form_labels_position)
+        raise HotGlue::Error, "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
+      end
+
+      if !['before','after','omit'].include?(@inline_list_labels)
+        raise HotGlue::Error, "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
+      end
+
+
+
       if  @markup == "erb"
         @template_builder = HotGlue::ErbTemplate.new(
           layout_strategy: @layout_strategy,
@@ -334,17 +346,6 @@ module HotGlue
       @no_list_label = options['no_list_label'] || false
       @no_list_heading = options['no_list_heading'] || false
 
-      @form_labels_position = options['form_labels_position']
-      if !['before','after','omit'].include?(@form_labels_position)
-
-        raise HotGlue::Error, "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
-      end
-
-
-
-      if !['before','after','omit'].include?(@inline_list_labels)
-        raise HotGlue::Error, "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
-      end
 
 
 

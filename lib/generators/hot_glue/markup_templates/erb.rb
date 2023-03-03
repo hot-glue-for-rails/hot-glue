@@ -27,7 +27,9 @@ module  HotGlue
       @layout_strategy = layout_strategy
       @show_only = show_only
       @ownership_field = ownership_field
+
       @form_labels_position = form_labels_position
+
       @inline_list_labels = inline_list_labels
       @singular = singular
       @form_placeholder_labels = form_placeholder_labels
