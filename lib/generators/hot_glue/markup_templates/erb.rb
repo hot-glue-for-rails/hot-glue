@@ -99,7 +99,8 @@ module  HotGlue
             if attachments.keys.include?(col)
               this_attachment  = attachments[col]
               thumbnail = this_attachment[:thumbnail]
-              field_result =  "<%= #{singular}.#{col}.attached? && #{singular}.#{col}.variable? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %><br /><%= f.file_field :#{col} %>"
+              field_result =  "<%= #{singular}.#{col}.attached? && #{singular}.#{col}.variable? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %><br />\n" +
+                "<%= f.file_field :#{col} #{', direct_upload: true ' if this_attachment[:direct_upload]}%>"
               field_error_name = col
             else
 

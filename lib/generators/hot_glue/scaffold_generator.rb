@@ -542,17 +542,28 @@ module HotGlue
           # format is: avatar{thumbnail|field_for_original_filename}
 
           if attachment_entry.include?("{")
-            attachment_entry =~ /(.*){(.*)\|(.*)}/
-            key, thumbnail, field_for_original_filename = $1, $2, $3
-            thumbnail.gsub!("}","")
+            if attachment_entry.count("|") == 1
+              attachment_entry =~ /(.*){(.*)\|(.*)}/
+              key, thumbnail, field_for_original_filename = $1, $2, $3
+            elsif attachment_entry.count("|") == 2
+              attachment_entry =~ /(.*){(.*)\|(.*)\|(.*)}/
+              key, thumbnail, field_for_original_filename, direct_upload = $1, $2, $3, $4
+
+              if !direct_upload.nil? && direct_upload != "true"
+                raise "received 3rd parameter in attachment long form specification that was not 'true'; for direct uploads, just use true or leave off for false"
+              end
+              direct_upload = !!direct_upload
+            end
           else
             key = attachment_entry
             thumbnail = "thumb"
+            direct_upload = nil
             field_for_original_filename = nil
           end
 
           @attachments[key.to_sym] = {thumbnail: thumbnail,
-                                      field_for_original_filename: field_for_original_filename}
+                                      field_for_original_filename: field_for_original_filename,
+                                      direct_upload: direct_upload}
         end
 
         puts "ATTACHMENTS: #{@attachments}"
