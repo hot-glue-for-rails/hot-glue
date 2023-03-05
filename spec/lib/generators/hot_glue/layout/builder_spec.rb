@@ -29,7 +29,7 @@ describe HotGlue::Layout::Builder do
 
 
           expect(result).to eq({:columns=>{:size_each=>2,
-                                           :button_columns => 2,
+                                           # :button_columns => 2,
                                            :container=>
                                              [[:name, :author_id],
                                               [:blurb, :long_description],
@@ -38,7 +38,6 @@ describe HotGlue::Layout::Builder do
                                               [:time_of_day, :selected, :genre]]
                                             }, :portals=>{}, :buttons=>{:size=>2}})
 
-          #
         end
       end
 

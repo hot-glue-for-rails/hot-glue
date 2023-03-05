@@ -5,6 +5,7 @@ module LayoutStrategy
       @builder = scaffold_builder
     end
 
+    def button_applied_classes; end
     def column_classes_for_button_column; ""; end
     def button_classes; ""; end
     def button_column_style; "" ; end
@@ -23,6 +24,7 @@ module LayoutStrategy
       (col_width/(builder.columns.count)).to_i
     end
     def list_classes; ""; end
+    def magic_button_classes; ""; end
     def row_classes; ""; end
     def row_heading_classes; ""; end
     def page_begin; '<div> '; end

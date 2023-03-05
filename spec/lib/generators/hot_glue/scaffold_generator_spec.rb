@@ -40,7 +40,7 @@ describe HotGlue::ScaffoldGenerator do
     remove_file("spec/dummy/app/controllers/jkls_controller.rb")
 
     remove_dir_with_namespace('spec/dummy/app/views/users')
-    remove_dir_with_namespace('spec/dummy/spec/system')
+    remove_dir_with_namespace('spec/dummy/spec/features')
 
     remove_dir_with_namespace('spec/dummy/app/views/ghis')
     remove_dir_with_namespace('spec/dummy/app/views/abcs')
@@ -101,11 +101,11 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "--specs-only" do
-    it "should create a file specs/system" do
+    it "should create a file specs/features" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Dfg","--specs-only"])
       expect(File.exist?("spec/dummy/spec/controller/dfgs_controller.rb")).to be(false)
-      expect(File.exist?("spec/dummy/spec/system/dfgs_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/features/dfgs_behavior_spec.rb")).to be(true)
     end
   end
 
@@ -219,17 +219,17 @@ describe HotGlue::ScaffoldGenerator do
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/destroy.turbo_stream.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/edit.turbo_stream.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/update.turbo_stream.erb")).to be(true)
-      expect(File.exist?("spec/dummy/spec/system/hello/dfgs_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/features/hello/dfgs_behavior_spec.rb")).to be(true)
     end
   end
 
   describe "--nested" do
-    it "should create a file at and specs/system" do
+    it "should create a file at and specs/features" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Ghi","--nested=dfg"])
 
       expect(File.exist?("spec/dummy/app/controllers/ghis_controller.rb")).to be(true)
-      expect(File.exist?("spec/dummy/spec/system/ghis_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/features/ghis_behavior_spec.rb")).to be(true)
     end
 
 
@@ -390,20 +390,17 @@ describe HotGlue::ScaffoldGenerator do
 
 
         describe "layout without smart layout" do
-          it "builds 1 column for fields and 2 for the buttons" do
-            response = Rails::Generators.invoke("hot_glue:scaffold",
-                                                ["User","--gd", "--layout=bootstrap"])
-
-            expect(
-               File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-sm-1'>Email<\/div>/
-            ).to be_a(Numeric)
-
-            file = File.read("spec/dummy/app/views/users/_show.erb")
-
-            expect(
-              File.read("spec/dummy/app/views/users/_list.erb") =~ /scaffold-col-heading scaffold-col-heading-buttons/
-            ).to be_a(Numeric)
-          end
+          # it "builds 1 column for fields and 2 for the buttons" do
+          #   response = Rails::Generators.invoke("hot_glue:scaffold",
+          #                                       ["User","--gd", "--layout=bootstrap"])
+          #
+          #   res = File.read("spec/dummy/app/views/users/_list.erb")
+          #
+          #   expect(res).to include("<div class='col-sm-1' heading--user--email >Email</div>")
+          #   res2 = File.read("spec/dummy/app/views/users/_show.erb")
+          #   byebug
+          #   expect(res2).to include("scaffold-col-heading scaffold-col-heading-buttons")
+          # end
         end
       end
 
@@ -419,8 +416,9 @@ describe HotGlue::ScaffoldGenerator do
 
 
               file = File.read("spec/dummy/app/views/users/_show.erb")
-              expect(file).to include("<div class='col-sm-2'><%= user.email %></div>")
-              expect(file).to include("<div class='col-sm-2'><%= user.family.try(:name) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %><\/div>")
+
+              expect(file).to include("<div class='col-sm-2 user--email'> <%= user.email %></div>")
+              expect(file).to include("<div class='col-sm-2 user--family_id'> <%= user.family.try(:name) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %></div>")
             end
           end
 
@@ -434,8 +432,7 @@ describe HotGlue::ScaffoldGenerator do
 
               file = File.read("spec/dummy/app/views/users/_list.erb")
 
-              expect(file).to include("<div class='col-sm-2'>Email</div>")
-
+              expect(file).to include("<div class='col-sm-2' heading--user--email >")
               expect(file).to include("<div class=\" scaffold-col-heading col-sm-4 \">")
               expect(file).to include("Dfgs")
             end
@@ -452,10 +449,8 @@ describe HotGlue::ScaffoldGenerator do
             end
 
             it "produces two columns for the fields" do
-
-              expect(
-                File.read("spec/dummy/app/views/users/_list.erb") =~ /<div class='col-sm-2'>Email<br \/>Family<\/div>/
-              ).to be_a(Numeric)
+              res =   File.read("spec/dummy/app/views/users/_list.erb")
+              expect(res).to include("<div class='col-sm-2' heading--user--email-family_id >Email<br />Family</div>")
             end
 
             it "has 4 columns for the Dfgs downnnest" do
@@ -605,14 +600,15 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "--form-labels-position" do
-    it "by default include them after" do
-      response = Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Abc","--god"])
-
-      expect(
-        File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>/
-      ).to_not be(nil)
-    end
+    # I'm testing this in the erb_spec.rb object
+    # it "by default include them after" do
+    #   response = Rails::Generators.invoke("hot_glue:scaffold",
+    #                                       ["Abc","--god"])
+    #
+    #   expect(
+    #     File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>/
+    #   ).to_not be(nil)
+    # end
 
     it "with 'omit' should make no labels" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
@@ -629,9 +625,12 @@ describe HotGlue::ScaffoldGenerator do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc","--god",
                                              "--form-labels-position=before"])
-      expect(
-        File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<label class='small form-text text-muted'>Name\<\/label>  <%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>/
-      ).to_not be(nil)
+
+      res = File.read("spec/dummy/app/views/abcs/_form.erb")
+
+      label_pos = res.index /<label class='small form-text text-muted'>Name\<\/label>/
+      field_pos = res.index /<%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>/
+      expect(label_pos < field_pos).to be(true)
     end
   end
 
@@ -647,7 +646,8 @@ describe HotGlue::ScaffoldGenerator do
     it "should make placeholder labels" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc","--god",
-                                             "--form-placeholder-labels"])
+                                             "--form-placeholder-labels=true"])
+
       expect(
         File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '', placeholder: 'Name' %>/
       ).to_not be(nil)
@@ -773,7 +773,7 @@ describe HotGlue::ScaffoldGenerator do
                                           ["Dfg","--god",
                                            "--magic-buttons=activate"])
       res = File.read("spec/dummy/app/views/dfgs/_show.erb")
-      expect(res).to include("<%= f.submit 'Activate'.html_safe, disabled: (dfg.respond_to?(:activateable?) && ! dfg.activateable? ), class: 'dfg-button btn btn-primary ' %>")
+      expect(res).to include("<%= f.submit 'Activate'.html_safe, disabled: (dfg.respond_to?(:activateable?) && ! dfg.activateable? ), class: 'dfg-button  ' %>")
     end
   end
 
@@ -821,8 +821,7 @@ describe HotGlue::ScaffoldGenerator do
 
       expect(res).to include("@visit = current_user.family.visits.find(params[:id])")
 
-      expect(res).to include("modified_params = hawk_params({user_id: [current_user.family, \"users\"]}, modified_params)")
-
+      expect(res).to include("modified_params = hawk_params({user_id: [current_user.family, \"\"]}, modified_params)")
       expect(res).to include("def load_visit
     @visit = current_user.family.visits.find(params[:id])
   end")

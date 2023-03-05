@@ -150,8 +150,7 @@ module HotGlue
     class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
     class_option :factory_creation, default: ''
     class_option :alt_foreign_key_lookup, default: '' #
-
-
+    class_option :attachments, default: ''
 
     def initialize(*meta_args)
       super
@@ -215,15 +214,6 @@ module HotGlue
           LayoutStrategy::HotGlue.new(self)
         end
 
-
-      if  @markup == "erb"
-        @template_builder = HotGlue::ErbTemplate.new(layout_strategy: @layout_strategy)
-      elsif  @markup == "slim"
-        raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
-      elsif  @markup == "haml"
-        raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
-      end
-
       args = meta_args[0]
       @singular = args.first.tableize.singularize # should be in form hello_world
 
@@ -233,32 +223,21 @@ module HotGlue
 
       @plural = options['plural'] || @singular.pluralize # respects what you set in inflections.rb, to override, use plural option
       @namespace = options['namespace'] || nil
-
-
       use_controller_name =  plural.titleize.gsub(" ", "")
-
       @controller_build_name = (( @namespace.titleize.gsub(" ","") + "::" if @namespace) || "") + use_controller_name + "Controller"
       @controller_build_folder = use_controller_name.underscore
       @controller_build_folder_singular = singular
 
-      # if ! @controller_build_folder.ends_with?("s")
-      #   raise HotGlue::Error, "can't build with controller name #{@controller_build_folder} because it doesn't end with an 's'"
-      # end
-
       @auth = options['auth'] || "current_user"
       @auth_identifier = options['auth_identifier'] || (! @god && @auth.gsub("current_", "")) || nil
 
-
-
       if options['nest']
         raise HotGlue::Error, "STOP: the flag --nest has been replaced with --nested; please re-run using the --nested flag"
-
       end
-
       @nested = (!options['nested'].empty? && options['nested']) || nil
-
       @singular_class = args.first # note this is the full class name with a model namespace
 
+      setup_attachments
 
       @exclude_fields = []
       @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
@@ -269,7 +248,6 @@ module HotGlue
         # semicolon to denote layout columns; commas separate fields
         @include_fields += options['include'].split(":").collect{|x|x.split(",")}.flatten.collect(&:to_sym)
       end
-
 
       @show_only = []
       if !options['show_only'].empty?
@@ -282,6 +260,76 @@ module HotGlue
       end
 
 
+      # syntax should be xyz_id{xyz_email},abc_id{abc_email}
+      # instead of a drop-down for the foreign entity, a text field will be presented
+      # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
+
+      alt_lookups_entry = options['alt_foreign_key_lookup'].split(",")
+      @alt_lookups = {}
+      @alt_foreign_key_lookup = alt_lookups_entry.each do |setting|
+        setting =~ /(.*){(.*)}/
+        key, lookup_as = $1, $2
+        assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
+
+        data = {lookup_as: lookup_as.gsub("+",""),
+                assoc: assoc,
+                with_create: lookup_as.include?("+")}
+        @alt_lookups[key] = data
+      end
+
+      puts "------ ALT LOOKUPS for #{@alt_lookups}"
+
+      @update_alt_lookups = @alt_lookups.collect{|key, value|
+        @update_show_only.include?(key) ?
+          {  key: value }
+          : nil}.compact
+
+      @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").titleize )
+      @list_label_heading =  options['list_label_heading'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase )
+
+      @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? "New " + eval("#{class_name}.class_variable_get(:@@table_label_singular)") : "New " + singular.gsub("_", " ").titleize )
+      @new_form_heading = options['new_form_heading'] || "New #{@label}"
+
+
+      identify_object_owner
+      setup_hawk_keys
+      @form_placeholder_labels = options['form_placeholder_labels'] # true or false
+      @inline_list_labels = options['inline_list_labels']  || 'omit' # 'before','after','omit'
+
+
+      @form_labels_position = options['form_labels_position']
+      if !['before','after','omit'].include?(@form_labels_position)
+        raise HotGlue::Error, "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
+      end
+
+      if !['before','after','omit'].include?(@inline_list_labels)
+        raise HotGlue::Error, "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
+      end
+
+
+
+      if  @markup == "erb"
+        @template_builder = HotGlue::ErbTemplate.new(
+          layout_strategy: @layout_strategy,
+          magic_buttons: @magic_buttons,
+          small_buttons: @small_buttons,
+          inline_list_labels: @inline_list_labels,
+          show_only: @show_only,
+          update_show_only: @update_show_only,
+          singular_class: singular_class,
+          singular: singular,
+          hawk_keys: @hawk_keys,
+          ownership_field: @ownership_field,
+          form_labels_position: @form_labels_position,
+          form_placeholder_labels: @form_placeholder_labels,
+          alt_lookups: @alt_lookups,
+          attachments: @attachments,
+        )
+      elsif  @markup == "slim"
+        raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
+      elsif  @markup == "haml"
+        raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
+      end
 
       @god = options['god'] || options['gd'] || false
       @specs_only = options['specs_only'] || false
@@ -298,19 +346,6 @@ module HotGlue
       @no_list_label = options['no_list_label'] || false
       @no_list_heading = options['no_list_heading'] || false
 
-      @form_labels_position = options['form_labels_position']
-      if !['before','after','omit'].include?(@form_labels_position)
-
-        raise HotGlue::Error, "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
-      end
-
-      @form_placeholder_labels = options['form_placeholder_labels'] # true or false
-      @inline_list_labels = options['inline_list_labels']  || 'omit' # 'before','after','omit'
-
-
-      if !['before','after','omit'].include?(@inline_list_labels)
-        raise HotGlue::Error, "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
-      end
 
 
 
@@ -415,10 +450,10 @@ module HotGlue
         end
       end
 
-      identify_object_owner
-      setup_hawk_keys
 
       @factory_creation = options['factory_creation'].gsub(";", "\n")
+
+
 
 
 
@@ -437,40 +472,17 @@ module HotGlue
                                               smart_layout: @smart_layout )
       @layout_object = builder.construct
 
+
+
       @menu_file_exists = true if @nested_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
       @turbo_streams = !!options['with_turbo_streams']
 
 
-      # syntax should be xyz_id{xyz_email},abc_id{abc_email}
-      # instead of a drop-down for the foreign entity, a text field will be presented
-      # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
 
-      alt_lookups_entry = options['alt_foreign_key_lookup'].split(",")
-      @alt_lookups = {}
-      @alt_foreign_key_lookup = alt_lookups_entry.each do |setting|
-        setting =~ /(.*){(.*)}/
-        key, lookup_as = $1, $2
-        assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
 
-        data = {lookup_as: lookup_as.gsub("+",""),
-                assoc: assoc,
-                with_create: lookup_as.include?("+")}
-        @alt_lookups[key] = data
-      end
 
-      puts "------ ALT LOOKUPS for #{@alt_lookups}"
 
-      @update_alt_lookups = @alt_lookups.collect{|key, value|
-                                              @update_show_only.include?(key) ?
-                                                    {  key: value }
-                                                      : nil}.compact
-
-      @label = options['label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") :  singular.gsub("_", " ").titleize )
-      @list_label_heading =  options['list_label_heading'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase )
-
-      @new_button_label = options['new_button_label'] || ( eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? "New " + eval("#{class_name}.class_variable_get(:@@table_label_singular)") : "New " + singular.gsub("_", " ").titleize )
-      @new_form_heading = options['new_form_heading'] || "New #{@label}"
     end
 
 
@@ -521,6 +533,43 @@ module HotGlue
       end
     end
 
+
+    def setup_attachments
+      @attachments = {}
+
+      if options["attachments"]
+        options['attachments'].split(",").each do |attachment_entry|
+          # format is: avatar{thumbnail|field_for_original_filename}
+
+          if attachment_entry.include?("{")
+            if attachment_entry.count("|") == 1
+              attachment_entry =~ /(.*){(.*)\|(.*)}/
+              key, thumbnail, field_for_original_filename = $1, $2, $3
+            elsif attachment_entry.count("|") == 2
+              attachment_entry =~ /(.*){(.*)\|(.*)\|(.*)}/
+              key, thumbnail, field_for_original_filename, direct_upload = $1, $2, $3, $4
+
+              if !direct_upload.nil? && direct_upload != "true"
+                raise "received 3rd parameter in attachment long form specification that was not 'true'; for direct uploads, just use true or leave off for false"
+              end
+              direct_upload = !!direct_upload
+            end
+          else
+            key = attachment_entry
+            thumbnail = "thumb"
+            direct_upload = nil
+            field_for_original_filename = nil
+          end
+
+          @attachments[key.to_sym] = {thumbnail: thumbnail,
+                                      field_for_original_filename: field_for_original_filename,
+                                      direct_upload: direct_upload}
+        end
+
+        puts "ATTACHMENTS: #{@attachments}"
+      end
+    end
+
     def identify_object_owner
       auth_assoc = @auth && @auth.gsub("current_","")
 
@@ -565,50 +614,65 @@ module HotGlue
         @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
       end
 
+      if @attachments.any?
+        puts "adding attachments-as-columns: #{@attachments}"
+        @attachments.keys.each do |attachment|
+          @columns << attachment if !@columns.include?(attachment)
+        end
+      end
+
+
 
       @associations = []
+
       @columns.each do |col|
         if col.to_s.starts_with?("_")
           @show_only << col
         end
 
-        if @the_object.columns_hash[col.to_s].type == :integer
-          if col.to_s.ends_with?("_id")
-            # guess the association name label
-            assoc_name = col.to_s.gsub("_id","")
+        if @the_object.columns_hash.keys.include?(col.to_s)
+          if @the_object.columns_hash[col.to_s].type == :integer
+            if col.to_s.ends_with?("_id")
+              # guess the association name label
+              assoc_name = col.to_s.gsub("_id","")
 
 
-            assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+              assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
-            if assoc_model.nil?
-              exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; or add to #{singular_class} `belongs_to :#{assoc_name}`.  To make a controller that can read all records, specify with --god."
-              puts exit_message
-              raise(HotGlue::Error, exit_message)
-            end
+              if assoc_model.nil?
+                exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; or add to #{singular_class} `belongs_to :#{assoc_name}`.  To make a controller that can read all records, specify with --god."
+                puts exit_message
+                raise(HotGlue::Error, exit_message)
+              end
 
-            begin
-              assoc_class = eval(assoc_model.try(:class_name))
-              @associations << assoc_name.to_sym
-              name_list = [:name, :to_label, :full_name, :display_name, :email]
+              begin
+                assoc_class = eval(assoc_model.try(:class_name))
+                @associations << assoc_name.to_sym
+                name_list = [:name, :to_label, :full_name, :display_name, :email]
 
-            rescue
-              # unreachable(?)
-              # if eval("#{singular_class}.reflect_on_association(:#{assoc_name.singularize})")
-              #   raise(HotGlue::Error,"*** Oops: #{singular_class} has no association for #{assoc_name.singularize}")
-              # else
-              #   raise(HotGlue::Error,"*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god.")
-              # end
-            end
+              rescue
+                # unreachable(?)
+                # if eval("#{singular_class}.reflect_on_association(:#{assoc_name.singularize})")
+                #   raise(HotGlue::Error,"*** Oops: #{singular_class} has no association for #{assoc_name.singularize}")
+                # else
+                #   raise(HotGlue::Error,"*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god.")
+                # end
+              end
 
-            if assoc_class && name_list.collect{ |field|
-              assoc_class.column_names.include?(field.to_s) ||  assoc_class.instance_methods.include?(field)
-            }.any?
-              # do nothing here
-            else
-              exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
-              raise(HotGlue::Error,exit_message)
+              if assoc_class && name_list.collect{ |field|
+                assoc_class.column_names.include?(field.to_s) ||  assoc_class.instance_methods.include?(field)
+              }.any?
+                # do nothing here
+              else
+                exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
+                raise(HotGlue::Error,exit_message)
+              end
             end
           end
+        elsif @attachments.keys.include?(col)
+
+        else
+          raise "couldn't find #{col} in either field list or attachments list"
         end
       end
     end
@@ -671,7 +735,7 @@ module HotGlue
     end
 
     def spec_related_column_lets
-      (@columns - @show_only).map { |col|
+      (@columns - @show_only - @attachments.keys).map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         if (type == :integer && col.to_s.ends_with?("_id") || type == :uuid)
           assoc = "#{col.to_s.gsub('_id','')}"
@@ -685,7 +749,7 @@ module HotGlue
 
     def list_column_headings
       @template_builder.list_column_headings(
-        columns: @layout_object[:columns][:container],
+        layout_object: @layout_object,
         col_identifier: @layout_strategy.column_classes_for_column_headings,
         column_width: @layout_strategy.column_width,
         singular: @singular
@@ -693,7 +757,7 @@ module HotGlue
     end
 
     def columns_spec_with_sample_data
-      @columns.map { |c|
+      (@columns - @attachments.keys).map { |c|
         type = eval("#{singular_class}.columns_hash['#{c}']").type
         random_data = case type
                       when :integer
@@ -768,7 +832,7 @@ module HotGlue
     end
 
     def test_capybara_block(which_partial = :create)
-      (@columns - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
+      ((@columns - @attachments.keys) - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         case type
         when :date
@@ -1154,19 +1218,8 @@ module HotGlue
     end
 
     def form_fields_html
-      @template_builder.all_form_fields(
-        columns: @layout_object[:columns][:container],
-        show_only: @show_only,
-        update_show_only: @update_show_only,
-        singular_class: singular_class,
-        singular: singular,
-        hawk_keys: @hawk_keys,
-        col_identifier:  @layout_strategy.column_classes_for_form_fields,
-        ownership_field: @ownership_field,
-        form_labels_position: @form_labels_position,
-        form_placeholder_labels: @form_placeholder_labels,
-        alt_lookups: @alt_lookups
-      )
+      @template_builder.all_form_fields(layout_strategy: @layout_strategy,
+                                        layout_object: @layout_object)
     end
 
     def list_label
@@ -1179,13 +1232,15 @@ module HotGlue
 
     def all_line_fields
       @template_builder.all_line_fields(
-        perc_width: @layout_strategy.each_col,     #undefined method `each_col'
-        columns:  @layout_object[:columns][:container],
-        show_only: @show_only,
-        singular_class: singular_class,
-        singular: singular,
         col_identifier: @layout_strategy.column_classes_for_line_fields,
-        inline_list_labels: @inline_list_labels
+        perc_width: @layout_strategy.each_col,     #undefined method `each_col'
+        layout_strategy: @layout_strategy,
+        layout_object: @layout_object
+        # columns:  @layout_object[:columns][:container],
+        # show_only: @show_only,
+        # singular_class: singular_class,
+        # singular: singular,
+        # attachments: @attachments
       )
     end
 
@@ -1323,5 +1378,11 @@ module HotGlue
       }.join(", ")
       res
     end
+
+    def controller_attachment_orig_filename_pickup_syntax
+      @attachments.collect{ |key, attachment|  "\n" + "    modified_params[:#{ attachment[:field_for_original_filename] }] = #{singular_name}_params['#{ key }'].original_filename" if attachment[:field_for_original_filename] }.compact.join("\n")
+    end
   end
+
+
 end

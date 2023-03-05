@@ -3,13 +3,41 @@ module  HotGlue
 
     attr_accessor :path, :singular, :singular_class,
                   :magic_buttons, :small_buttons,
-                  :show_only, :column_width, :layout_strategy, :perc_width,
+                  :show_only, :layout_strategy, :perc_width,
                   :ownership_field, :form_labels_position,
-                  :inline_list_labels,
-                  :columns, :column_width, :col_identifier, :singular,
-                  :form_placeholder_labels, :hawk_keys
+                  :inline_list_labels, :layout_object,
+                  :columns,  :col_identifier, :singular,
+                  :form_placeholder_labels, :hawk_keys, :update_show_only,
+                  :alt_lookups, :attachments, :show_only
 
 
+    def initialize(singular:, singular_class: ,
+                   layout_strategy: , magic_buttons: ,
+                   small_buttons: , show_only: ,
+                   ownership_field: , form_labels_position: ,
+                   inline_list_labels: ,
+                   form_placeholder_labels:, hawk_keys:,
+                   update_show_only:, alt_lookups: , attachments: )
+
+      @singular = singular
+      @singular_class = singular_class
+
+      @magic_buttons = magic_buttons
+      @small_buttons = small_buttons
+      @layout_strategy = layout_strategy
+      @show_only = show_only
+      @ownership_field = ownership_field
+
+      @form_labels_position = form_labels_position
+
+      @inline_list_labels = inline_list_labels
+      @singular = singular
+      @form_placeholder_labels = form_placeholder_labels
+      @hawk_keys = hawk_keys
+      @update_show_only = update_show_only
+      @alt_lookups = alt_lookups
+      @attachments = attachments
+    end
 
     def add_spaces_each_line(text, num_spaces)
       add_spaces = " " * num_spaces
@@ -25,9 +53,12 @@ module  HotGlue
       }.join("\n")
     end
 
-    def list_column_headings(col_identifier: , columns: , column_width:, singular: )
+    def list_column_headings(layout_object: ,
+                             col_identifier: ,
+                             column_width:, singular: )
       col_style = @layout_strategy.column_headings_col_style
 
+      columns = layout_object[:columns][:container]
       result = columns.map{ |column|
         "<div class='#{col_identifier}' heading--#{singular}--#{column.join("-")} " + col_style + ">" +
           column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
@@ -40,64 +71,79 @@ module  HotGlue
     # THE FORM
     ################################################################
 
-    def all_form_fields(*args)
 
-      @columns = args[0][:columns]
-      @show_only = args[0][:show_only]
+    def all_form_fields(layout_strategy: , layout_object: )
 
-      @singular_class = args[0][:singular_class]
-      @ownership_field  = args[0][:ownership_field]
-      @form_labels_position = args[0][:form_labels_position]
-      @form_placeholder_labels = args[0][:form_placeholder_labels]
-      @hawk_keys = args[0][:hawk_keys]
-      @singular = args[0][:singular]
+      # @show_only = args[0][:show_only]
+      #
+      # @singular_class = args[0][:singular_class]
+      # @ownership_field  = args[0][:ownership_field]
+      # @form_labels_position = args[0][:form_labels_position]
+      # @form_placeholder_labels = args[0][:form_placeholder_labels]
+      # @hawk_keys = args[0][:hawk_keys]
+      # @singular = args[0][:singular]
+      # attachments = args[0][:attachments]
+      #
+      # @alt_lookups = args[0][:alt_lookups]
+      #
+      # column_classes = args[0][:col_identifier]
+      # update_show_only = args[0][:update_show_only] || []
+      # singular = @singular
 
-      @alt_lookups = args[0][:alt_lookups]
-
-      column_classes = args[0][:col_identifier]
-      update_show_only = args[0][:update_show_only] || []
-      singular = @singular
+      column_classes = layout_strategy.column_classes_for_form_fields
+      columns = layout_object[:columns][:container]
 
       result = columns.map{ |column|
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
-            type = eval("#{singular_class}.columns_hash['#{col}']").type
-            limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-            sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
+            if attachments.keys.include?(col)
+              this_attachment  = attachments[col]
+              thumbnail = this_attachment[:thumbnail]
+              field_result =  "<%= #{singular}.#{col}.attached? && #{singular}.#{col}.variable? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %><br />\n" +
+                "<%= f.file_field :#{col} #{', direct_upload: true ' if this_attachment[:direct_upload]}%>"
+              field_error_name = col
+            else
 
-            field_result =
-              if show_only.include?(col.to_sym)
-                show_only_result(type: type, col: col, singular: singular)
-              else
-                case type
-                when :integer
-                  integer_result(col)
-                when :uuid
-                  association_result(col)
-                when :string
-                  string_result(col, sql_type, limit)
-                when :text
-                  text_result(col, sql_type, limit)
-                when :float
-                  field_output(col, nil, 5, column_classes)
-                when :datetime
-                  "<%= datetime_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
-                when :date
-                  "<%= date_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
-                when :time
-                  "<%= time_field_localized(f, :#{col}, #{singular}.#{col},  '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
-                when :boolean
-                  boolean_result(col)
-                when :enum
-                  enum_result(col)
+              type = eval("#{singular_class}.columns_hash['#{col}']").type
+              limit = eval("#{singular_class}.columns_hash['#{col}']").limit
+              sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
+
+              field_result =
+                if show_only.include?(col.to_sym)
+                  show_only_result(type: type, col: col, singular: singular)
+                else
+                  case type
+                  when :integer
+                    integer_result(col)
+                  when :uuid
+                    association_result(col)
+                  when :string
+                    string_result(col, sql_type, limit)
+                  when :text
+                    text_result(col, sql_type, limit)
+                  when :float
+                    field_output(col, nil, 5, column_classes)
+                  when :datetime
+                    "<%= datetime_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+                  when :date
+                    "<%= date_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+                  when :time
+                    "<%= time_field_localized(f, :#{col}, #{singular}.#{col},  '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+                  when :boolean
+                    boolean_result(col)
+                  when :enum
+                    enum_result(col)
+                  end
                 end
+
+              if (type == :integer) && col.to_s.ends_with?("_id")
+                field_error_name = col.to_s.gsub("_id","")
+              else
+                field_error_name = col
               end
 
-            if (type == :integer) && col.to_s.ends_with?("_id")
-              field_error_name = col.to_s.gsub("_id","")
-            else
-              field_error_name = col
             end
+            the_label = "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
             show_only_open = ""
             show_only_close = ""
             if update_show_only.include?(col)
@@ -105,13 +151,12 @@ module  HotGlue
                 show_only_result(type: type, col: col, singular: singular) + "<% else %>"
               show_only_close = "<% end %>"
             end
-            the_label = "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
-            add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
-                                    add_spaces_each_line( (@form_labels_position == 'before' ? the_label : "") +
-                                    show_only_open +  field_result + show_only_close +
-                                    (@form_labels_position == 'after' ? the_label : "")   , 4) +
-                                    "\n  </span>\n  <br />", 2)
 
+            add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
+                                    add_spaces_each_line( (form_labels_position == 'before' ? the_label : "") +
+                                                            show_only_open +  field_result + show_only_close +
+                                                            (form_labels_position == 'after' ? the_label : "")   , 4) +
+                                    "\n  </span>\n  <br />", 2)
 
           }.join("") + "\n  </div>"
       }.join("\n")
@@ -174,7 +219,6 @@ module  HotGlue
         is_owner = col == ownership_field
         assoc_class_name = assoc.class_name.to_s
         display_column = HotGlue.derrive_reference_name(assoc_class_name)
-
         if @hawk_keys[assoc.foreign_key.to_sym]
           hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
           hawked_association = hawk_definition.join(".")
@@ -255,35 +299,40 @@ module  HotGlue
     ################################################################
 
 
-    def all_line_fields(*args)
-      @columns = args[0][:columns]
-      @show_only = args[0][:show_only]
-      @singular_class = args[0][:singular_class]
-      @singular = args[0][:singular]
-      @perc_width = args[0][:perc_width]
-      @col_identifier =  @layout_strategy.column_classes_for_line_fields
+    def all_line_fields(layout_strategy:,
+                        layout_object: ,
+                        perc_width:,
+                        col_identifier: nil)
 
-      @inline_list_labels = args[0][:inline_list_labels] || 'omit'
+      @col_identifier =  layout_strategy.column_classes_for_line_fields
+
+      inline_list_labels = @inline_list_labels  || 'omit'
+      columns = layout_object[:columns][:container]
 
       columns_count = columns.count + 1
-      perc_width = (@perc_width).floor
+      perc_width = (perc_width).floor
 
-      style_with_flex_basis = @layout_strategy.style_with_flex_basis(perc_width)
+      style_with_flex_basis = layout_strategy.style_with_flex_basis(perc_width)
 
       result = columns.map{ |column|
+
         "<div class='#{col_identifier} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
-
-
         column.map { |col|
-          if eval("#{singular_class}.columns_hash['#{col}']").nil?
+          if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
           end
-          type = eval("#{singular_class}.columns_hash['#{col}']").type
-          limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-          sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
 
-          field_output =
-            case type
+          if attachments.keys.include?(col)
+            this_attachment  = attachments[col]
+            thumbnail = this_attachment[:thumbnail]
+            field_output = "<%= #{singular}.#{col}.attached? && #{singular}.#{col}.variable? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>"
+          else
+            type = eval("#{singular_class}.columns_hash['#{col}']").type
+            limit = eval("#{singular_class}.columns_hash['#{col}']").limit
+            sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
+
+            field_output =
+              case type
               when :integer
                 # look for a belongs_to on this object
                 if col.ends_with?("_id")
@@ -305,48 +354,48 @@ module  HotGlue
                   "<%= #{singular}.#{col}%>"
                 end
 
-            when :uuid
-              assoc_name = col.to_s.gsub("_id","")
-              assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+              when :uuid
+                assoc_name = col.to_s.gsub("_id","")
+                assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
-              if assoc.nil?
-                exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-                puts exit_message
-                exit
-                # raise(HotGlue::Error,exit_message)
-              end
+                if assoc.nil?
+                  exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+                  puts exit_message
+                  exit
+                  # raise(HotGlue::Error,exit_message)
+                end
 
-              display_column =  HotGlue.derrive_reference_name(assoc.class_name.to_s)
-              "<%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
+                display_column =  HotGlue.derrive_reference_name(assoc.class_name.to_s)
+                "<%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
 
-            when :float
-              width = (limit && limit < 40) ? limit : (40)
-              "<%= #{singular}.#{col}%>"
-            when :string
-              width = (limit && limit < 40) ? limit : (40)
-              "<%= #{singular}.#{col} %>"
-            when :text
-              "<%= #{singular}.#{col} %>"
-            when :datetime
-              "<% unless #{singular}.#{col}.nil? %>
+              when :float
+                width = (limit && limit < 40) ? limit : (40)
+                "<%= #{singular}.#{col}%>"
+              when :string
+                width = (limit && limit < 40) ? limit : (40)
+                "<%= #{singular}.#{col} %>"
+              when :text
+                "<%= #{singular}.#{col} %>"
+              when :datetime
+                "<% unless #{singular}.#{col}.nil? %>
   <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
   <% else %>
   <span class='alert-danger'>MISSING</span>
   <% end %>"
-            when :date
-              "<% unless #{singular}.#{col}.nil? %>
+              when :date
+                "<% unless #{singular}.#{col}.nil? %>
       <%= #{singular}.#{col} %>
     <% else %>
     <span class='alert-danger'>MISSING</span>
     <% end %>"
-            when :time
-              "<% unless #{singular}.#{col}.nil? %>
+              when :time
+                "<% unless #{singular}.#{col}.nil? %>
       <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone) %>
      <% else %>
     <span class='alert-danger'>MISSING</span>
     <% end %>"
-            when :boolean
-              "
+              when :boolean
+                "
     <% if #{singular}.#{col}.nil? %>
         <span class='alert-danger'>MISSING</span>
     <% elsif #{singular}.#{col} %>
@@ -356,15 +405,15 @@ module  HotGlue
     <% end %>
 
   "
-            when :enum
-              enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
+              when :enum
+                enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
 
-              if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
-                enum_definer = "#{singular_class}.#{enum_type}_labels"
-              else
-                enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
-              end
-                       "
+                if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
+                  enum_definer = "#{singular_class}.#{enum_type}_labels"
+                else
+                  enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
+                end
+                "
     <% if #{singular}.#{col}.nil? %>
         <span class='alert-danger'>MISSING</span>
     <% else %>
@@ -372,7 +421,8 @@ module  HotGlue
     <% end %>
 
 "
-          end #end of switch
+              end #end of switch
+          end
 
           label = "<br/><label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
