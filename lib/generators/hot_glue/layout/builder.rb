@@ -6,13 +6,14 @@ module HotGlue
       attr_reader :include_setting,
                   :downnest_object,
                   :buttons_width, :columns,
-                  :smart_layout, :specified_grouping_mode
+                  :smart_layout, :specified_grouping_mode, :stacked_downnesting
 
       def initialize(include_setting: nil,
                      downnest_object: nil,
                      buttons_width: nil,
                      smart_layout: nil,
-                     columns: nil)
+                     columns: nil,
+                     stacked_downnesting: false)
         @include_setting = include_setting
         @downnest_object = downnest_object
         @buttons_width = buttons_width
@@ -21,6 +22,7 @@ module HotGlue
 
         @no_buttons = @buttons_width == 0
         @specified_grouping_mode = include_setting.include?(":")
+        @stacked_downnesting = stacked_downnesting
       end
 
       def construct
@@ -44,20 +46,27 @@ module HotGlue
 
         bootstrap_columns = (12 - @buttons_width )
 
-        bootstrap_columns = bootstrap_columns - (downnest_object.collect{|k,v| v}.sum)
+        if(!stacked_downnesting)
+          bootstrap_columns = bootstrap_columns - (downnest_object.collect{|k,v| v}.sum)
+        else
+          bootstrap_columns = bootstrap_columns - 4
+        end
 
         available_columns = (bootstrap_columns / 2).floor # bascially turns the 12-column grid into a 6-column grid
 
         if available_columns < 0
           raise "Cannot build layout with #{how_many_downnest} downnested portals"
         end
-
+        #
+        # if !stacked_downnesting
+        #
+        # else
+        #
+        # end
         downnest_children_width = []
-
         downnest_object.each do |child, size|
           layout_object[:portals][child] = {size:  size}
         end
-
 
         if smart_layout
           # automatic control
