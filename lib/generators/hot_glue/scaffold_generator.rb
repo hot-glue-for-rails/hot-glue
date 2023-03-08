@@ -793,13 +793,13 @@ module HotGlue
 
     def objest_nest_factory_setup
       # TODO: figure out what this is for
-      res = "  "
+      res = ""
       if @auth
         last_parent = ", #{@auth_identifier}: #{@auth}"
       end
 
       @nested_set.each do |arg|
-        res << "let(:#{arg[:singular]}2) {create(:#{arg[:singular]} #{last_parent} )}\n"
+        res << "  let(:#{arg[:singular]}) {create(:#{arg[:singular]} #{last_parent} )}\n"
         last_parent = ", #{arg[:singular]}: #{arg[:singular]}"
       end
       res
