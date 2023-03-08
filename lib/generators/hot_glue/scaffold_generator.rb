@@ -151,6 +151,7 @@ module HotGlue
     class_option :factory_creation, default: ''
     class_option :alt_foreign_key_lookup, default: '' #
     class_option :attachments, default: ''
+    class_option :stacked_downnesting, default: false
 
     def initialize(*meta_args)
       super
@@ -345,6 +346,7 @@ module HotGlue
       @no_list = options['no_list'] || false
       @no_list_label = options['no_list_label'] || false
       @no_list_heading = options['no_list_heading'] || false
+      @stacked_downnesting = options['stacked_downnesting']
 
 
 
@@ -456,7 +458,6 @@ module HotGlue
 
 
 
-
       # SETUP FIELDS & LAYOUT
       setup_fields
       if  (@columns - @show_only - (@ownership_field ?  [@ownership_field.to_sym] : [])).empty?
@@ -469,7 +470,8 @@ module HotGlue
                                               downnest_object: @downnest_object,
                                               buttons_width: buttons_width,
                                               columns: @columns,
-                                              smart_layout: @smart_layout )
+                                              smart_layout: @smart_layout,
+                                              stacked_downnesting: @stacked_downnesting)
       @layout_object = builder.construct
 
 
@@ -660,7 +662,7 @@ module HotGlue
               end
 
               if assoc_class && name_list.collect{ |field|
-                assoc_class.column_names.include?(field.to_s) ||  assoc_class.instance_methods.include?(field)
+                assoc_class.respond_to?(field.to_s) ||  assoc_class.instance_methods.include?(field)
               }.any?
                 # do nothing here
               else

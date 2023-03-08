@@ -1,16 +1,17 @@
 <%= all_line_fields %>
 
+
+
 <% if @downnest_children.any? %>
   <% each_downnest_width = @downnest_children.count == 1 ? 33 : (53/@downnest_children.count).floor %>
-
+  <% if @stacked_downnesting %><div class="<%= @layout_strategy.downnest_portal_stacked_column_width  %> scaffold-downnest" ><% end %>
   <% @downnest_object.each do |downnest, size| %>
-
     <% downnest_object =  eval("#{singular_class}.reflect_on_association(:#{downnest})") %>
     <% if downnest_object.nil?; raise "no relationship for downnested portal `#{downnest}` found on `#{singular_class}`; please check relationship for has_many :#{downnest}"; end; %>
     <% downnest_class = downnest_object.class_name %>
     <% downnest_object_name = eval("#{downnest_class}.table_name") %>
     <% downnest_style = @layout_strategy.downnest_style %>
-    <div class="<%= @layout_strategy.downnest_portal_column_width(downnest)  %> scaffold-downnest" <%= downnest_style  %> >
+    <% if !@stacked_downnesting %><div class="<%= @layout_strategy.downnest_portal_column_width(downnest)  %> scaffold-downnest" <%= downnest_style  %> ><% end %>
   <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest_object_name %>/list", locals: {
         <%= @singular %>: <%= @singular %>,
         <%= downnest_object_name %>: <%= @singular %>.<%= downnest %>
@@ -18,8 +19,9 @@
       .merge({nested_for: "<% if @nested_set.any? %>#{nested_for + "__" if defined?(nested_for)}<% end %><%= @singular %>-#{<%= @singular %>.id}"})
       <%= @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {} )"}.join("\n") %>
     \%>
-  </div>
+    <% if !@stacked_downnesting %></div><% end %>
   <% end %>
+  <% if @stacked_downnesting %></div><% end %>
 <% end %>
 
 <%= @layout_strategy.button_style %>

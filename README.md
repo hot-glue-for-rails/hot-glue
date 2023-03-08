@@ -956,6 +956,86 @@ Omits the heading of column names that appears above the 1st row of data.
 
 ## Special Features
 
+### `--attachments`
+
+#### ActiveStorage Quick Setup
+(For complete docs, refer to https://guides.rubyonrails.org/active_storage_overview.html)
+`brew install vips`
+(for videos brew install ffmpeg)
+
+```
+bundle add image_processing
+./bin/rails active_storage:install
+./bin/rails db:migrate
+```
+
+Generate an images model:
+
+`rails generate model Images name:string`
+
+add to `app/model/image.rb`, giving it a variant called thumb (Note: Hot Glue will fallback to using a variant called "thumb" if you use the shorthand syntax. If you use the long syntax, you can specify the variant to use for displaying the image)
+
+```
+has_one_attached :avatar do |attachable|
+  attachable.variant :thumb, resize_to_limit: [100, 100]
+end
+```
+Generate a Hot Glue scaffold with the attachment avatar appended to the field list (the shorthand syntax)
+
+`rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar'`
+
+(Attachments behave like fields and follow the same layout rules used for fields, except that, unlike fields, when NOT using an --include list, they do not get automatically added. Thus, attachments are opt-in. You do not need to specify an attachment on the attachments list as ALSO being on the include list, but you can for the purpose of using the layout tricks discussed in Specified Grouping Mode to make the attachment appear on the layout where you want it to)
+
+#### Caveats:
+• If thumbnails aren't showing up, make sure you have
+
+1) installed vips, and
+2) used an image that supports ActiveStorage "variable" mechanism. The supported types are png, gif, jpg, pjpeg, tiff, bmp, vnd.adobe.photoshop, vnd.microsoft.icon, webp. see https://stackoverflow.com/a/61971660/3163663
+To debug, make sure the object responds true to the variable? method.
+
+#### `--attachments` Long form syntax with 1st or only parameter
+--attachments='_attachment name_{_variant name_}'
+By default, Hot Glue assumes you have a variant called "thumb." Use the long-form syntax specifying a variant other than "thumb". For example, "thumbnail"
+
+`rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar{thumbnail}'`
+
+
+#### `--attachments` Long form syntax with 1st and 2nd parameters
+
+`--attachments='_attachment name_{_variant name_|_field for saving original filename_}'`
+
+Grab the original file name of the uploaded file and stick it into a field called `name`
+
+`rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar{thumbnail|name} --show-only=name'`
+
+Note: You must have a string field called name. It does not need to be visible, but if it is, it should be part of the show-only list. (If it is not part of the show-only list, Hot Glue will overwrite it every time you upload a new file, making it so that any user's change might not stick.)
+
+Note that the original_filename is not part of the inputted parameters, so it does not pass through strong parameters — it simply gets appended to the model bypassing the strong parameters mechanism, which is why it is irrelevant if it is included in the field list and recommended that if you do include it, you make it show-only so as not to allow your users to edit or modify it.
+
+#### `--attachments` Long form syntax with 1st, 2nd, and 3rd parameters
+An optional 3rd parameter to the long-form syntax allows you to specify direct upload, which will add direct_upload: true to your f.file_field tags.
+
+Simply specify a 3rd parameter of true to enable this attachment to use direct upload.
+
+`--attachments='avatar{thumbnail|orig_filename|true}'`
+
+#### For S3 Setup
+bundle add aws-sdk-s3
+in config/storage.yml, enable this block and configure with the access key + secret associated with an AWS user that has permissions________:
+
+# Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
+amazon:
+  service: S3
+  access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
+  secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
+  region: us-east-1
+  bucket: your_own_bucket-<%= Rails.env %> 
+
+in development.rb or production.rb (or both), set
+```
+config.active_storage.service = :amazon
+```
+
 ### `--alt-lookup-foreign-keys`
 
 Allows you to specify that a foreign key should act as a search field, allowing the user to input a unique value (like an email) to search for a related record.
@@ -1111,6 +1191,13 @@ Now, your labels will show up as defined in the `_labels` ("Is Pending", etc) in
 
 
 # VERSION HISTORY
+#### TBR
+- Attachments! Please see the new flag `--atachments` under the "Special Features" section
+- Fixes to downnesting
+- `--stacked-downnesting` — The Layout Builder now can stack downnesting portals instead of putting them side-by-side. When stacked, there is no limit to how many you can have and the entire stack takes up 4-bootstrap columns. 
+
+
+
 #### 2023-03-01 - v0.5.8 
 
 • Fixes spec assertions for enums to work with the enum `_label` field (when provided).
