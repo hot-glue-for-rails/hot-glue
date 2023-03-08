@@ -77,9 +77,9 @@ describe 'interaction for <%= controller_class_name %>' do
     "      " + ["expect(page).to have_content(#{singular}#{1}.#{assoc_name}.#{HotGlue.derrive_reference_name(association.class_name)})"].join("\n      ")
   when :enum
     if(eval("#{singular_class}.respond_to?(:#{col}_labels)"))
-     "      " + "expect(page).to have_content(#{singular_class}.#{col}_labels[#{singular}#{1}.#{col}])"
+     "      " + "expect(page).to have_content(#{singular}1.#{col}_labels[#{singular}#{1}.#{col}])"
     else
-     "      " + "expect(page).to have_content(new_#{col})"
+     "      " + "expect(page).to have_content(#{singular}1.#{col})"
     end
 
   when :boolean
