@@ -93,75 +93,36 @@ If you doing the 'Super-Quick Setup', you can skip the additional blog posts lin
 
 ## The Super-Quick Setup
 
-Be sure to do `git add .` and `git commit -m "initial commit"` after creating your new Rails 7 app.
+https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-quick-scripts/
 
-```
-bundle add rspec-rails factory_bot_rails ffaker --group "development, test" && 
-git add . && git commit -m "adds gems" && 
-rails generate rspec:install && 
-git add . && git commit -m "adds rspec" && 
-rm app/assets/stylesheets/application.css &&
-echo "" > app/assets/stylesheets/application.scss && 
-sed -i '' -e  's/# gem "sassc-rails"//g' Gemfile && sed -i '' -e 's/# Use Sass to process CSS//g' Gemfile && 
-bundle install && bundle add sassc-rails && git add . && git commit -m "adds sassc-rails" && 
-rm -rf test/ && git add . && git commit -m "removes minitest" && 
-bundle add hot-glue && git add . && git commit -m "adds hot-glue" && 
-rails generate hot_glue:install --layout=bootstrap && 
-git add . && git commit -m "hot glue setup" &&
-bundle add bootstrap &&
-echo "\n@import 'bootstrap';\n" >> app/assets/stylesheets/application.scss
-sed -i '' -e  's/# Rails.application.config.assets.precompile += %w( admin.js admin.css )/Rails.application.config.assets.precompile += %w( application.scss )/g' config/initializers/assets.rb &&
-sed -i '' -e 's/Rails.application.configure do/Rails.application.configure do\n  config.sass.inline_source_maps = true/g' config/environments/development.rb 
-git add . && git commit -m "bootstrap install" &&
-bundle add font_awesome5_rails && 
-echo "\n@import 'font_awesome5_webfont';\n" >> app/assets/stylesheets/application.scss
-git add . && git commit -m "adds fontawesome" &&  
-bundle add kaminari && 
-rails generate kaminari:views bootstrap4 && 
-git add . && git commit -m "adding kaminari and views" &&
-bundle add devise && bundle install && 
-git add . && git commit -m "adding devise gem" && 
-rails generate devise:install && 
-rails g devise:views && 
-sed -i '' -e  's/Rails.application.configure do/Rails.application.configure do\n  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }/g' config/environments/development.rb && 
-sed -i '' -e  's/# root "articles#index"//g' config/routes.rb && 
-sed -i '' -e  's/Rails.application.routes.draw do/Rails.application.routes.draw do\n  root to: "welcome#index"/g' config/routes.rb && 
-git add . && git commit -m 'devise view fixes' &&
-rails generate controller Welcome &&
-sed -i '' -e 's/class WelcomeController < ApplicationController/class WelcomeController < ApplicationController\n  def index\n\n  end/g' app/controllers/welcome_controller.rb &&
-echo "hello world" > app/views/welcome/index.erb &&
-git add . && git commit -m "generates Welcome controller" &&
-sed -i '' -e 's/html: { method: :post }/html: { method: :post, 'data-turbo': false}/g' app/views/devise/confirmations/new.html.erb &&
-sed -i '' -e 's/ url: session_path(resource_name))/ url: session_path(resource_name), html: {"data-turbo": false})/g' app/views/devise/sessions/new.html.erb && 
-sed -i '' -e 's/ url: registration_path(resource_name))/ url: registration_path(resource_name), html: {"data-turbo": false})/g' app/views/devise/registrations/new.html.erb && 
-sed -i '' -e 's/, html: { method: :post })/, html: { method: :post, "data-turbo": false })/g' app/views/devise/passwords/new.html.erb && 
-git add . && git commit -m 'devise view fixes' &&
-rails generate model User name:string &&
-rails generate devise User && git add . && git commit -m "adds Users model with devise" && 
-&& ./bin/setup && rails db:migrate &&
-git add . && git commit -m "schema file"
-```
+From section #1 (rails new), choose either (1) ImportMap Rails, (2) JSBundling, or (3) Shakapacker. 
 
+You will copy & paste the whole code block from each section into your terminal. (Pick only ONE option for each section.)
 
-For Importmap apps:
-```
-./bin/importmap pin "bootstrap@5.1.3" &&
-./bin/importmap pin "@popperjs/core@2.11.2" &&
-git add . && git commit -m "pinning boostrap and popper js for bootstrap"
-```
+For Hot Glue, you will need:
 
-For JSBundling & Shakapacker:
-```
-echo "\ncss: yarn build:css --watch\n" >> Procfile.dev &&
-yarn add @popperjs/core bootstrap bootstrap-icons sass &&
-sed -i '' -e 's/\/\/= link_directory ..\/stylesheets .css//g' app/assets/config/manifest.js &&
-sed -i '' -e 's/  "scripts": {/  "scripts": {\n    "build:css": "sass .\/app\/assets\/stylesheets\/application.scss:.\/app\/assets\/builds\/application.css --no-source-map --load-path=node_modules",/g' package.json &&
-yarn install &&
-git add . && git commit -m "adding bootstrap packages"
-```
+Section #1 is to create a new Rails app. (Or you can do that yourself.)
+
+Section #2 is to setup Rspec, FactoryBot, and Faker.
+
+Section #4 is optional but highly recommended.
+
+Section #5 is where you will pick a CSS Framework (Bootstrap, Tailwind, or none)
+
+Section #6 is for two support gems needed ofr Hot Glue
+
+Section #7 is for Hot Glue itself
+
+You will also need section #8 to setup Devise. 
 
 
 ## Step-By-Step Setup
+
+### 1. RAILS NEW
+To understand the options for `rails new`, see [this post](https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-bootstrap/)
+
+It is important that you know what kind of app you are creating (Importmap, JSBundling, or Shakapacker) because there are specific differences in how you will work with them. (Hot Glue is compatible with all 3 paradigms, but if you don't take the time to understand the setup, you will be confused as to why things aren't working.)
+
 
 ### 2. ADD RSPEC, FACTORY-BOT, AND FFAKER
 
@@ -257,21 +218,7 @@ Those features come by default with Devise, and you'll find the fields for them 
 
 In this example above, you are creating all of those fields along with a simple 'name' (string) field for your User table.
 
-
-!!! Warning: as of 2022-09-19, Devise is still not compatible out-of-the-box with Rails Turbo.
-
-To fix this, run
-`rails generate devise:views`
-
-
-Then manually add `html: {'data-turbo' => "false"}` to all of the Devise forms. You will need to edit the following forms:
-`views/devise/sessions/new.html.erb`, `views/devise/registrations/edit.html.erb`, 
-`views/devise/registrations/new.html.erb`, and  
-
-Add the data-turbo false option in the html key of the form, shown in bold here: 
-
-form_for(resource, as: resource_name, **html: {'data-turbo' => "false"},** url: session_path(resource_name) ) do |f|
-
+Devise 4.9.0 is now fully compatible with Rails 7.
 
 #### Hot Glue Installer Notes 
 
