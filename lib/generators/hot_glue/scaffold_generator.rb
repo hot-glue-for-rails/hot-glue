@@ -70,7 +70,7 @@ module HotGlue
         with_params: with_params,
         put_form: put_form,
         nested_set: rest_of_nest  )
-      return "defined?(#{instance_sym + nested_set[0][:singular]}) ? #{is_present_path} : #{is_missing_path}"
+      return "defined?(#{instance_sym + nested_set[0][:singular]}2) ? #{is_present_path} : #{is_missing_path}"
     end
   end
 
@@ -781,23 +781,25 @@ module HotGlue
     end
 
     def object_parent_mapping_as_argument_for_specs
+
       if @self_auth
         ""
-      elsif @nested_set.any?
+      elsif @nested_set.any? && ! @nested_set.last[:optional]
         ", " + @nested_set.last[:singular] + ": " + @nested_set.last[:singular]
-      elsif @auth
+      elsif @auth && !@god
         ", #{@auth_identifier}: #{@auth}"
       end
     end
 
     def objest_nest_factory_setup
-      res = "  "
+      # TODO: figure out what this is for
+      res = ""
       if @auth
         last_parent = ", #{@auth_identifier}: #{@auth}"
       end
 
       @nested_set.each do |arg|
-        res << "let(:#{arg[:singular]}) {create(:#{arg[:singular]} #{last_parent} )}\n"
+        res << "  let(:#{arg[:singular]}) {create(:#{arg[:singular]} #{last_parent} )}\n"
         last_parent = ", #{arg[:singular]}: #{arg[:singular]}"
       end
       res
@@ -1384,7 +1386,9 @@ module HotGlue
     def controller_attachment_orig_filename_pickup_syntax
       @attachments.collect{ |key, attachment|  "\n" + "    modified_params[:#{ attachment[:field_for_original_filename] }] = #{singular_name}_params['#{ key }'].original_filename" if attachment[:field_for_original_filename] }.compact.join("\n")
     end
+
+    def any_datetime_fields?
+      (@columns - @attachments.keys.collect(&:to_sym)).collect{|col| eval("#{singular_class}.columns_hash['#{col}']").type}.include?(:datetime)
+    end
   end
-
-
 end
