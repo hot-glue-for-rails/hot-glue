@@ -907,6 +907,7 @@ Omits the heading of column names that appears above the 1st row of data.
 
 #### ActiveStorage Quick Setup
 (For complete docs, refer to https://guides.rubyonrails.org/active_storage_overview.html)
+
 `brew install vips`
 (for videos brew install ffmpeg)
 
@@ -941,15 +942,29 @@ Generate a Hot Glue scaffold with the attachment avatar appended to the field li
 To debug, make sure the object responds true to the variable? method.
 
 #### `--attachments` Long form syntax with 1st or only parameter
---attachments='_attachment name_{_variant name_}'
-By default, Hot Glue assumes you have a variant called "thumb." Use the long-form syntax specifying a variant other than "thumb". For example, "thumbnail"
+
+**--attachments='_attachment name_{_variant name_}'**
+
+By default, Hot Glue assumes you have a variant called "thumb" (what you see in the example above).
+
+What if your variant is called something else?
+
+Use the long-form syntax specifying a variant name other than `thumb`. For example, `thumbnail`
 
 `rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar{thumbnail}'`
+
+The model would look like this:
+```
+has_one_attached :avatar do |attachable|
+  attachable.variant :thumbnail, resize_to_limit: [100, 100]
+end
+```
+
 
 
 #### `--attachments` Long form syntax with 1st and 2nd parameters
 
-`--attachments='_attachment name_{_variant name_|_field for saving original filename_}'`
+**--attachments='_attachment name_{_variant name_|_field for saving original filename_}'**
 
 Grab the original file name of the uploaded file and stick it into a field called `name`
 
@@ -960,15 +975,19 @@ Note: You must have a string field called name. It does not need to be visible, 
 Note that the original_filename is not part of the inputted parameters, so it does not pass through strong parameters — it simply gets appended to the model bypassing the strong parameters mechanism, which is why it is irrelevant if it is included in the field list and recommended that if you do include it, you make it show-only so as not to allow your users to edit or modify it.
 
 #### `--attachments` Long form syntax with 1st, 2nd, and 3rd parameters
+
 An optional 3rd parameter to the long-form syntax allows you to specify direct upload, which will add direct_upload: true to your f.file_field tags.
 
 Simply specify a 3rd parameter of true to enable this attachment to use direct upload.
 
-`--attachments='avatar{thumbnail|orig_filename|true}'`
+**--attachments='avatar{thumbnail|orig_filename|true}'**
 
 #### For S3 Setup
 bundle add aws-sdk-s3
-in config/storage.yml, enable this block and configure with the access key + secret associated with an AWS user that has permissions________:
+in `config/storage.yml`, enable this block and configure with the access key + secret associated with an AWS user that has permissions________:
+
+
+```
 
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 amazon:
@@ -978,10 +997,34 @@ amazon:
   region: us-east-1
   bucket: your_own_bucket-<%= Rails.env %> 
 
+```
+
 in development.rb or production.rb (or both), set
 ```
 config.active_storage.service = :amazon
 ```
+
+#### For Dropzone support
+- Dropzone requires direct uploads, so you must have direct uploads enabled for the attachment you want to use dropzone with.
+- Direct uploads requires that you have configured your external storage (S3, etc) correctly. See the ActiveStorage guide.
+
+
+`yarn add dropzone`
+
+`bundle add stimulus-rails`
+
+`./bin/rails stimulus:install`
+
+`yarn add @rails/activestorage`
+
+
+add to your SCSS fiels:
+```
+@import "dropzone/dist/dropzone";
+@import "dropzone/dist/basic";
+```
+
+
 
 ### `--alt-lookup-foreign-keys`
 
