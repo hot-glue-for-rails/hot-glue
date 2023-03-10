@@ -62,14 +62,40 @@ Instantly get a simple CRUD interface
 
 _If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/README2.md) and complete those steps FIRST._
 
+## The Super-Quick Setup
 
-## 1. Rails 7 New App
+https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-quick-scripts/
 
-To run Turbo (which Hot Glue requires), you must either (1) be running an ImportMap-Rails app, or (2) be running a Node-compiled app using any of JSBundling, Shakapacker, or its alternatives. 
+Copy & paste the whole code block from each section into your terminal. (Pick only ONE option for each section.)
 
-For reference, see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-do-i-need-importmap-rails/
 
-Once you create the new Rails app, you can skip to the 'Super-Quick Setup' below.
+From section #1 (`rails new`), choose either (1) ImportMap Rails, (2) JSBundling, or (3) Shakapacker. 
+
+For Hot Glue, you will need:
+
+Section #1 is to create a new Rails app. (Or you can do that yourself.)
+
+Section #2 is to setup Rspec, FactoryBot, and Faker.
+
+Section #4 is optional but highly recommended.
+
+Section #5 is where you will pick a CSS Framework (Bootstrap, Tailwind, or none)
+
+Section #6 is for two support gems (Kaminari and Font-Awesome) for Hot Glue
+
+Section #7 is for Hot Glue itself
+
+You will also need section #8 to setup Devise if you want authentication.
+
+
+## Step-By-Step Setup
+
+### 1. RAILS NEW
+To understand the options for `rails new`, see [this post](https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-bootstrap/)
+
+It is important that you know what kind of app you are creating (Importmap, JSBundling, or Shakapacker) because there are specific differences in how you will work with them. (Hot Glue is compatible with all 3 paradigms, but if you don't take the time to understand the setup, you will be confused as to why things aren't working.)
+
+To run Turbo (which Hot Glue requires), you must either (1) be running an ImportMap-Rails app, or (2) be running a Node-compiled app using any of JSBundling, Shakapacker, or its alternatives.
 
 (1) To use ImportMap Rails, start with
 `rails new`
@@ -88,40 +114,6 @@ Once you create the new Rails app, you can skip to the 'Super-Quick Setup' below
 (For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/))
 
 (Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/blob/main/README2.md) before continuing.)
-
-If you doing the 'Super-Quick Setup', you can skip the additional blog posts linked above because the steps in them are covered in the shell script(s) below.
-
-## The Super-Quick Setup
-
-https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-quick-scripts/
-
-From section #1 (rails new), choose either (1) ImportMap Rails, (2) JSBundling, or (3) Shakapacker. 
-
-You will copy & paste the whole code block from each section into your terminal. (Pick only ONE option for each section.)
-
-For Hot Glue, you will need:
-
-Section #1 is to create a new Rails app. (Or you can do that yourself.)
-
-Section #2 is to setup Rspec, FactoryBot, and Faker.
-
-Section #4 is optional but highly recommended.
-
-Section #5 is where you will pick a CSS Framework (Bootstrap, Tailwind, or none)
-
-Section #6 is for two support gems needed ofr Hot Glue
-
-Section #7 is for Hot Glue itself
-
-You will also need section #8 to setup Devise. 
-
-
-## Step-By-Step Setup
-
-### 1. RAILS NEW
-To understand the options for `rails new`, see [this post](https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-bootstrap/)
-
-It is important that you know what kind of app you are creating (Importmap, JSBundling, or Shakapacker) because there are specific differences in how you will work with them. (Hot Glue is compatible with all 3 paradigms, but if you don't take the time to understand the setup, you will be confused as to why things aren't working.)
 
 
 ### 2. ADD RSPEC, FACTORY-BOT, AND FFAKER
@@ -545,11 +537,11 @@ This is covered in [Example #4 in the Hot Glue Tutorial](https://school.jasonfle
 You don't need this if the pluralized version is just + "s" of the singular version.
 Only use for non-standard plurlizations, and be sure to pass it as TitleCase (as if you pluralized the model name which is non-standard for Rails)
 
-An better alternative is to define the non-standard plurlizations globally in your app.
+An better alternative is to define the non-standard plurlizations globally in your app, which Hot Glue will respect.
 
 Make a file at `config/initializers/inflections.rb`
-
-# Add new inflection rules using the following format
+ 
+Add new inflection rules using the following format:
 ```
 ActiveSupport::Inflector.inflections do |inflect|
     inflect.irregular 'clothing', 'clothes'
@@ -738,6 +730,9 @@ Can now be created with more space (wider) by adding a `+` to the end of the dow
 
 The 'Abcs' portal will display as 5 bootstrap columns instead of the typical 4. (You may use multiple ++ to keep making it wider but the inverse with minus is not supported
 
+### `--stacked-downnesting`
+
+This puts the downnested portals on top of one another (stacked top to bottom) instead of side-by-side (left to right). This is useful if you have a lot of downnested portals and you want to keep the page from getting too wide.
 
 
 ## FLAGS (Options with no values)
@@ -800,7 +795,7 @@ To do this, use flag `--display-list-after-update`. The update will behave like 
 
 ### `--with-turbo-streams`
 
-If and only if you specify `--with-turbo-streams`, your views will contain `turbo_stream_from` directives. Whereas your views will always contain `turbo_frame_tags` (wether or not this flag is specified) and will use the Turbo stream replacement mechanism for non-idempotent actions (create & update). This flag just brings the magic of live-reload to the scaffold interfaces themselves.
+If and only if you specify `--with-turbo-streams`, your views will contain `turbo_stream_from` directives. Whereas your views will always contain `turbo_frame_tags` (whether or not this flag is specified) and will use the Turbo stream replacement mechanism for non-idempotent actions (create & update). This flag just brings the magic of live-reload to the scaffold interfaces themselves.
 
 **_To test_**: Open the same interface in two separate browser windows. Make an edit in one window and watch your edit appear in the other window instantly.
 
@@ -815,6 +810,7 @@ please note that *creating* and *deleting* do not yet have a full & complete imp
 
 ### `--alt-foreign-key-lookup` (Foreign Key Lookups)
 
+Example #1
 `--alt-foreign-key-lookup=user_id{email}`
 
 Let's assume a `Company` `has_many :company_users` and also a `Company` `has_many :users, through: :company_users`
@@ -826,6 +822,19 @@ A drop down of _all users in the_ database will be display on the screen where y
 Let's say instead you don't want to expose the full list of all users to this controller, but instead make your user enter the full email address of the user to identify them.
 
 Instead of a drop-down, the interface will present an input box for the user to supply an *search by* email.
+
+Example #2
+```
+--alt-foreign-key-lookup='agent_id{email+}'
+```
+
+First, assume the current able has a `belongs_to` association for `agent_id` to a foreign model, `Agent`
+
+Here, we would build a scaffold that would treat the foreign key `agent_id` as an alt lookup, allowing the user to search for foreign records by email (the agent's email).
+
+The `+` symbol indicates to automatically make a new `agent` record (without it, the agent_id will be set to nil if there is no associated agent record found -- this may cause the update to fail, unless `optional: true` is on the belongs_to association.)
+
+
 
 ** Note: Current implementation does not work in conjunction with hawked associations to protect against users from accessing associated records not within scope.**
 TODO: make it work with hawked associations to protect against users from accessing associated records not within scope
@@ -865,8 +874,6 @@ The text at the top of the new form that appears when the new input entry is dis
 Omits list LABEL itself above the list. (Do not confuse with the list heading which contains the field labels.)
 
 Note that list labels may  be automatically omitted on downnested scaffolds.
-
-
 
 
 ## Field Labels
@@ -1026,25 +1033,11 @@ add to your SCSS fiels:
 
 
 
-### `--alt-lookup-foreign-keys`
-
-Allows you to specify that a foreign key should act as a search field, allowing the user to input a unique value (like an email) to search for a related record.
-
-Example:
-```
---alt-foreign-key-lookup='agent_id{email+}'
-```
-
-First, assume the current able has a `belongs_to` association for `agent_id` to a foreign model, `Agent`
-
-Here, we would build a scaffold that would treat the foreign key `agent_id` as an alt lookup, allowing the user to search for foreign records by email (the agent's email).
-
-The `+` symbol indicates to automatically make a new `agent` record (without it, the agent_id will be set to nil if there is no associated agent record found -- this may cause the update to fail, unless `optional: true` is on the belongs_to association.)
-
-
 ### `--factory-creation={ ... }`
 
 The code you specify inside of `{` and `}` will be used to generate a new object. The factory should instantiate with any arguments (I suggest Ruby keyword arguments) and must provide a method that is the name of the thing.
+
+You may use semi-colons to separate multiple lines of code.
 
 For example, a user Factory might be called like so:
 
@@ -1053,6 +1046,7 @@ For example, a user Factory might be called like so:
 (Note we are relying on the `user_params` method provided by the controller.)
 
 You must do one of two things:
+
 1) In the code you specify, set an instance variable `@user` to be the newly created thing. (Your code should contain something like `@thing = ` to trigger this option.)
 2) Make a local variable called `factory` **and** have a method of the name of the object (`user`) on a local variable called `factory` that your code created
 
@@ -1099,13 +1093,12 @@ agent_factory = AgentFactory.new(find_or_create_by_email: agent_company_params[:
 
 
 
-
-
 ## Automatic Base Controller
 
 HotGlue will copy a file named base_controller.rb to the same folder where it tries to create any controller, unless such a file exists there already.
 
 The created controller will always have this base controller as its subclass. You are encouraged to implement functionality common to the *namespace* (shared between the controllers in the namespace) using this technique.
+
 
 ## Special Table Labels
 
@@ -1140,6 +1133,7 @@ Child portals have the headings omitted automatically (there is a heading identi
 # Note about enums
 
 The Rails 7 enum implementation for Postgres is very slick but has a counter-intuitive facet.
+
 Define your Enums in Postgres as strings:
 (database migration)
 ```
@@ -1163,27 +1157,30 @@ enum status: {
   }
 ```
 
-To set the labels, use another class-level method that is a hash of keys-to-labels using a method named the same name as the enum method but with `_labels`
+To set the labels, use a class-level method that is a hash of keys-to-labels using a method named the same name as the enum method but with `_labels`
 
 If no `_labels` method exists, Hot Glue will fallback to using the Postgres-defined names.
 ```
 def self.status_labels
     {
-      pending: 'Is Pending',
-      active: 'Is active',
-      archived: 'Is Archived',
+      pending: 'Is currently pending',
+      active: 'Is really active',
+      archived: 'Is done & archived',
       disabled: 'Is Disabled',
       waiting: 'Is Waiting'
     }
 ```
 
-Now, your labels will show up as defined in the `_labels` ("Is Pending", etc) instead of the database-values.
+Now, your labels will show up on the front-end as defined in the `_labels` ("Is currently pending", etc) instead of the database-values.
 
 
 # VERSION HISTORY
+
 #### TBR
 - Attachments! Please see the new flag `--atachments` under the "Special Features" section
+
 - Fixes to downnesting
+
 - `--stacked-downnesting` — The Layout Builder now can stack downnesting portals instead of putting them side-by-side. When stacked, there is no limit to how many you can have and the entire stack takes up 4-bootstrap columns. 
 
 
