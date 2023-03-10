@@ -981,40 +981,61 @@ Note: You must have a string field called name. It does not need to be visible, 
 
 Note that the original_filename is not part of the inputted parameters, so it does not pass through strong parameters — it simply gets appended to the model bypassing the strong parameters mechanism, which is why it is irrelevant if it is included in the field list and recommended that if you do include it, you make it show-only so as not to allow your users to edit or modify it.
 
+
 #### `--attachments` Long form syntax with 1st, 2nd, and 3rd parameters
 
-An optional 3rd parameter to the long-form syntax allows you to specify direct upload, which will add direct_upload: true to your f.file_field tags.
+An optional 3rd parameter to the long-form syntax allows you to specify direct upload using the word "direct", which will add direct_upload: true to your f.file_field tags.
 
-Simply specify a 3rd parameter of true to enable this attachment to use direct upload.
+Simply specify a 3rd parameter of `direct` to enable this attachment to use direct upload.
 
-**--attachments='avatar{thumbnail|orig_filename|true}'**
+**--attachments='avatar{thumbnail|orig_filename|direct}'**
+
+If you leave the 2nd parameter blank when using the 3rd parameter, it will default to NOT saving the original filename:
+
+`--attachments='avatar{thumbnail||direct}'`
+
 
 #### For S3 Setup
+```
 bundle add aws-sdk-s3
-in `config/storage.yml`, enable this block and configure with the access key + secret associated with an AWS user that has permissions________:
-
-
 ```
 
+in `config/storage.yml`, enable this block and configure with the access key + secret associated with an AWS user that has permissions:
+
+Also be sure to change `bucket`
+
+```
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 amazon:
   service: S3
   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
   region: us-east-1
-  bucket: your_own_bucket-<%= Rails.env %> 
+  bucket: your_bucket-<%= Rails.env %> 
 
 ```
+
 
 in development.rb or production.rb (or both), set
 ```
 config.active_storage.service = :amazon
 ```
 
+
+#### For Direct Upload 
+
+`yarn add @rails/activestorage`
+
+
+
+
+
+
+
 #### For Dropzone support
 - Dropzone requires direct uploads, so you must have direct uploads enabled for the attachment you want to use dropzone with.
+- 
 - Direct uploads requires that you have configured your external storage (S3, etc) correctly. See the ActiveStorage guide.
-
 
 `yarn add dropzone`
 

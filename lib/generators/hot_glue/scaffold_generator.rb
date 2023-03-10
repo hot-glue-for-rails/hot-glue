@@ -551,8 +551,9 @@ module HotGlue
               attachment_entry =~ /(.*){(.*)\|(.*)\|(.*)}/
               key, thumbnail, field_for_original_filename, direct_upload = $1, $2, $3, $4
 
-              if !direct_upload.nil? && direct_upload != "true"
-                raise "received 3rd parameter in attachment long form specification that was not 'true'; for direct uploads, just use true or leave off for false"
+              field_for_original_filename = nil if field_for_original_filename == ""
+              if !direct_upload.nil? && direct_upload != "direct"
+                raise "received 3rd parameter in attachment long form specification that was not 'direct'; for direct uploads, just use true or leave off for false"
               end
               direct_upload = !!direct_upload
             end
