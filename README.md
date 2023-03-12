@@ -996,9 +996,12 @@ If you leave the 2nd parameter blank when using the 3rd parameter, it will defau
 
 
 #### For S3 Setup
+
+
 ```
 bundle add aws-sdk-s3
 ```
+
 
 in `config/storage.yml`, enable this block and configure with the access key + secret associated with an AWS user that has permissions:
 
@@ -1023,13 +1026,16 @@ config.active_storage.service = :amazon
 
 
 #### For Direct Upload 
-
-`yarn add @rails/activestorage`
-
-
-
+```
+yarn add @rails/activestorage
+```
 
 
+Install ActiveStorage JS using: 
+
+`rails generate hot_glue:direct_upload_install`
+
+AND be sure to use the 3rd parameter ('direct') explained above.
 
 
 #### For Dropzone support
