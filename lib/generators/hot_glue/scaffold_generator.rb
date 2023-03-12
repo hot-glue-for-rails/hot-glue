@@ -540,12 +540,16 @@ module HotGlue
       @attachments = {}
 
       if options["attachments"]
+
         options['attachments'].split(",").each do |attachment_entry|
           # format is: avatar{thumbnail|field_for_original_filename}
 
           if attachment_entry.include?("{")
             num_params = attachment_entry.split("|").count
-            if num_params == 2
+            if num_params == 1
+              attachment_entry =~ /(.*){(.*)}/
+              key, thumbnail = $1, $2
+            elsif num_params == 2
               attachment_entry =~ /(.*){(.*)\|(.*)}/
               key, thumbnail, field_for_original_filename = $1, $2, $3
             elsif num_params > 2
@@ -570,6 +574,10 @@ module HotGlue
 
               if dropzone && !direct_upload
                 raise "dropzone requires direct_upload"
+              end
+
+              if field_for_original_filename && direct_upload
+                raise "Unfortunately orig filename extraction doesn't work with direct upload; please set 2nd parameter to empty string to disable"
               end
 
               direct_upload = !!direct_upload

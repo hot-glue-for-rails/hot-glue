@@ -916,7 +916,7 @@ Omits the heading of column names that appears above the 1st row of data.
 (For complete docs, refer to https://guides.rubyonrails.org/active_storage_overview.html)
 
 `brew install vips`
-(for videos brew install ffmpeg)
+(for videos `brew install ffmpeg`)
 
 ```
 bundle add image_processing
@@ -1049,7 +1049,6 @@ AND be sure to use the 3rd parameter ('direct') when building a HG scaffold as e
 - Direct uploads requires that you have configured your external storage (S3, etc) correctly. See the ActiveStorage guide.
 
 `yarn add dropzone`
-`yarn add @rails/activestorage`
 
 
 (If you don't already have stimulus-rails, you will also need: `bundle add stimulus-rails` and `./bin/rails stimulus:install`)
