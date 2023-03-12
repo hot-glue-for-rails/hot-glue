@@ -544,29 +544,49 @@ module HotGlue
           # format is: avatar{thumbnail|field_for_original_filename}
 
           if attachment_entry.include?("{")
-            if attachment_entry.count("|") == 1
+            num_params = attachment_entry.split("|").count
+            if num_params == 2
               attachment_entry =~ /(.*){(.*)\|(.*)}/
               key, thumbnail, field_for_original_filename = $1, $2, $3
-            elsif attachment_entry.count("|") == 2
-              attachment_entry =~ /(.*){(.*)\|(.*)\|(.*)}/
-              key, thumbnail, field_for_original_filename, direct_upload = $1, $2, $3, $4
+            elsif num_params > 2
+              if num_params == 3
+                attachment_entry =~ /(.*){(.*)\|(.*)\|(.*)}/
+                key, thumbnail, field_for_original_filename, direct_upload = $1, $2, $3, $4
+              elsif num_params > 3
+                attachment_entry =~ /(.*){(.*)\|(.*)\|(.*)\|(.*)}/
+                key, thumbnail, field_for_original_filename, direct_upload, dropzone = $1, $2, $3, $4, $5
+              end
+
 
               field_for_original_filename = nil if field_for_original_filename == ""
+
               if !direct_upload.nil? && direct_upload != "direct"
-                raise "received 3rd parameter in attachment long form specification that was not 'direct'; for direct uploads, just use true or leave off for false"
+                raise "received 3rd parameter in attachment long form specification that was not 'direct'; for direct uploads, just use 'direct' or leave off to disable"
               end
+
+              if !dropzone.nil? && dropzone != "dropzone"
+                raise "received 4th parameter in attachment long form specification that was not 'dropzone'; for dropzone, just use true or leave off to disable"
+              end
+
+              if dropzone && !direct_upload
+                raise "dropzone requires direct_upload"
+              end
+
               direct_upload = !!direct_upload
+              dropzone = !!dropzone
             end
           else
             key = attachment_entry
             thumbnail = "thumb"
             direct_upload = nil
             field_for_original_filename = nil
+            dropzone  = nil
           end
 
           @attachments[key.to_sym] = {thumbnail: thumbnail,
                                       field_for_original_filename: field_for_original_filename,
-                                      direct_upload: direct_upload}
+                                      direct_upload: direct_upload,
+                                      dropzone: dropzone}
         end
 
         puts "ATTACHMENTS: #{@attachments}"
