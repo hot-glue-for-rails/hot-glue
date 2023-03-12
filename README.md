@@ -1025,38 +1025,41 @@ config.active_storage.service = :amazon
 ```
 
 
-#### For Direct Upload 
+#### For Direct Upload Support
+1. 
 ```
 yarn add @rails/activestorage
 ```
 
+2. You need a job runner like sidekiq or delayed_job. I recommend sidekiq. Make sure to have it 
 
-Install ActiveStorage JS using: 
+- Start sidekiq with `bundle exec sidekiq` while you are testing
+
+3. Install ActiveStorage JS using: 
 
 `rails generate hot_glue:direct_upload_install`
 
-AND be sure to use the 3rd parameter ('direct') explained above.
+AND be sure to use the 3rd parameter ('direct') when building a HG scaffold as explained above.
 
 
 #### For Dropzone support
 - Dropzone requires direct uploads, so you must have direct uploads enabled for the attachment you want to use dropzone with.
-- 
+
+
 - Direct uploads requires that you have configured your external storage (S3, etc) correctly. See the ActiveStorage guide.
 
 `yarn add dropzone`
-
-`bundle add stimulus-rails`
-
-`./bin/rails stimulus:install`
-
 `yarn add @rails/activestorage`
 
 
-add to your SCSS fiels:
+(If you don't already have stimulus-rails, you will also need: `bundle add stimulus-rails` and `./bin/rails stimulus:install`)
+
+Then run:
 ```
-@import "dropzone/dist/dropzone";
-@import "dropzone/dist/basic";
+rails generate hot_glue:dropzone_install
 ```
+This will 1) copy the dropzone_controller.js file into your app and 2) add the dropzone css into your app's application.css or application.bootstrap.css file.
+
 
 
 
