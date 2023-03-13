@@ -1035,27 +1035,41 @@ describe HotGlue::ScaffoldGenerator do
   describe "attachments" do
     describe "for short form syntax" do
       it "should not generate OK for a bad attachment name" do
-        expect {
-        response = Rails::Generators.invoke("hot_glue:scaffold",
+        expect { response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc", "--gd", "--attachments=xyz"])
-        }.to raise_exception(HotGlue::Error)
-      end
-
-      it "should generate OK if there is a matching association" do
+        }.to raise_exception(HotGlue::Error, /Could not find xyz attachment/)
 
       end
 
+      it "should generate automatic thumbnail if there is a mathcing 'thumb' variant" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Abc","--gd", "--attachments=aaa"])
+
+        _form = File.read("spec/dummy/app/views/abcs/_form.erb")
+        _show = File.read("spec/dummy/app/views/abcs/_show.erb")
+        expect(_form).to include("<%= f.file_field :aaa %>")
+      end
+
+      it "should generate with no thumbnail if no variant 'thumb' exists" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Abc", "--gd", "--attachments=bbb"])
+        _form = File.read("spec/dummy/app/views/abcs/_form.erb")
+        _show = File.read("spec/dummy/app/views/abcs/_show.erb")
+        expect(_form).to include("<%= f.file_field :bbb %>")
+      end
     end
 
 
     describe "long form syntax with 1 parameter - thumbnail" do
-      describe "When no variant matches the given thumbnail" do
+      describe "When passed a thumbnail name for a variant that does not exist" do
         it "should raise an error" do
-
+          expect { response = Rails::Generators.invoke("hot_glue:scaffold",
+                                                       ["Abc", "--gd", "--attachments=aaa{badthumbnail}"])
+          }.to raise_exception(HotGlue::Error, /you specified to use badthumbnail as the thumbnail/)
         end
       end
       describe "When a variant matches the given thumbnail" do
-        it "should raise an error" do
+        it "generate with the given thumbnail" do
 
         end
       end
@@ -1069,5 +1083,7 @@ describe HotGlue::ScaffoldGenerator do
     describe "long form syntax with 4 parameters" do
 
     end
+
+    
   end
 end

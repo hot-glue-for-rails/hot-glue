@@ -575,7 +575,7 @@ module HotGlue
               end
 
               if !dropzone.nil? && dropzone != "dropzone"
-                raise "received 4th parameter in attachment long form specification that was not 'dropzone'; for dropzone, just use true or leave off to disable"
+                raise "received 4th parameter in attachme long form specification that was not 'dropzone'; for dropzone, just use true or leave off to disable"
               end
 
               if dropzone && !direct_upload
@@ -591,20 +591,27 @@ module HotGlue
             end
           else
             key = attachment_entry
-            thumbnail = "thumb"
+
+            if !(eval("#{singular_class}.reflect_on_attachment(:#{attachment_entry})"))
+              raise HotGlue::Error, "Could not find #{attachment_entry} attachment on #{singular_class}"
+            end
+            if eval("#{singular_class}.reflect_on_attachment(:#{attachment_entry}).variants.include?(:thumb)")
+              thumbnail = "thumb"
+            else
+              thumbnail = nil
+            end
 
             direct_upload = nil
             field_for_original_filename = nil
             dropzone  = nil
           end
 
-          if thumbnail && !eval('#{singular_class}.reflect_on_attachment(:#{attachment_entry}).variants.includes?(:#{thumbnail})')
+          if thumbnail && !eval("#{singular_class}.reflect_on_attachment(:#{key}).variants.include?(:#{thumbnail})")
             raise HotGlue::Error, "you specified to use #{thumbnail} as the thumbnail but could not find any such variant on the #{key} attachment; add to your #{singular}.rb file:
   has_one_attached :#{key} do |attachable|
     attachable.variant :#{thumbnail}, resize_to_limit: [100, 100]
   end
 "
-
           end
 
 
