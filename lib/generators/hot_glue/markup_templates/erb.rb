@@ -101,8 +101,7 @@ module  HotGlue
               thumbnail = this_attachment[:thumbnail]
               direct = this_attachment[:direct_upload]
               dropzone = this_attachment[:dropzone]
-              field_result = (eval("#{singular_class}.reflect_on_attachment(:#{col}).variants.any?") ?
-                               "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "") +
+              field_result = (this_attachment[:thumbnail] ?   "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "") +
                 "<br />\n" +
                 "<%= f.file_field :#{col} #{', direct_upload: true ' if direct}#{', "data-dropzone-target": "input"' if dropzone}%>"
 
@@ -334,8 +333,7 @@ module  HotGlue
             this_attachment  = attachments[col]
             thumbnail = this_attachment[:thumbnail]
 
-            field_output =  (eval("#{singular_class}.reflect_on_attachment(:#{col}).variants.any?") ?
-                               "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "")
+            field_output =  (this_attachment[:thumbnail] ? "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "")
 
           else
             type = eval("#{singular_class}.columns_hash['#{col}']").type
