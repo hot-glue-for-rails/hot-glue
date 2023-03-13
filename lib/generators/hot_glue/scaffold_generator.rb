@@ -571,19 +571,19 @@ module HotGlue
               end
 
               if !direct_upload.nil? && direct_upload != "direct"
-                raise "received 3rd parameter in attachment long form specification that was not 'direct'; for direct uploads, just use 'direct' or leave off to disable"
+                raise HotGlue::Error, "received 3rd parameter in attachment long form specification that was not 'direct'; for direct uploads, just use 'direct' or leave off to disable"
               end
 
               if !dropzone.nil? && dropzone != "dropzone"
-                raise "received 4th parameter in attachme long form specification that was not 'dropzone'; for dropzone, just use true or leave off to disable"
+                raise HotGlue::Error, "received 4th parameter in attachme long form specification that was not 'dropzone'; for dropzone, just use true or leave off to disable"
               end
 
               if dropzone && !direct_upload
-                raise "dropzone requires direct_upload"
+                raise HotGlue::Error, "dropzone requires direct_upload"
               end
 
               if field_for_original_filename && direct_upload
-                raise "Unfortunately orig filename extraction doesn't work with direct upload; please set 2nd parameter to empty string to disable"
+                raise HotGlue::Error, "Unfortunately orig filename extraction doesn't work with direct upload; please set 2nd parameter to empty string to disable"
               end
 
               direct_upload = !!direct_upload

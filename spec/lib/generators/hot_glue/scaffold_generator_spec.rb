@@ -1032,7 +1032,7 @@ describe HotGlue::ScaffoldGenerator do
   end
 
 
-  describe "attachments" do
+  describe "attachments parameter syntax" do
     describe "for short form syntax" do
       it "should not generate OK for a bad attachment name" do
         expect { response = Rails::Generators.invoke("hot_glue:scaffold",
@@ -1075,15 +1075,49 @@ describe HotGlue::ScaffoldGenerator do
       end
     end
     describe "long form syntax with 2 parameters" do
+      describe "when 1st parameter is empty string" do
 
+      end
+
+      describe "when 1st parameter is not empty string" do
+
+      end
     end
     describe "long form syntax with 3 parameters" do
-
+      describe "when passed 'direct'" do
+        it "should render" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Abc", "--gd", "--attachments=bbb{||direct}"])
+          _form = File.read("spec/dummy/app/views/abcs/_form.erb")
+          expect(_form).to include('<%= f.file_field :bbb , direct_upload: true %>')
+        end
+      end
+      describe "when passed anything else" do
+        it "should raise an error" do
+          expect { response = Rails::Generators.invoke("hot_glue:scaffold",
+                                                       ["Abc", "--gd", "--attachments=bbb{||xxx}"])
+          }.to raise_exception(HotGlue::Error, /received 3rd parameter in attachment long form specification that was not/)
+        end
+      end
     end
     describe "long form syntax with 4 parameters" do
-
+      describe "when passed 'dropzone'" do
+        it "should render" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Abc", "--gd", "--attachments=bbb{||direct|dropzone}"])
+          _form = File.read("spec/dummy/app/views/abcs/_form.erb")
+          # _show = File.read("spec/dummy/app/views/abcs/_show.erb")
+          expect(_form).to include('class="dropzone dropzone-default dz-clickable"')
+          expect(_form).to include('<%= f.file_field :bbb , direct_upload: true , "data-dropzone-target": "input"%>')
+        end
+      end
+      describe "when passed anything else" do
+        it "should raise an error" do
+          expect { response = Rails::Generators.invoke("hot_glue:scaffold",
+                                                       ["Abc", "--gd", "--attachments=bbb{||direct|xxx}"])
+          }.to raise_exception(HotGlue::Error, /received 4th parameter in attachme long form specification that was not 'dropzone'/)
+        end
+      end
     end
-
-    
   end
 end
