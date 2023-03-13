@@ -981,6 +981,7 @@ Note: You must have a string field called name. It does not need to be visible, 
 
 Note that the original_filename is not part of the inputted parameters, so it does not pass through strong parameters — it simply gets appended to the model bypassing the strong parameters mechanism, which is why it is irrelevant if it is included in the field list and recommended that if you do include it, you make it show-only so as not to allow your users to edit or modify it.
 
+Note: The 1st and 2nd parameters may be left empty but the 3rd and 4th parameters must either be specified or the parameter must be left off. 
 
 #### `--attachments` Long form syntax with 1st, 2nd, and 3rd parameters
 

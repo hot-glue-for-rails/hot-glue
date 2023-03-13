@@ -806,7 +806,7 @@ describe HotGlue::ScaffoldGenerator do
                                              "--hawk=dfg_id,xyz_id"])
 
       res = File.read("spec/dummy/app/controllers/ghis_controller.rb")
-      expect(res).to include("hawk_params({dfg_id: [current_user, \"dfgs\"], xyz_id: [current_user, \"xyzs\"]}, modified_params)")
+      expect(res).to include("hawk_params({dfg_id: [current_user.dfgs], xyz_id: [current_user.xyzs]}, modified_params)")
 
     end
 
@@ -821,7 +821,8 @@ describe HotGlue::ScaffoldGenerator do
 
       expect(res).to include("@visit = current_user.family.visits.find(params[:id])")
 
-      expect(res).to include("modified_params = hawk_params({user_id: [current_user.family, \"\"]}, modified_params)")
+      expect(res).to include("modified_params = hawk_params({user_id: [current_user.family]}, modified_params)")
+
       expect(res).to include("def load_visit
     @visit = current_user.family.visits.find(params[:id])
   end")
@@ -966,8 +967,7 @@ describe HotGlue::ScaffoldGenerator do
       expect {
          Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Borked", "--gd", "--include=missing_label_table_id"])
-      }.to raise_exception("Oops: Missing a label for `MissingLabelTable`. Can't find any column to use as the display label for the missing_label_table association on the Borked model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`MissingLabelTable` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)")
-
+      }.to raise_exception("*** Oops: Can't find any column to use as the display label on Borked model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your Borked model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)")
     end
   end
 
@@ -1028,6 +1028,46 @@ describe HotGlue::ScaffoldGenerator do
       File.open("spec/dummy/app/controllers/fruits/base_controller.rb", "w") {|file| file.puts "don't replace me"}
       res = File.read("spec/dummy/app/controllers/fruits/base_controller.rb")
       expect(res).to include("don't replace me")
+    end
+  end
+
+
+  describe "attachments" do
+    describe "for short form syntax" do
+      it "should not generate OK for a bad attachment name" do
+        expect {
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Abc", "--gd", "--attachments=xyz"])
+        }.to raise_exception(HotGlue::Error)
+      end
+
+      it "should generate OK if there is a matching association" do
+
+      end
+
+    end
+
+
+    describe "long form syntax with 1 parameter - thumbnail" do
+      describe "When no variant matches the given thumbnail" do
+        it "should raise an error" do
+
+        end
+      end
+      describe "When a variant matches the given thumbnail" do
+        it "should raise an error" do
+
+        end
+      end
+    end
+    describe "long form syntax with 2 parameters" do
+
+    end
+    describe "long form syntax with 3 parameters" do
+
+    end
+    describe "long form syntax with 4 parameters" do
+
     end
   end
 end

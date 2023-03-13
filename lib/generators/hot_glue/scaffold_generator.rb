@@ -523,12 +523,15 @@ module HotGlue
           end
 
           hawk_scope = key.gsub("_id", "").pluralize
-          @hawk_keys[key.to_sym] = [hawk_to]
+          optional = eval(singular_class + ".reflect_on_association(:#{key.gsub('_id','')})").options[:optional]
+
+          @hawk_keys[key.to_sym] = {bind_to: [hawk_to], optional: optional}
           use_shorthand = !options["hawk"].include?("{")
 
           if use_shorthand # only include the hawk scope if using the shorthand
-            @hawk_keys[key.to_sym] << hawk_scope
+            @hawk_keys[key.to_sym][:bind_to] << hawk_scope
           end
+
         end
 
         puts "HAWKING: #{@hawk_keys}"
@@ -561,8 +564,11 @@ module HotGlue
                 key, thumbnail, field_for_original_filename, direct_upload, dropzone = $1, $2, $3, $4, $5
               end
 
-
               field_for_original_filename = nil if field_for_original_filename == ""
+
+              if thumbnail == ''
+                thumbnail = nil
+              end
 
               if !direct_upload.nil? && direct_upload != "direct"
                 raise "received 3rd parameter in attachment long form specification that was not 'direct'; for direct uploads, just use 'direct' or leave off to disable"
@@ -586,10 +592,21 @@ module HotGlue
           else
             key = attachment_entry
             thumbnail = "thumb"
+
             direct_upload = nil
             field_for_original_filename = nil
             dropzone  = nil
           end
+
+          if thumbnail && !eval('#{singular_class}.reflect_on_attachment(:#{attachment_entry}).variants.includes?(:#{thumbnail})')
+            raise HotGlue::Error, "you specified to use #{thumbnail} as the thumbnail but could not find any such variant on the #{key} attachment; add to your #{singular}.rb file:
+  has_one_attached :#{key} do |attachable|
+    attachable.variant :#{thumbnail}, resize_to_limit: [100, 100]
+  end
+"
+
+          end
+
 
           @attachments[key.to_sym] = {thumbnail: thumbnail,
                                       field_for_original_filename: field_for_original_filename,
@@ -1304,7 +1321,6 @@ module HotGlue
         elsif me.column_names.include?("email") || me.instance_methods(false).include?(:email)
           "email"
         else
-          # NOT UNREACHABLE BUT UNTESTED
           exit_message = "*** Oops: Can't find any column to use as the display label on #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, 5) email, or 6) number directly on your #{singular_class} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
           raise(HotGlue::Error, exit_message)
         end
@@ -1407,7 +1423,7 @@ module HotGlue
 
     def hawk_to_ruby
       res = @hawk_keys.collect{ |k,v|
-        "#{k}: [#{v[0]}, \"#{v[1]}\"]"
+        "#{k.to_s}: [#{v[:bind_to].join(".")}]"
       }.join(", ")
       res
     end

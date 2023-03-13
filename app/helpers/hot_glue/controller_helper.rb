@@ -79,11 +79,14 @@ module HotGlue
       hawk_schema.each do |hawk_key,hawk_definition|
         hawk_root = hawk_definition[0]
         # hawk_scope = hawk_definition[1]
-        begin
-          eval("hawk_root").find(modified_params[hawk_key.to_s])
-        rescue ActiveRecord::RecordNotFound => e
-          @hawk_alarm << "You aren't allowed to set #{hawk_key.to_s} to #{modified_params[hawk_key.to_s]}. "
-          modified_params.tap { |hs| hs.delete(hawk_key.to_s) }
+
+        unless modified_params[hawk_key.to_s].blank?
+          begin
+            eval("hawk_root").find(modified_params[hawk_key.to_s])
+          rescue ActiveRecord::RecordNotFound => e
+            @hawk_alarm << "You aren't allowed to set #{hawk_key.to_s} to #{modified_params[hawk_key.to_s]}. "
+            modified_params.tap { |hs| hs.delete(hawk_key.to_s) }
+          end
         end
       end
       modified_params

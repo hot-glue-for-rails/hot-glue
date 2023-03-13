@@ -101,8 +101,11 @@ module  HotGlue
               thumbnail = this_attachment[:thumbnail]
               direct = this_attachment[:direct_upload]
               dropzone = this_attachment[:dropzone]
-              field_result =  "<%= #{singular}.#{col}.attached? && #{singular}.#{col}.variable? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %><br />\n" +
+              field_result = (eval("#{singular_class}.reflect_on_attachment(:#{col}).variants.any?") ?
+                               "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "") +
+                "<br />\n" +
                 "<%= f.file_field :#{col} #{', direct_upload: true ' if direct}#{', "data-dropzone-target": "input"' if dropzone}%>"
+
               if dropzone
                 field_result = "<div class=\"dropzone dropzone-default dz-clickable\" data-controller=\"dropzone\" data-dropzone-max-file-size=\"2\" data-dropzone-max-files=\"1\">\n  "+ field_result + "\n</div>"
               end
@@ -226,7 +229,7 @@ module  HotGlue
         display_column = HotGlue.derrive_reference_name(assoc_class_name)
         if @hawk_keys[assoc.foreign_key.to_sym]
           hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
-          hawked_association = hawk_definition.join(".")
+          hawked_association = hawk_definition[:bind_to].join(".")
         else
           hawked_association = "#{assoc.class_name}.all"
         end
@@ -330,7 +333,10 @@ module  HotGlue
           if attachments.keys.include?(col)
             this_attachment  = attachments[col]
             thumbnail = this_attachment[:thumbnail]
-            field_output = "<%= #{singular}.#{col}.attached? && #{singular}.#{col}.variable? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>"
+
+            field_output =  (eval("#{singular_class}.reflect_on_attachment(:#{col}).variants.any?") ?
+                               "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "")
+
           else
             type = eval("#{singular_class}.columns_hash['#{col}']").type
             limit = eval("#{singular_class}.columns_hash['#{col}']").limit

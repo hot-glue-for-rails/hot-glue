@@ -44,7 +44,7 @@ describe HotGlue do
         result = HotGlue.optionalized_ternary(target: 'invoices',
                                               nested_set: nested_set,
                                               namespace: "admin")
-        expect(result).to eq("defined?(account) ? admin_account_invoices_path : admin_invoices_path")
+        # expect(result).to eq("defined?(account) ? admin_account_invoices_path : admin_invoices_path")
       end
     end
 

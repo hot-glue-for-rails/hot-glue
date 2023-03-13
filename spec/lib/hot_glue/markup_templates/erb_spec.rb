@@ -291,7 +291,8 @@ describe HotGlue::ErbTemplate do
                                      alt_lookups: {},
                                      singular_class: Ghi,
                                      singular: "ghi",
-                                     hawk_keys: {dfg_id: ["current_user", "dfgs"] }})
+                                     hawk_keys: {dfg_id: {bind_to: ["current_user.dfgs"], optional: false }}})
+
       expect(res).to include("f.collection_select(:dfg_id, current_user.dfgs,")
     end
   end
