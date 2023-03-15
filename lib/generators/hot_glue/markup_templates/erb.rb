@@ -102,8 +102,7 @@ module  HotGlue
               direct = this_attachment[:direct_upload]
               dropzone = this_attachment[:dropzone]
               field_result = (this_attachment[:thumbnail] ?   "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "") +
-                "<br />\n" +
-                "<%= f.file_field :#{col} #{', direct_upload: true ' if direct}#{', "data-dropzone-target": "input"' if dropzone}%>"
+                "<br />\n" + (update_show_only.include?(col) ? "" : "<%= f.file_field :#{col} #{', direct_upload: true ' if direct}#{', "data-dropzone-target": "input"' if dropzone}%>")
 
               if dropzone
                 field_result = "<div class=\"dropzone dropzone-default dz-clickable\" data-controller=\"dropzone\" data-dropzone-max-file-size=\"2\" data-dropzone-max-files=\"1\">\n  "+ field_result + "\n</div>"
