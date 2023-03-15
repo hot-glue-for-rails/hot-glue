@@ -948,13 +948,17 @@ Generate a Hot Glue scaffold with the attachment avatar appended to the field li
 2) used an image that supports ActiveStorage "variable" mechanism. The supported types are png, gif, jpg, pjpeg, tiff, bmp, vnd.adobe.photoshop, vnd.microsoft.icon, webp. see https://stackoverflow.com/a/61971660/3163663
 To debug, make sure the object responds true to the variable? method.
 
-#### `--attachments` Long form syntax with 1st or only parameter
+If you use the shorthand syntax,  Hot Glue looks for a variant "thumb" (what you see in the example above). 
 
-**--attachments='_attachment name_{_variant name_}'**
+If it finds one, it will render thumbnails from the attachment variant `thumb`. To specify a variant name other than "thumb", use the first parameter below.
 
-By default, Hot Glue assumes you have a variant called "thumb" (what you see in the example above).
+If using the shortform syntax and Hot Glue does **not find a variant** called `thumb` at the code generation time, it will build scaffolding without thumbnails.
 
-What if your variant is called something else?
+#### `--attachments` Long form syntax with 1 parameter
+
+**--attachments='_attachment name_{_variant name_}'** 
+
+What if your variant is called something other than `thumb`
 
 Use the long-form syntax specifying a variant name other than `thumb`. For example, `thumbnail`
 
@@ -967,6 +971,7 @@ has_one_attached :avatar do |attachable|
 end
 ```
 
+If using the long-form syntax with 1 parameter and Hot Glue does not find the specified variant declared in your attachment, it will stop and raise an error. 
 
 
 #### `--attachments` Long form syntax with 1st and 2nd parameters
@@ -975,13 +980,13 @@ end
 
 Grab the original file name of the uploaded file and stick it into a field called `name`
 
-`rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar{thumbnail|name} --show-only=name'`
+`rails generate hot_glue:scaffold Image --include='orig_filename:avatar' --gd --attachments='avatar{thumbnail|name} --show-only=name'`
 
-Note: You must have a string field called name. It does not need to be visible, but if it is, it should be part of the show-only list. (If it is not part of the show-only list, Hot Glue will overwrite it every time you upload a new file, making it so that any user's change might not stick.)
+Note: You must have a string field called `orig_filename`. It does not need to be visible, but if it is, it should be part of the `--show-only` list. (If it is not part of the show-only list, Hot Glue will overwrite it every time you upload a new file, making it so that any user's change might not stick.)
 
-Note that the original_filename is not part of the inputted parameters, so it does not pass through strong parameters — it simply gets appended to the model bypassing the strong parameters mechanism, which is why it is irrelevant if it is included in the field list and recommended that if you do include it, you make it show-only so as not to allow your users to edit or modify it.
+Note that the `orig_filename` is not part of the inputted parameters,  it simply gets appended to the model **bypassing the Rails strong parameters mechanism**, which is why it is irrelevant if it is included in the field list and recommended that if you do include it, you make it show-only so as not to allow your users to edit or modify it.
 
-Note: The 1st and 2nd parameters may be left empty but the 3rd and 4th parameters must either be specified or the parameter must be left off. 
+Note: The 1st and 2nd parameters may be left empty (use `||`) but the 3rd and 4th parameters must either be specified or the parameter must be left off. 
 
 #### `--attachments` Long form syntax with 1st, 2nd, and 3rd parameters
 
@@ -1207,12 +1212,13 @@ Now, your labels will show up on the front-end as defined in the `_labels` ("Is 
 # VERSION HISTORY
 
 #### TBR
-- Attachments! Please see the new flag `--atachments` under the "Special Features" section
+- Attachments! You can use Hot Glue to seamlessly create an image, file, or video attachment. Please see the docs in new flag `--atachments` under the "Special Features" section
 
 - Fixes to downnesting
 
-- `--stacked-downnesting` — The Layout Builder now can stack downnesting portals instead of putting them side-by-side. When stacked, there is no limit to how many you can have and the entire stack takes up 4-bootstrap columns. 
+- `--stacked-downnesting` flag — The Layout Builder now can stack downnesting portals instead of putting them side-by-side. When stacked, there is no limit to how many you can have and the entire stack takes up 4-bootstrap columns. 
 
+- Hot Glue has been moved on Github from my personal organization to a new organization named `hot-glue-for-rails`. The new Github url is: `https://github.com/hot-glue-for-rails/hot-glue`
 
 
 #### 2023-03-01 - v0.5.8 
