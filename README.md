@@ -1211,8 +1211,10 @@ Now, your labels will show up on the front-end as defined in the `_labels` ("Is 
 
 # VERSION HISTORY
 
-#### TBR
+#### 2023-03-17 - v0.5.9
 - Attachments! You can use Hot Glue to seamlessly create an image, file, or video attachment. Please see the docs in new flag `--atachments` under the "Special Features" section
+
+- Watch the demo on attachments here on YouTube: https://youtu.be/yJbjwReCr18
 
 - Fixes to downnesting
 
