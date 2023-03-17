@@ -575,7 +575,7 @@ module HotGlue
               end
 
               if !dropzone.nil? && dropzone != "dropzone"
-                raise HotGlue::Error, "received 4th parameter in attachme long form specification that was not 'dropzone'; for dropzone, just use true or leave off to disable"
+                raise HotGlue::Error, "received 4th parameter in attachme long form specification that was not 'dropzone'; for dropzone, just use 'dropzone' or leave off to disable"
               end
 
               if dropzone && !direct_upload
