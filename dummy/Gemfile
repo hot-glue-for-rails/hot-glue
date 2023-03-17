@@ -51,3 +51,5 @@ end
 # Use Redis for Action Cable
 gem "redis", "~> 4.0"
 gem 'hot-glue', path: "../"
+
+gem "image_processing", "~> 1.12"
