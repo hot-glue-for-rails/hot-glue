@@ -20,7 +20,7 @@ Hot Glue generates functionality that is quick and dirty. It lets you be crafty.
 * Automatically reads your models (make them, add relationships, **and** migrate your database before building your scaffolding!)
 * Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination
 * Great for prototyping, but you should learn Rails fundamentals first.
-* 'Packaged' with Devise, Kaminari, Rspec, FontAwesome (optional)
+* 'Packaged' with Devise, Kaminari, Rspec
 * Create system specs automatically along with the generated code.
 * Nest your routes model-by-model for built-in poor man's authentication.
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
@@ -81,7 +81,7 @@ Section #4 is optional but highly recommended.
 
 Section #5 is where you will pick a CSS Framework (Bootstrap, Tailwind, or none)
 
-Section #6 is for two support gems (Kaminari and Font-Awesome) for Hot Glue
+Section #6 is for two support gems (Kaminari) for Hot Glue
 
 Section #7 is for Hot Glue itself
 
@@ -172,16 +172,7 @@ default is `erb`. IMPORTANT: As of right now, HAML and SLIM are not currently su
 
 The Hot Glue installer did several things for you in this step. Examine the git diffs or see 'Hot Glue Installer Notes' below.
 
-
-### 4. Font-awesome (optional)
-
-I recommend
-https://github.com/tomkra/font_awesome5_rails
-or
-https://github.com/FortAwesome/font-awesome-sass
-
-
-### 5. Devise
+### 4. Devise
 (If you are on Rails 6, you must do ALL of the steps in the Legacy Setup steps. Be sure not to skip **Legacy Step #5** below)
 https://github.com/jasonfb/hot-glue/blob/main/README2.md
 
