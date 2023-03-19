@@ -292,7 +292,7 @@ module HotGlue
       @new_form_heading = options['new_form_heading'] || "New #{@label}"
 
 
-      identify_object_owner
+
       setup_hawk_keys
       @form_placeholder_labels = options['form_placeholder_labels'] # true or false
       @inline_list_labels = options['inline_list_labels']  || 'omit' # 'before','after','omit'
@@ -456,10 +456,11 @@ module HotGlue
       @factory_creation = options['factory_creation'].gsub(";", "\n")
 
 
-
+      identify_object_owner
 
       # SETUP FIELDS & LAYOUT
       setup_fields
+
       if  (@columns - @show_only - (@ownership_field ?  [@ownership_field.to_sym] : [])).empty?
         @no_field_form = true
       end
@@ -631,6 +632,7 @@ module HotGlue
       if @object_owner_sym && ! @self_auth
         auth_assoc_field = auth_assoc + "_id" unless @god
         assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
+
         if assoc
           @ownership_field = assoc.name.to_s + "_id"
         elsif ! @nested_set.any?
@@ -664,6 +666,7 @@ module HotGlue
 
 
         @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| @exclude_fields.include?(field) }
+
 
       else
         @columns = @the_object.columns.map(&:name).map(&:to_sym).reject{|field| !@include_fields.include?(field) }
