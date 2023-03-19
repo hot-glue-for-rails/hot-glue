@@ -20,7 +20,7 @@ Hot Glue generates functionality that is quick and dirty. It lets you be crafty.
 * Automatically reads your models (make them, add relationships, **and** migrate your database before building your scaffolding!)
 * Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination
 * Great for prototyping, but you should learn Rails fundamentals first.
-* 'Packaged' with Devise, Kaminari, Rspec, FontAwesome (optional)
+* 'Packaged' with Devise, Kaminari, Rspec
 * Create system specs automatically along with the generated code.
 * Nest your routes model-by-model for built-in poor man's authentication.
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
@@ -81,7 +81,7 @@ Section #4 is optional but highly recommended.
 
 Section #5 is where you will pick a CSS Framework (Bootstrap, Tailwind, or none)
 
-Section #6 is for two support gems (Kaminari and Font-Awesome) for Hot Glue
+Section #6 is for two support gems (Kaminari) for Hot Glue
 
 Section #7 is for Hot Glue itself
 
@@ -98,18 +98,18 @@ It is important that you know what kind of app you are creating (Importmap, JSBu
 To run Turbo (which Hot Glue requires), you must either (1) be running an ImportMap-Rails app, or (2) be running a Node-compiled app using any of JSBundling, Shakapacker, or its alternatives.
 
 (1) To use ImportMap Rails, start with
-`rails new`
+`rails new MyGreatApp`
 
 (For full instructions to install Bootstrap with Importmap, check out [these instructions](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/importmap-rails-with-bootstrap-sprockets-stimulus-and-turbo-long-tutorial/))
 
 (2) To use JSBundling, start with
-`rails new --javascript=jsbundling`
+`rails new MyGreatApp --javascript=esbuild`
 
 
 **If using JSBundling, make sure to use the new `./bin/dev` to start your server instead of the old `rails server` or else your Turbo interactions will not work correctly.**
 (If you want Bootstrap for a JSBundling app, install it following [these instructions](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-up-running-with-jsbundling-esbuild-stimulus-turbo-bootstrap-circleci/))
 
-(3) To use Shakapacker, start with `rails new --skip-javascript` and [see this post](https://jasonfleetwoodboldt.com/courses/react-heart-rails/rails-7-shakapacker-and-reactonrails-quick-setup-part-1/)
+(3) To use Shakapacker, start with `rails new MyGreatApp --skip-javascript` and [see this post](https://jasonfleetwoodboldt.com/courses/react-heart-rails/rails-7-shakapacker-and-reactonrails-quick-setup-part-1/)
 
 (For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/))
 
@@ -133,9 +133,16 @@ end
 
 - Because you are not using Minitest, you can delete the `test/` folder at the root of your repository.
 
+### 3. CSS Bundling Rails (optional)
+
+```
+bundle add cssbundling-rails
+./bin/rails css:install:bootstrap
+```
 
 
-### 3. HOTGLUE INSTALLER
+
+### 4. HOTGLUE INSTALLER
 Add `gem 'hot-glue'` to your Gemfile & `bundle install`
 
 During in installation, you MUST supply a `--layout` flag.
@@ -172,16 +179,7 @@ default is `erb`. IMPORTANT: As of right now, HAML and SLIM are not currently su
 
 The Hot Glue installer did several things for you in this step. Examine the git diffs or see 'Hot Glue Installer Notes' below.
 
-
-### 4. Font-awesome (optional)
-
-I recommend
-https://github.com/tomkra/font_awesome5_rails
-or
-https://github.com/FortAwesome/font-awesome-sass
-
-
-### 5. Devise
+### 4. Devise
 (If you are on Rails 6, you must do ALL of the steps in the Legacy Setup steps. Be sure not to skip **Legacy Step #5** below)
 https://github.com/jasonfb/hot-glue/blob/main/README2.md
 

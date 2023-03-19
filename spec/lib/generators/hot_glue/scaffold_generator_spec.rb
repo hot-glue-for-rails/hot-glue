@@ -312,6 +312,16 @@ describe HotGlue::ScaffoldGenerator do
   end
 
   describe "choosing which fields to include" do
+    it "should not include the object owner by default" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg"])
+        _form = File.read("spec/dummy/app/views/dfgs/_form.erb")
+        expect(_form).to_not include("<%= f.collection_select(:user_id,")
+
+        _show = File.read("spec/dummy/app/views/dfgs/_show.erb")
+        expect(_form).to_not include("<%= dfg.user")
+    end
+
     describe "--exclude" do
       it "should allow a list of exlcuded fields" do
         response = Rails::Generators.invoke("hot_glue:scaffold",

@@ -28,6 +28,7 @@ dummy/config/hot_glue.yml
 
 coverage/
 
+spec/dummy/app/controllers/
+spec/dummy/app/views/
 
-spec/dummy/
 dummy/spec/system/
