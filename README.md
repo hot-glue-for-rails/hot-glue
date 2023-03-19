@@ -172,7 +172,7 @@ default is `erb`. IMPORTANT: As of right now, HAML and SLIM are not currently su
 
 
 #### example installing ERB using Bootstrap layout:
-`rails generate hot_glue:install --markup=erb --layout=bootstrap`
+`./bin/rails generate hot_glue:install --markup=erb --layout=bootstrap`
 
 #### Example installing using Hot Glue layout and the 'like_mountain_view' (Gmail-inspired) theme:
 `rails generate hot_glue:install --markup=erb --layout=hotglue --theme=like_mountain_view`
@@ -185,7 +185,7 @@ https://github.com/jasonfb/hot-glue/blob/main/README2.md
 
 You MUST run the installer FIRST or else you will put your app into a non-workable state:
 ```
-rails generate devise:install
+./bin/rails generate devise:install
 ```
 
 IMPORTANT: Follow the instructions the Devise installer gives you, *Except Step 3*, you can skip this step:
@@ -200,7 +200,7 @@ IMPORTANT: Follow the instructions the Devise installer gives you, *Except Step 
 
 Be sure to create primary auth model with:
 
-`rails generate devise User name:string`
+`./bin/rails generate devise User name:string`
 
 Remember, you don't need to tell Devise that your User has an email, an encrypted password, a reset token, and a 'remember me' flag to let the user stay logged in.
 
@@ -304,7 +304,7 @@ Alternatively, you can define your own driver like so:
 TitleCase class name of the thing you want to build a scaffoling for.
 
 ```
-rails generate hot_glue:scaffold Thing
+./bin/rails generate hot_glue:scaffold Thing
 ```
 
 (note: Your `Thing` object must `belong_to` an authenticated `User` or alternatively you must create a Gd controller, see below.)
@@ -318,7 +318,7 @@ All options begin with two dashes (`--`) and a followed by an `=` and a value
 pass `--namespace=` as an option to denote a namespace to apply to the Rails path helpers
 
 
-`rails generate hot_glue:scaffold Thing --namespace=dashboard`
+`./bin/rails generate hot_glue:scaffold Thing --namespace=dashboard`
 
 This produces several views at `app/views/dashboard/things/` and a controller at`app/controllers/dashboard/things_controller.rb`
 
@@ -350,9 +350,9 @@ resources :invoices do
 end
 ```
 
-`rails generate hot_glue:scaffold Invoice`
+`./bin/rails generate hot_glue:scaffold Invoice`
 
-`rails generate hot_glue:scaffold Line --nested=invoice`
+`./bin/rails generate hot_glue:scaffold Line --nested=invoice`
 
 
 Remember, nested should match how the hierarchy of nesting is in your `routes.rb` file. (Which Hot Glue does not create or edit for you.)
@@ -374,11 +374,11 @@ end
 
 _For multi-level nesting use slashes to separate your levels of nesting._
 
-`rails generate hot_glue:scaffold Invoice`
+`./bin/rails generate hot_glue:scaffold Invoice`
 
-`rails generate hot_glue:scaffold Line --nested=invoice`
+`./bin/rails generate hot_glue:scaffold Line --nested=invoice`
 
-`rails generate hot_glue:scaffold Charge --nested=invoice/line`
+`./bin/rails generate hot_glue:scaffold Charge --nested=invoice/line`
 
 
 
@@ -420,8 +420,8 @@ end
 Even though we have two routes pointed to **invoices**, both will go to the same controller (`app/controllers/admin/invoices_controller.rb`)
 
 ```
-rails generate hot_glue:scaffold User --namespace=admin --gd
-rails generate hot_glue:scaffold Invoice --namespace=admin --gd --nested=~users
+./bin/rails generate hot_glue:scaffold User --namespace=admin --gd
+./bin/rails generate hot_glue:scaffold Invoice --namespace=admin --gd --nested=~users
 ```
 Notice for the Invoice build, the parent user is *optionalized* (not 'optional'-- optionalized: to be made so it can be made optional).  
 
@@ -443,7 +443,7 @@ If you use Devise, you probably already have a `current_user` method available i
 
 If you use a different object other than "User" for authentication, override using the `auth` option.
 
-`rails generate hot_glue:scaffold Thing --auth=current_account`
+`./bin/rails generate hot_glue:scaffold Thing --auth=current_account`
 
 You will note that in this example it is presumed that the Account object will have an association for `things`
 
@@ -482,7 +482,7 @@ As well, the `after_sign_in_path_for(user)` here is a hook for Devise also that 
 The default (do not pass `auth_identifier=`) will match the `auth` (So if you use 'account' as the auth, `authenticate_account!` will get invoked from your generated controller; the default is always 'user', so you can leave both auth and auth_identifier off if you want 'user')
 
 
-`rails generate hot_glue:scaffold Thing --auth=current_account --auth_identifier=login`
+`./bin/rails generate hot_glue:scaffold Thing --auth=current_account --auth_identifier=login`
 
  
 In this example, the controller produced with:
@@ -496,7 +496,7 @@ However, the object graph anchors would continue to start from current_account. 
 
 Use empty string to **turn this method off**:
  
-`rails generate hot_glue:scaffold Thing --auth=current_account --auth_identifier=''`
+`./bin/rails generate hot_glue:scaffold Thing --auth=current_account --auth_identifier=''`
 
 In this case a controller would be generated that would have NO before_action to authenticate the account, but it would still treat the current_account as the auth root for the purpose of loading the objects.
 
@@ -558,7 +558,7 @@ By default, all fields are included unless they are on the default exclude list.
 If you specify any exclude list, those excluded **and** the default exclude list will be excluded. (If you need any of the fields on the default exclude list, you must use `--include` instead.)
 
 
-`rails generate hot_glue:scaffold Account --exclude=password`
+`./bin/rails generate hot_glue:scaffold Account --exclude=password`
 
 
 ### `--include=`
@@ -566,7 +566,7 @@ Separate field names by COMMA
 
 If you specify an include list, it will be treated as a whitelist: no fields will be included unless specified on the include list.
 
-`rails generate hot_glue:scaffold Account --include=first_name,last_name,company_name,created_at,kyc_verified_at`
+`./bin/rails generate hot_glue:scaffold Account --include=first_name,last_name,company_name,created_at,kyc_verified_at`
 
 You may not specify both include and exclude.
 
@@ -924,7 +924,7 @@ bundle add image_processing
 
 Generate an images model:
 
-`rails generate model Images name:string`
+`./bin/rails generate model Images name:string`
 
 add to `app/model/image.rb`, giving it a variant called thumb (Note: Hot Glue will fallback to using a variant called "thumb" if you use the shorthand syntax. If you use the long syntax, you can specify the variant to use for displaying the image)
 
@@ -935,7 +935,7 @@ end
 ```
 Generate a Hot Glue scaffold with the attachment avatar appended to the field list (the shorthand syntax)
 
-`rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar'`
+`./bin/rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar'`
 
 (Attachments behave like fields and follow the same layout rules used for fields, except that, unlike fields, when NOT using an --include list, they do not get automatically added. Thus, attachments are opt-in. You do not need to specify an attachment on the attachments list as ALSO being on the include list, but you can for the purpose of using the layout tricks discussed in Specified Grouping Mode to make the attachment appear on the layout where you want it to)
 
@@ -960,7 +960,7 @@ What if your variant is called something other than `thumb`
 
 Use the long-form syntax specifying a variant name other than `thumb`. For example, `thumbnail`
 
-`rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar{thumbnail}'`
+`./bin/rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar{thumbnail}'`
 
 The model would look like this:
 ```
@@ -978,7 +978,7 @@ If using the long-form syntax with 1 parameter and Hot Glue does not find the sp
 
 Grab the original file name of the uploaded file and stick it into a field called `name`
 
-`rails generate hot_glue:scaffold Image --include='orig_filename:avatar' --gd --attachments='avatar{thumbnail|name} --show-only=name'`
+`./bin/rails generate hot_glue:scaffold Image --include='orig_filename:avatar' --gd --attachments='avatar{thumbnail|name} --show-only=name'`
 
 Note: You must have a string field called `orig_filename`. It does not need to be visible, but if it is, it should be part of the `--show-only` list. (If it is not part of the show-only list, Hot Glue will overwrite it every time you upload a new file, making it so that any user's change might not stick.)
 
@@ -1041,7 +1041,7 @@ yarn add @rails/activestorage
 
 3. Install ActiveStorage JS using: 
 
-`rails generate hot_glue:direct_upload_install`
+`./bin/rails generate hot_glue:direct_upload_install`
 
 AND be sure to use the 3rd parameter ('direct') when building a HG scaffold as explained above.
 
@@ -1059,7 +1059,7 @@ AND be sure to use the 3rd parameter ('direct') when building a HG scaffold as e
 
 Then run:
 ```
-rails generate hot_glue:dropzone_install
+./bin/rails generate hot_glue:dropzone_install
 ```
 This will 1) copy the dropzone_controller.js file into your app and 2) add the dropzone css into your app's application.css or application.bootstrap.css file.
 
@@ -1074,7 +1074,7 @@ You may use semi-colons to separate multiple lines of code.
 
 For example, a user Factory might be called like so:
 
-`rails generate hot_glue:scaffold User --factory-creation={factory = UserFactory.new(params: user_params)} --gd`
+`./bin/rails generate hot_glue:scaffold User --factory-creation={factory = UserFactory.new(params: user_params)} --gd`
 
 (Note we are relying on the `user_params` method provided by the controller.)
 
