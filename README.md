@@ -98,18 +98,18 @@ It is important that you know what kind of app you are creating (Importmap, JSBu
 To run Turbo (which Hot Glue requires), you must either (1) be running an ImportMap-Rails app, or (2) be running a Node-compiled app using any of JSBundling, Shakapacker, or its alternatives.
 
 (1) To use ImportMap Rails, start with
-`rails new`
+`rails new MyGreatApp`
 
 (For full instructions to install Bootstrap with Importmap, check out [these instructions](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/importmap-rails-with-bootstrap-sprockets-stimulus-and-turbo-long-tutorial/))
 
 (2) To use JSBundling, start with
-`rails new --javascript=jsbundling`
+`rails new MyGreatApp --javascript=esbuild`
 
 
 **If using JSBundling, make sure to use the new `./bin/dev` to start your server instead of the old `rails server` or else your Turbo interactions will not work correctly.**
 (If you want Bootstrap for a JSBundling app, install it following [these instructions](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-up-running-with-jsbundling-esbuild-stimulus-turbo-bootstrap-circleci/))
 
-(3) To use Shakapacker, start with `rails new --skip-javascript` and [see this post](https://jasonfleetwoodboldt.com/courses/react-heart-rails/rails-7-shakapacker-and-reactonrails-quick-setup-part-1/)
+(3) To use Shakapacker, start with `rails new MyGreatApp --skip-javascript` and [see this post](https://jasonfleetwoodboldt.com/courses/react-heart-rails/rails-7-shakapacker-and-reactonrails-quick-setup-part-1/)
 
 (For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/))
 
