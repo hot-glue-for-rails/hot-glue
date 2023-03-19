@@ -455,8 +455,9 @@ module HotGlue
 
       @factory_creation = options['factory_creation'].gsub(";", "\n")
 
-
       identify_object_owner
+
+
 
       # SETUP FIELDS & LAYOUT
       setup_fields
