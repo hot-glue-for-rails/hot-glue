@@ -133,9 +133,16 @@ end
 
 - Because you are not using Minitest, you can delete the `test/` folder at the root of your repository.
 
+### 3. CSS Bundling Rails (optional)
+
+```
+bundle add cssbundling-rails
+./bin/rails css:install:bootstrap
+```
 
 
-### 3. HOTGLUE INSTALLER
+
+### 4. HOTGLUE INSTALLER
 Add `gem 'hot-glue'` to your Gemfile & `bundle install`
 
 During in installation, you MUST supply a `--layout` flag.
