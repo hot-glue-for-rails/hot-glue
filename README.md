@@ -41,8 +41,6 @@ Other than the opinionated differences and additional features, Hot Glue produce
 ## [GET THE COURSE TODAY](https://school.jasonfleetwoodboldt.com/8188/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
 
 
-[![Hot Glue Course](https://user-images.githubusercontent.com/59002/189544503-6edbcd40-1728-4b13-ac9a-c7772ccb8284.jpg)](https://school.jasonfleetwoodboldt.com/8188?utm_source=github.com&utm_campaign=github_hot_glue_readme_page)
-
 ---
 ---
 ## HOW EASY?
