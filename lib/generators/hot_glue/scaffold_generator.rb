@@ -672,6 +672,7 @@ module HotGlue
 
       # build a new polymorphic object
       @associations = []
+      @column_map = {}
       @columns.each do |col|
         if @the_object.columns_hash.keys.include?(col.to_s)
 
@@ -695,6 +696,7 @@ module HotGlue
         end
 
         # store this_column_object into a structure
+        @column_map[col] = this_column_object
       end
     end
 
