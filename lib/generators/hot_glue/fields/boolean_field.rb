@@ -1,0 +1,3 @@
+class BooleanField < Field
+
+end

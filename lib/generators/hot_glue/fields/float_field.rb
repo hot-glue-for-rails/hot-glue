@@ -1,0 +1,3 @@
+class FloatField < Field
+
+end

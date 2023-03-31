@@ -1,0 +1,3 @@
+class EnumField < Field
+
+end

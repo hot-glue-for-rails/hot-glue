@@ -1,0 +1,3 @@
+class UUIDField < Field
+
+end

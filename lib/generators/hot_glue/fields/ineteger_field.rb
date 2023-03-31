@@ -1,0 +1,3 @@
+class IntegerField < Field
+
+end

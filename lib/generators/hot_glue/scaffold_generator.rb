@@ -1,10 +1,9 @@
 require 'rails/generators/erb/scaffold/scaffold_generator'
 require 'ffaker'
+require_relative './fields/field'
 
 require_relative './markup_templates/base'
 require_relative './markup_templates/erb'
-# require_relative './markup_templates/haml'
-# require_relative './markup_templates/slim'
 
 require_relative './layout/builder'
 require_relative './layout_strategy/base'
@@ -676,21 +675,31 @@ module HotGlue
       end
 
 
+      # build a new polymorphic object
+      @columns.each do |col|
+        if @the_object.columns_hash.keys.include?(col.to_s)
+          if col.to_s.starts_with?("_")
+            @show_only << col
+          end
+
+          this_column_object = FieldFactory.new(name: col.to_s,
+                                                type: @the_object.columns_hash[col.to_s].type)
+
+        elsif @attachments.keys.include?(col)
+
+        else
+          raise "couldn't find #{col} in either field list or attachments list"
+        end
+      end
 
       @associations = []
 
       @columns.each do |col|
-        if col.to_s.starts_with?("_")
-          @show_only << col
-        end
-
         if @the_object.columns_hash.keys.include?(col.to_s)
           if @the_object.columns_hash[col.to_s].type == :integer
             if col.to_s.ends_with?("_id")
               # guess the association name label
               assoc_name = col.to_s.gsub("_id","")
-
-
               assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
               if assoc_model.nil?
@@ -704,29 +713,20 @@ module HotGlue
                 @associations << assoc_name.to_sym
                 name_list = [:name, :to_label, :full_name, :display_name, :email]
 
-              rescue
-                # unreachable(?)
-                # if eval("#{singular_class}.reflect_on_association(:#{assoc_name.singularize})")
-                #   raise(HotGlue::Error,"*** Oops: #{singular_class} has no association for #{assoc_name.singularize}")
-                # else
-                #   raise(HotGlue::Error,"*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god.")
-                # end
               end
 
               if assoc_class && name_list.collect{ |field|
                 assoc_class.respond_to?(field.to_s) ||  assoc_class.instance_methods.include?(field)
-              }.any?
-                # do nothing here
-              else
+              }.none?
                 exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
                 raise(HotGlue::Error,exit_message)
               end
             end
           end
-        elsif @attachments.keys.include?(col)
-
-        else
-          raise "couldn't find #{col} in either field list or attachments list"
+        # elsif @attachments.keys.include?(col)
+        #
+        # else
+        #   raise "couldn't find #{col} in either field list or attachments list"
         end
       end
     end

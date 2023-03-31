@@ -1,0 +1,3 @@
+class StringField < Field
+
+end
