@@ -7,6 +7,7 @@ describe HotGlue::Version do
   end
 
   it "should be a major- syntax" do
+    @version = HotGlue::Version::CURRENT
     split  = @version.split(".").collect(&:to_i)
     expect(split[0]).to be_kind_of(Numeric)
   end

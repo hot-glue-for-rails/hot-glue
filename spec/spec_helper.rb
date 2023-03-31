@@ -14,6 +14,7 @@ SimpleCov.start 'rails' do
   add_filter "/vendor/"
   add_filter "/test/"
   add_filter "/dummy/"
+  add_filter "lib/hotglue/version.rb"
   add_filter "lib/generators/hot_glue/templates/capybara_login.rb"
 end
 
