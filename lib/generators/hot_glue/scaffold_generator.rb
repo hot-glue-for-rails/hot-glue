@@ -470,34 +470,10 @@ module HotGlue
       @menu_file_exists = true if @nested_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
       @turbo_streams = !!options['with_turbo_streams']
-
-
-
-
-
-
     end
 
 
-    def fields_filtered_for_email_lookups
-      @columns.reject{|c| @alt_lookups.keys.include?(c) } + @alt_lookups.values.map{|v| ("__lookup_#{v[:lookup_as]}").to_sym}
-    end
 
-
-    def creation_syntax
-
-      merge_with = @alt_lookups.collect{ |key, data|
-        "#{data[:assoc].downcase}: #{data[:assoc].downcase}_factory.#{data[:assoc].downcase}"
-      }.join(", ")
-
-      if @factory_creation == ''
-        "@#{singular_name } = #{ class_name }.create(modified_params)"
-      else
-        "#{@factory_creation}\n" +
-        "    @#{singular_name } = #{ class_name }.create(modified_params#{'.merge(' + merge_with + ')' if !merge_with.empty?})"
-      end
-    end
-    
     def setup_hawk_keys
       @hawk_keys = {}
 
@@ -672,7 +648,7 @@ module HotGlue
 
       # build a new polymorphic object
       @associations = []
-      @column_map = {}
+      @columns_map = {}
       @columns.each do |col|
         if @the_object.columns_hash.keys.include?(col.to_s)
 
@@ -688,18 +664,31 @@ module HotGlue
           if field.is_a?(AssociationField)
             @associations << field.assoc_name.to_sym
           end
-
+          @columns_map[col] = this_column_object.field
         elsif @attachments.keys.include?(col)
 
         else
           raise "couldn't find #{col} in either field list or attachments list"
         end
-
-        # store this_column_object into a structure
-        @column_map[col] = this_column_object
       end
     end
 
+    def fields_filtered_for_email_lookups
+      @columns.reject{|c| @alt_lookups.keys.include?(c) } + @alt_lookups.values.map{|v| ("__lookup_#{v[:lookup_as]}").to_sym}
+    end
+
+    def creation_syntax
+      merge_with = @alt_lookups.collect{ |key, data|
+        "#{data[:assoc].downcase}: #{data[:assoc].downcase}_factory.#{data[:assoc].downcase}"
+      }.join(", ")
+
+      if @factory_creation == ''
+        "@#{singular_name } = #{ class_name }.create(modified_params)"
+      else
+        "#{@factory_creation}\n" +
+          "    @#{singular_name } = #{ class_name }.create(modified_params#{'.merge(' + merge_with + ')' if !merge_with.empty?})"
+      end
+    end
 
     def auth_root
       "authenticate_" + @auth_identifier.split(".")[0] + "!"
@@ -784,23 +773,14 @@ module HotGlue
     end
 
     def columns_spec_with_sample_data
-      (@columns - @attachments.keys).map { |c|
-        type = eval("#{singular_class}.columns_hash['#{c}']").type
-        random_data = case type
-                      when :integer
-                        rand(1...1000)
-                      when :string
-                        FFaker::AnimalUS.common_name
-                      when :text
-                        FFaker::AnimalUS.common_name
-                      when :datetime
-                        Time.now + rand(1..5).days
-                      end
-        c.to_s + ": '" + random_data.to_s + "'"
+      @columns_map.map  { |col, col_object|
+        unless col_object.is_a?(AssociationField)
+          random_data = col_object.spec_random_data
+          col.to_s + ": '" + random_data.to_s + "'"
+        end
       }.join(", ")
     end
-
-
+    
     def regenerate_me_code
       "rails generate hot_glue:scaffold #{ @meta_args[0][0] } #{@meta_args[1].collect{|x| x.gsub(/\s*=\s*([\S\s]+)/, '=\'\1\'')}.join(" ")}"
     end
@@ -1148,15 +1128,6 @@ module HotGlue
 
         end
       end
-
-      # menu_file = "app/views#{namespace_with_dash}/menu.erb"
-      #
-      # if File.exist?(menu_file)
-      #   # TODO: can I insert the new menu item into the menu programatically here?
-      #   # not sure how i would achieve this without nokogiri
-      #
-      # end
-
     end
 
     def append_model_callbacks
@@ -1265,11 +1236,6 @@ module HotGlue
         perc_width: @layout_strategy.each_col,     #undefined method `each_col'
         layout_strategy: @layout_strategy,
         layout_object: @layout_object
-        # columns:  @layout_object[:columns][:container],
-        # show_only: @show_only,
-        # singular_class: singular_class,
-        # singular: singular,
-        # attachments: @attachments
       )
     end
 
