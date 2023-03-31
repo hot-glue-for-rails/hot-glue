@@ -1,31 +1,34 @@
 class FieldFactory
   attr_accessor :field
-  def initialize(type: , name: )
-    @field = case type
+  def initialize(type: , name: , object: , singular_class: )
+    field_class = case type
              when :integer
                if name.to_s.ends_with?("_id")
-                 AssociationField.new(name: name)
+                 AssociationField
                else
-                 IntegerField.new(name: name)
+                 IntegerField
                end
             when :uuid
-              UUIDField.new(name: name)
+              UUIDField
             when :string
-              StringField.new(name: name)
+              StringField
             when :text
-              TextField.new(name: name)
+              TextField
             when :float
-              FloatField.new(name: name)
+              FloatField
             when :datetime
-              DateTimeField.new(name: name)
+              DateTimeField
             when :date
-              DateField.new(name: name)
+              DateField
             when :time
-              TimeField.new(name: name)
+              TimeField
             when :boolean
-              BooleanField.new(name: name)
+              BooleanField
             when :enum
-              EnumField.new(name: name)
+              EnumField
             end
+    @field = field_class.new(name: name,
+                             object: object,
+                             singular_class: singular_class)
   end
 end
