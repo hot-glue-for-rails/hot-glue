@@ -180,11 +180,6 @@ module HotGlue
 
       if @stimulus_syntax.nil?
         @stimulus_syntax = true
-
-        # if Rails.version.split(".")[0].to_i >= 7
-        #   @stimulus_syntax = true
-        # else
-        # end
       end
 
       if !options['markup'].nil?
@@ -749,22 +744,26 @@ module HotGlue
       nil
     end
 
+    def filepath_prefix
+      'spec/dummy/' if Rails.env.test?
+    end
+
     def copy_controller_and_spec_files
       @default_colspan = @columns.size
       unless @specs_only
-        template "controller.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "#{@controller_build_folder}_controller.rb")
+        template "controller.rb.erb", File.join("#{filepath_prefix}app/controllers#{namespace_with_dash}", "#{@controller_build_folder}_controller.rb")
         if @namespace
           begin
             eval(controller_descends_from)
             # puts "   skipping   base controller #{controller_descends_from}"
           rescue NameError => e
-            template "base_controller.rb.erb", File.join("#{'spec/dummy/' if Rails.env.test?}app/controllers#{namespace_with_dash}", "base_controller.rb")
+            template "base_controller.rb.erb", File.join("#{filepath_prefix}app/controllers#{namespace_with_dash}", "base_controller.rb")
           end
         end
       end
 
       unless @no_specs
-        dest_file = File.join("#{'spec/dummy/' if Rails.env.test?}spec/features#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
+        dest_file = File.join("#{filepath_prefix}spec/features#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
 
         if  File.exist?(dest_file)
           existing_file = File.open(dest_file)
@@ -786,7 +785,7 @@ module HotGlue
         template "system_spec.rb.erb", dest_file
       end
 
-      template "#{@markup}/_errors.#{@markup}", File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}", "_errors.#{@markup}")
+      template "#{@markup}/_errors.#{@markup}", File.join("#{filepath_prefix}app/views#{namespace_with_dash}", "_errors.#{@markup}")
     end
 
     def spec_foreign_association_merge_hash
@@ -1157,7 +1156,7 @@ module HotGlue
           dest_filename = cc_filename_with_extensions("#{view}", "#{@markup}")
 
 
-          dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
+          dest_filepath = File.join("#{filepath_prefix}app/views#{namespace_with_dash}",
                                     @controller_build_folder, dest_filename)
 
 
@@ -1171,7 +1170,7 @@ module HotGlue
         formats.each do |format|
           source_filename = cc_filename_with_extensions( "#{@markup}/#{view}.turbo_stream.#{@markup}")
           dest_filename = cc_filename_with_extensions("#{view}", "turbo_stream.#{@markup}")
-          dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/views#{namespace_with_dash}",
+          dest_filepath = File.join("#{filepath_prefix}app/views#{namespace_with_dash}",
                                     @controller_build_folder, dest_filename)
 
 
@@ -1196,7 +1195,7 @@ module HotGlue
 
       if options['with_turbo_streams'] == true
         dest_filename = cc_filename_with_extensions("#{singular_class.underscore}", "rb")
-        dest_filepath = File.join("#{'spec/dummy/' if Rails.env.test?}app/models", dest_filename)
+        dest_filepath = File.join("#{filepath_prefix}app/models", dest_filename)
 
 
         puts "appending turbo callbacks to #{dest_filepath}"
