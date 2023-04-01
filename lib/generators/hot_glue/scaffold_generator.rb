@@ -1,6 +1,7 @@
 require 'rails/generators/erb/scaffold/scaffold_generator'
 require 'ffaker'
 require_relative './fields/field'
+require_relative './field_factory'
 
 require_relative './markup_templates/base'
 require_relative './markup_templates/erb'
@@ -780,7 +781,7 @@ module HotGlue
         end
       }.join(", ")
     end
-    
+
     def regenerate_me_code
       "rails generate hot_glue:scaffold #{ @meta_args[0][0] } #{@meta_args[1].collect{|x| x.gsub(/\s*=\s*([\S\s]+)/, '=\'\1\'')}.join(" ")}"
     end
