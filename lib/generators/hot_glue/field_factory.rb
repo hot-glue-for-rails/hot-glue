@@ -12,8 +12,8 @@ require_relative "fields/uuid_field"
 
 
 class FieldFactory
-  attr_accessor :field
-  def initialize(type: , name: , object: , singular_class: )
+  attr_accessor :field, :class_name
+  def initialize(type: , name: , class_name: , singular_class: )
     field_class = case type
              when :integer
                if name.to_s.ends_with?("_id")
@@ -39,9 +39,11 @@ class FieldFactory
               BooleanField
             when :enum
               EnumField
-            end
+                  end
+    @class_name = class_name
+
     @field = field_class.new(name: name,
-                             object: object,
+                             class_name: singular_class,
                              singular_class: singular_class)
   end
 end

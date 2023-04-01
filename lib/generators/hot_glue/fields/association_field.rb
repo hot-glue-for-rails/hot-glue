@@ -5,7 +5,7 @@ require_relative './field.rb'
 class AssociationField < Field
   attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations
 
-  def initialize(name: , object:, singular_class: )
+  def initialize(name: , class_name: , singular_class:   )
     super
     @assoc_name = name.to_s.gsub("_id","")
     @assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
@@ -30,8 +30,20 @@ class AssociationField < Field
     end
   end
 
+  def test_capybara_block(which_partial)
+    assoc = name.to_s.gsub('_id','')
 
-  def validate_assocication
-
+    # TODO: move control into the calling code
+    # @update_show_only
+    # @alt_lookups
+    if which_partial == :update && @update_show_only.include?(name)
+      # do not update tests
+    elsif @alt_lookups.keys.include?(name.to_s)
+      lookup = @alt_lookups[col_name.to_s][:lookup_as]
+      "      find(\"[name='#{singular}[__lookup_#{lookup}]']\").fill_in( with: #{assoc}1.#{lookup} )"
+    else
+      "      #{col_name}_selector = find(\"[name='#{singular}[#{col_name}]']\").click \n" +
+      "      #{col_name}_selector.first('option', text: #{assoc}1.name).select_option"
+    end
   end
 end

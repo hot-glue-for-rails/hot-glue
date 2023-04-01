@@ -17,8 +17,6 @@ module HotGlue
   class Error < StandardError
   end
 
-
-
   def self.construct_downnest_object(input)
     res = input.split(",").map { |child|
       child_name = child.gsub("+","")
@@ -658,7 +656,7 @@ module HotGlue
           end
 
           this_column_object = FieldFactory.new(name: col.to_s,
-                                                object: @the_object,
+                                                class_name: class_name,
                                                 singular_class: singular_class,
                                                 type: @the_object.columns_hash[col.to_s].type)
           field = this_column_object.field
@@ -751,6 +749,10 @@ module HotGlue
       ", #{testing_name}: #{testing_name}1"
     end
 
+    def testing_name
+      singular_class_name.gsub("::","_").underscore
+    end
+
     def spec_related_column_lets
       (@columns - @show_only - @attachments.keys).map { |col|
         type = eval("#{singular_class}.columns_hash['#{col}']").type
@@ -825,10 +827,6 @@ module HotGlue
       @singular
     end
 
-    def testing_name
-      singular_class_name.gsub("::","_").underscore
-    end
-
     def singular_class_name
       @singular_class
     end
@@ -842,74 +840,47 @@ module HotGlue
     end
 
     def test_capybara_block(which_partial = :create)
-      ((@columns - @attachments.keys) - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
-        type = eval("#{singular_class}.columns_hash['#{col}']").type
-        case type
-        when :date
-          "      " + "new_#{col} = Date.current + (rand(100).days) \n" +
-            '      ' + "find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-        when :time
-          # "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
-          # '      ' + "find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-
-        when :datetime
-          "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
-            '      ' + "find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-
-        when :integer
-          if col.to_s.ends_with?("_id")
-            capybara_block_for_association(col_name: col, which_partial: which_partial)
-          else
-            "      new_#{col} = rand(10) \n" +
-            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-          end
-        when :float
-          "      " + "new_#{col} = rand(10) \n" +
-            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-        when :uuid
-          capybara_block_for_association(col_name: col, which_partial: which_partial)
-
-        when :enum
-          "      list_of_#{col.to_s} = #{singular_class}.defined_enums['#{col.to_s}'].keys \n" +
-            "      " + "new_#{col.to_s} = list_of_#{col.to_s}[rand(list_of_#{col.to_s}.length)].to_s \n" +
-            '      find("select[name=\'' + singular + '[' + col.to_s + ']\']  option[value=\'#{new_' + col.to_s + '}\']").select_option'
-
-        when :boolean
-          "      new_#{col} = 1 \n" +
-            "      find(\"[name='#{testing_name}[#{col}]'][value='\#{new_" + col.to_s + "}']\").choose"
-        when :string
-          faker_string =
-            if col.to_s.include?('email')
-              "FFaker::Internet.email"
-            elsif  col.to_s.include?('domain')
-              "FFaker::Internet.domain_name"
-            elsif col.to_s.include?('ip_address') || col.to_s.ends_with?('_ip')
-              "FFaker::Internet.ip_v4_address"
-            else
-              "FFaker::Movie.title"
-            end
-            "      " + "new_#{col} = #{faker_string} \n" +
-            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-        when :text
-          "      " + "new_#{col} = FFaker::Lorem.paragraphs(1).join("") \n" +
-            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+      @columns_map.map { | col, col_obj|
+        show_only_list = which_partial == :create ? @show_only : (@update_show_only+@show_only)
+        unless @attachments.keys.include?(col) || show_only_list.include?(col)
+          col_obj.test_capybara_block(which_partial)
         end
-
       }.join("\n")
+
+      # ((@columns - @attachments.keys) - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
+      #   type = eval("#{singular_class}.columns_hash['#{col}']").type
+      #   case type
+      #   when :date
+      #
+      #   when :time
+      #     # "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
+      #     # '      ' + "find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+      #
+      #   when :datetime
+      #
+      #   when :integer
+      #
+      #   when :float
+      #
+      #   when :uuid
+      #     # capybara_block_for_association(col_name: col, which_partial: which_partial)
+      #
+      #   when :enum
+      #
+      #   when :boolean
+      #
+      #   when :string
+      #
+      #   when :text
+      #
+      #   end
+      #
+      # }
     end
 
 
     def capybara_block_for_association(col_name: nil , which_partial: nil )
-      assoc = col_name.to_s.gsub('_id','')
-      if which_partial == :update && @update_show_only.include?(col_name)
-        # do not update tests
-      elsif @alt_lookups.keys.include?(col_name.to_s)
-        lookup = @alt_lookups[col_name.to_s][:lookup_as]
-        "      find(\"[name='#{singular}[__lookup_#{lookup}]']\").fill_in( with: #{assoc}1.#{lookup} )"
-      else
-        "      #{col_name}_selector = find(\"[name='#{singular}[#{col_name}]']\").click \n" +
-          "      #{col_name}_selector.first('option', text: #{assoc}1.name).select_option"
-      end
+
     end
 
 
