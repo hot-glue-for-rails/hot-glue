@@ -29,4 +29,8 @@ class Field
   def capybara_expectation_assertion
     "expect(page).to have_content(new_#{name})"
   end
+
+  def spec_setup_let_arg
+
+  end
 end

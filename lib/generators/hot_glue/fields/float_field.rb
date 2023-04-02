@@ -5,6 +5,7 @@ class FloatField < Field
 
   end
 
-
-
+  def spec_setup_let_arg
+    "#{name}: rand(1)*10000"
+  end
 end

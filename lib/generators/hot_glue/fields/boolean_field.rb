@@ -7,4 +7,8 @@ class BooleanField < Field
   def capybara_expectation_assertion
     ["expect(page).to have_content(#{singular}#{1}.#{name} ? 'YES' : 'NO')"].join("\n      ")
   end
+
+  def spec_setup_let_arg
+    "#{name}: !!rand(2).floor"
+  end
 end

@@ -18,4 +18,16 @@ class StringField < Field
     return "      " + "new_#{name} = #{faker_string} \n" +
     "      find(\"[name='#{testing_name}[#{ name.to_s }]']\").fill_in(with: new_#{name.to_s})"
   end
+
+  def spec_setup_let_arg
+    if name.to_s.include?('email')
+      "#{name}: FFaker::Internet.email"
+    elsif  name.to_s.include?('domain')
+      "#{name}: FFaker::Internet.domain_name"
+    elsif name.to_s.include?('ip_address') || name.to_s.ends_with?('_ip')
+      "#{name}: FFaker::Internet.ip_v4_address"
+    else
+      "#{name}: FFaker::Movie.title"
+    end
+  end
 end

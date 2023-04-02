@@ -12,4 +12,8 @@ class DateTimeField < Field
   def capybara_expectation_assertion
     super
   end
+
+  def spec_setup_let_arg
+    "#{name}: DateTime.current + rand(1000).seconds"
+  end
 end

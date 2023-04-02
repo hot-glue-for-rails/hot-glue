@@ -12,4 +12,8 @@ class EnumField < Field
       "expect(page).to have_content(new_#{name})"
     end
   end
+
+  def spec_setup_let_args
+    super
+  end
 end

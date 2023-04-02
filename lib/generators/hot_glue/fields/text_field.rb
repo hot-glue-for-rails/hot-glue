@@ -7,4 +7,8 @@ class TextField < Field
     "      " + "new_#{name} = FFaker::Lorem.paragraphs(1).join("") \n" +
     "      find(\"[name='#{testing_name}[#{ name.to_s }]']\").fill_in(with: new_#{name.to_s})"
   end
+
+  def spec_setup_let_arg
+    "#{name}:  FFaker::Lorem.paragraphs(10).join("  ")"
+  end
 end
