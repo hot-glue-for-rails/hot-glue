@@ -16,4 +16,12 @@ class EnumField < Field
   def spec_setup_let_args
     super
   end
+
+  def spec_list_view_assertion
+    if(eval("#{singular_class}.respond_to?(:#{name}_labels)"))
+      "      " + "expect(page).to have_content(#{singular_class}.#{name}_labels[#{singular}#{1}.#{name}])"
+    else
+      "      " + "expect(page).to have_content(#{singular}1.#{name})"
+    end
+  end
 end

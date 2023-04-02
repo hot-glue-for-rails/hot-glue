@@ -25,36 +25,7 @@ describe 'interaction for <%= controller_class_name %>' do
   describe "index" do
     it "should show me the list" do
       visit <%= path_helper_plural %>
-<%=
-(@columns - @attachments.keys.collect(&:to_sym)).map { |col|
-  type = eval("#{singular_class}.columns_hash['#{col}']").type
-
-  case type
-  when :datetime
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(current_timezone)  )"].join("\n      ")
-  when :integer
-    if !col.ends_with?("_id")
-      "      " + ["expect(page).to have_content(#{singular}#{1}.#{col})"].join("\n      ")
-    end
-  when :uuid
-    assoc_name = col.to_s.gsub('_id','')
-    association = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{assoc_name}.#{HotGlue.derrive_reference_name(association.class_name)})"].join("\n      ")
-  when :enum
-    if(eval("#{singular_class}.respond_to?(:#{col}_labels)"))
-     "      " + "expect(page).to have_content(#{singular_class}.#{col}_labels[#{singular}#{1}.#{col}])"
-    else
-     "      " + "expect(page).to have_content(#{singular}1.#{col})"
-    end
-
-  when :boolean
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{col} ? 'YES' : 'NO')"].join("\n      ")
-  else
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{col})"].join("\n      ")
-  end
-
-}.join("\n")
-      %>
+      <%= @columns_map.collect{|col, col_object| col_object.spec_list_view_assertion }   %>
     end
   end
 
@@ -67,16 +38,13 @@ describe 'interaction for <%= controller_class_name %>' do
       click_button "Save"
       expect(page).to have_content("Successfully created")
 
-<%="      " +
-
-@columns_map.map{ |col, col_object|
+<%="      " + @columns_map.map{ |col, col_object|
   if @attachments.keys.collect(&:to_sym).include?(col)
   elsif @show_only.include?(col)
   else
       col_object.spec_make_assertion
   end
-
-  }.compact.join("\n      ")
+ }.compact.join("\n      ")
   %>
     end
   end<% end %>

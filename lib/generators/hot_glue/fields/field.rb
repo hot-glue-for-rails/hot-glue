@@ -33,4 +33,8 @@ class Field
   def spec_setup_let_arg
 
   end
+
+  def spec_list_view_assertion
+    "      " + ["expect(page).to have_content(#{singular}#{1}.#{name})"].join("\n      ")
+  end
 end
