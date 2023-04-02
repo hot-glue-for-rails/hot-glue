@@ -1,10 +1,13 @@
 class Field
-  attr_accessor :name, :object, :singular_class, :class_name
+  attr_accessor :name, :object, :singular_class, :class_name, :singular,
+                :update_show_only
 
-  def initialize(name: , class_name: , singular_class: )
+  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: )
     @name = name
-    @singular_class = singular_class
+    @alt_lookups = alt_lookups
+    @singular = singular
     @class_name = class_name
+    @update_show_only = update_show_only
   end
 
   def getName
@@ -16,7 +19,7 @@ class Field
   end
 
   def testing_name
-    singular_class.to_s.gsub("::","_").underscore
+    class_name.to_s.gsub("::","_").underscore
   end
 
   def test_capybara_block(which_partial = nil)

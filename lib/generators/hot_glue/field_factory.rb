@@ -13,7 +13,7 @@ require_relative "fields/uuid_field"
 
 class FieldFactory
   attr_accessor :field, :class_name
-  def initialize(type: , name: , class_name: , singular_class: )
+  def initialize(type: , name: , generator: )
     field_class = case type
              when :integer
                if name.to_s.ends_with?("_id")
@@ -43,7 +43,9 @@ class FieldFactory
     @class_name = class_name
 
     @field = field_class.new(name: name,
-                             class_name: singular_class,
-                             singular_class: singular_class)
+                             class_name: generator.singular_class,
+                             alt_lookups: generator.alt_lookups,
+                             singular: generator.singular,
+                             update_show_only: generator.update_show_only)
   end
 end

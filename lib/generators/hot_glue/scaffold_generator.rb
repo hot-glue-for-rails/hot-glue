@@ -93,8 +93,9 @@ module HotGlue
     hook_for :form_builder, :as => :scaffold
 
     source_root File.expand_path('templates', __dir__)
-    attr_accessor :path, :singular, :plural, :singular_class, :nest_with
-    attr_accessor :columns, :downnest_children, :layout_object
+    attr_accessor :path, :singular, :plural, :singular_class, :nest_with,
+                  :columns, :downnest_children, :layout_object, :alt_lookups,
+                  :update_show_only
 
     class_option :singular, type: :string, default: nil
     class_option :plural, type: :string, default: nil
@@ -656,8 +657,7 @@ module HotGlue
           end
 
           this_column_object = FieldFactory.new(name: col.to_s,
-                                                class_name: class_name,
-                                                singular_class: singular_class,
+                                                generator: self,
                                                 type: @the_object.columns_hash[col.to_s].type)
           field = this_column_object.field
           if field.is_a?(AssociationField)
@@ -846,43 +846,7 @@ module HotGlue
           col_obj.test_capybara_block(which_partial)
         end
       }.join("\n")
-
-      # ((@columns - @attachments.keys) - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
-      #   type = eval("#{singular_class}.columns_hash['#{col}']").type
-      #   case type
-      #   when :date
-      #
-      #   when :time
-      #     # "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
-      #     # '      ' + "find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-      #
-      #   when :datetime
-      #
-      #   when :integer
-      #
-      #   when :float
-      #
-      #   when :uuid
-      #     # capybara_block_for_association(col_name: col, which_partial: which_partial)
-      #
-      #   when :enum
-      #
-      #   when :boolean
-      #
-      #   when :string
-      #
-      #   when :text
-      #
-      #   end
-      #
-      # }
     end
-
-
-    def capybara_block_for_association(col_name: nil , which_partial: nil )
-
-    end
-
 
     def path_helper_args
       if @nested_set.any? && @nested

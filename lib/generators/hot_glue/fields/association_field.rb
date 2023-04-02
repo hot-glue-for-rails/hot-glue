@@ -1,17 +1,16 @@
 
 require_relative './field.rb'
 
-
 class AssociationField < Field
-  attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations
+  attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups
 
-  def initialize(name: , class_name: , singular_class:   )
+  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: )
     super
     @assoc_name = name.to_s.gsub("_id","")
-    @assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+    @assoc_model = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
 
     if @assoc_model.nil?
-      exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{@assoc_name} or the model #{@assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{@assoc_name.titlecase}; or add to #{singular_class} `belongs_to :#{@assoc_name}`.  To make a controller that can read all records, specify with --god."
+      exit_message = "*** Oops: The model #{class_name} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; or add to #{class_name} `belongs_to :#{assoc_name}`.  To make a controller that can read all records, specify with --god."
       puts exit_message
       raise(HotGlue::Error, exit_message)
     end
@@ -32,18 +31,14 @@ class AssociationField < Field
 
   def test_capybara_block(which_partial)
     assoc = name.to_s.gsub('_id','')
-
-    # TODO: move control into the calling code
-    # @update_show_only
-    # @alt_lookups
-    if which_partial == :update && @update_show_only.include?(name)
+    if which_partial == :update && update_show_only.include?(name)
       # do not update tests
-    elsif @alt_lookups.keys.include?(name.to_s)
-      lookup = @alt_lookups[col_name.to_s][:lookup_as]
+    elsif alt_lookups.keys.include?(name.to_s)
+      lookup = alt_lookups[name.to_s][:lookup_as]
       "      find(\"[name='#{singular}[__lookup_#{lookup}]']\").fill_in( with: #{assoc}1.#{lookup} )"
     else
-      "      #{col_name}_selector = find(\"[name='#{singular}[#{col_name}]']\").click \n" +
-      "      #{col_name}_selector.first('option', text: #{assoc}1.name).select_option"
+      "      #{name}_selector = find(\"[name='#{singular}[#{name}]']\").click \n" +
+      "      #{name}_selector.first('option', text: #{assoc}1.name).select_option"
     end
   end
 end

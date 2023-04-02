@@ -3,7 +3,7 @@ class DateTimeField < Field
     Time.now + rand(1..5).days
   end
 
-  def test_capybara_block
+  def test_capybara_block(which_partial = nil)
     "      " + "new_#{name} = DateTime.current + (rand(100).days) \n" +
     '      ' + "find(\"[name='#{testing_name}[#{ name.to_s }]']\").fill_in(with: new_#{name.to_s})"
 

@@ -306,9 +306,7 @@ describe HotGlue::ScaffoldGenerator do
                                           ["Jkl","--god","--layout=tailwind"])
 
 
-
     end
-
   end
 
   describe "choosing which fields to include" do
