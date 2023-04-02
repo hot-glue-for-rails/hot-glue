@@ -617,7 +617,6 @@ module HotGlue
     end
 
     def setup_fields
-
       if !@include_fields
         @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
                              :reset_password_token,
@@ -747,7 +746,7 @@ module HotGlue
     end
 
     def testing_name
-      singular_class_name.gsub("::","_").underscore
+      singular_class.gsub("::","_").underscore
     end
 
     def spec_related_column_lets
@@ -810,10 +809,6 @@ module HotGlue
 
     def controller_class_name
       @controller_build_name
-    end
-
-    def singular_class_name
-      @singular_class
     end
 
     def plural_name
@@ -965,10 +960,8 @@ module HotGlue
         else
           "@" + @nested_set.last[:singular] + ".#{plural}"
         end
-
       end
     end
-
 
     def all_objects_root
       if @auth
@@ -1000,7 +993,6 @@ module HotGlue
       !Gem::Specification.sort_by{ |g| [g.name.downcase, g.version] }.group_by{ |g| g.name }['devise']
     end
 
-
     def magic_button_output
       @template_builder.magic_button_output(
         path: HotGlue.optionalized_ternary(namespace: @namespace,
@@ -1017,7 +1009,6 @@ module HotGlue
     def nav_template
       "#{namespace_with_trailing_dash}nav"
     end
-
 
     def include_nav_template
       File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}")
@@ -1088,11 +1079,7 @@ module HotGlue
     end
 
     def namespace_with_trailing_dash
-      if @namespace
-        "#{@namespace}/"
-      else
-        ""
-      end
+      @namespace ? "#{@namespace}/" : ""
     end
 
     def all_views
@@ -1138,7 +1125,6 @@ module HotGlue
       false
     end
 
-
     def model_search_fields # an array of fields we can search on
       []
     end
@@ -1172,8 +1158,6 @@ module HotGlue
         "ApplicationController"
       end
     end
-
-
 
     def display_class
       me = eval(singular_class)
@@ -1228,7 +1212,7 @@ module HotGlue
         flash[:notice] = (flash[:notice] || \"\") <<  (res ? res + \" \" : \"\")
       rescue ActiveRecord::RecordInvalid => e
         @#{singular}.errors.add(:base, e.message)
-        flash[:alert] = (flash[:alert] || \"\") << 'There was ane error #{magic_button}ing your #{@singular}: '
+        flash[:alert] = (flash[:alert] || \"\") << 'There was an error #{magic_button}ing your #{@singular}: '
       end
     end"
 
