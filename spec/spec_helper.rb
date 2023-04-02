@@ -10,13 +10,13 @@ class SimpleCov::Formatter::MergedFormatter
   end
 end
 SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
-# SimpleCov.start 'rails' do
-#   add_filter "/vendor/"
-#   add_filter "/test/"
-#   add_filter "/dummy/"
-#   add_filter "lib/hotglue/version.rb"
-#   add_filter "lib/generators/hot_glue/templates/capybara_login.rb"
-# end
+SimpleCov.start 'rails' do
+  add_filter "/vendor/"
+  add_filter "/test/"
+  add_filter "/dummy/"
+  add_filter "lib/hotglue/version.rb"
+  add_filter "lib/generators/hot_glue/templates/capybara_login.rb"
+end
 
 require "rails/all"
 require 'rails/generators'

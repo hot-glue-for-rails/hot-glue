@@ -25,4 +25,8 @@ class Field
   def test_capybara_block(which_partial = nil)
     ""
   end
+
+  def capybara_expectation_assertion
+    "expect(page).to have_content(new_#{name})"
+  end
 end

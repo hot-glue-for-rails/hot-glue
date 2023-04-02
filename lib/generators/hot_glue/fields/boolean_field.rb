@@ -3,4 +3,8 @@ class BooleanField < Field
     "      new_#{name} = 1 \n" +
     "      find(\"[name='#{testing_name}[#{name}]'][value='\#{new_" + name.to_s + "}']\").choose"
   end
+
+  def capybara_expectation_assertion
+    ["expect(page).to have_content(#{singular}#{1}.#{name} ? 'YES' : 'NO')"].join("\n      ")
+  end
 end

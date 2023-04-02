@@ -98,38 +98,18 @@ describe 'interaction for <%= controller_class_name %>' do
       visit <%= path_helper_plural %>
       click_link "<%= @new_button_label %>"
       expect(page).to have_selector(:xpath, './/h3[contains(., "<%= @new_button_label %>")]')
-<%= test_capybara_block(:create) %>
+<%= capybara_make_updates(:create) %>
       click_button "Save"
       expect(page).to have_content("Successfully created")
+
 <%="      " +
 
-  ((@columns - @attachments.keys.collect(&:to_sym)) - @show_only).map { |col|
-    type = eval("#{singular_class}.columns_hash['#{col}']").type
-
-    case type
-    when :datetime
-      #    "      expect(page).to have_content(#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y')  + \" @ \" +
-      # new_#{col}.in_time_zone(current_timezone).strftime('%l').strip + \":\" +
-      # new_#{col}.in_time_zone(current_timezone).strftime('%M %p').strip + \" \" +
-      # timezonize(current_timezone))"
-    when :integer
-      if col.to_s.ends_with?("_id")
-        # shoould the assoication be on here
-      else
-         "expect(page).to have_content(new_#{col})"
-      end
-
-    when :boolean
-        ["expect(page).to have_content(#{singular}#{1}.#{col} ? 'YES' : 'NO')"].join("\n      ")
-    when :enum
-      if(eval("#{singular_class}.respond_to?(:#{col}_labels)"))
-        "expect(page).to have_content(#{singular_class}.#{col}_labels[new_#{col}])"
-      else
-        "expect(page).to have_content(new_#{col})"
-      end
-    else
-      "expect(page).to have_content(new_#{col})"
-    end
+@columns_map.map{ |col, col_object|
+  if @attachments.keys.collect(&:to_sym).include?(col)
+  elsif @show_only.include?(col)
+  else
+      col_object.capybara_expectation_assertion
+  end
 
   }.compact.join("\n      ")
   %>
@@ -143,10 +123,10 @@ describe 'interaction for <%= controller_class_name %>' do
       find("a.edit-<%= singular %>-button[href='/<%= namespace_with_slash %><%= plural %>/#{<%= singular %>1.id}/edit']").click
 
       expect(page).to have_content("Editing #{<%= singular %>1.<%= @display_class %>.squish || "(no name)"}")
-<%= test_capybara_block(:update) %>
+<%= capybara_make_updates(:update) %>
       click_button "Save"
       within("turbo-frame#<%= @namespace %>__#{dom_id(<%= singular %>1)} ") do
-<%= ((@columns - @attachments.keys.collect(&:to_sym)) - @show_only).map { |col|
+<%= ((@columns - @attachments.keys.collect(&:to_sym)) - (@show_only+@update_show_only)).map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
 
       if type == :uuid || (type == :integer && col.to_s.ends_with?("_id"))

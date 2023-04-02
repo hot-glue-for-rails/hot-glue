@@ -839,10 +839,15 @@ module HotGlue
       @auth_identifier
     end
 
-    def test_capybara_block(which_partial = :create)
+    def capybara_make_updates(which_partial = :create)
+
       @columns_map.map { | col, col_obj|
         show_only_list = which_partial == :create ? @show_only : (@update_show_only+@show_only)
-        unless @attachments.keys.include?(col) || show_only_list.include?(col)
+
+        if @attachments.keys.include?(col)
+        elsif  show_only_list.include?(col)
+          "      page.should have_no_selector(:css, \"[name='#{testing_name}[#{ col.to_s }]'\")"
+        else
           col_obj.test_capybara_block(which_partial)
         end
       }.join("\n")

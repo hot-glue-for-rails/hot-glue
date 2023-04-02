@@ -11,4 +11,8 @@ class IntegerField < Field
         "      find(\"[name='#{testing_name}[#{ name.to_s }]']\").fill_in(with: new_#{name.to_s})"
     end
   end
+
+  def capybara_expectation_assertion
+    "expect(page).to have_content(new_#{name})"
+  end
 end

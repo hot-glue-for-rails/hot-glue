@@ -4,4 +4,12 @@ class EnumField < Field
     "      " + "new_#{name.to_s} = list_of_#{name.to_s}[rand(list_of_#{name.to_s}.length)].to_s \n" +
     '      find("select[name=\'' + singular + '[' + name.to_s + ']\']  option[value=\'#{new_' + name.to_s + '}\']").select_option'
   end
+
+  def capybara_expectation_assertion
+    if(eval("#{singular_class}.respond_to?(:#{name}_labels)"))
+      "expect(page).to have_content(#{singular_class}.#{name}_labels[new_#{name}])"
+    else
+      "expect(page).to have_content(new_#{name})"
+    end
+  end
 end
