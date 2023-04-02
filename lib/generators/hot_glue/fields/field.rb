@@ -22,11 +22,11 @@ class Field
     class_name.to_s.gsub("::","_").underscore
   end
 
-  def test_capybara_block(which_partial = nil)
+  def spec_setup_and_change_act(which_partial = nil)
     ""
   end
 
-  def capybara_expectation_assertion
+  def spec_make_assertion
     "expect(page).to have_content(new_#{name})"
   end
 

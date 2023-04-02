@@ -848,7 +848,7 @@ module HotGlue
         elsif  show_only_list.include?(col)
           "      page.should have_no_selector(:css, \"[name='#{testing_name}[#{ col.to_s }]'\")"
         else
-          col_obj.test_capybara_block(which_partial)
+          col_obj.spec_setup_and_change_act(which_partial)
         end
       }.join("\n")
     end

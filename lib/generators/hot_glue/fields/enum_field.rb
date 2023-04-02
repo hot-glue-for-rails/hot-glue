@@ -1,11 +1,11 @@
 class EnumField < Field
-  def test_capybara_block(which_partial = nil)
+  def spec_setup_and_change_act(which_partial = nil)
     "      list_of_#{name.to_s} = #{singular_class}.defined_enums['#{name.to_s}'].keys \n" +
     "      " + "new_#{name.to_s} = list_of_#{name.to_s}[rand(list_of_#{name.to_s}.length)].to_s \n" +
     '      find("select[name=\'' + singular + '[' + name.to_s + ']\']  option[value=\'#{new_' + name.to_s + '}\']").select_option'
   end
 
-  def capybara_expectation_assertion
+  def spec_make_assertion
     if(eval("#{singular_class}.respond_to?(:#{name}_labels)"))
       "expect(page).to have_content(#{singular_class}.#{name}_labels[new_#{name}])"
     else

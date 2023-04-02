@@ -3,13 +3,13 @@ class DateTimeField < Field
     Time.now + rand(1..5).days
   end
 
-  def test_capybara_block(which_partial = nil)
+  def spec_setup_and_change_act(which_partial = nil)
     "      " + "new_#{name} = DateTime.current + (rand(100).days) \n" +
     '      ' + "find(\"[name='#{testing_name}[#{ name.to_s }]']\").fill_in(with: new_#{name.to_s})"
 
   end
 
-  def capybara_expectation_assertion
+  def spec_make_assertion
     super
   end
 

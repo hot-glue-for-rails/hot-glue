@@ -1,10 +1,10 @@
 class BooleanField < Field
-  def test_capybara_block(which_partial = nil)
+  def spec_setup_and_change_act(which_partial = nil)
     "      new_#{name} = 1 \n" +
     "      find(\"[name='#{testing_name}[#{name}]'][value='\#{new_" + name.to_s + "}']\").choose"
   end
 
-  def capybara_expectation_assertion
+  def spec_make_assertion
     ["expect(page).to have_content(#{singular}#{1}.#{name} ? 'YES' : 'NO')"].join("\n      ")
   end
 

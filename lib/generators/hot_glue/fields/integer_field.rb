@@ -3,7 +3,7 @@ class IntegerField < Field
     rand(1...1000)
   end
 
-  def test_capybara_block(which_partial = nil)
+  def spec_setup_and_change_act(which_partial = nil)
     if name.to_s.ends_with?("_id")
       capybara_block_for_association(name_name: name, which_partial: which_partial)
     else
@@ -12,7 +12,7 @@ class IntegerField < Field
     end
   end
 
-  def capybara_expectation_assertion
+  def spec_make_assertion
     "expect(page).to have_content(new_#{name})"
   end
 

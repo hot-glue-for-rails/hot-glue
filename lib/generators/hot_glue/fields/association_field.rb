@@ -42,7 +42,7 @@ class AssociationField < Field
     name.to_s.gsub('_id','')
   end
 
-  def test_capybara_block(which_partial)
+  def spec_setup_and_change_act(which_partial)
     if which_partial == :update && update_show_only.include?(name)
       # do not update tests
     elsif alt_lookups.keys.include?(name.to_s)
@@ -54,7 +54,7 @@ class AssociationField < Field
     end
   end
 
-  def capybara_expectation_assertion
+  def spec_make_assertion
     " expect(page).to have_content(#{assoc}1.name)"
   end
 

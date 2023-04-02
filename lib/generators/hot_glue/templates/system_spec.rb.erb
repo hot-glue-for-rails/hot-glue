@@ -1,21 +1,20 @@
-require 'rails_helper'
+<% item1_addOns = ""
+ if (eval(@singular_class).instance_methods.include?(display_class.to_s))
+  item1_addOns << "#{display_class}: FFaker::Name.name"
+ end
+item1_addOns << ", " + @columns_map.collect{|col, col_object|
+  col_object.spec_setup_let_arg
+}.compact.join(", ")
+%>require 'rails_helper'
 
 describe 'interaction for <%= controller_class_name %>' do
   include HotGlue::ControllerHelper
   include ActionView::RecordIdentifier
 
   <%= @existing_content %>
-  <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
+  <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<% end %>
 <%= spec_related_column_lets %>
-  <% item1_addOns = ""
-   if (eval(@singular_class).instance_methods.include?(display_class.to_s))
-    item1_addOns << "#{display_class}: FFaker::Name.name"
-   end
-
-  item1_addOns << ", " + @columns_map.collect{|col, col_object|
-    col_object.spec_setup_let_arg
-  }.compact.join(", ")
-  %>let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )}
+  let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )}
 <%= objest_nest_factory_setup %> <% unless @god || @existing_content.include?("login_as")%>
   before do
     login_as(<%= @auth %>)
@@ -74,7 +73,7 @@ describe 'interaction for <%= controller_class_name %>' do
   if @attachments.keys.collect(&:to_sym).include?(col)
   elsif @show_only.include?(col)
   else
-      col_object.capybara_expectation_assertion
+      col_object.spec_make_assertion
   end
 
   }.compact.join("\n      ")

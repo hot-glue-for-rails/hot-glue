@@ -3,7 +3,7 @@ class StringField < Field
     FFaker::AnimalUS.common_name
   end
 
-  def test_capybara_block(which_partial = nil)
+  def spec_setup_and_change_act(which_partial = nil)
     faker_string =
       if name.to_s.include?('email')
         "FFaker::Internet.email"
