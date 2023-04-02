@@ -72,7 +72,7 @@ module  HotGlue
     ################################################################
 
 
-    def all_form_fields(layout_strategy: , layout_object: )
+    def all_form_fields(layout_strategy:, layout_object: )
       column_classes = layout_strategy.column_classes_for_form_fields
       columns = layout_object[:columns][:container]
 

@@ -1,13 +1,19 @@
 class Field
   attr_accessor :name, :object, :singular_class, :class_name, :singular,
                 :update_show_only
+  attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :assoc_label
 
-  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: )
+  attr_accessor :hawk_keys, :auth
+
+  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: ,
+                 hawk_keys: , auth: )
     @name = name
     @alt_lookups = alt_lookups
     @singular = singular
     @class_name = class_name
     @update_show_only = update_show_only
+    @hawk_keys = hawk_keys
+    @auth = auth
   end
 
   def getName
@@ -36,5 +42,9 @@ class Field
 
   def spec_list_view_assertion
     "      " + ["expect(page).to have_content(#{singular}#{1}.#{name})"].join("\n      ")
+  end
+
+  def spec_related_column_lets
+    ""
   end
 end

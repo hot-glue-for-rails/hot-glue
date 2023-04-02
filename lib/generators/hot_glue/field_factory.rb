@@ -43,6 +43,8 @@ class FieldFactory
     @class_name = class_name
 
     @field = field_class.new(name: name,
+                             hawk_keys: generator.hawk_keys,
+                             auth: generator.auth,
                              class_name: generator.singular_class,
                              alt_lookups: generator.alt_lookups,
                              singular: generator.singular,

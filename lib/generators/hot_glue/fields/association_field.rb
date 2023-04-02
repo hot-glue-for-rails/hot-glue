@@ -2,9 +2,8 @@
 require_relative './field.rb'
 
 class AssociationField < Field
-  attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :assoc_label
 
-  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: )
+  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: , hawk_keys: , auth: )
     super
     assoc_model = eval("#{class_name}.reflect_on_association(:#{assoc})")
 
@@ -23,7 +22,7 @@ class AssociationField < Field
     if assoc_class && name_list.collect{ |field|
       assoc_class.respond_to?(field.to_s) || assoc_class.instance_methods.include?(field)
     }.none?
-      exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{@assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
+      exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{@assoc_name} association on the #{class_name} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
       raise(HotGlue::Error, exit_message)
     end
 
@@ -64,5 +63,13 @@ class AssociationField < Field
 
   def spec_list_view_assertion
 
+  end
+
+  def spec_related_column_lets
+    the_foreign_class = eval(class_name + ".reflect_on_association(:" + assoc + ")").class_name.split("::").last.underscore
+
+    hawk_keys_on_lets = (hawk_keys["#{assoc}_id".to_sym] ? ", #{auth.gsub('current_', '')}: #{auth}": "")
+
+    "  let!(:#{assoc}1) {create(:#{the_foreign_class}" +  hawk_keys_on_lets + ")}"
   end
 end

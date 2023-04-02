@@ -2,16 +2,13 @@ require 'rails/generators/erb/scaffold/scaffold_generator'
 require 'ffaker'
 require_relative './fields/field'
 require_relative './field_factory'
-
 require_relative './markup_templates/base'
 require_relative './markup_templates/erb'
-
 require_relative './layout/builder'
 require_relative './layout_strategy/base'
 require_relative './layout_strategy/bootstrap'
 require_relative './layout_strategy/hot_glue'
 require_relative './layout_strategy/tailwind'
-
 
 module HotGlue
   class Error < StandardError
@@ -95,7 +92,7 @@ module HotGlue
     source_root File.expand_path('templates', __dir__)
     attr_accessor :path, :singular, :plural, :singular_class, :nest_with,
                   :columns, :downnest_children, :layout_object, :alt_lookups,
-                  :update_show_only
+                  :update_show_only, :hawk_keys, :auth
 
     class_option :singular, type: :string, default: nil
     class_option :plural, type: :string, default: nil
@@ -682,10 +679,10 @@ module HotGlue
       }.join(", ")
 
       if @factory_creation == ''
-        "@#{singular_name } = #{ class_name }.create(modified_params)"
+        "@#{singular } = #{ class_name }.create(modified_params)"
       else
         "#{@factory_creation}\n" +
-          "    @#{singular_name } = #{ class_name }.create(modified_params#{'.merge(' + merge_with + ')' if !merge_with.empty?})"
+          "    @#{singular } = #{ class_name }.create(modified_params#{'.merge(' + merge_with + ')' if !merge_with.empty?})"
       end
     end
 
@@ -754,16 +751,9 @@ module HotGlue
     end
 
     def spec_related_column_lets
-      (@columns - @show_only - @attachments.keys).map { |col|
-        type = eval("#{singular_class}.columns_hash['#{col}']").type
-        if (type == :integer && col.to_s.ends_with?("_id") || type == :uuid)
-          assoc = "#{col.to_s.gsub('_id','')}"
-          the_foreign_class = eval(@singular_class + ".reflect_on_association(:" + assoc + ")").class_name.split("::").last.underscore
-          hawk_keys_on_lets = (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")
-
-          "  let!(:#{assoc}1) {create(:#{the_foreign_class}" +  hawk_keys_on_lets + ")}"
-        end
-      }.compact.join("\n")
+      @columns_map.collect { |col, col_object|
+        col_object.spec_related_column_lets
+      }.join("\n")
     end
 
     def list_column_headings
@@ -800,7 +790,6 @@ module HotGlue
     end
 
     def objest_nest_factory_setup
-      # TODO: figure out what this is for
       res = ""
       if @auth
         last_parent = ", #{@auth_identifier}: #{@auth}"
@@ -821,10 +810,6 @@ module HotGlue
 
     def controller_class_name
       @controller_build_name
-    end
-
-    def singular_name
-      @singular
     end
 
     def singular_class_name
@@ -1315,7 +1300,7 @@ module HotGlue
     end
 
     def controller_attachment_orig_filename_pickup_syntax
-      @attachments.collect{ |key, attachment|  "\n" + "    modified_params[:#{ attachment[:field_for_original_filename] }] = #{singular_name}_params['#{ key }'].original_filename" if attachment[:field_for_original_filename] }.compact.join("\n")
+      @attachments.collect{ |key, attachment|  "\n" + "    modified_params[:#{ attachment[:field_for_original_filename] }] = #{singular}_params['#{ key }'].original_filename" if attachment[:field_for_original_filename] }.compact.join("\n")
     end
 
     def any_datetime_fields?
