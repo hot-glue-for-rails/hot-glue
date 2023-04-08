@@ -3,7 +3,8 @@ require_relative './field.rb'
 
 class AssociationField < Field
 
-  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: , hawk_keys: , auth: )
+  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: ,
+                 hawk_keys: , auth: , sample_file_path: )
     super
     assoc_model = eval("#{class_name}.reflect_on_association(:#{assoc})")
 
