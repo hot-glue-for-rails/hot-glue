@@ -72,24 +72,7 @@ module  HotGlue
     ################################################################
 
 
-    def all_form_fields(layout_strategy: , layout_object: )
-
-      # @show_only = args[0][:show_only]
-      #
-      # @singular_class = args[0][:singular_class]
-      # @ownership_field  = args[0][:ownership_field]
-      # @form_labels_position = args[0][:form_labels_position]
-      # @form_placeholder_labels = args[0][:form_placeholder_labels]
-      # @hawk_keys = args[0][:hawk_keys]
-      # @singular = args[0][:singular]
-      # attachments = args[0][:attachments]
-      #
-      # @alt_lookups = args[0][:alt_lookups]
-      #
-      # column_classes = args[0][:col_identifier]
-      # update_show_only = args[0][:update_show_only] || []
-      # singular = @singular
-
+    def all_form_fields(layout_strategy:, layout_object: )
       column_classes = layout_strategy.column_classes_for_form_fields
       columns = layout_object[:columns][:container]
 

@@ -31,6 +31,6 @@ coverage/
 spec/dummy/app/controllers/
 spec/dummy/app/views/
 spec/dummy/app/javascript/application.js
-dummy/spec/system/
+dummy/spec/features/
 
 spec/dummy/app/javascript/controllers/dropzone_controller.js

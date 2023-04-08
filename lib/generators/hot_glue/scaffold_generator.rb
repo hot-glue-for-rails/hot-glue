@@ -1,23 +1,18 @@
 require 'rails/generators/erb/scaffold/scaffold_generator'
 require 'ffaker'
-
+require_relative './fields/field'
+require_relative './field_factory'
 require_relative './markup_templates/base'
 require_relative './markup_templates/erb'
-# require_relative './markup_templates/haml'
-# require_relative './markup_templates/slim'
-
 require_relative './layout/builder'
 require_relative './layout_strategy/base'
 require_relative './layout_strategy/bootstrap'
 require_relative './layout_strategy/hot_glue'
 require_relative './layout_strategy/tailwind'
 
-
 module HotGlue
   class Error < StandardError
   end
-
-
 
   def self.construct_downnest_object(input)
     res = input.split(",").map { |child|
@@ -95,8 +90,9 @@ module HotGlue
     hook_for :form_builder, :as => :scaffold
 
     source_root File.expand_path('templates', __dir__)
-    attr_accessor :path, :singular, :plural, :singular_class, :nest_with
-    attr_accessor :columns, :downnest_children, :layout_object
+    attr_accessor :path, :singular, :plural, :singular_class, :nest_with,
+                  :columns, :downnest_children, :layout_object, :alt_lookups,
+                  :update_show_only, :hawk_keys, :auth, :sample_file_path
 
     class_option :singular, type: :string, default: nil
     class_option :plural, type: :string, default: nil
@@ -189,6 +185,7 @@ module HotGlue
 
       yaml_from_config = YAML.load(File.read("config/hot_glue.yml"))
       @markup =  yaml_from_config[:markup]
+      @sample_file_path = yaml_from_config[:sample_file_path]
 
       if options['layout']
         layout = options['layout']
@@ -449,12 +446,7 @@ module HotGlue
 
 
       @factory_creation = options['factory_creation'].gsub(";", "\n")
-
       identify_object_owner
-
-
-
-      # SETUP FIELDS & LAYOUT
       setup_fields
 
       if  (@columns - @show_only - (@ownership_field ?  [@ownership_field.to_sym] : [])).empty?
@@ -476,34 +468,10 @@ module HotGlue
       @menu_file_exists = true if @nested_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
       @turbo_streams = !!options['with_turbo_streams']
-
-
-
-
-
-
     end
 
 
-    def fields_filtered_for_email_lookups
-      @columns.reject{|c| @alt_lookups.keys.include?(c) } + @alt_lookups.values.map{|v| ("__lookup_#{v[:lookup_as]}").to_sym}
-    end
 
-
-    def creation_syntax
-
-      merge_with = @alt_lookups.collect{ |key, data|
-        "#{data[:assoc].downcase}: #{data[:assoc].downcase}_factory.#{data[:assoc].downcase}"
-      }.join(", ")
-
-      if @factory_creation == ''
-        "@#{singular_name } = #{ class_name }.create(modified_params)"
-      else
-        "#{@factory_creation}\n" +
-        "    @#{singular_name } = #{ class_name }.create(modified_params#{'.merge(' + merge_with + ')' if !merge_with.empty?})"
-      end
-    end
-    
     def setup_hawk_keys
       @hawk_keys = {}
 
@@ -650,7 +618,6 @@ module HotGlue
     end
 
     def setup_fields
-
       if !@include_fields
         @exclude_fields.push :id, :created_at, :updated_at, :encrypted_password,
                              :reset_password_token,
@@ -673,64 +640,76 @@ module HotGlue
         @attachments.keys.each do |attachment|
           @columns << attachment if !@columns.include?(attachment)
         end
+
+        check_if_sample_file_is_present
       end
 
 
-
+      # build a new polymorphic object
       @associations = []
-
+      @columns_map = {}
       @columns.each do |col|
+        if !(@the_object.columns_hash.keys.include?(col.to_s) ||  @attachments.keys.include?(col))
+          raise "couldn't find #{col} in either field list or attachments list"
+        end
+
         if col.to_s.starts_with?("_")
           @show_only << col
         end
 
         if @the_object.columns_hash.keys.include?(col.to_s)
-          if @the_object.columns_hash[col.to_s].type == :integer
-            if col.to_s.ends_with?("_id")
-              # guess the association name label
-              assoc_name = col.to_s.gsub("_id","")
-
-
-              assoc_model = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-
-              if assoc_model.nil?
-                exit_message = "*** Oops: The model #{singular_class} is missing an association for :#{assoc_name} or the model #{assoc_name.titlecase} doesn't exist. TODO: Please implement a model for #{assoc_name.titlecase}; or add to #{singular_class} `belongs_to :#{assoc_name}`.  To make a controller that can read all records, specify with --god."
-                puts exit_message
-                raise(HotGlue::Error, exit_message)
-              end
-
-              begin
-                assoc_class = eval(assoc_model.try(:class_name))
-                @associations << assoc_name.to_sym
-                name_list = [:name, :to_label, :full_name, :display_name, :email]
-
-              rescue
-                # unreachable(?)
-                # if eval("#{singular_class}.reflect_on_association(:#{assoc_name.singularize})")
-                #   raise(HotGlue::Error,"*** Oops: #{singular_class} has no association for #{assoc_name.singularize}")
-                # else
-                #   raise(HotGlue::Error,"*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god.")
-                # end
-              end
-
-              if assoc_class && name_list.collect{ |field|
-                assoc_class.respond_to?(field.to_s) ||  assoc_class.instance_methods.include?(field)
-              }.any?
-                # do nothing here
-              else
-                exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{assoc_name} association on the #{singular_class} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
-                raise(HotGlue::Error,exit_message)
-              end
-            end
-          end
+          type =  @the_object.columns_hash[col.to_s].type
         elsif @attachments.keys.include?(col)
-
-        else
-          raise "couldn't find #{col} in either field list or attachments list"
+          type = :attachment
         end
+        this_column_object = FieldFactory.new(name: col.to_s,
+                                              generator: self,
+                                              type: type)
+        field = this_column_object.field
+        if field.is_a?(AssociationField)
+          @associations << field.assoc_name.to_sym
+        end
+        @columns_map[col] = this_column_object.field
+
+
+
       end
     end
 
+
+    def check_if_sample_file_is_present
+      if sample_file_path.nil?
+        puts "you have no sample file path set in config/hot_glue.yml"
+        settings = File.read("config/hot_glue.yml")
+        @sample_file_path = "spec/files/computer_code.jpg"
+        added_setting = ":sample_file_path: #{sample_file_path}"
+        File.open("config/hot_glue.yml", "w") { |f| f.write settings + "\n" +   added_setting }
+
+        puts "adding `#{added_setting}` to config/hot_glue.yml"
+      elsif ! File.exist?(sample_file_path)
+        puts "NO SAMPLE FILE FOUND: adding sample file at #{sample_file_path}"
+        template "computer_code.jpg", File.join("#{filepath_prefix}spec/files/", "computer_code.jpg")
+      end
+
+      puts ""
+    end
+
+    def fields_filtered_for_email_lookups
+      @columns.reject{|c| @alt_lookups.keys.include?(c) } + @alt_lookups.values.map{|v| ("__lookup_#{v[:lookup_as]}").to_sym}
+    end
+
+    def creation_syntax
+      merge_with = @alt_lookups.collect{ |key, data|
+        "#{data[:assoc].downcase}: #{data[:assoc].downcase}_factory.#{data[:assoc].downcase}"
+      }.join(", ")
+
+      if @factory_creation == ''
+        "@#{singular } = #{ class_name }.create(modified_params)"
+      else
+        "#{@factory_creation}\n" +
+          "    @#{singular } = #{ class_name }.create(modified_params#{'.merge(' + merge_with + ')' if !merge_with.empty?})"
+      end
+    end
 
     def auth_root
       "authenticate_" + @auth_identifier.split(".")[0] + "!"
@@ -755,7 +734,6 @@ module HotGlue
         if @namespace
           begin
             eval(controller_descends_from)
-            # puts "   skipping   base controller #{controller_descends_from}"
           rescue NameError => e
             template "base_controller.rb.erb", File.join("#{filepath_prefix}app/controllers#{namespace_with_dash}", "base_controller.rb")
           end
@@ -792,17 +770,14 @@ module HotGlue
       ", #{testing_name}: #{testing_name}1"
     end
 
-    def spec_related_column_lets
-      (@columns - @show_only - @attachments.keys).map { |col|
-        type = eval("#{singular_class}.columns_hash['#{col}']").type
-        if (type == :integer && col.to_s.ends_with?("_id") || type == :uuid)
-          assoc = "#{col.to_s.gsub('_id','')}"
-          the_foreign_class = eval(@singular_class + ".reflect_on_association(:" + assoc + ")").class_name.split("::").last.underscore
-          hawk_keys_on_lets = (@hawk_keys["#{assoc}_id".to_sym] ? ", #{@auth.gsub('current_', '')}: #{@auth}": "")
+    def testing_name
+      singular_class.gsub("::","_").underscore
+    end
 
-          "  let!(:#{assoc}1) {create(:#{the_foreign_class}" +  hawk_keys_on_lets + ")}"
-        end
-      }.compact.join("\n")
+    def spec_related_column_lets
+      @columns_map.collect { |col, col_object|
+        col_object.spec_related_column_lets
+      }.join("\n")
     end
 
     def list_column_headings
@@ -815,22 +790,13 @@ module HotGlue
     end
 
     def columns_spec_with_sample_data
-      (@columns - @attachments.keys).map { |c|
-        type = eval("#{singular_class}.columns_hash['#{c}']").type
-        random_data = case type
-                      when :integer
-                        rand(1...1000)
-                      when :string
-                        FFaker::AnimalUS.common_name
-                      when :text
-                        FFaker::AnimalUS.common_name
-                      when :datetime
-                        Time.now + rand(1..5).days
-                      end
-        c.to_s + ": '" + random_data.to_s + "'"
+      @columns_map.map  { |col, col_object|
+        unless col_object.is_a?(AssociationField)
+          random_data = col_object.spec_random_data
+          col.to_s + ": '" + random_data.to_s + "'"
+        end
       }.join(", ")
     end
-
 
     def regenerate_me_code
       "rails generate hot_glue:scaffold #{ @meta_args[0][0] } #{@meta_args[1].collect{|x| x.gsub(/\s*=\s*([\S\s]+)/, '=\'\1\'')}.join(" ")}"
@@ -848,7 +814,6 @@ module HotGlue
     end
 
     def objest_nest_factory_setup
-      # TODO: figure out what this is for
       res = ""
       if @auth
         last_parent = ", #{@auth_identifier}: #{@auth}"
@@ -871,18 +836,6 @@ module HotGlue
       @controller_build_name
     end
 
-    def singular_name
-      @singular
-    end
-
-    def testing_name
-      singular_class_name.gsub("::","_").underscore
-    end
-
-    def singular_class_name
-      @singular_class
-    end
-
     def plural_name
       plural
     end
@@ -891,77 +844,17 @@ module HotGlue
       @auth_identifier
     end
 
-    def test_capybara_block(which_partial = :create)
-      ((@columns - @attachments.keys) - (which_partial == :create ? @show_only : (@update_show_only+@show_only))).map { |col|
-        type = eval("#{singular_class}.columns_hash['#{col}']").type
-        case type
-        when :date
-          "      " + "new_#{col} = Date.current + (rand(100).days) \n" +
-            '      ' + "find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-        when :time
-          # "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
-          # '      ' + "find(\"[name='#{singular}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+    def capybara_make_updates(which_partial = :create)
+      @columns_map.map { | col, col_obj|
+        show_only_list = which_partial == :create ? @show_only : (@update_show_only+@show_only)
 
-        when :datetime
-          "      " + "new_#{col} = DateTime.current + (rand(100).days) \n" +
-            '      ' + "find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-
-        when :integer
-          if col.to_s.ends_with?("_id")
-            capybara_block_for_association(col_name: col, which_partial: which_partial)
-          else
-            "      new_#{col} = rand(10) \n" +
-            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-          end
-        when :float
-          "      " + "new_#{col} = rand(10) \n" +
-            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-        when :uuid
-          capybara_block_for_association(col_name: col, which_partial: which_partial)
-
-        when :enum
-          "      list_of_#{col.to_s} = #{singular_class}.defined_enums['#{col.to_s}'].keys \n" +
-            "      " + "new_#{col.to_s} = list_of_#{col.to_s}[rand(list_of_#{col.to_s}.length)].to_s \n" +
-            '      find("select[name=\'' + singular + '[' + col.to_s + ']\']  option[value=\'#{new_' + col.to_s + '}\']").select_option'
-
-        when :boolean
-          "      new_#{col} = 1 \n" +
-            "      find(\"[name='#{testing_name}[#{col}]'][value='\#{new_" + col.to_s + "}']\").choose"
-        when :string
-          faker_string =
-            if col.to_s.include?('email')
-              "FFaker::Internet.email"
-            elsif  col.to_s.include?('domain')
-              "FFaker::Internet.domain_name"
-            elsif col.to_s.include?('ip_address') || col.to_s.ends_with?('_ip')
-              "FFaker::Internet.ip_v4_address"
-            else
-              "FFaker::Movie.title"
-            end
-            "      " + "new_#{col} = #{faker_string} \n" +
-            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
-        when :text
-          "      " + "new_#{col} = FFaker::Lorem.paragraphs(1).join("") \n" +
-            "      find(\"[name='#{testing_name}[#{ col.to_s }]']\").fill_in(with: new_#{col.to_s})"
+        if show_only_list.include?(col)
+          "      page.should have_no_selector(:css, \"[name='#{testing_name}[#{ col.to_s }]'\")"
+        else
+          col_obj.spec_setup_and_change_act(which_partial)
         end
-
       }.join("\n")
     end
-
-
-    def capybara_block_for_association(col_name: nil , which_partial: nil )
-      assoc = col_name.to_s.gsub('_id','')
-      if which_partial == :update && @update_show_only.include?(col_name)
-        # do not update tests
-      elsif @alt_lookups.keys.include?(col_name.to_s)
-        lookup = @alt_lookups[col_name.to_s][:lookup_as]
-        "      find(\"[name='#{singular}[__lookup_#{lookup}]']\").fill_in( with: #{assoc}1.#{lookup} )"
-      else
-        "      #{col_name}_selector = find(\"[name='#{singular}[#{col_name}]']\").click \n" +
-          "      #{col_name}_selector.first('option', text: #{assoc}1.name).select_option"
-      end
-    end
-
 
     def path_helper_args
       if @nested_set.any? && @nested
@@ -1090,10 +983,8 @@ module HotGlue
         else
           "@" + @nested_set.last[:singular] + ".#{plural}"
         end
-
       end
     end
-
 
     def all_objects_root
       if @auth
@@ -1125,7 +1016,6 @@ module HotGlue
       !Gem::Specification.sort_by{ |g| [g.name.downcase, g.version] }.group_by{ |g| g.name }['devise']
     end
 
-
     def magic_button_output
       @template_builder.magic_button_output(
         path: HotGlue.optionalized_ternary(namespace: @namespace,
@@ -1142,7 +1032,6 @@ module HotGlue
     def nav_template
       "#{namespace_with_trailing_dash}nav"
     end
-
 
     def include_nav_template
       File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}")
@@ -1179,15 +1068,6 @@ module HotGlue
 
         end
       end
-
-      # menu_file = "app/views#{namespace_with_dash}/menu.erb"
-      #
-      # if File.exist?(menu_file)
-      #   # TODO: can I insert the new menu item into the menu programatically here?
-      #   # not sure how i would achieve this without nokogiri
-      #
-      # end
-
     end
 
     def append_model_callbacks
@@ -1222,11 +1102,7 @@ module HotGlue
     end
 
     def namespace_with_trailing_dash
-      if @namespace
-        "#{@namespace}/"
-      else
-        ""
-      end
+      @namespace ? "#{@namespace}/" : ""
     end
 
     def all_views
@@ -1272,7 +1148,6 @@ module HotGlue
       false
     end
 
-
     def model_search_fields # an array of fields we can search on
       []
     end
@@ -1296,11 +1171,6 @@ module HotGlue
         perc_width: @layout_strategy.each_col,     #undefined method `each_col'
         layout_strategy: @layout_strategy,
         layout_object: @layout_object
-        # columns:  @layout_object[:columns][:container],
-        # show_only: @show_only,
-        # singular_class: singular_class,
-        # singular: singular,
-        # attachments: @attachments
       )
     end
 
@@ -1311,8 +1181,6 @@ module HotGlue
         "ApplicationController"
       end
     end
-
-
 
     def display_class
       me = eval(singular_class)
@@ -1367,7 +1235,7 @@ module HotGlue
         flash[:notice] = (flash[:notice] || \"\") <<  (res ? res + \" \" : \"\")
       rescue ActiveRecord::RecordInvalid => e
         @#{singular}.errors.add(:base, e.message)
-        flash[:alert] = (flash[:alert] || \"\") << 'There was ane error #{magic_button}ing your #{@singular}: '
+        flash[:alert] = (flash[:alert] || \"\") << 'There was an error #{magic_button}ing your #{@singular}: '
       end
     end"
 
@@ -1439,7 +1307,7 @@ module HotGlue
     end
 
     def controller_attachment_orig_filename_pickup_syntax
-      @attachments.collect{ |key, attachment|  "\n" + "    modified_params[:#{ attachment[:field_for_original_filename] }] = #{singular_name}_params['#{ key }'].original_filename" if attachment[:field_for_original_filename] }.compact.join("\n")
+      @attachments.collect{ |key, attachment|  "\n" + "    modified_params[:#{ attachment[:field_for_original_filename] }] = #{singular}_params['#{ key }'].original_filename" if attachment[:field_for_original_filename] }.compact.join("\n")
     end
 
     def any_datetime_fields?

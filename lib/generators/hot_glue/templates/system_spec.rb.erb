@@ -1,55 +1,20 @@
-require 'rails_helper'
+<% item1_addOns = ""
+ if (eval(@singular_class).instance_methods.include?(display_class.to_s))
+  item1_addOns << "#{display_class}: FFaker::Name.name"
+ end
+item1_addOns << ", " + @columns_map.collect{|col, col_object|
+  col_object.spec_setup_let_arg
+}.compact.join(", ")
+%>require 'rails_helper'
 
 describe 'interaction for <%= controller_class_name %>' do
   include HotGlue::ControllerHelper
   include ActionView::RecordIdentifier
 
   <%= @existing_content %>
-  <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
+  <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<% end %>
 <%= spec_related_column_lets %>
-  <% item1_addOns = ""
-   if (eval(@singular_class).instance_methods.include?(display_class.to_s))
-    item1_addOns << "#{display_class}: FFaker::Name.name"
-   end
-
-  item1_addOns << ", " + (@columns - @attachments.keys.collect(&:to_sym)).map { |col|
-  type = eval("#{singular_class}.columns_hash['#{col}']").type
-  case type
-  when :string
-    faker_string =
-    if col.to_s.include?('email')
-      "#{col}: FFaker::Internet.email"
-    elsif  col.to_s.include?('domain')
-      "#{col}: FFaker::Internet.domain_name"
-    elsif col.to_s.include?('ip_address') || col.to_s.ends_with?('_ip')
-      "#{col}: FFaker::Internet.ip_v4_address"
-    else
-      "#{col}: FFaker::Movie.title"
-    end
-  when :text
-    "#{col}:  FFaker::Lorem.paragraphs(10).join("  ")"
-
-  when :float
-    "#{col}: rand(1)*10000"
-  when :boolean
-    "#{col}: !!rand(2).floor"
-  when :time
-    "#{col}: Time.current + rand(5000).seconds"
-  when :date
-    "#{col}: Date.current + rand(50).days"
-  when :datetime
-    "#{col}: DateTime.current + rand(1000).seconds"
-  when :integer
-    if col.to_s.ends_with?("_id")
-      "#{col.to_s.gsub('_id','')}: #{col.to_s.gsub('_id','')}1"
-    else
-     "#{col}: rand(100)"
-    end
-  when :uuid
-    "#{col.to_s.gsub('_id','')}: #{col.to_s.gsub('_id','')}1"
-  end
-}.compact.join(", ")
-  %>let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )}
+  let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )}
 <%= objest_nest_factory_setup %> <% unless @god || @existing_content.include?("login_as")%>
   before do
     login_as(<%= @auth %>)
@@ -60,36 +25,7 @@ describe 'interaction for <%= controller_class_name %>' do
   describe "index" do
     it "should show me the list" do
       visit <%= path_helper_plural %>
-<%=
-(@columns - @attachments.keys.collect(&:to_sym)).map { |col|
-  type = eval("#{singular_class}.columns_hash['#{col}']").type
-
-  case type
-  when :datetime
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(current_timezone)  )"].join("\n      ")
-  when :integer
-    if !col.ends_with?("_id")
-      "      " + ["expect(page).to have_content(#{singular}#{1}.#{col})"].join("\n      ")
-    end
-  when :uuid
-    assoc_name = col.to_s.gsub('_id','')
-    association = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{assoc_name}.#{HotGlue.derrive_reference_name(association.class_name)})"].join("\n      ")
-  when :enum
-    if(eval("#{singular_class}.respond_to?(:#{col}_labels)"))
-     "      " + "expect(page).to have_content(#{singular_class}.#{col}_labels[#{singular}#{1}.#{col}])"
-    else
-     "      " + "expect(page).to have_content(#{singular}1.#{col})"
-    end
-
-  when :boolean
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{col} ? 'YES' : 'NO')"].join("\n      ")
-  else
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{col})"].join("\n      ")
-  end
-
-}.join("\n")
-      %>
+      <%= @columns_map.collect{|col, col_object| col_object.spec_list_view_assertion }   %>
     end
   end
 
@@ -98,40 +34,17 @@ describe 'interaction for <%= controller_class_name %>' do
       visit <%= path_helper_plural %>
       click_link "<%= @new_button_label %>"
       expect(page).to have_selector(:xpath, './/h3[contains(., "<%= @new_button_label %>")]')
-<%= test_capybara_block(:create) %>
+<%= capybara_make_updates(:create) %>
       click_button "Save"
       expect(page).to have_content("Successfully created")
-<%="      " +
 
-  ((@columns - @attachments.keys.collect(&:to_sym)) - @show_only).map { |col|
-    type = eval("#{singular_class}.columns_hash['#{col}']").type
-
-    case type
-    when :datetime
-      #    "      expect(page).to have_content(#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y')  + \" @ \" +
-      # new_#{col}.in_time_zone(current_timezone).strftime('%l').strip + \":\" +
-      # new_#{col}.in_time_zone(current_timezone).strftime('%M %p').strip + \" \" +
-      # timezonize(current_timezone))"
-    when :integer
-      if col.to_s.ends_with?("_id")
-        # shoould the assoication be on here
-      else
-         "expect(page).to have_content(new_#{col})"
-      end
-
-    when :boolean
-        ["expect(page).to have_content(#{singular}#{1}.#{col} ? 'YES' : 'NO')"].join("\n      ")
-    when :enum
-      if(eval("#{singular_class}.respond_to?(:#{col}_labels)"))
-        "expect(page).to have_content(#{singular_class}.#{col}_labels[new_#{col}])"
-      else
-        "expect(page).to have_content(new_#{col})"
-      end
-    else
-      "expect(page).to have_content(new_#{col})"
-    end
-
-  }.compact.join("\n      ")
+<%="      " + @columns_map.map{ |col, col_object|
+  if @attachments.keys.collect(&:to_sym).include?(col)
+  elsif @show_only.include?(col)
+  else
+      col_object.spec_make_assertion
+  end
+ }.compact.join("\n      ")
   %>
     end
   end<% end %>
@@ -143,10 +56,10 @@ describe 'interaction for <%= controller_class_name %>' do
       find("a.edit-<%= singular %>-button[href='/<%= namespace_with_slash %><%= plural %>/#{<%= singular %>1.id}/edit']").click
 
       expect(page).to have_content("Editing #{<%= singular %>1.<%= @display_class %>.squish || "(no name)"}")
-<%= test_capybara_block(:update) %>
+<%= capybara_make_updates(:update) %>
       click_button "Save"
       within("turbo-frame#<%= @namespace %>__#{dom_id(<%= singular %>1)} ") do
-<%= ((@columns - @attachments.keys.collect(&:to_sym)) - @show_only).map { |col|
+<%= ((@columns - @attachments.keys.collect(&:to_sym)) - (@show_only+@update_show_only)).map { |col|
       type = eval("#{singular_class}.columns_hash['#{col}']").type
 
       if type == :uuid || (type == :integer && col.to_s.ends_with?("_id"))
