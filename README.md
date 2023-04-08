@@ -1208,6 +1208,14 @@ Now, your labels will show up on the front-end as defined in the `_labels` ("Is 
 
 
 # VERSION HISTORY
+#### 2023-04-08 - v0.5.9.2
+• This begins a refactor of the field knowledge into properly abstracted Field objects
+• No functional changes, except that the specs now contain an `attach_file` for attachments.
+
+#### - v0.5.9.1
+• Fixed issue with ownership fields coming through as associations.
+
+
 
 #### 2023-03-17 - v0.5.9
 - Attachments! You can use Hot Glue to seamlessly create an image, file, or video attachment. Please see the docs in new flag `--atachments` under the "Special Features" section
