@@ -92,7 +92,7 @@ module HotGlue
     source_root File.expand_path('templates', __dir__)
     attr_accessor :path, :singular, :plural, :singular_class, :nest_with,
                   :columns, :downnest_children, :layout_object, :alt_lookups,
-                  :update_show_only, :hawk_keys, :auth
+                  :update_show_only, :hawk_keys, :auth, :sample_file_path
 
     class_option :singular, type: :string, default: nil
     class_option :plural, type: :string, default: nil
@@ -185,6 +185,7 @@ module HotGlue
 
       yaml_from_config = YAML.load(File.read("config/hot_glue.yml"))
       @markup =  yaml_from_config[:markup]
+      @sample_file_path = yaml_from_config[:sample_file_path]
 
       if options['layout']
         layout = options['layout']
@@ -639,6 +640,8 @@ module HotGlue
         @attachments.keys.each do |attachment|
           @columns << attachment if !@columns.include?(attachment)
         end
+
+        check_if_sample_file_is_present
       end
 
 
@@ -646,26 +649,49 @@ module HotGlue
       @associations = []
       @columns_map = {}
       @columns.each do |col|
-        if @the_object.columns_hash.keys.include?(col.to_s)
-
-          if col.to_s.starts_with?("_")
-            @show_only << col
-          end
-
-          this_column_object = FieldFactory.new(name: col.to_s,
-                                                generator: self,
-                                                type: @the_object.columns_hash[col.to_s].type)
-          field = this_column_object.field
-          if field.is_a?(AssociationField)
-            @associations << field.assoc_name.to_sym
-          end
-          @columns_map[col] = this_column_object.field
-        elsif @attachments.keys.include?(col)
-
-        else
+        if !(@the_object.columns_hash.keys.include?(col.to_s) ||  @attachments.keys.include?(col))
           raise "couldn't find #{col} in either field list or attachments list"
         end
+
+        if col.to_s.starts_with?("_")
+          @show_only << col
+        end
+
+        if @the_object.columns_hash.keys.include?(col.to_s)
+          type =  @the_object.columns_hash[col.to_s].type
+        elsif @attachments.keys.include?(col)
+          type = :attachment
+        end
+        this_column_object = FieldFactory.new(name: col.to_s,
+                                              generator: self,
+                                              type: type)
+        field = this_column_object.field
+        if field.is_a?(AssociationField)
+          @associations << field.assoc_name.to_sym
+        end
+        @columns_map[col] = this_column_object.field
+
+
+
       end
+    end
+
+
+    def check_if_sample_file_is_present
+      if sample_file_path.nil?
+        puts "you have no sample file path set in config/hot_glue.yml"
+        settings = File.read("config/hot_glue.yml")
+        @sample_file_path = "spec/files/computer_code.jpg"
+        added_setting = ":sample_file_path: #{sample_file_path}"
+        File.open("config/hot_glue.yml", "w") { |f| f.write settings + "\n" +   added_setting }
+
+        puts "adding `#{added_setting}` to config/hot_glue.yml"
+      elsif ! File.exist?(sample_file_path)
+        puts "NO SAMPLE FILE FOUND: adding sample file at #{sample_file_path}"
+        template "computer_code.jpg", File.join("#{filepath_prefix}spec/files/", "computer_code.jpg")
+      end
+
+      puts ""
     end
 
     def fields_filtered_for_email_lookups
@@ -708,7 +734,6 @@ module HotGlue
         if @namespace
           begin
             eval(controller_descends_from)
-            # puts "   skipping   base controller #{controller_descends_from}"
           rescue NameError => e
             template "base_controller.rb.erb", File.join("#{filepath_prefix}app/controllers#{namespace_with_dash}", "base_controller.rb")
           end
@@ -820,12 +845,10 @@ module HotGlue
     end
 
     def capybara_make_updates(which_partial = :create)
-
       @columns_map.map { | col, col_obj|
         show_only_list = which_partial == :create ? @show_only : (@update_show_only+@show_only)
 
-        if @attachments.keys.include?(col)
-        elsif  show_only_list.include?(col)
+        if show_only_list.include?(col)
           "      page.should have_no_selector(:css, \"[name='#{testing_name}[#{ col.to_s }]'\")"
         else
           col_obj.spec_setup_and_change_act(which_partial)

@@ -3,10 +3,10 @@ class Field
                 :update_show_only
   attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :assoc_label
 
-  attr_accessor :hawk_keys, :auth
+  attr_accessor :hawk_keys, :auth, :sample_file_path
 
   def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: ,
-                 hawk_keys: , auth: )
+                 hawk_keys: , auth: , sample_file_path: nil)
     @name = name
     @alt_lookups = alt_lookups
     @singular = singular
@@ -14,6 +14,7 @@ class Field
     @update_show_only = update_show_only
     @hawk_keys = hawk_keys
     @auth = auth
+    @sample_file_path = sample_file_path
   end
 
   def getName

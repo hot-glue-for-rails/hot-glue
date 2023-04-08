@@ -9,6 +9,7 @@ require_relative "fields/string_field"
 require_relative "fields/text_field"
 require_relative "fields/time_field"
 require_relative "fields/uuid_field"
+require_relative "fields/attachment_field"
 
 
 class FieldFactory
@@ -39,7 +40,9 @@ class FieldFactory
               BooleanField
             when :enum
               EnumField
-                  end
+            when :attachment
+              AttachmentField
+            end
     @class_name = class_name
 
     @field = field_class.new(name: name,
@@ -48,6 +51,7 @@ class FieldFactory
                              class_name: generator.singular_class,
                              alt_lookups: generator.alt_lookups,
                              singular: generator.singular,
-                             update_show_only: generator.update_show_only)
+                             update_show_only: generator.update_show_only,
+                             sample_file_path: generator.sample_file_path)
   end
 end
