@@ -8,35 +8,29 @@ module  HotGlue
                   :inline_list_labels, :layout_object,
                   :columns,  :col_identifier, :singular,
                   :form_placeholder_labels, :hawk_keys, :update_show_only,
-                  :alt_lookups, :attachments, :show_only
+                  :alt_lookups, :attachments, :show_only, :columns_map, :attachments
 
 
-    def initialize(singular:, singular_class: ,
-                   layout_strategy: , magic_buttons: ,
-                   small_buttons: , show_only: ,
-                   ownership_field: , form_labels_position: ,
-                   inline_list_labels: ,
-                   form_placeholder_labels:, hawk_keys:,
-                   update_show_only:, alt_lookups: , attachments: )
+    def initialize(singular:, singular_class: , layout_strategy: , magic_buttons: ,  small_buttons: , show_only: ,
+                   ownership_field: , form_labels_position: ,  inline_list_labels: , form_placeholder_labels:,
+                   hawk_keys:,  update_show_only:, alt_lookups: , attachments: , columns_map:   )
 
-      @singular = singular
-      @singular_class = singular_class
-
-      @magic_buttons = magic_buttons
-      @small_buttons = small_buttons
-      @layout_strategy = layout_strategy
-      @show_only = show_only
-      @ownership_field = ownership_field
-
-      @form_labels_position = form_labels_position
-
-      @inline_list_labels = inline_list_labels
-      @singular = singular
-      @form_placeholder_labels = form_placeholder_labels
-      @hawk_keys = hawk_keys
-      @update_show_only = update_show_only
       @alt_lookups = alt_lookups
       @attachments = attachments
+      @columns_map = columns_map
+      @form_placeholder_labels = form_placeholder_labels
+      @form_labels_position = form_labels_position
+      @hawk_keys = hawk_keys
+      @inline_list_labels = inline_list_labels
+      @layout_strategy = layout_strategy
+      @magic_buttons = magic_buttons
+      @ownership_field = ownership_field
+      @show_only = show_only
+      @singular = singular
+      @singular = singular
+      @singular_class = singular_class
+      @small_buttons = small_buttons
+      @update_show_only = update_show_only
     end
 
     def add_spaces_each_line(text, num_spaces)
@@ -76,21 +70,27 @@ module  HotGlue
       column_classes = layout_strategy.column_classes_for_form_fields
       columns = layout_object[:columns][:container]
 
-      result = columns.map{ |column|
-        "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
-          column.map { |col|
-            if attachments.keys.include?(col)
-              this_attachment  = attachments[col]
-              thumbnail = this_attachment[:thumbnail]
-              direct = this_attachment[:direct_upload]
-              dropzone = this_attachment[:dropzone]
-              field_result = (this_attachment[:thumbnail] ?   "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "") +
-                "<br />\n" + (update_show_only.include?(col) ? "" : "<%= f.file_field :#{col} #{', direct_upload: true ' if direct}#{', "data-dropzone-target": "input"' if dropzone}%>")
 
-              if dropzone
-                field_result = "<div class=\"dropzone dropzone-default dz-clickable\" data-controller=\"dropzone\" data-dropzone-max-file-size=\"2\" data-dropzone-max-files=\"1\">\n  "+ field_result + "\n</div>"
-              end
-              field_error_name = col
+      result = columns.map{ |outer_column| # the outer column might be several fields together
+        "  <div class='#{column_classes} cell--#{singular}--#{outer_column.join("-")}' >" +
+          outer_column.map { |col|
+
+
+            if attachments.keys.include?(col)
+              field_result = columns_map[col].form_field_output
+              field_error_name = columns_map[col].field_error_name
+
+              # this_attachment  = attachments[col]
+              # thumbnail = this_attachment[:thumbnail]
+              # direct = this_attachment[:direct_upload]
+              # dropzone = thierb_spec.rbs_attachment[:dropzone]
+              # field_result = (this_attachment[:thumbnail] ?   "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "") +
+              #   "<br />\n" + (update_show_only.include?(col) ? "" : "<%= f.file_field :#{col} #{', direct_upload: true ' if direct}#{', "data-dropzone-target": "input"' if dropzone}%>")
+              #
+              # if dropzone
+              #   field_result = "<div class=\"dropzone dropzone-default dz-clickable\" data-controller=\"dropzone\" data-dropzone-max-file-size=\"2\" data-dropzone-max-files=\"1\">\n  "+ field_result + "\n</div>"
+              # end
+              # field_error_name = col
             else
 
               type = eval("#{singular_class}.columns_hash['#{col}']").type
@@ -132,6 +132,8 @@ module  HotGlue
               end
 
             end
+
+
             the_label = "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
             show_only_open = ""
             show_only_close = ""
@@ -141,10 +143,13 @@ module  HotGlue
               show_only_close = "<% end %>"
             end
 
+            form_labels_before = (form_labels_position == 'before' ? the_label : "")
+            form_labels_after = (form_labels_position == 'after' ? the_label : "")
+
             add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
-                                    add_spaces_each_line( (form_labels_position == 'before' ? the_label : "") +
+                                    add_spaces_each_line( form_labels_before +
                                                             show_only_open +  field_result + show_only_close +
-                                                            (form_labels_position == 'after' ? the_label : "")   , 4) +
+                                                            form_labels_after , 4) +
                                     "\n  </span>\n  <br />", 2)
 
           }.join("") + "\n  </div>"

@@ -45,7 +45,8 @@ describe HotGlue::ErbTemplate do
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
       alt_lookups: {},
-      attachments: {})
+      attachments: {},
+      columns_map: {jkl: {}})
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy,
                                        layout_object: layout_object)
@@ -87,7 +88,8 @@ describe HotGlue::ErbTemplate do
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
       alt_lookups: [],
-      attachments: {})
+      attachments: {},
+      columns_map: {jkl: {}})
 
     @template_builder.all_line_fields( perc_width: 15,
                                          layout_strategy: layout_strategy,

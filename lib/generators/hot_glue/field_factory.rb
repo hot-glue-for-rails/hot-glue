@@ -14,7 +14,7 @@ require_relative "fields/attachment_field"
 
 class FieldFactory
   attr_accessor :field, :class_name
-  def initialize(type: , name: , generator: )
+  def initialize(type: , name: , generator: , data: {})
     field_class = case type
              when :integer
                if name.to_s.ends_with?("_id")
@@ -52,6 +52,7 @@ class FieldFactory
                              alt_lookups: generator.alt_lookups,
                              singular: generator.singular,
                              update_show_only: generator.update_show_only,
+                             attachment_data: data,
                              sample_file_path: generator.sample_file_path)
   end
 end

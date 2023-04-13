@@ -299,6 +299,15 @@ module HotGlue
         raise HotGlue::Error, "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
       end
 
+      @factory_creation = options['factory_creation'].gsub(";", "\n")
+
+      identify_object_owner
+
+      setup_fields
+
+      if  (@columns - @show_only - (@ownership_field ?  [@ownership_field.to_sym] : [])).empty?
+        @no_field_form = true
+      end
 
 
       if  @markup == "erb"
@@ -317,6 +326,8 @@ module HotGlue
           form_placeholder_labels: @form_placeholder_labels,
           alt_lookups: @alt_lookups,
           attachments: @attachments,
+          columns_map: @columns_map,
+          attachments: @attachments
         )
       elsif  @markup == "slim"
         raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
@@ -445,13 +456,7 @@ module HotGlue
       end
 
 
-      @factory_creation = options['factory_creation'].gsub(";", "\n")
-      identify_object_owner
-      setup_fields
 
-      if  (@columns - @show_only - (@ownership_field ?  [@ownership_field.to_sym] : [])).empty?
-        @no_field_form = true
-      end
 
       buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
@@ -659,12 +664,16 @@ module HotGlue
 
         if @the_object.columns_hash.keys.include?(col.to_s)
           type =  @the_object.columns_hash[col.to_s].type
+          data = {}
         elsif @attachments.keys.include?(col)
           type = :attachment
+          data = @attachments[col]
         end
+
         this_column_object = FieldFactory.new(name: col.to_s,
                                               generator: self,
-                                              type: type)
+                                              type: type,
+                                              data: data)
         field = this_column_object.field
         if field.is_a?(AssociationField)
           @associations << field.assoc_name.to_sym
