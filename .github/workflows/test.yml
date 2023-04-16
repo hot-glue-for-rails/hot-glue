@@ -12,4 +12,5 @@ jobs:
           # Not needed with a .ruby-version file
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
+      - run: rspec
       - run: script/test

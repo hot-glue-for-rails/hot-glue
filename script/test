@@ -4,10 +4,6 @@ clean_generated_code() {
 ./clean_generated_code
 }
 
-echo "Internal test suite for Hot Glue  (install, basic commands)..."
-# the internal specs test only Hot Glue's command line usage
-rspec spec
-
 script/clean_generated_code
 
 echo "Integration test suite for Hot Glue..."
@@ -45,9 +41,9 @@ rails generate hot_glue:scaffold Human --gd
 # --alt-lookup-foreign-keys
 # --factory-creation
 
+puts "running rspec...."
 
-
-rspec spec || exit
+rspec || exit
 
 cd ../
 
