@@ -1208,6 +1208,9 @@ Now, your labels will show up on the front-end as defined in the `_labels` ("Is 
 
 
 # VERSION HISTORY
+#### 2023-04-19 - renamed previous version to v0.5.11
+
+
 #### 2023-04-08 - v0.5.9.2
 • This begins a refactor of the field knowledge into properly abstracted Field objects
 • No functional changes, except that the specs now contain an `attach_file` for attachments.
