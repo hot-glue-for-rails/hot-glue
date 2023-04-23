@@ -16,16 +16,21 @@ describe HotGlue::ErbTemplate do
   # t.timestamps
 
   let(:layout_strategy) {
-
     LayoutStrategy::HotGlue.new(OpenStruct.new({}))
   }
+
+  let(:generator) {
+
+  }
   def factory_all_form_fields(options)
+    generator =  OpenStruct.new(downnest_object: {} ,
+                             columns: options[:columns],
+                             smart_layout: false,
+                              bootstrap_column_width: 2)
 
     builder = HotGlue::Layout::Builder.new(include_setting: '',
-                                           downnest_object: {},
-                                           buttons_width: 0,
-                                           columns: options[:columns],
-                                           smart_layout: false )
+                                           generator: generator,
+                                           buttons_width: 0,)
     layout_object = builder.construct
 
 
@@ -53,23 +58,19 @@ describe HotGlue::ErbTemplate do
   end
 
   def factory_all_line_fields(options)
-    # @template_builder.all_line_fields({
-    #                                     form_labels_position: 'after',
-    #                                     columns: [:name, :blurb],
-    #                                     show_only: [],
-    #                                     singular_class: Jkl,
-    #                                     singular: "jkl",
-    #                                     perc_width: 15,
-    #                                     col_identifier:  "col-md-2",
-    #                                     ownership_field: "hgi"
-    #                                   }.merge(options)
-    # )
+
+
+    generator =  OpenStruct.new(downnest_object: {} ,
+                                columns: options[:columns],
+                                smart_layout: false,
+                                buttons_width: 0,
+                                bootstrap_column_width: 2)
 
     builder = HotGlue::Layout::Builder.new(include_setting: '',
-                                           downnest_object: {},
-                                           buttons_width: 0,
-                                           columns: options[:columns],
-                                           smart_layout: false )
+                                           generator: generator,
+                                           buttons_width: 0)
+
+
     layout_object = builder.construct
 
 
