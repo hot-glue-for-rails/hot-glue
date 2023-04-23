@@ -2,18 +2,6 @@ name: Test
 on: [ push, pull_request ]
 
 jobs:
-#  build:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: Set up Ruby
-#        uses: ruby/setup-ruby@v1
-#        with:
-#          # Not needed with a .ruby-version file
-#          # runs 'bundle install' and caches installed gems automatically
-#          bundler-cache: true
-#      - run: bundle install
-
   internal_tests:
     runs-on: ubuntu-latest
     steps:
