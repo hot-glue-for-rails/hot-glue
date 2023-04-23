@@ -91,7 +91,7 @@ module HotGlue
 
           else
             layout_object[:columns][:container] = (0..available_columns-1).collect { |x|
-              [ columns[x]]
+              [ columns[x] ]
             }
             layout_object[:columns][:container] = (0..available_columns-1).collect { |x|  [columns[x]] }
             layout_object[:columns][:container].reject!{|x| x == [nil]}

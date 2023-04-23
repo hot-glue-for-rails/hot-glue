@@ -73,14 +73,14 @@ describe HotGlue::Layout::Builder do
       it "should concat the two fields into one column " do
         generator =  OpenStruct.new(downnest_object: {get_emails_rules: 4} ,
                                     columns: [:api_key, :api_id],
-                                    smart_layout: true,
-                                    bootstrap_column_width: 2,
-                                    include_setting: "api_key,api_id:")
+                                    smart_layout: false,
+                                    bootstrap_column_width: 2  )
 
-        builder = HotGlue::Layout::Builder.new(include_setting: '',
+        builder = HotGlue::Layout::Builder.new(include_setting: "api_key,api_id:",
                                                generator: generator,
                                                buttons_width: 2)
         result = builder.construct
+
         expect(result[:columns][:container]).to eq([[:api_key, :api_id]])
         expect(result[:portals][:get_emails_rules][:size]).to eq(4)
       end
@@ -137,7 +137,7 @@ describe HotGlue::Layout::Builder do
     end
 
 
-    describe "When not specified grouping mode and when not smarty layouts" do
+    describe "When not specified grouping mode and when not smart layouts" do
       it "should just give 1 column per field" do
 
         generator =  OpenStruct.new(downnest_object: {} ,
