@@ -1208,6 +1208,12 @@ Now, your labels will show up on the front-end as defined in the `_labels` ("Is 
 
 
 # VERSION HISTORY
+#### TBR — adds new option for bootstrap_column_width (default to 2)
+- You can specify this as a builder option (`--bootstrap-column-width`)
+or in your `config/hot_glue.yml` file. Passing option will override config setting
+
+
+
 #### 2023-04-19 - renamed previous version to v0.5.11
 
 

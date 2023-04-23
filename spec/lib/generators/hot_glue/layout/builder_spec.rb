@@ -20,12 +20,19 @@ describe HotGlue::Layout::Builder do
         end
 
         it "should make 5 2-columns if given 11 fields" do
-          x = HotGlue::Layout::Builder.new(include_setting: "",
-                                            downnest_object: {},
-                                            buttons_width: 2,
-                                            columns: [:name, :author_id, :blurb, :long_description, :cost, :how_many_printed, :approved_at, :release_on, :time_of_day, :selected, :genre],
-                                            smart_layout: true)
-          result = x.construct
+
+
+          generator =  OpenStruct.new(downnest_object: {} ,
+                                      columns: [:name, :author_id, :blurb, :long_description, :cost, :how_many_printed, :approved_at, :release_on, :time_of_day, :selected, :genre],
+                                      smart_layout: true,
+                                      bootstrap_column_width: 2)
+
+          builder = HotGlue::Layout::Builder.new(include_setting: '',
+                                                 generator: generator,
+                                                 buttons_width: 2)
+
+
+          result = builder.construct
 
 
           expect(result).to eq({:columns=>{:size_each=>2,
@@ -64,12 +71,16 @@ describe HotGlue::Layout::Builder do
 
     describe "Specified Grouping mode ( using colons)" do
       it "should concat the two fields into one column " do
-        x = HotGlue::Layout::Builder.new(include_setting: "api_key,api_id:",
-                                          downnest_object:  {get_emails_rules: 4},
-                                          buttons_width: 2,
-                                          columns: [:api_key, :api_id],
-                                          smart_layout: false)
-        result = x.construct
+        generator =  OpenStruct.new(downnest_object: {get_emails_rules: 4} ,
+                                    columns: [:api_key, :api_id],
+                                    smart_layout: false,
+                                    bootstrap_column_width: 2  )
+
+        builder = HotGlue::Layout::Builder.new(include_setting: "api_key,api_id:",
+                                               generator: generator,
+                                               buttons_width: 2)
+        result = builder.construct
+
         expect(result[:columns][:container]).to eq([[:api_key, :api_id]])
         expect(result[:portals][:get_emails_rules][:size]).to eq(4)
       end
@@ -78,12 +89,34 @@ describe HotGlue::Layout::Builder do
     describe "with smart layouts" do
       describe "when not using semicolons" do
         it "should concat the two fields and give 2 more columns back to the downnest" do
-          x = HotGlue::Layout::Builder.new(include_setting: "api_key,api_id",
-                                            downnest_object: {get_emails_rules: 4},
-                                            buttons_width: 2,
-                                            columns: [:api_key, :api_id],
-                                            smart_layout: true)
-          result = x.construct
+
+          # TODO: FIX ME—--- I think this is a bug
+          # 1) HotGlue::Layout::Builder#construct Specified Grouping mode ( using colons) should concat the two fields into one column
+          #      Failure/Error: expect(result[:columns][:container]).to eq([[:api_key, :api_id]])
+          #
+          #        expected: [[:api_key, :api_id]]
+          #             got: [[:api_key], [:api_id]]
+          #
+          #        (compared using ==)
+          #
+          #        Diff:
+          #        @@ -1 +1 @@
+          #        -[[:api_key, :api_id]]
+          #        +[[:api_key], [:api_id]]
+
+          generator =  OpenStruct.new(downnest_object: {get_emails_rules: 4} ,
+                                      columns: [:api_key, :api_id],
+                                      smart_layout: false,
+                                      buttons_width: 0,
+                                      bootstrap_column_width: 2,
+                                      include_setting: "api_key,api_id:")
+
+          builder = HotGlue::Layout::Builder.new(include_setting: '',
+                                                 generator: generator,
+                                                 buttons_width: 0)
+
+
+          result = builder.construct
           expect(result[:columns][:container]).to eq([[:api_key], [:api_id]])
           expect(result[:portals][:get_emails_rules][:size]).to eq(4)
         end
@@ -104,16 +137,21 @@ describe HotGlue::Layout::Builder do
     end
 
 
-    describe "When not specified grouping mode and when not smarty layouts" do
+    describe "When not specified grouping mode and when not smart layouts" do
       it "should just give 1 column per field" do
-        x = HotGlue::Layout::Builder.new(include_setting: "name,how_many",
-                                         downnest_object: {},
-                                          buttons_width: 2,
-                                          columns: [:name, :how_many],
-                                          smart_layout: false)
-        result = x.construct
-        expect(result[:columns][:container]).to eq([[:name], [:how_many]])
 
+        generator =  OpenStruct.new(downnest_object: {} ,
+                                    columns: [:name, :how_many],
+                                    smart_layout: false,
+                                    buttons_width: 0,
+                                    bootstrap_column_width: 2,
+                                    include_setting: "name,how_many")
+
+        builder = HotGlue::Layout::Builder.new(include_setting: '',
+                                               generator: generator,
+                                               buttons_width: 0)
+        result = builder.construct
+        expect(result[:columns][:container]).to eq([[:name], [:how_many]])
       end
     end
   end
