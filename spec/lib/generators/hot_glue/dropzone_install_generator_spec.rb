@@ -3,8 +3,8 @@ require 'rails_helper'
 
 describe HotGlue::DropzoneInstallGenerator do
   after(:each) do
-    File.delete("spec/dummy/app/assets/stylesheets/application.scss") if File.exists?("spec/dummy/app/assets/stylesheets/application.scss")
-    File.delete("spec/dummy/app/assets/stylesheets/application.bootstrap.scss") if File.exists?("spec/dummy/app/assets/stylesheets/application.bootstrap.scss")
+    # File.delete("spec/dummy/app/assets/stylesheets/application.scss") if File.exists?("spec/dummy/app/assets/stylesheets/application.scss")
+    # File.delete("spec/dummy/app/assets/stylesheets/application.bootstrap.scss") if File.exists?("spec/dummy/app/assets/stylesheets/application.bootstrap.scss")
   end
 
   describe "bootstrap" do
