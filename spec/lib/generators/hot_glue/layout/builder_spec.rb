@@ -73,7 +73,7 @@ describe HotGlue::Layout::Builder do
       it "should concat the two fields into one column " do
         generator =  OpenStruct.new(downnest_object: {get_emails_rules: 4} ,
                                     columns: [:api_key, :api_id],
-                                    smart_layout: false,
+                                    smart_layout: true,
                                     bootstrap_column_width: 2,
                                     include_setting: "api_key,api_id:")
 
