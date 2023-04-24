@@ -6,7 +6,7 @@ class Field
   attr_accessor :hawk_keys, :auth, :sample_file_path
 
   def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: ,
-                 hawk_keys: , auth: , sample_file_path: nil)
+                 hawk_keys: , auth: , sample_file_path: nil, attachment_data: nil )
     @name = name
     @alt_lookups = alt_lookups
     @singular = singular
