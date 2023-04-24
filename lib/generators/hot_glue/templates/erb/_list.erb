@@ -13,7 +13,7 @@
         <div class="<%= @layout_strategy.row_classes %> <%= @layout_strategy.row_heading_classes %>">
           <%= list_column_headings %>
 
-          <% if @downnest_object.any? %>
+          <% if @downnest_object.any? && !@big_edit %>
             <% if !@stacked_downnesting %>
               <%= @layout_strategy.downnest_column_style  %>
               <% @downnest_object.each do |downnest,i| %>
@@ -33,7 +33,6 @@
               <% end %>
               </div>
             <% end %>
-
           <% end %>
 
           <div class=' scaffold-col-heading scaffold-col-heading-buttons <%= @layout_strategy.column_classes_for_column_headings %>' <%= @layout_strategy.button_column_style %>>

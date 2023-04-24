@@ -27,6 +27,7 @@ module HotGlue
         @no_buttons = @buttons_width == 0
         @specified_grouping_mode = include_setting.include?(":")
         @bootstrap_column_width = generator.bootstrap_column_width
+        @big_edit = generator.big_edit
       end
 
       def construct
@@ -45,34 +46,29 @@ module HotGlue
         #   layout_object[:portals][child] = {size: size}
         # end
 
-        # smart layout: bootstrap_column_width columns per field; 4 column for EACH downnested portals, 2 column for buttons
-        how_many_downnest = downnest_object.size
-
         bootstrap_columns = (12 - @buttons_width )
 
-        if(!stacked_downnesting)
-          bootstrap_columns = bootstrap_columns - (downnest_object.collect{|k,v| v}.sum)
-        else
-          bootstrap_columns = bootstrap_columns - 4
-        end
+        unless @big_edit
+          # how_many_downnest = downnest_object.size
+          if(!stacked_downnesting)
+            bootstrap_columns = bootstrap_columns - (downnest_object.collect{|k,v| v}.sum)
+          else
+            bootstrap_columns = bootstrap_columns - 4
+          end
 
+          # downnest_children_width = []
+          downnest_object.each do |child, size|
+            layout_object[:portals][child] = {size:  size}
+          end
+        end
         available_columns = (bootstrap_columns / bootstrap_column_width).floor
+
         # when set to 2, turns the 12-column grid into a 6-column grid
-
         if available_columns < 0
-          raise "Cannot build layout with #{how_many_downnest} downnested portals"
-        end
-        #
-        # if !stacked_downnesting
-        #
-        # else
-        #
-        # end
-        downnest_children_width = []
-        downnest_object.each do |child, size|
-          layout_object[:portals][child] = {size:  size}
+          raise "Cannot build layout -- too few columns"
         end
 
+        # smart layout: bootstrap_column_width columns per field; 4 column for EACH downnested portals, 2 column for buttons
         if smart_layout
           # automatic control
           #

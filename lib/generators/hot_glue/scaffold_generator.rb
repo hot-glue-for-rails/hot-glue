@@ -19,13 +19,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   hook_for :form_builder, :as => :scaffold
 
   source_root File.expand_path('templates', __dir__)
-  attr_accessor :alt_lookups,  :auth,  :columns, :bootstrap_column_width,
+  attr_accessor :alt_lookups, :attachments, :auth,
+                :big_edit, :bootstrap_column_width,
+                :columns,
                 :downnest_children, :downnest_object,
+                :button_icons,
                 :hawk_keys, :layout_object,
                 :nest_with,
                 :path,  :plural,
                 :sample_file_path,  :singular, :singular_class, :smart_layout,
-                :stacked_downnesting,  :update_show_only, :attachments
+                :stacked_downnesting,  :update_show_only
 
   class_option :singular, type: :string, default: nil
   class_option :plural, type: :string, default: nil
@@ -82,6 +85,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :attachments, default: ''
   class_option :stacked_downnesting, default: false
   class_option :bootstrap_column_width, default: nil #must be nil to detect if user has not passed
+  class_option :button_icons, default: nil
 
   def initialize(*meta_args)
     super
@@ -130,6 +134,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         raise "Invalid option #{layout} in Hot glue config (config/hot_glue.yml). You must either use --layout= when generating or have a file config/hotglue.yml; specify layout as either 'hotglue' or 'bootstrap'"
       end
     end
+
+    @button_icons = get_default_from_config(key: :button_icons) || 'none'
 
     @layout_strategy =
       case layout
@@ -425,11 +431,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     builder = HotGlue::Layout::Builder.new(generator: self,
                                          include_setting: options['include'],
-                                         buttons_width: buttons_width
-
-
-
-                                           )
+                                         buttons_width: buttons_width )
     @layout_object = builder.construct
 
 

@@ -1,9 +1,11 @@
-<\%= link_to "<i class='fa fa-arrow-circle-left  2x'></i> Back to list".html_safe, <%= path_helper_plural %> %>
-
+<% if @big_edit %>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <\%= link_to "<% if @button_icons == 'font-awesome' %><i class='fa fa-arrow-circle-left  2x'></i><% end %> Back to list".html_safe, <%= path_helper_plural %> %>
+<% end %>
 <\%= turbo_frame_tag "<%= @namespace %>__#{dom_id(@<%= singular %>)}" do  %>
-
   <div class="cell editable" style="position: relative;">
-
     <\% if @<%= singular %>.errors.any? %>
       <\%= render(partial: "<%= namespace_with_trailing_dash %>errors", locals: {resource: @<%= singular %> }) %>
     <\% end %>
@@ -12,9 +14,36 @@
     <\%= form_with model: <%= "@" + singular %>, url: <%= form_path_edit_helper %> do |f| %>
     <\%=  render partial: "form",  locals: {:<%=  singular  %> => <%= "@" + singular%>, f: f}<%= @nested_set.collect{|arg| ".merge(@#{arg[:singular]} ? {#{arg[:singular]}: @#{arg[:singular]}} : {})" }.join %> \%>
     <\% end %>
-
+  </div>
+<\% end %>
+<% if @big_edit %>
+    </div>
   </div>
 
-<\% end %>
 
+<% if @downnest_children.any? && @big_edit %>
+  <% each_downnest_width = @downnest_children.count == 1 ? 33 : (53/@downnest_children.count).floor %>
+    <% @downnest_object.each do |downnest, size| %>
+      <div class="row">
+        <div class="col-md-6">
+          <% downnest_object =  eval("#{singular_class}.reflect_on_association(:#{downnest})") %>
+          <% if downnest_object.nil?; raise "no relationship for downnested portal `#{downnest}` found on `#{singular_class}`; please check relationship for has_many :#{downnest}"; end; %>
+          <% downnest_class = downnest_object.class_name %>
+          <% downnest_object_name = eval("#{downnest_class}.table_name") %>
+          <% downnest_style = @layout_strategy.downnest_style %>
+
+          <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest_object_name %>/list", locals: {
+          <%= @singular %>: @<%= @singular %>,
+          <%= downnest_object_name %>: @<%= @singular %>.<%= downnest %>
+          }
+          .merge({nested_for: "<% if @nested_set.any? %>#{nested_for + "__" if defined?(nested_for)}<% end %><%= @singular %>-#{@<%= @singular %>.id}"})
+          <%= @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {} )"}.join("\n") %>
+          \%>
+
+          </div>
+        </div>
+      <% end %>
+  <% end %>
+</div>
+<% end %>
 

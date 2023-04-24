@@ -62,7 +62,7 @@ module  HotGlue
 
       columns = layout_object[:columns][:container]
       result = columns.map{ |column|
-        "<div class='#{col_identifier}' heading--#{singular}--#{column.join("-")} " + col_style + ">" +
+        "<div class='#{col_identifier} heading--#{singular}--#{column.join("-")}' " + col_style + ">" +
           column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
       }.join("\n")
       return result

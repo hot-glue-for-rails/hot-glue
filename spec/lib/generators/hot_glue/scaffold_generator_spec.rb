@@ -142,9 +142,24 @@ describe HotGlue::ScaffoldGenerator do
     it "should not make the delete turbostream file" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Dfg","--big-edit"])
+
       expect(
         File.read("spec/dummy/app/views/dfgs/_show.erb") =~ /edit_dfg_path\(dfg\)/
       ).to_not be(nil)
+    end
+
+    it "should not put downnest portals on the list view instead putting them on the edit page" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["User","--gd",
+                                           "--big-edit",
+                                           "--smart-layout",
+                                           "--downnest=dfgs,xyzs",
+                                           "--layout=bootstrap"])
+
+      list_view = File.read("spec/dummy/app/views/users/_show.erb")
+      expect(list_view ).to_not include("Dfgs")
+      edit_view = File.read("spec/dummy/app/views/users/edit.erb")
+      expect(edit_view ).to include("<%= render partial: \"dfgs/list")
     end
   end
 
@@ -440,7 +455,7 @@ describe HotGlue::ScaffoldGenerator do
 
               file = File.read("spec/dummy/app/views/users/_list.erb")
 
-              expect(file).to include("<div class='col-sm-2' heading--user--email >")
+              expect(file).to include("<div class='col-sm-2 heading--user--email' >")
               expect(file).to include("<div class=\" scaffold-col-heading col-sm-4 \">")
               expect(file).to include("Dfgs")
             end
@@ -458,7 +473,7 @@ describe HotGlue::ScaffoldGenerator do
 
             it "produces two columns for the fields" do
               res =   File.read("spec/dummy/app/views/users/_list.erb")
-              expect(res).to include("<div class='col-sm-2' heading--user--email-family_id >Email<br />Family</div>")
+              expect(res).to include("<div class='col-sm-2 heading--user--email-family_id' >Email<br />Family</div>")
             end
 
             it "has 4 columns for the Dfgs downnnest" do

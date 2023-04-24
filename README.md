@@ -750,6 +750,10 @@ end
 
 ```
 
+### `--button-icons` (default is no icons)
+You can specify this either as builder flag or as a config setting (in `config/hot_glue.yml`)
+Use `font-awesome` for Font Awesome or `none` for no icons.
+
 
 ### `--specs-only`
 
@@ -782,6 +786,8 @@ Omits delete button & destroy action.
 ### `--big-edit`
 
 If you do not want inline editing of your list items but instead want to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
+
+When using `--big-edit`, any downnested portals will be displayed on the edit page instead of on the list page. 
 
 ### `--display-list-after-update`
 
@@ -901,9 +907,6 @@ Use `before` to make the labels come before or `after` to make them come after. 
 ### `--no-list-heading`
 
 Omits the heading of column names that appears above the 1st row of data.
-
-
-
 
 
 ## Special Features
@@ -1208,14 +1211,14 @@ Now, your labels will show up on the front-end as defined in the `_labels` ("Is 
 
 
 # VERSION HISTORY
-#### TBR — adds new option for bootstrap_column_width (default to 2)
+#### 2023-04-24 - v0.5.12
+- adds new option for `bootstrap_column_width` (default is 2) to specify the number of bootstrap columns a visual column should take up
 - You can specify this as a builder option (`--bootstrap-column-width`)
 or in your `config/hot_glue.yml` file. Passing option will override config setting
-
-
+- Adds new option for `button_icons` (default to "font-awesome"); use `none` to have no button icons
+- When using big edit with downnested portals, the downnested portals now display on the edit page instead of the list page.
 
 #### 2023-04-19 - renamed previous version to v0.5.11
-
 
 #### 2023-04-08 - v0.5.9.2
 • This begins a refactor of the field knowledge into properly abstracted Field objects
@@ -1223,8 +1226,6 @@ or in your `config/hot_glue.yml` file. Passing option will override config setti
 
 #### - v0.5.9.1
 • Fixed issue with ownership fields coming through as associations.
-
-
 
 #### 2023-03-17 - v0.5.9
 - Attachments! You can use Hot Glue to seamlessly create an image, file, or video attachment. Please see the docs in new flag `--atachments` under the "Special Features" section

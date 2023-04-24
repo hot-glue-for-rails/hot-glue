@@ -2,7 +2,7 @@
 
 
 
-<% if @downnest_children.any? %>
+<% if @downnest_children.any? && ! @big_edit %>
   <% each_downnest_width = @downnest_children.count == 1 ? 33 : (53/@downnest_children.count).floor %>
   <% if @stacked_downnesting %><div class="<%= @layout_strategy.downnest_portal_stacked_column_width  %> scaffold-downnest" ><% end %>
   <% @downnest_object.each do |downnest, size| %>
