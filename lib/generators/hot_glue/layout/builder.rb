@@ -47,21 +47,21 @@ module HotGlue
         # end
 
         bootstrap_columns = (12 - @buttons_width )
-        available_columns = (bootstrap_columns / bootstrap_column_width).floor
 
         unless @big_edit
-          how_many_downnest = downnest_object.size
+          # how_many_downnest = downnest_object.size
           if(!stacked_downnesting)
             bootstrap_columns = bootstrap_columns - (downnest_object.collect{|k,v| v}.sum)
           else
             bootstrap_columns = bootstrap_columns - 4
           end
 
-          downnest_children_width = []
+          # downnest_children_width = []
           downnest_object.each do |child, size|
             layout_object[:portals][child] = {size:  size}
           end
         end
+        available_columns = (bootstrap_columns / bootstrap_column_width).floor
 
         # when set to 2, turns the 12-column grid into a 6-column grid
         if available_columns < 0
