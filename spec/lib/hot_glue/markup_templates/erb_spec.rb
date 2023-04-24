@@ -26,6 +26,7 @@ describe HotGlue::ErbTemplate do
     generator =  OpenStruct.new(downnest_object: {} ,
                              columns: options[:columns],
                              smart_layout: false,
+
                               bootstrap_column_width: 2)
 
     builder = HotGlue::Layout::Builder.new(include_setting: '',
@@ -50,6 +51,7 @@ describe HotGlue::ErbTemplate do
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
       alt_lookups: {},
+      columns_map: {dfg_id: {}},
       attachments: {})
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy,
@@ -62,6 +64,7 @@ describe HotGlue::ErbTemplate do
 
     generator =  OpenStruct.new(downnest_object: {} ,
                                 columns: options[:columns],
+
                                 smart_layout: false,
                                 buttons_width: 0,
                                 bootstrap_column_width: 2)
@@ -76,6 +79,7 @@ describe HotGlue::ErbTemplate do
 
     @template_builder = HotGlue::ErbTemplate.new(
       show_only: [],
+      columns_map: {},
       singular_class: "Jkl",
       singular: "jkl",
       hawk_keys: {},
@@ -292,6 +296,7 @@ describe HotGlue::ErbTemplate do
                                      alt_lookups: {},
                                      singular_class: Ghi,
                                      singular: "ghi",
+
                                      hawk_keys: {dfg_id: {bind_to: ["current_user.dfgs"], optional: false }}})
 
       expect(res).to include("f.collection_select(:dfg_id, current_user.dfgs,")

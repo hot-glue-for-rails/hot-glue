@@ -8,19 +8,21 @@ module  HotGlue
                   :inline_list_labels, :layout_object,
                   :columns,  :col_identifier, :singular,
                   :form_placeholder_labels, :hawk_keys, :update_show_only,
-                  :alt_lookups, :attachments, :show_only
+                  :alt_lookups, :attachments, :show_only, :columns_map
 
 
-    def initialize(singular:, singular_class: ,
+      def initialize(singular:, singular_class: ,
                    layout_strategy: , magic_buttons: ,
                    small_buttons: , show_only: ,
                    ownership_field: , form_labels_position: ,
                    inline_list_labels: ,
                    form_placeholder_labels:, hawk_keys:,
-                   update_show_only:, alt_lookups: , attachments: )
+                   update_show_only:, alt_lookups: , attachments: , columns_map: )
 
       @singular = singular
       @singular_class = singular_class
+
+      @columns_map = columns_map
 
       @magic_buttons = magic_buttons
       @small_buttons = small_buttons
@@ -80,17 +82,9 @@ module  HotGlue
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
             if attachments.keys.include?(col)
-              this_attachment  = attachments[col]
-              thumbnail = this_attachment[:thumbnail]
-              direct = this_attachment[:direct_upload]
-              dropzone = this_attachment[:dropzone]
-              field_result = (this_attachment[:thumbnail] ?   "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "") +
-                "<br />\n" + (update_show_only.include?(col) ? "" : "<%= f.file_field :#{col} #{', direct_upload: true ' if direct}#{', "data-dropzone-target": "input"' if dropzone}%>")
 
-              if dropzone
-                field_result = "<div class=\"dropzone dropzone-default dz-clickable\" data-controller=\"dropzone\" data-dropzone-max-file-size=\"2\" data-dropzone-max-files=\"1\">\n  "+ field_result + "\n</div>"
-              end
-              field_error_name = col
+              field_result = columns_map[col].form_field_output
+              field_error_name = columns_map[col].field_error_name
             else
 
               type = eval("#{singular_class}.columns_hash['#{col}']").type

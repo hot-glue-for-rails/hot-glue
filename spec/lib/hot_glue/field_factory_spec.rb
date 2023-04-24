@@ -8,7 +8,8 @@ describe FieldFactory do
                                                   class_name: "Abc",
                                                   alt_lookups: {},
                                                   singular: "abc",
-                                                  update_show_only: []
+                                                  update_show_only: [],
+                                                  attachments: {}
                                                 }))
 
     expect(ff.field).to be_a(IntegerField)

@@ -45,6 +45,7 @@ class FieldFactory
             end
     @class_name = class_name
 
+
     @field = field_class.new(name: name,
                              hawk_keys: generator.hawk_keys,
                              auth: generator.auth,
@@ -52,6 +53,7 @@ class FieldFactory
                              alt_lookups: generator.alt_lookups,
                              singular: generator.singular,
                              update_show_only: generator.update_show_only,
+                             attachment_data: generator.attachments[name.to_sym],
                              sample_file_path: generator.sample_file_path)
   end
 end

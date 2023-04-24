@@ -25,7 +25,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :nest_with,
                 :path,  :plural,
                 :sample_file_path,  :singular, :singular_class, :smart_layout,
-                :stacked_downnesting,  :update_show_only
+                :stacked_downnesting,  :update_show_only, :attachments
 
   class_option :singular, type: :string, default: nil
   class_option :plural, type: :string, default: nil
@@ -235,28 +235,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
 
-    if  @markup == "erb"
-      @template_builder = HotGlue::ErbTemplate.new(
-        layout_strategy: @layout_strategy,
-        magic_buttons: @magic_buttons,
-        small_buttons: @small_buttons,
-        inline_list_labels: @inline_list_labels,
-        show_only: @show_only,
-        update_show_only: @update_show_only,
-        singular_class: singular_class,
-        singular: singular,
-        hawk_keys: @hawk_keys,
-        ownership_field: @ownership_field,
-        form_labels_position: @form_labels_position,
-        form_placeholder_labels: @form_placeholder_labels,
-        alt_lookups: @alt_lookups,
-        attachments: @attachments,
-        )
-    elsif  @markup == "slim"
-      raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
-    elsif  @markup == "haml"
-      raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
-    end
+
+
 
     @god = options['god'] || options['gd'] || false
     @specs_only = options['specs_only'] || false
@@ -389,11 +369,66 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
-    # downnest_object: @downnest_object,
+    # build a new polymorphic object
+    @associations = []
+    @columns_map = {}
+    @columns.each do |col|
+      if !(@the_object.columns_hash.keys.include?(col.to_s) ||  @attachments.keys.include?(col))
+        raise "couldn't find #{col} in either field list or attachments list"
+      end
 
-      builder = HotGlue::Layout::Builder.new(generator: self,
-                                           include_setting: options['include'],
-                                           buttons_width: buttons_width
+      if col.to_s.starts_with?("_")
+        @show_only << col
+      end
+
+      if @the_object.columns_hash.keys.include?(col.to_s)
+        type =  @the_object.columns_hash[col.to_s].type
+      elsif @attachments.keys.include?(col)
+        type = :attachment
+      end
+      this_column_object = FieldFactory.new(name: col.to_s,
+                                            generator: self,
+                                            type: type)
+      field = this_column_object.field
+      if field.is_a?(AssociationField)
+        @associations << field.assoc_name.to_sym
+      end
+      @columns_map[col] = this_column_object.field
+    end
+
+
+
+    # create the template object
+    if  @markup == "erb"
+      @template_builder = HotGlue::ErbTemplate.new(
+        layout_strategy: @layout_strategy,
+        magic_buttons: @magic_buttons,
+        small_buttons: @small_buttons,
+        inline_list_labels: @inline_list_labels,
+        show_only: @show_only,
+        update_show_only: @update_show_only,
+        singular_class: singular_class,
+        singular: singular,
+        hawk_keys: @hawk_keys,
+        ownership_field: @ownership_field,
+        form_labels_position: @form_labels_position,
+        form_placeholder_labels: @form_placeholder_labels,
+        alt_lookups: @alt_lookups,
+        attachments: @attachments,
+        columns_map: @columns_map
+      )
+    elsif  @markup == "slim"
+      raise(HotGlue::Error,  "SLIM IS NOT IMPLEMENTED")
+    elsif  @markup == "haml"
+      raise(HotGlue::Error,  "HAML IS NOT IMPLEMENTED")
+    end
+
+    builder = HotGlue::Layout::Builder.new(generator: self,
+                                         include_setting: options['include'],
+                                         buttons_width: buttons_width
+
+
+
                                            )
     @layout_object = builder.construct
 
@@ -577,38 +612,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
       check_if_sample_file_is_present
     end
-
-
-    # build a new polymorphic object
-    @associations = []
-    @columns_map = {}
-    @columns.each do |col|
-      if !(@the_object.columns_hash.keys.include?(col.to_s) ||  @attachments.keys.include?(col))
-        raise "couldn't find #{col} in either field list or attachments list"
-      end
-
-      if col.to_s.starts_with?("_")
-        @show_only << col
-      end
-
-      if @the_object.columns_hash.keys.include?(col.to_s)
-        type =  @the_object.columns_hash[col.to_s].type
-      elsif @attachments.keys.include?(col)
-        type = :attachment
-      end
-      this_column_object = FieldFactory.new(name: col.to_s,
-                                            generator: self,
-                                            type: type)
-      field = this_column_object.field
-      if field.is_a?(AssociationField)
-        @associations << field.assoc_name.to_sym
-      end
-      @columns_map[col] = this_column_object.field
-
-
-
-    end
   end
+
+
+
+
 
 
   def check_if_sample_file_is_present
