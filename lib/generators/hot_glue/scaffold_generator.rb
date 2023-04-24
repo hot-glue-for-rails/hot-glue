@@ -23,6 +23,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :big_edit, :bootstrap_column_width,
                 :columns,
                 :downnest_children, :downnest_object,
+                :button_icons,
                 :hawk_keys, :layout_object,
                 :nest_with,
                 :path,  :plural,
@@ -84,6 +85,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :attachments, default: ''
   class_option :stacked_downnesting, default: false
   class_option :bootstrap_column_width, default: nil #must be nil to detect if user has not passed
+  class_option :button_icons, default: nil
 
   def initialize(*meta_args)
     super
@@ -132,6 +134,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         raise "Invalid option #{layout} in Hot glue config (config/hot_glue.yml). You must either use --layout= when generating or have a file config/hotglue.yml; specify layout as either 'hotglue' or 'bootstrap'"
       end
     end
+
+    @button_icons = get_default_from_config(key: :button_icons) || true
 
     @layout_strategy =
       case layout
