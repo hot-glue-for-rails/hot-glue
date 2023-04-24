@@ -13,7 +13,7 @@
         <div class="<%= @layout_strategy.row_classes %> <%= @layout_strategy.row_heading_classes %>">
           <%= list_column_headings %>
 
-          <% if @downnest_object.any? %>
+          <% if @downnest_object.any? && !@big_edit %>
             <% if !@stacked_downnesting %>
               <%= @layout_strategy.downnest_column_style  %>
               <% @downnest_object.each do |downnest,i| %>

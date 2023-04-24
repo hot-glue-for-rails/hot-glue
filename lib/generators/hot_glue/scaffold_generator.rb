@@ -19,13 +19,15 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   hook_for :form_builder, :as => :scaffold
 
   source_root File.expand_path('templates', __dir__)
-  attr_accessor :alt_lookups,  :auth,  :columns, :bootstrap_column_width,
+  attr_accessor :alt_lookups, :attachments, :auth,
+                :big_edit, :bootstrap_column_width,
+                :columns,
                 :downnest_children, :downnest_object,
                 :hawk_keys, :layout_object,
                 :nest_with,
                 :path,  :plural,
                 :sample_file_path,  :singular, :singular_class, :smart_layout,
-                :stacked_downnesting,  :update_show_only, :attachments
+                :stacked_downnesting,  :update_show_only
 
   class_option :singular, type: :string, default: nil
   class_option :plural, type: :string, default: nil
@@ -425,11 +427,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     builder = HotGlue::Layout::Builder.new(generator: self,
                                          include_setting: options['include'],
-                                         buttons_width: buttons_width
-
-
-
-                                           )
+                                         buttons_width: buttons_width )
     @layout_object = builder.construct
 
 
