@@ -135,7 +135,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
     end
 
-    @button_icons = get_default_from_config(key: :button_icons) || true
+    @button_icons = get_default_from_config(key: :button_icons) || 'none'
 
     @layout_strategy =
       case layout
