@@ -648,10 +648,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     }.join(", ")
 
     if @factory_creation == ''
-      "@#{singular } = #{ class_name }.create(modified_params)"
+      "@#{singular } = #{ class_name }.create(modified_params#{'.merge(' + merge_with + ')' if !merge_with.empty?})"
     else
       "#{@factory_creation}\n" +
-        "    @#{singular } = #{ class_name }.create(modified_params#{'.merge(' + merge_with + ')' if !merge_with.empty?})"
+        "    @#{singular } = factory.#{singular}"
     end
   end
 
@@ -1256,5 +1256,21 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def any_datetime_fields?
     (@columns - @attachments.keys.collect(&:to_sym)).collect{|col| eval("#{singular_class}.columns_hash['#{col}']").type}.include?(:datetime)
+  end
+
+  def post_action_parental_updates
+    @nested_set.collect{ |data|
+      parent = data[:singular]
+      "@#{singular}.#{parent}.reload"
+    }.join("\n")
+  end
+
+
+  def turbo_parental_updates
+    @nested_set.collect{| data|
+      "<%= turbo_stream.replace \"#{@namespace + '__' if @namespace}\#{dom_id(@#{data[:singular]})}\" do %>
+    <%= render partial: \"#{@namespace}/#{data[:plural]}/edit\", locals: {#{data[:singular]}: @#{singular}.#{data[:singular]}.reload} %>
+  <% end %>"
+    }.join("\n")
   end
 end
