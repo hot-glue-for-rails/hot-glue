@@ -1231,6 +1231,21 @@ Now, your labels will show up on the front-end as defined in the `_labels` ("Is 
 
 
 # VERSION HISTORY
+
+#### TBR
+- When updating a record in a child that appears within a nested parent (path), the parent EDIT record will aautomatically be turbo replaced along with the record you are editing (works for create, update, and destroy).
+
+For example
+`rails generate hot_glue:scafold LineItem --nested=invioce`
+Whenever the line item is created, updated, or destroyed, the parent invoice record gets re-rendered automatically. 
+
+
+- Changes to how flash_notices work. Please re-generate your flash_notices using:
+`` 
+
+(if you fail to do this your flash error notices won't work correctly)
+- after this release, you can delete all old `_errors.erb` file generated in each scaffold-built folder. These have been folded into flash_notices and are no longer output. (Please delete the relic files `_errors.erb`)
+
 #### 2023-04-24 - v0.5.12
 - adds new option for `bootstrap_column_width` (default is 2) to specify the number of bootstrap columns a visual column should take up
 - You can specify this as a builder option (`--bootstrap-column-width`)
