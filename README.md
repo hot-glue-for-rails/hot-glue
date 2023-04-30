@@ -1136,16 +1136,16 @@ However, two special variables are in scope which you can use in your calling co
 
 Either one must be recieved by your factory for your factory to create data based off the inputted data. 
 
-Always, always be sure your factory has a method with the **same name** of the built object, which hot glue will call next: 
+Rememebr, `*_params` has the input params passed only the through the sanitizer, and modified_params has it passed through the timezone aware mechanism and other Hot Glue-specific defaults.
 
+Always: 
+• In your factory calling code, assign the variable `factory = ` (do not use a different variable name),
+• Write a factory object with a `new` method that received the paramters you are specifying in your calling code,
+• Be sure your factory has an _instance method_ a method with the **same name** of the built object, which hot glue will call next: 
 
 `@agent = factory.agent`
 
-(don't include this in your factory code)
-
-
-
-
+Don't include this last line in your factory code. 
 
 
 
