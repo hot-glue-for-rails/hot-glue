@@ -1124,8 +1124,28 @@ Thus, your factory object must have a method of the same name as the factory bei
 For example, assuming the example from above, we are going to do the lookup ourselves inside of our own `AgentFactory` object.)
 
 ```
-agent_factory = AgentFactory.new(find_or_create_by_email: agent_company_params[:__lookup_email])
+factory = AgentFactory.new(find_or_create_by_email: agent_company_params[:__lookup_email], 
+                            params: modified_params)
 ```
+
+Here the new AgentFactory will recieve any variables by keyword argument, and since you're specifying the calling code here, Hot Glue does not dictate your factory's setup.
+However, two special variables are in scope which you can use in your calling code.
+
+`*_params` (where * is the name of the thing you are building)
+`modified_params` a variable that has been transmogrified for the timezone aware input
+
+Either one must be recieved by your factory for your factory to create data based off the inputted data. 
+
+Always, always be sure your factory has a method with the **same name** of the built object, which hot glue will call next: 
+
+
+`@agent = factory.agent`
+
+(don't include this in your factory code)
+
+
+
+
 
 
 
