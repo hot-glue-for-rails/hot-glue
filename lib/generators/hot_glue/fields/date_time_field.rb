@@ -10,7 +10,8 @@ class DateTimeField < Field
   end
 
   def spec_make_assertion
-    super
+
+    "expect(page).to have_content(new_#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone))"
   end
 
   def spec_setup_let_arg
