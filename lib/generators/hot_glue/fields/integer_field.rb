@@ -21,6 +21,6 @@ class IntegerField < Field
   end
 
   def spec_list_view_assertion
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{name})"].join("\n      ")
+    "expect(page).to have_content(#{singular}#{1}.#{name})"
   end
 end

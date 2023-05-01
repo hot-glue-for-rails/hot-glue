@@ -25,7 +25,7 @@ describe 'interaction for <%= controller_class_name %>' do
   describe "index" do
     it "should show me the list" do
       visit <%= path_helper_plural %>
-      <%= @columns_map.collect{|col, col_object| col_object.spec_list_view_assertion }   %>
+      <%= @columns_map.collect{|col, col_object| col_object.spec_list_view_assertion }.join("\n      ")   %>
     end
   end
 

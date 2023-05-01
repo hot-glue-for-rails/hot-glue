@@ -4,18 +4,7 @@
     <div class="col-md-12">
       <\%= link_to "<% if @button_icons == 'font-awesome' %><i class='fa fa-arrow-circle-left  2x'></i><% end %> Back to list".html_safe, <%= path_helper_plural %> %>
 <% end %>
-<\%= turbo_frame_tag "<%= @namespace %>__#{dom_id(@<%= singular %>)}" do  %>
-  <div class="cell editable" style="position: relative;">
-    <\% if @<%= singular %>.errors.any? %>
-      <\%= render(partial: "<%= namespace_with_trailing_dash %>errors", locals: {resource: @<%= singular %> }) %>
-    <\% end %>
-
-    <h2>Editing <\%= @<%= @singular %>.<%= display_class %> %></h2>
-    <\%= form_with model: <%= "@" + singular %>, url: <%= form_path_edit_helper %> do |f| %>
-    <\%=  render partial: "form",  locals: {:<%=  singular  %> => <%= "@" + singular%>, f: f}<%= @nested_set.collect{|arg| ".merge(@#{arg[:singular]} ? {#{arg[:singular]}: @#{arg[:singular]}} : {})" }.join %> \%>
-    <\% end %>
-  </div>
-<\% end %>
+<\%= render partial: "edit", locals: {<%= singular %>: @<%= singular %>} %>
 <% if @big_edit %>
     </div>
   </div>

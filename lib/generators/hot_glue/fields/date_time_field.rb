@@ -19,6 +19,6 @@ class DateTimeField < Field
   end
 
   def spec_list_view_assertion
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(current_timezone)  )"].join("\n      ")
+    "expect(page).to have_content(#{singular}#{1}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(current_timezone)  )"
   end
 end

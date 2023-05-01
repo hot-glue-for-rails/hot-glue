@@ -1240,12 +1240,13 @@ For example
 Whenever the line item is created, updated, or destroyed, the parent invoice record gets re-rendered automatically. 
 
 
-- Changes to how flash_notices work. Please re-generate your flash_notices using:
-`` 
+- This changes to how flash_notices work.
+- Please re-install the flash notice with:
 
-(if you fail to do this your flash error notices won't work correctly)
-- If upgrading a codebase previously built, you can delete all old `_errors.erb` file generated in each scaffold-built folder. These have been folded into flash_notices and are no longer output. (Please delete the relic files `_errors.erb`)
+`rails generate hot_glue:flash_notices_install` 
 
+- If upgrading a codebase previously built on Hot Glue, code build on newer versions of Hot GLue will delete any found files `_errors` (their functionality has been moved into `_flash_notices`)
+- 
 - The destroy action on controllers now produces an "alert" message for successful deletion.
 
 #### 2023-04-24 - v0.5.12
