@@ -707,7 +707,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       template "system_spec.rb.erb", dest_file
     end
 
-    template "#{@markup}/_errors.#{@markup}", File.join("#{filepath_prefix}app/views#{namespace_with_dash}", "_errors.#{@markup}")
+
+    if File.exist("#{@markup}/_errors.#{@markup}")
+      File.delete("#{@markup}/_errors.#{@markup}")
+    end
   end
 
   def spec_foreign_association_merge_hash
@@ -1050,14 +1053,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def all_views
-    res =  %w(index  _line _list _show _errors)
+    res =  %w(index  _line _list _show)
 
     unless @no_create
       res += %w(new _new_form _new_button)
     end
 
     unless @no_edit
-      res << 'edit'
+      res += %w{edit _edit}
     end
 
     if !( @no_edit && @no_create)

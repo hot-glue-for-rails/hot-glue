@@ -27,13 +27,8 @@ module HotGlue
       end
 
 
-      @markup = options['markup']
-      if @markup == "haml"
-        copy_file "haml/_flash_notices.haml", "#{'spec/dummy/' if Rails.env.test?}app/views/layouts/_flash_notices.haml"
-      elsif @markup == "erb"
-        copy_file "erb/_flash_notices.erb", "#{'spec/dummy/' if Rails.env.test?}app/views/layouts/_flash_notices.erb"
-
-      end
+      @markup = options['markup'] || "erb"
+      copy_file "erb/_flash_notices.erb", "#{'spec/dummy/' if Rails.env.test?}app/views/layouts/_flash_notices.erb"
 
       begin
         if Rails.version.split(".")[0].to_i == 6
