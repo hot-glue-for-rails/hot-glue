@@ -708,7 +708,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
 
-    if File.exist("#{@markup}/_errors.#{@markup}")
+    if File.exist?("#{@markup}/_errors.#{@markup}")
       File.delete("#{@markup}/_errors.#{@markup}")
     end
   end
