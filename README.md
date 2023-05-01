@@ -1244,7 +1244,9 @@ Whenever the line item is created, updated, or destroyed, the parent invoice rec
 `` 
 
 (if you fail to do this your flash error notices won't work correctly)
-- after this release, you can delete all old `_errors.erb` file generated in each scaffold-built folder. These have been folded into flash_notices and are no longer output. (Please delete the relic files `_errors.erb`)
+- If upgrading a codebase previously built, you can delete all old `_errors.erb` file generated in each scaffold-built folder. These have been folded into flash_notices and are no longer output. (Please delete the relic files `_errors.erb`)
+
+- The destroy action on controllers now produces an "alert" message for successful deletion.
 
 #### 2023-04-24 - v0.5.12
 - adds new option for `bootstrap_column_width` (default is 2) to specify the number of bootstrap columns a visual column should take up
