@@ -58,7 +58,7 @@ describe HotGlue do
         result = HotGlue.optionalized_ternary(target: 'invoices',
                                               nested_set: nested_set,
                                               namespace: "admin")
-        expect(result).to eq("admin_account_invoices_path")
+        expect(result).to eq("admin_account_invoices_path(account)")
       end
 
 
