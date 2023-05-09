@@ -1229,6 +1229,27 @@ def self.status_labels
 
 Now, your labels will show up on the front-end as defined in the `_labels` ("Is currently pending", etc) instead of the database-values.
 
+### Validation Magic
+
+Use ActiveRecord validations or hooks to validate your data. Hot Glue will automatically display the errors in the UI.
+
+TO prevent a record from being destroyed, use a syntax like this:
+
+```
+before_destroy :check_if_allowed_to_destroy
+
+def check_if_allowed_to_destroy
+  if (some_condition)
+    self.errors.add(:base, "Cannot delete")
+    raise ActiveRecord::RecordNotDestroyed("Cannot delete because of some condition")
+  end
+end
+
+```
+
+
+
+
 
 # VERSION HISTORY
 
