@@ -1,5 +1,5 @@
 <%= turbo_frame_tag "flash_notices" do %>
-  <% unless notice.nil? && alert.nil? && !resource %>
+  <% unless notice.nil? && alert.nil? && !defined?(resource) %>
     <div class="alert alert-<%= alert ? 'danger' : 'primary' %> alert-dismissible">
       <div><%= notice %></div>
       <div><%= alert %></div>

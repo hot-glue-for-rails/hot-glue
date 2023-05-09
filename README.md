@@ -1241,12 +1241,16 @@ Whenever the line item is created, updated, or destroyed, the parent invoice rec
 
 
 - This changes to how flash_notices work.
-- Please re-install the flash notice with:
+- 
+- After you upgrade to 0.5.14 from a prior version, please re-install the global flash notice
+- template with:
 
 `rails generate hot_glue:flash_notices_install` 
 
-- If upgrading a codebase previously built on Hot Glue, code build on newer versions of Hot GLue will delete any found files `_errors` (their functionality has been moved into `_flash_notices`)
-- 
+The newer template will work with old Hot Glue scaffold (generated prior to 0.5.14) and new scaffold moving forward.
+
+If you miss this step, your old Hot Glue flash notices template will not show the model error messages (but will continue to show the global alert & notice messages)
+
 - The destroy action on controllers now produces an "alert" message for successful deletion.
 
 #### 2023-04-24 - v0.5.12
