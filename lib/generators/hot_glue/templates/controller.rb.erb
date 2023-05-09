@@ -137,10 +137,10 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 <% end %><% if destroy_action %>  def destroy
     begin
       @<%=singular_name%>.destroy
+      flash[:notice] = '<%= singular_name.titlecase %> successfully deleted'
     rescue StandardError => e
-      flash[:alert] = '<%= singular_name.titlecase %> could not be deleted.'
-    end
-    <%= post_action_parental_updates %>
+      flash[:alert] = '<%= singular_name.titlecase %> could not be deleted'
+    end <%= post_action_parental_updates %>
     load_all_<%= plural %>
   end<% end %>
 

@@ -1262,10 +1262,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def post_action_parental_updates
-    @nested_set.collect{ |data|
-      parent = data[:singular]
-      "@#{singular}.#{parent}.reload"
-    }.join("\n")
+    if @nested_set.any?
+      "\n" + @nested_set.collect{ |data|
+        parent = data[:singular]
+        "@#{singular}.#{parent}.reload"
+      }.join("\n")
+    end
   end
 
 
