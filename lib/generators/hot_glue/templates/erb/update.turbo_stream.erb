@@ -5,6 +5,6 @@
 <\% end %>
 <% end %>
 <%= turbo_parental_updates %>
-<\%= turbo_stream.replace "flash_notices" do %>
+<\%= turbo_stream.update "flash_notices" do %>
   <\%= render partial: "layouts/flash_notices", locals: {resource: @<%= singular %>} %>
 <\% end %>
