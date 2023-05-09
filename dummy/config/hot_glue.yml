@@ -1,3 +1,5 @@
 ---
 :layout: bootstrap
 :markup: erb
+
+:sample_file_path: spec/files/computer_code.jpg
