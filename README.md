@@ -1229,24 +1229,50 @@ def self.status_labels
 
 Now, your labels will show up on the front-end as defined in the `_labels` ("Is currently pending", etc) instead of the database-values.
 
+### Validation Magic
+
+Use ActiveRecord validations or hooks to validate your data. Hot Glue will automatically display the errors in the UI.
+
+TO prevent a record from being destroyed, use a syntax like this:
+
+```
+before_destroy :check_if_allowed_to_destroy
+
+def check_if_allowed_to_destroy
+  if (some_condition)
+    self.errors.add(:base, "Cannot delete")
+    raise ActiveRecord::RecordNotDestroyed("Cannot delete because of some condition")
+  end
+end
+
+```
+
+
+
+
 
 # VERSION HISTORY
 
-#### TBR
-- When updating a record in a child that appears within a nested parent (path), the parent EDIT record will aautomatically be turbo replaced along with the record you are editing (works for create, update, and destroy).
+#### TBR 
+- When using big edit, updating a child will now re-render the parent EDIT record automatically.
 
 For example
 `rails generate hot_glue:scafold LineItem --nested=invioce`
-Whenever the line item is created, updated, or destroyed, the parent invoice record gets re-rendered automatically. 
 
+Whenever the line item is created, updated, or destroyed, the parent invoice record gets (edit action) re-rendered automatically. This happens for the big edit screen of the invoice.
+
+#### 2023-05-14 - v0.5.14 Delete message flash notice and new flash notice partial
 
 - This changes to how flash_notices work.
-- Please re-install the flash notice with:
+- After you upgrade to 0.5.14 from a prior version, please re-install the global flash notice
+- template with:
 
 `rails generate hot_glue:flash_notices_install` 
 
-- If upgrading a codebase previously built on Hot Glue, code build on newer versions of Hot GLue will delete any found files `_errors` (their functionality has been moved into `_flash_notices`)
-- 
+The newer template will work with old Hot Glue scaffold (generated prior to 0.5.14) and new scaffold moving forward.
+
+If you miss this step, your old Hot Glue flash notices template will not show the model error messages (but will continue to show the global alert & notice messages)
+
 - The destroy action on controllers now produces an "alert" message for successful deletion.
 
 #### 2023-04-24 - v0.5.12
