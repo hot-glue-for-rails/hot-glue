@@ -95,10 +95,7 @@ module  HotGlue
 
               field_result =
                 if show_only.include?(col.to_sym)
-
-                  # field_result = columns_map[col].form_show_only_output
-                  #
-                  show_only_result(type: type, col: col, singular: singular)
+                  field_result = columns_map[col].form_show_only_output
                 else
                   case type
                   when :integer
@@ -151,36 +148,19 @@ module  HotGlue
     end
 
 
-    def show_only_result(type:, col: , singular: )
-      if type == :uuid || (type == :integer && col.ends_with?("_id"))
-        association_read_only_result(col)
-      else
-        "<%= #{singular}.#{col} %>"
-      end
-    end
+    # def show_only_result(type:, col: , singular: )
+    #   if type == :uuid || (type == :integer && col.ends_with?("_id"))
+    #     association_read_only_result(col)
+    #   else
+    #     "<%= #{singular}.#{col} %>"
+    #   end
+    # end
 
 
 
-    def association_read_only_result(col)
-      assoc_name = col.to_s.gsub("_id","")
-      assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-      if assoc.nil?
-        exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-        exit
-      end
-
-      is_owner = col == ownership_field
-      assoc_class_name = assoc.class_name.to_s
-      display_column = HotGlue.derrive_reference_name(assoc_class_name)
-
-      if @hawk_keys[assoc.foreign_key.to_sym]
-        hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
-        hawked_association = hawk_definition.join(".")
-      else
-        hawked_association = "#{assoc.class_name}.all"
-      end
-      "<%= #{@singular}.#{assoc_name}.#{display_column} %>"
-    end
+    # def association_read_only_result(col)
+    #
+    # end
 
     def association_result(col)
 

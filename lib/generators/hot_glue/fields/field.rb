@@ -56,4 +56,8 @@ class Field
   def spec_related_column_lets
     ""
   end
+
+  def form_show_only_output
+    "<%= #{singular}.#{name} %>"
+  end
 end
