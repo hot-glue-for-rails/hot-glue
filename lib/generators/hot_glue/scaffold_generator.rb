@@ -707,9 +707,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       template "system_spec.rb.erb", dest_file
     end
 
-
-    if File.exist?("#{@markup}/_errors.#{@markup}")
-      File.delete("#{@markup}/_errors.#{@markup}")
+    if File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/_errors.#{@markup}")
+      File.delete("#{filepath_prefix}app/views#{namespace_with_dash}/_errors.#{@markup}")
     end
   end
 
