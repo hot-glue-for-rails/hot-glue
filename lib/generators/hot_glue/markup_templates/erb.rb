@@ -81,17 +81,23 @@ module  HotGlue
       result = columns.map{ |column|
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
-            if attachments.keys.include?(col)
 
+            # field_result = show_only.include?(col.to_sym) ?
+            #                  columns_map[col].form_show_only_output :
+            #                  columns_map[col].form_field_output
+
+            if attachments.keys.include?(col)
               field_result = columns_map[col].form_field_output
-              field_error_name = columns_map[col].field_error_name
             else
               type = eval("#{singular_class}.columns_hash['#{col}']").type
               limit = eval("#{singular_class}.columns_hash['#{col}']").limit
               sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
-              field_error_name = columns_map[col].field_error_name
+
               field_result =
                 if show_only.include?(col.to_sym)
+
+                  # field_result = columns_map[col].form_show_only_output
+                  #
                   show_only_result(type: type, col: col, singular: singular)
                 else
                   case type
@@ -117,22 +123,21 @@ module  HotGlue
                     enum_result(col)
                   end
                 end
-
-              if (type == :integer) && col.to_s.ends_with?("_id")
-                field_error_name = col.to_s.gsub("_id","")
-              else
-                field_error_name = col
-              end
-
             end
+
+            field_error_name = columns_map[col].field_error_name
             the_label = "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
             show_only_open = ""
             show_only_close = ""
+
+            byebug if columns_map[col].nil?
+
             if update_show_only.include?(col)
               show_only_open = "<% if action_name == 'edit' %>" +
                 show_only_result(type: type, col: col, singular: singular) + "<% else %>"
               show_only_close = "<% end %>"
             end
+
 
             add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
                                     add_spaces_each_line( (form_labels_position == 'before' ? the_label : "") +

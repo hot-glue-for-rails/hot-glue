@@ -24,15 +24,16 @@ describe HotGlue::ErbTemplate do
   }
   def factory_all_form_fields(options)
     generator =  OpenStruct.new(downnest_object: {} ,
-                             columns: options[:columns],
-                             smart_layout: false,
-
-                              bootstrap_column_width: 2)
+                                columns: options[:columns],
+                                smart_layout: false,
+                                attachments: {},
+                                bootstrap_column_width: 2, singular: options[:singular] || "jkl")
 
     builder = HotGlue::Layout::Builder.new(include_setting: '',
                                            generator: generator,
                                            buttons_width: 0,)
     layout_object = builder.construct
+
 
 
     @template_builder = HotGlue::ErbTemplate.new(
@@ -49,11 +50,27 @@ describe HotGlue::ErbTemplate do
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
       alt_lookups: {},
-      columns_map: {hgi_id:
-                      AssociationField.new(ownership_field: "", name: "hgi", class_name: "Jkl", alt_lookups: {},
-                                           singular: "Jkl", update_show_only: nil, hawk_keys: {},
-                                           auth: "", sample_file_path: nil, attachment_data: nil)},
+      columns_map: {
+        long_description: FieldFactory.new(type: :text, name: "long_description", generator: generator).field,
+        cost: FieldFactory.new(type: :float, name: "cost", generator: generator).field,
+        blurb: FieldFactory.new(type: :string, name: "blurb", generator: generator).field,
 
+        selected: BooleanField.new(name: "selected", ownership_field: "",  auth: "",
+                                    class_name: "Jkl", alt_lookups: {}, singular: "Jkl",
+                                    update_show_only: nil, sample_file_path: nil, attachment_data: nil),
+
+        name: TextField.new(name: "name", ownership_field: "",  auth: "",
+                            class_name: "Jkl", alt_lookups: {}, singular: "Jkl",
+                            update_show_only: nil, sample_file_path: nil, attachment_data: nil),
+        hgi_id:
+                      AssociationField.new(ownership_field: "", name: "hgi", class_name: "Jkl", alt_lookups: {},
+                                           singular: "Jkl", update_show_only: nil, hawk_keys:  options[:hawk_keys],
+                                           auth: "", sample_file_path: nil, attachment_data: nil),
+        time_of_day: FieldFactory.new(type: :time, name: "time_of_day", generator: generator).field,
+        release_on: FieldFactory.new(type: :date, name: "release_on", generator: generator).field,
+        approved_at: FieldFactory.new(type: :datetime, name: "approved_at", generator: generator).field,
+        how_many_printed: FieldFactory.new(type: :integer, name: "how_many_printed", generator: generator).field,
+      },
       attachments: {})
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy,
@@ -277,8 +294,9 @@ describe HotGlue::ErbTemplate do
   end
 
   describe "with an ownership_field" do
-
   end
+
+  let (:hawk_keys_for_hgi_id) {{hgi_id: {bind_to: ["current_user.hgis"], optional: false }}}
 
   describe "hawked foreign keys" do
     #  this test is proxy-texting to HotGlue::ErbTemplate#integer_result
@@ -289,9 +307,9 @@ describe HotGlue::ErbTemplate do
                                      alt_lookups: {},
                                      singular_class: Jkl,
                                      singular: "jkl",
-                                     hawk_keys: {hgi_id: {bind_to: ["current_user.hgis"], optional: false }}})
+                                     hawk_keys: hawk_keys_for_hgi_id})
 
-      expect(res).to include("f.collection_select(:dfg_id, current_user.hgis,")
+      expect(res).to include("<%= f.collection_select(:hgi, current_user.hgis,")
     end
   end
 end

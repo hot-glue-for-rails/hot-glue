@@ -6,9 +6,9 @@ class Field
   attr_accessor :hawk_keys, :auth, :sample_file_path, :form_placeholder_labels, :ownership_field
 
   def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: ,
-                 hawk_keys: , auth: , ownership_field: ,
-                 sample_file_path: nil, attachment_data: nil,
-                 form_placeholder_labels: nil)
+                  auth: , ownership_field: ,   hawk_keys: nil,
+                  sample_file_path: nil, attachment_data: nil,
+                  form_placeholder_labels: nil)
     @name = name
     @alt_lookups = alt_lookups
     @singular = singular
