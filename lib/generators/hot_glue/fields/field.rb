@@ -3,10 +3,12 @@ class Field
                 :update_show_only
   attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :assoc_label
 
-  attr_accessor :hawk_keys, :auth, :sample_file_path
+  attr_accessor :hawk_keys, :auth, :sample_file_path, :form_placeholder_labels, :ownership_field
 
   def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: ,
-                 hawk_keys: , auth: , sample_file_path: nil, attachment_data: nil )
+                 hawk_keys: , auth: , ownership_field: ,
+                 sample_file_path: nil, attachment_data: nil,
+                 form_placeholder_labels: nil)
     @name = name
     @alt_lookups = alt_lookups
     @singular = singular
@@ -15,10 +17,16 @@ class Field
     @hawk_keys = hawk_keys
     @auth = auth
     @sample_file_path = sample_file_path
+    @form_placeholder_labels = form_placeholder_labels
+    @ownership_field = ownership_field
   end
 
   def getName
     @name
+  end
+
+  def field_error_name
+    name
   end
 
   def spec_random_data

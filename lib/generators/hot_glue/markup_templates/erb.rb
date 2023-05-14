@@ -86,18 +86,17 @@ module  HotGlue
               field_result = columns_map[col].form_field_output
               field_error_name = columns_map[col].field_error_name
             else
-
               type = eval("#{singular_class}.columns_hash['#{col}']").type
               limit = eval("#{singular_class}.columns_hash['#{col}']").limit
               sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
-
+              field_error_name = columns_map[col].field_error_name
               field_result =
                 if show_only.include?(col.to_sym)
                   show_only_result(type: type, col: col, singular: singular)
                 else
                   case type
                   when :integer
-                    integer_result(col)
+                    columns_map[col].form_field_output
                   when :uuid
                     association_result(col)
                   when :string
@@ -137,7 +136,7 @@ module  HotGlue
 
             add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
                                     add_spaces_each_line( (form_labels_position == 'before' ? the_label : "") +
-                                                            show_only_open +  field_result + show_only_close +
+                                                            show_only_open + field_result + show_only_close +
                                                             (form_labels_position == 'after' ? the_label : "")   , 4) +
                                     "\n  </span>\n  <br />", 2)
 
@@ -155,14 +154,7 @@ module  HotGlue
       end
     end
 
-    def integer_result(col)
-      # look for a belongs_to on this object
-      if col.to_s.ends_with?("_id")
-        association_result(col)
-      else
-        "  <%= f.text_field :#{col}, value: #{@singular}.#{col}, autocomplete: 'off', size: 4, class: 'form-control', type: 'number'"  + (@form_placeholder_labels ? ", placeholder: '#{col.to_s.humanize}'" : "")  +  " %>\n " + "\n"
-      end
-    end
+
 
     def association_read_only_result(col)
       assoc_name = col.to_s.gsub("_id","")
@@ -186,34 +178,7 @@ module  HotGlue
     end
 
     def association_result(col)
-      assoc_name = col.to_s.gsub("_id","")
-      assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
-
-      if @alt_lookups.keys.include?(col.to_s)
-        alt = @alt_lookups[col.to_s][:lookup_as]
-        "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" %>"
-      else
-        if assoc.nil?
-          exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-          exit
-        end
-
-        is_owner = col == ownership_field
-        assoc_class_name = assoc.class_name.to_s
-        display_column = HotGlue.derrive_reference_name(assoc_class_name)
-        if @hawk_keys[assoc.foreign_key.to_sym]
-          hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
-          hawked_association = hawk_definition[:bind_to].join(".")
-        else
-          hawked_association = "#{assoc.class_name}.all"
-        end
-
-        (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
-          "  <%= f.collection_select(:#{col}, #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col} }, class: 'form-control') %>\n" +
-          (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
-          (is_owner ? "\n<% end %>" : "")
-      end
     end
 
     def string_result(col, sql_type, limit)

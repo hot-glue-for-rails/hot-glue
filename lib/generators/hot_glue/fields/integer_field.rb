@@ -23,4 +23,9 @@ class IntegerField < Field
   def spec_list_view_assertion
     "expect(page).to have_content(#{singular}#{1}.#{name})"
   end
+
+  def form_field_output
+    # look for a belongs_to on this object
+    "  <%= f.text_field :#{name}, value: #{@singular}.#{name}, autocomplete: 'off', size: 4, class: 'form-control', type: 'number'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  +  " %>\n " + "\n"
+  end
 end

@@ -1,7 +1,7 @@
 class AttachmentField < Field
   attr_accessor :attachment_data
   def initialize(name:, class_name:, alt_lookups:, singular:, update_show_only:, hawk_keys:, auth:,
-                 sample_file_path: nil, attachment_data: )
+                 sample_file_path: nil, attachment_data:, ownership_field: )
     super
     @attachment_data = attachment_data
   end
@@ -30,7 +30,5 @@ class AttachmentField < Field
     return field_result
   end
 
-  def field_error_name
-    name
-  end
+
 end

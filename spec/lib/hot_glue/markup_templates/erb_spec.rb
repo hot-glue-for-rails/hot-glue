@@ -36,11 +36,9 @@ describe HotGlue::ErbTemplate do
 
 
     @template_builder = HotGlue::ErbTemplate.new(
-      # columns: [[:name, :blurb]],
       show_only: [],
       singular_class: options[:singular_class] || "Jkl",
       singular: options[:singular] || "jkl",
-      # col_identifier:  "col-md-2",
       hawk_keys: options[:hawk_keys] || {},
       ownership_field: "hgi",
       layout_strategy: layout_strategy,
@@ -51,7 +49,11 @@ describe HotGlue::ErbTemplate do
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
       alt_lookups: {},
-      columns_map: {dfg_id: {}},
+      columns_map: {hgi_id:
+                      AssociationField.new(ownership_field: "", name: "hgi", class_name: "Jkl", alt_lookups: {},
+                                           singular: "Jkl", update_show_only: nil, hawk_keys: {},
+                                           auth: "", sample_file_path: nil, attachment_data: nil)},
+
       attachments: {})
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy,
@@ -60,8 +62,6 @@ describe HotGlue::ErbTemplate do
   end
 
   def factory_all_line_fields(options)
-
-
     generator =  OpenStruct.new(downnest_object: {} ,
                                 columns: options[:columns],
 
@@ -264,11 +264,9 @@ describe HotGlue::ErbTemplate do
     end
   end
 
-
   describe "with show only fields" do
 
   end
-
 
   describe "with singular_class" do
 
@@ -282,24 +280,18 @@ describe HotGlue::ErbTemplate do
 
   end
 
-
-
-
   describe "hawked foreign keys" do
     #  this test is proxy-texting to HotGlue::ErbTemplate#integer_result
     #
-    #
 
-
-    it "should hawk the dfg_id to the current user" do
-      res = factory_all_form_fields({columns: [:dfg_id],
+    it "should hawk the hgi_id to the current user" do
+      res = factory_all_form_fields({columns: [:hgi_id],
                                      alt_lookups: {},
-                                     singular_class: Ghi,
-                                     singular: "ghi",
+                                     singular_class: Jkl,
+                                     singular: "jkl",
+                                     hawk_keys: {hgi_id: {bind_to: ["current_user.hgis"], optional: false }}})
 
-                                     hawk_keys: {dfg_id: {bind_to: ["current_user.dfgs"], optional: false }}})
-
-      expect(res).to include("f.collection_select(:dfg_id, current_user.dfgs,")
+      expect(res).to include("f.collection_select(:dfg_id, current_user.hgis,")
     end
   end
 end

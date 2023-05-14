@@ -4,8 +4,10 @@ require_relative './field.rb'
 class AssociationField < Field
 
   def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: ,
-                 hawk_keys: , auth: , sample_file_path:, attachment_data: nil )
+                 hawk_keys: , auth: , sample_file_path:,  ownership_field: ,
+                 attachment_data: nil )
     super
+
     assoc_model = eval("#{class_name}.reflect_on_association(:#{assoc})")
 
     if assoc_model.nil?
@@ -72,5 +74,40 @@ class AssociationField < Field
     hawk_keys_on_lets = (hawk_keys["#{assoc}_id".to_sym] ? ", #{auth.gsub('current_', '')}: #{auth}": "")
 
     "  let!(:#{assoc}1) {create(:#{the_foreign_class}" +  hawk_keys_on_lets + ")}"
+  end
+
+  def form_field_output
+    assoc_name = name.to_s.gsub("_id","")
+    assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
+
+
+    if @alt_lookups.keys.include?(name.to_s)
+      alt = @alt_lookups[name.to_s][:lookup_as]
+      "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" %>"
+    else
+      if assoc.nil?
+        exit_message = "*** Oops. on the #{class_name} object, there doesn't seem to be an association called '#{assoc_name}'"
+        exit
+      end
+
+      is_owner = name == ownership_field
+      assoc_class_name = assoc.class_name.to_s
+      display_column = HotGlue.derrive_reference_name(assoc_class_name)
+      if @hawk_keys[assoc.foreign_key.to_sym]
+        hawk_definition = @hawk_keys[assoc.foreign_key.to_sym]
+        hawked_association = hawk_definition[:bind_to].join(".")
+      else
+        hawked_association = "#{assoc.class_name}.all"
+      end
+
+      (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
+        "  <%= f.collection_select(:#{name}, #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{name} }, class: 'form-control') %>\n" +
+        (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
+        (is_owner ? "\n<% end %>" : "")
+    end
+  end
+
+  def field_error_name
+
   end
 end

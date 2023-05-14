@@ -47,6 +47,7 @@ class FieldFactory
 
 
     @field = field_class.new(name: name,
+                             ownership_field: generator.ownership_field,
                              hawk_keys: generator.hawk_keys,
                              auth: generator.auth,
                              class_name: generator.singular_class,
