@@ -1253,16 +1253,17 @@ end
 
 # VERSION HISTORY
 
-#### TBR
-- When updating a record in a child that appears within a nested parent (path), the parent EDIT record will aautomatically be turbo replaced along with the record you are editing (works for create, update, and destroy).
+#### TBR 
+- When using big edit, updating a child will now re-render the parent EDIT record automatically.
 
 For example
 `rails generate hot_glue:scafold LineItem --nested=invioce`
-Whenever the line item is created, updated, or destroyed, the parent invoice record gets re-rendered automatically. 
 
+Whenever the line item is created, updated, or destroyed, the parent invoice record gets (edit action) re-rendered automatically. This happens for the big edit screen of the invoice.
+
+#### 2023-05-14 - v0.5.14 Delete message flash notice and new flash notice partial
 
 - This changes to how flash_notices work.
-- 
 - After you upgrade to 0.5.14 from a prior version, please re-install the global flash notice
 - template with:
 
