@@ -4,7 +4,7 @@ class AttachmentField < Field
                  sample_file_path: nil, attachment_data:, ownership_field:, layout_strategy: ,
                  form_placeholder_labels: , form_labels_position:)
     super
-    
+
     @attachment_data = attachment_data
   end
 

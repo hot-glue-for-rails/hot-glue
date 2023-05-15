@@ -143,43 +143,8 @@ module  HotGlue
           if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
           end
-
-          if attachments.keys.include?(col)
-
-            field_output = columns_map[col].line_field_output
-
-          else
-            type = eval("#{singular_class}.columns_hash['#{col}']").type
-            limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-            sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
-
-            field_output =
-              case type
-              when :integer
-                columns_map[col].line_field_output
-              when :uuid
-                columns_map[col].line_field_output
-
-              when :float
-                columns_map[col].line_field_output
-
-              when :string
-                columns_map[col].line_field_output
-              when :text
-                columns_map[col].line_field_output
-              when :datetime
-                columns_map[col].line_field_output
-              when :date
-                columns_map[col].line_field_output
-              when :time
-                columns_map[col].line_field_output
-              when :boolean
-                columns_map[col].line_field_output
-              when :enum
-                columns_map[col].line_field_output
-              end #end of switch
-          end
-
+          field_output = columns_map[col].line_field_output
+          
           label = "<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
           "#{inline_list_labels == 'before' ? label + "<br/>" : ''}#{field_output}#{inline_list_labels == 'after' ? "<br/>" + label : ''}"
