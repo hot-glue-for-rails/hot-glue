@@ -81,60 +81,21 @@ module  HotGlue
       result = columns.map{ |column|
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
-
-            # field_result = show_only.include?(col.to_sym) ?
-            #                  columns_map[col].form_show_only_output :
-            #                  columns_map[col].form_field_output
-
-            if attachments.keys.include?(col)
-              field_result = columns_map[col].form_field_output
-            else
-              type = eval("#{singular_class}.columns_hash['#{col}']").type
-              limit = eval("#{singular_class}.columns_hash['#{col}']").limit
-              sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
-
-              field_result =
-                if show_only.include?(col.to_sym)
-                  field_result = columns_map[col].form_show_only_output
-                else
-                  case type
-                  when :integer
-                    columns_map[col].form_field_output
-                  when :uuid
-                    columns_map[col].form_field_output
-                  when :string
-                    columns_map[col].form_field_output
-                  when :text
-                    columns_map[col].form_field_output
-                  when :float
-                    columns_map[col].form_field_output
-                  when :datetime
-                    columns_map[col].form_field_output
-                  when :date
-                    columns_map[col].form_field_output
-                  when :time
-                    columns_map[col].form_field_output
-                  when :boolean
-                    columns_map[col].form_field_output
-                  when :enum
-                    columns_map[col].form_field_output
-                  end
-                end
-            end
+            field_result = show_only.include?(col.to_sym) ?
+                             columns_map[col].form_show_only_output :
+                             columns_map[col].form_field_output
 
             field_error_name = columns_map[col].field_error_name
+
             the_label = "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
             show_only_open = ""
             show_only_close = ""
-
-            byebug if columns_map[col].nil?
 
             if update_show_only.include?(col)
               show_only_open = "<% if action_name == 'edit' %>" +
                 show_only_result(type: type, col: col, singular: singular) + "<% else %>"
               show_only_close = "<% end %>"
             end
-
 
             add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
                                     add_spaces_each_line( (form_labels_position == 'before' ? the_label : "") +
@@ -156,10 +117,9 @@ module  HotGlue
     end
 
 
-
-
     ################################################################
-
+    # THE SHOW ACTION
+    ################################################################
 
     def all_line_fields(layout_strategy:,
                         layout_object: ,
