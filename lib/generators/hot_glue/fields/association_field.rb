@@ -19,9 +19,7 @@ class AssociationField < Field
       raise(HotGlue::Error, exit_message)
     end
 
-    begin
-      @assoc_class = eval(assoc_model.try(:class_name))
-    end
+    @assoc_class = eval(assoc_model.try(:class_name))
 
     name_list = [:name, :to_label, :full_name, :display_name, :email]
 
@@ -95,7 +93,7 @@ class AssociationField < Field
       is_owner = name == ownership_field
       assoc_class_name = assoc.class_name.to_s
       display_column = HotGlue.derrive_reference_name(assoc_class_name)
-      
+
       if hawk_keys[assoc.foreign_key.to_sym]
         hawk_definition = hawk_keys[assoc.foreign_key.to_sym]
         hawked_association = hawk_definition[:bind_to].join(".")

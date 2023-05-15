@@ -160,19 +160,6 @@ module  HotGlue
               when :integer
                 # look for a belongs_to on this object
                 if col.ends_with?("_id")
-                  assoc_name = col.to_s.gsub("_id","")
-                  assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-
-                  if assoc.nil?
-                    exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-                    puts exit_message
-                    exit
-                    # raise(HotGlue::Error,exit_message)
-                  end
-                  assoc_class_name = assoc.class_name
-
-                  display_column =  HotGlue.derrive_reference_name(assoc_class_name)
-
                   columns_map[col].line_field_output
 
                 else
