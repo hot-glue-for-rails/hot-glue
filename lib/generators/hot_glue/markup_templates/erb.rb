@@ -101,13 +101,14 @@ module  HotGlue
                   when :integer
                     columns_map[col].form_field_output
                   when :uuid
-                    association_result(col)
+                    columns_map[col].form_field_output
                   when :string
-                    string_result(col, sql_type, limit)
+                    columns_map[col].form_field_output
                   when :text
-                    text_result(col, sql_type, limit)
+                    columns_map[col].form_field_output
                   when :float
-                    field_output(col, nil, 5, column_classes)
+                    columns_map[col].form_field_output
+
                   when :datetime
                     "<%= datetime_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
                   when :date
@@ -148,53 +149,6 @@ module  HotGlue
     end
 
 
-    # def show_only_result(type:, col: , singular: )
-    #   if type == :uuid || (type == :integer && col.ends_with?("_id"))
-    #     association_read_only_result(col)
-    #   else
-    #     "<%= #{singular}.#{col} %>"
-    #   end
-    # end
-
-
-
-    # def association_read_only_result(col)
-    #
-    # end
-
-    def association_result(col)
-
-    end
-
-    def string_result(col, sql_type, limit)
-      if sql_type == "varchar" || sql_type == "character varying"
-        field_output(col, nil, limit || 40, col_identifier)
-      else
-        text_area_output(col, 65536, col_identifier)
-      end
-    end
-
-
-    def text_result(col, sql_type, limit)
-      if sql_type == "varchar"
-        field_output(col, nil, limit, col_identifier)
-      else
-        text_area_output(col, 65536, col_identifier)
-      end
-    end
-
-    def field_output(col, type = nil, width, col_identifier )
-      "  <%= f.text_field :#{col}, value: #{@singular}.#{col}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (@form_placeholder_labels ? ", placeholder: '#{col.to_s.humanize}'" : "")  +  " %>\n " + "\n"
-    end
-
-    def text_area_output(col, field_length, col_identifier )
-      lines = field_length % 40
-      if lines > 5
-        lines = 5
-      end
-
-      "<%= f.text_area :#{col}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}'"  + ( @form_placeholder_labels ? ", placeholder: '#{col.to_s.humanize}'" : "") + " %>"
-    end
 
     def boolean_result(col)
       (form_labels_position == 'before' ?  " <br />"  : "") +

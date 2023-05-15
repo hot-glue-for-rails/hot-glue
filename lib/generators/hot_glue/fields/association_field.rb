@@ -5,7 +5,7 @@ class AssociationField < Field
 
   def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: ,
                  hawk_keys: , auth: , sample_file_path:,  ownership_field: ,
-                 attachment_data: nil )
+                 attachment_data: nil , layout_strategy: , form_placeholder_labels: nil )
     super
 
     assoc_model = eval("#{class_name}.reflect_on_association(:#{assoc})")

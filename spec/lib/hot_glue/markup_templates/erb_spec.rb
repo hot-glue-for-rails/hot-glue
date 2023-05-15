@@ -27,7 +27,10 @@ describe HotGlue::ErbTemplate do
                                 columns: options[:columns],
                                 smart_layout: false,
                                 attachments: {},
-                                bootstrap_column_width: 2, singular: options[:singular] || "jkl")
+                                bootstrap_column_width: 2,
+                                singular_class: "Jkl",
+                                form_placeholder_labels: options[:form_placeholder_labels],
+                                singular: options[:singular] || "jkl")
 
     builder = HotGlue::Layout::Builder.new(include_setting: '',
                                            generator: generator,
@@ -52,18 +55,14 @@ describe HotGlue::ErbTemplate do
       alt_lookups: {},
       columns_map: {
         long_description: FieldFactory.new(type: :text, name: "long_description", generator: generator).field,
+
         cost: FieldFactory.new(type: :float, name: "cost", generator: generator).field,
         blurb: FieldFactory.new(type: :string, name: "blurb", generator: generator).field,
 
-        selected: BooleanField.new(name: "selected", ownership_field: "",  auth: "",
-                                    class_name: "Jkl", alt_lookups: {}, singular: "Jkl",
-                                    update_show_only: nil, sample_file_path: nil, attachment_data: nil),
-
-        name: TextField.new(name: "name", ownership_field: "",  auth: "",
-                            class_name: "Jkl", alt_lookups: {}, singular: "Jkl",
-                            update_show_only: nil, sample_file_path: nil, attachment_data: nil),
-        hgi_id:
-                      AssociationField.new(ownership_field: "", name: "hgi", class_name: "Jkl", alt_lookups: {},
+        selected: FieldFactory.new(type: :boolean, name: "selected", generator: generator).field,
+        name: FieldFactory.new(type: :string, name: "name", generator: generator).field,
+        hgi_id: AssociationField.new(layout_strategy: layout_strategy,
+          ownership_field: "", name: "hgi_id", class_name: "Jkl", alt_lookups: {},
                                            singular: "Jkl", update_show_only: nil, hawk_keys:  options[:hawk_keys],
                                            auth: "", sample_file_path: nil, attachment_data: nil),
         time_of_day: FieldFactory.new(type: :time, name: "time_of_day", generator: generator).field,
@@ -309,7 +308,7 @@ describe HotGlue::ErbTemplate do
                                      singular: "jkl",
                                      hawk_keys: hawk_keys_for_hgi_id})
 
-      expect(res).to include("<%= f.collection_select(:hgi, current_user.hgis,")
+      expect(res).to include("<%= f.collection_select(:hgi_id, current_user.hgis,")
     end
   end
 end

@@ -45,8 +45,9 @@ class FieldFactory
             end
     @class_name = class_name
 
-
     @field = field_class.new(name: name,
+                             layout_strategy: generator.layout_strategy,
+                             form_placeholder_labels: generator.form_placeholder_labels,
                              ownership_field: generator.ownership_field,
                              hawk_keys: generator.hawk_keys,
                              auth: generator.auth,

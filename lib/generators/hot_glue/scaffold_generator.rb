@@ -28,7 +28,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :nest_with,
                 :path,  :plural,
                 :sample_file_path,  :singular, :singular_class, :smart_layout,
-                :stacked_downnesting,  :update_show_only, :ownership_field
+                :stacked_downnesting,  :update_show_only, :ownership_field,
+                :layout_strategy, :form_placeholder_labels
 
   class_option :singular, type: :string, default: nil
   class_option :plural, type: :string, default: nil

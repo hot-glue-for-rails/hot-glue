@@ -30,4 +30,21 @@ class StringField < Field
       "#{name}: FFaker::Movie.title"
     end
   end
+
+  def form_field_output
+    if sql_type == "varchar" || sql_type == "character varying"
+      field_output(nil, limit || 40)
+    else
+      text_area_output( 65536)
+    end
+  end
+
+  # TODO: dry with text_field.rb
+  def text_result(col, sql_type, limit)
+    if sql_type == "varchar"
+      field_output( nil, limit)
+    else
+      text_area_output( 65536)
+    end
+  end
 end

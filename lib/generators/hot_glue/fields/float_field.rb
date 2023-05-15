@@ -8,4 +8,8 @@ class FloatField < Field
   def spec_setup_let_arg
     "#{name}: rand(1)*10000"
   end
+
+  def form_field_output
+    field_output(nil, 5)
+  end
 end
