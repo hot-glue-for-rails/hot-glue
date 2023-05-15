@@ -72,6 +72,10 @@ class Field
     "<%= #{singular}.#{name} %>"
   end
 
+  def line_field_output
+    "<%= #{singular}.#{name} %>"
+  end
+
   def field_output(type = nil, width )
     "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  +  " %>\n " + "\n"
   end

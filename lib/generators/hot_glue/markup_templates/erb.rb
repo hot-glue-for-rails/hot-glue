@@ -158,35 +158,17 @@ module  HotGlue
             field_output =
               case type
               when :integer
-                # look for a belongs_to on this object
-                if col.ends_with?("_id")
-                  columns_map[col].line_field_output
-
-                else
-                  "<%= #{singular}.#{col}%>"
-                end
-
+                columns_map[col].line_field_output
               when :uuid
-                assoc_name = col.to_s.gsub("_id","")
-                assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
-
-                if assoc.nil?
-                  exit_message =  "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-                  puts exit_message
-                  exit
-                  # raise(HotGlue::Error,exit_message)
-                end
-
                 columns_map[col].line_field_output
 
               when :float
                 columns_map[col].line_field_output
 
               when :string
-                width = (limit && limit < 40) ? limit : (40)
-                "<%= #{singular}.#{col} %>"
+                columns_map[col].line_field_output
               when :text
-                "<%= #{singular}.#{col} %>"
+                columns_map[col].line_field_output
               when :datetime
                 "<% unless #{singular}.#{col}.nil? %>
   <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
