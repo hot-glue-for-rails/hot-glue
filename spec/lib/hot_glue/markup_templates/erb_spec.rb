@@ -62,6 +62,7 @@ describe HotGlue::ErbTemplate do
         selected: FieldFactory.new(type: :boolean, name: "selected", generator: generator).field,
         name: FieldFactory.new(type: :string, name: "name", generator: generator).field,
         hgi_id: AssociationField.new(layout_strategy: layout_strategy,
+                                     form_labels_position: 'before',
           ownership_field: "", name: "hgi_id", class_name: "Jkl", alt_lookups: {},
                                            singular: "Jkl", update_show_only: nil, hawk_keys:  options[:hawk_keys],
                                            auth: "", sample_file_path: nil, attachment_data: nil),

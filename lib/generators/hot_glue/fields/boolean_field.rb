@@ -15,4 +15,14 @@ class BooleanField < Field
   def spec_list_view_assertion
     "      " + ["expect(page).to have_content(#{singular}#{1}.#{name} ? 'YES' : 'NO')"].join("\n      ")
   end
+  
+  
+  def form_field_output
+    (form_labels_position == 'before' ?  " <br />"  : "") +
+      "  <%= f.radio_button(:#{name},  '0', checked: #{singular}.#{name}  ? '' : 'checked') %>\n" +
+      "  <%= f.label(:#{name}, value: 'No', for: '#{singular}_#{name}_0') %>\n" +
+      "  <%= f.radio_button(:#{name}, '1',  checked: #{singular}.#{name}  ? 'checked' : '') %>\n" +
+      "  <%= f.label(:#{name}, value: 'Yes', for: '#{singular}_#{name}_1') %>\n" +
+      (form_labels_position == 'after' ?  " <br />"  : "")
+  end
 end

@@ -111,11 +111,11 @@ module  HotGlue
                   when :datetime
                     columns_map[col].form_field_output
                   when :date
-                    "<%= date_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+                    columns_map[col].form_field_output
                   when :time
-                    "<%= time_field_localized(f, :#{col}, #{singular}.#{col},  '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+                    columns_map[col].form_field_output
                   when :boolean
-                    boolean_result(col)
+                    columns_map[col].form_field_output
                   when :enum
                     enum_result(col)
                   end
@@ -145,18 +145,6 @@ module  HotGlue
           }.join("") + "\n  </div>"
       }.join("\n")
       return result
-    end
-
-
-
-    def boolean_result(col)
-      (form_labels_position == 'before' ?  " <br />"  : "") +
-        "  <%= f.radio_button(:#{col},  '0', checked: #{singular}.#{col}  ? '' : 'checked') %>\n" +
-        "  <%= f.label(:#{col}, value: 'No', for: '#{singular}_#{col}_0') %>\n" +
-        "  <%= f.radio_button(:#{col}, '1',  checked: #{singular}.#{col}  ? 'checked' : '') %>\n" +
-        "  <%= f.label(:#{col}, value: 'Yes', for: '#{singular}_#{col}_1') %>\n" +
-      (form_labels_position == 'after' ?  " <br />"  : "")
-
     end
 
     def enum_result(col)

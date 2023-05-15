@@ -9,4 +9,7 @@ class DateField < Field
   end
 
 
+  def form_field_output
+    "<%= date_field_localized(f, :#{name}, #{singular}.#{name}, '#{ name.to_s.humanize  }', #{auth ? auth+'.timezone' : 'nil'}) %>"
+  end
 end

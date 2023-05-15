@@ -4,10 +4,11 @@ class Field
   attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :assoc_label
 
   attr_accessor :hawk_keys, :auth, :sample_file_path, :form_placeholder_labels, :ownership_field,
-                :sql_type, :limit, :layout_strategy
+                :sql_type, :limit, :layout_strategy, :form_labels_position
 
-  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: ,
-                 auth: , ownership_field: , hawk_keys: nil, layout_strategy: , form_placeholder_labels:  ,
+  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: , form_labels_position:,
+                  form_placeholder_labels: ,
+                 auth: , ownership_field: , hawk_keys: nil, layout_strategy:  ,
                  sample_file_path: nil, attachment_data: nil  )
 
     @name = name
@@ -21,6 +22,7 @@ class Field
     @sample_file_path = sample_file_path
     @form_placeholder_labels = form_placeholder_labels
     @ownership_field = ownership_field
+    @form_labels_position = form_labels_position
 
 
     # TODO: remove knowledge of subclasses from Field
