@@ -117,7 +117,7 @@ module  HotGlue
                   when :boolean
                     columns_map[col].form_field_output
                   when :enum
-                    enum_result(col)
+                    columns_map[col].form_field_output
                   end
                 end
             end
@@ -145,18 +145,6 @@ module  HotGlue
           }.join("") + "\n  </div>"
       }.join("\n")
       return result
-    end
-
-    def enum_result(col)
-      enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
-
-      if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
-        enum_definer = "#{singular_class}.#{enum_type}_labels"
-      else
-        enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
-      end
-
-      "<%= f.collection_select(:#{col},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: @#{singular}.#{col} }, class: 'form-control') %>"
     end
 
     ################################################################

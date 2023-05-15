@@ -24,4 +24,15 @@ class EnumField < Field
       "expect(page).to have_content(#{singular}1.#{name})"
     end
   end
+
+  def form_fields_output
+    enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{name}'}[0].sql_type")
+
+    if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
+      enum_definer = "#{singular_class}.#{enum_type}_labels"
+    else
+      enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
+    end
+    return "<%= f.collection_select(:#{name},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: #{singular}.#{name} }, class: 'form-control') %>"
+  end
 end
