@@ -16,7 +16,7 @@ module  HotGlue
                    small_buttons: , show_only: ,
                    ownership_field: , form_labels_position: ,
                    inline_list_labels: ,
-                   form_placeholder_labels:, hawk_keys:,
+                   form_placeholder_labels:, hawk_keys: ,
                    update_show_only:, alt_lookups: , attachments: , columns_map: )
 
       @singular = singular
@@ -172,7 +172,8 @@ module  HotGlue
                   assoc_class_name = assoc.class_name
 
                   display_column =  HotGlue.derrive_reference_name(assoc_class_name)
-                  "<%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
+
+                  columns_map[col].line_field_output
 
                 else
                   "<%= #{singular}.#{col}%>"
@@ -189,12 +190,11 @@ module  HotGlue
                   # raise(HotGlue::Error,exit_message)
                 end
 
-                display_column =  HotGlue.derrive_reference_name(assoc.class_name.to_s)
-                "<%= #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
+                columns_map[col].line_field_output
 
               when :float
-                width = (limit && limit < 40) ? limit : (40)
-                "<%= #{singular}.#{col}%>"
+                columns_map[col].line_field_output
+
               when :string
                 width = (limit && limit < 40) ? limit : (40)
                 "<%= #{singular}.#{col} %>"
@@ -226,9 +226,7 @@ module  HotGlue
       YES
     <% else %>
       NO
-    <% end %>
-
-  "
+    <% end %>"
               when :enum
                 enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
 
@@ -248,10 +246,9 @@ module  HotGlue
               end #end of switch
           end
 
-          label = "<br/><label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+          label = "<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
-          (inline_list_labels == 'before' ? label : "") + field_output +
-            (inline_list_labels == 'after' ? label : "")
+          "#{inline_list_labels == 'before' ? label + "<br/>" : ''}#{field_output}#{inline_list_labels == 'after' ? "<br/>" + label : ''}"
         }.join(  "<br />") + "</div>"
       }.join("\n")
     end

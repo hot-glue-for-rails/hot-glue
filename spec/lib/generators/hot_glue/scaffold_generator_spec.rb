@@ -700,7 +700,7 @@ describe HotGlue::ScaffoldGenerator do
                                           ["Abc","--god",
                                            "--inline-list-labels=before"])
       res = File.read("spec/dummy/app/views/abcs/_show.erb")
-      expect(res).to include("<label class='small form-text text-muted'>Name</label><%= abc.name %>")
+      expect(res).to include("<label class='small form-text text-muted'>Name</label><br/><%= abc.name %>")
     end
 
     describe "#list_label" do

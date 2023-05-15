@@ -27,7 +27,6 @@ class Field
 
     # TODO: remove knowledge of subclasses from Field
     unless self.class == AttachmentField
-      byebug if eval("#{class_name}.columns_hash['#{name}']").nil?
       @sql_type = eval("#{class_name}.columns_hash['#{name}']").sql_type
       @limit = eval("#{class_name}.columns_hash['#{name}']").limit
     end
