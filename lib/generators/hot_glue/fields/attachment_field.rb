@@ -4,6 +4,7 @@ class AttachmentField < Field
                  sample_file_path: nil, attachment_data:, ownership_field:, layout_strategy: ,
                  form_placeholder_labels: , form_labels_position:)
     super
+    
     @attachment_data = attachment_data
   end
 
@@ -31,5 +32,9 @@ class AttachmentField < Field
     return field_result
   end
 
+  def line_field_output
+    thumbnail = attachment_data[:thumbnail]
 
+    (thumbnail ? "<%= #{singular}.#{name}.attached? ? image_tag(#{singular}.#{name}.variant(:#{thumbnail})) : '' %>" : "")
+  end
 end

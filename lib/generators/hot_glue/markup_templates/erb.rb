@@ -145,10 +145,8 @@ module  HotGlue
           end
 
           if attachments.keys.include?(col)
-            this_attachment  = attachments[col]
-            thumbnail = this_attachment[:thumbnail]
 
-            field_output =  (this_attachment[:thumbnail] ? "<%= #{singular}.#{col}.attached? ? image_tag(#{singular}.#{col}.variant(:#{thumbnail})) : '' %>" : "")
+            field_output = columns_map[col].line_field_output
 
           else
             type = eval("#{singular_class}.columns_hash['#{col}']").type
@@ -170,48 +168,15 @@ module  HotGlue
               when :text
                 columns_map[col].line_field_output
               when :datetime
-                "<% unless #{singular}.#{col}.nil? %>
-  <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
-  <% else %>
-  <span class='alert-danger'>MISSING</span>
-  <% end %>"
+                columns_map[col].line_field_output
               when :date
-                "<% unless #{singular}.#{col}.nil? %>
-      <%= #{singular}.#{col} %>
-    <% else %>
-    <span class='alert-danger'>MISSING</span>
-    <% end %>"
+                columns_map[col].line_field_output
               when :time
-                "<% unless #{singular}.#{col}.nil? %>
-      <%= #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone) %>
-     <% else %>
-    <span class='alert-danger'>MISSING</span>
-    <% end %>"
+                columns_map[col].line_field_output
               when :boolean
-                "
-    <% if #{singular}.#{col}.nil? %>
-        <span class='alert-danger'>MISSING</span>
-    <% elsif #{singular}.#{col} %>
-      YES
-    <% else %>
-      NO
-    <% end %>"
+                columns_map[col].line_field_output
               when :enum
-                enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{col}'}[0].sql_type")
-
-                if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
-                  enum_definer = "#{singular_class}.#{enum_type}_labels"
-                else
-                  enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
-                end
-                "
-    <% if #{singular}.#{col}.nil? %>
-        <span class='alert-danger'>MISSING</span>
-    <% else %>
-      <%=  #{enum_definer}[#{singular}.#{col}.to_sym] %>
-    <% end %>
-
-"
+                columns_map[col].line_field_output
               end #end of switch
           end
 

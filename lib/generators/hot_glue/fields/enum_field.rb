@@ -35,4 +35,21 @@ class EnumField < Field
     end
     return "<%= f.collection_select(:#{name},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: #{singular}.#{name} }, class: 'form-control') %>"
   end
+
+  def line_field_output
+    enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{name}'}[0].sql_type")
+
+    if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
+      enum_definer = "#{singular_class}.#{enum_type}_labels"
+    else
+      enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
+    end
+    "
+    <% if #{singular}.#{name}.nil? %>
+        <span class='alert-danger'>MISSING</span>
+    <% else %>
+      <%=  #{enum_definer}[#{singular}.#{name}.to_sym] %>
+    <% end %>
+"
+  end
 end

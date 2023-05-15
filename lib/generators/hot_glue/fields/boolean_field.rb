@@ -25,4 +25,15 @@ class BooleanField < Field
       "  <%= f.label(:#{name}, value: 'Yes', for: '#{singular}_#{name}_1') %>\n" +
       (form_labels_position == 'after' ?  " <br />"  : "")
   end
+
+  def line_field_output
+    "
+    <% if #{singular}.#{name}.nil? %>
+        <span class='alert-danger'>MISSING</span>
+    <% elsif #{singular}.#{name} %>
+      YES
+    <% else %>
+      NO
+    <% end %>"
+  end
 end
