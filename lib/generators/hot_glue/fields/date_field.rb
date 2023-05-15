@@ -7,4 +7,6 @@ class DateField < Field
   def spec_setup_let_arg
     "#{name}: Date.current + rand(50).days"
   end
+
+
 end

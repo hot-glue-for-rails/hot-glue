@@ -108,9 +108,8 @@ module  HotGlue
                     columns_map[col].form_field_output
                   when :float
                     columns_map[col].form_field_output
-
                   when :datetime
-                    "<%= datetime_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
+                    columns_map[col].form_field_output
                   when :date
                     "<%= date_field_localized(f, :#{col}, #{singular}.#{col}, '#{ col.to_s.humanize  }', #{@auth ? @auth+'.timezone' : 'nil'}) %>"
                   when :time
