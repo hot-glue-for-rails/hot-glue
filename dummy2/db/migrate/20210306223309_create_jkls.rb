@@ -1,6 +1,6 @@
-class CreateJkls < ActiveRecord::Migration[6.1]
+class CreateJkls < ActiveRecord::Migration[7.0]
   def change
-    # create_enum 'genres', %w[Fiction Nonfiction Mystery Romance Novel]
+    create_enum 'genres', %w[Fiction Nonfiction Mystery Romance Novel]
 
     create_table :jkls do |t|
       t.integer :hgi_id
@@ -14,8 +14,8 @@ class CreateJkls < ActiveRecord::Migration[6.1]
       t.date :release_on
       t.time :time_of_day
       t.boolean :selected
-      t.integer :genre
-      # t.enum :genre, as: :genres
+      t.enum :genre, enum_type: :genres
+
       t.timestamps
     end
   end
