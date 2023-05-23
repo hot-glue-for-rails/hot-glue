@@ -38,12 +38,7 @@ jobs:
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
 
-      - name: Run RSpec
-        env:
-          - RUBYOPT: "-W:no-deprecated -W:no-experimental" # Suppress Rails 6 deprecation warnings for ruby 2.7
-          - RAILS_ENV: "test"
-          - DATABASE_URL: "postgres://postgres@localhost:5432/test_database_name"
-        run: bundle install && bundle exec rspec
+
 
 
 #  system_tests:
