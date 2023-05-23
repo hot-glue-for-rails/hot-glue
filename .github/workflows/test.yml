@@ -30,15 +30,20 @@ jobs:
       - name: Connect to PostgreSQL
         # Runs a script that creates a PostgreSQL table, populates
         # the table with data, and then retrieves the data.
-        run: dummy/bin/setup
+        run: cd dummy && bundle exec rails db:setup && cd ..
         # Environment variables used by the `client.js` script to create a new PostgreSQL table.
         env:
           # The hostname used to communicate with the PostgreSQL service container
           POSTGRES_HOST: postgres
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
-      - run: bundle install
-      - run: bundle exec rspec
+
+      - name: Run RSpec
+        env:
+          - RUBYOPT: "-W:no-deprecated -W:no-experimental" # Suppress Rails 6 deprecation warnings for ruby 2.7
+          - RAILS_ENV: "test"
+          - DATABASE_URL: "postgres://postgres@localhost:5432/test_database_name"
+        run: bundle install && bundle exec rspec
 
 
   system_tests:
@@ -69,12 +74,19 @@ jobs:
       - name: Connect to PostgreSQL
         # Runs a script that creates a PostgreSQL table, populates
         # the table with data, and then retrieves the data.
-        run: dummy/bin/setup
+        run: cd dummy && bundle exec rails db:setup && cd ..
         # Environment variables used by the `client.js` script to create a new PostgreSQL table.
         env:
           # The hostname used to communicate with the PostgreSQL service container
           POSTGRES_HOST: postgres
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
-      - run: bundle install
-      - run: bundle exec script/test
+
+      - name: Run System Tests
+        env:
+          - RUBYOPT: "-W:no-deprecated -W:no-experimental" # Suppress Rails 6 deprecation warnings for ruby 2.7
+          - RAILS_ENV: "test"
+          - DATABASE_URL: "postgres://postgres@localhost:5432/test_database_name"
+        run: |
+          bundle install 
+          bundle exec script/test
