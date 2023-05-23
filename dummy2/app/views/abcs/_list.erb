@@ -1,0 +1,37 @@
+<%= turbo_frame_tag "__abcs-list"   do %>
+  <div class="container ">
+    
+      <h4>
+        Apples
+      </h4>
+    
+
+    <%= render partial: "abcs/new_button", locals: {} %><br />
+
+    
+      
+        <div class="row ">
+          <div class='col-sm-1 heading--abc--name' >Name</div>
+
+          
+
+          <div class=' scaffold-col-heading scaffold-col-heading-buttons col-sm-1' >
+          </div>
+        </div>
+      
+
+      <% if abcs.empty? %>
+    <div>
+        None
+    </div>
+      <% end %>
+      <% abcs.each do |abc| %>
+        <%= render partial: 'abcs/line', locals: {abc: abc}
+            .merge(defined?(nested_for) ? {nested_for: nested_for} : {})
+      
+        %>
+      <% end %>
+    <% if abcs.respond_to?(:total_pages) %><%= paginate(abcs) %> <% end %>
+  
+  </div>
+<% end %>

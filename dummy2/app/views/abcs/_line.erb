@@ -1,0 +1,10 @@
+<%= turbo_frame_tag "__#{ dom_id(abc) }" do  %>
+  <div class='row' data-id='<%= abc.id %>' data-edit='false'>
+    <%= render partial: 'abcs/show', locals: { abc: abc } %>
+
+  </div>
+<% end %>
+
+
+
+
