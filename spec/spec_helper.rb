@@ -1,15 +1,9 @@
 ENV["RAILS_ENV"] ||= "test"
-# require 'byebug'
+require 'byebug'
 
 require 'simplecov'
 require 'simplecov-rcov'
-class SimpleCov::Formatter::MergedFormatter
-  def format(result)
-    SimpleCov::Formatter::HTMLFormatter.new.format(result)
-    SimpleCov::Formatter::RcovFormatter.new.format(result)
-  end
-end
-SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
+
 SimpleCov.start 'rails' do
   add_filter "/vendor/"
   add_filter "/test/"
@@ -17,6 +11,15 @@ SimpleCov.start 'rails' do
   add_filter "lib/hotglue/version.rb"
   add_filter "lib/generators/hot_glue/templates/capybara_login.rb"
 end
+
+class SimpleCov::Formatter::MergedFormatter
+  def format(result)
+    SimpleCov::Formatter::HTMLFormatter.new.format(result)
+    SimpleCov::Formatter::RcovFormatter.new.format(result)
+  end
+end
+SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
+
 
 require "rails/all"
 require 'rails/generators'
@@ -33,6 +36,9 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 Dummy::Application.initialize!
 
+
+
+
 RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
   config.order = :random
@@ -47,6 +53,7 @@ RSpec.configure do |config|
   end
 
   config.before {
+
     restore_default_warning_free_config
   }
 end

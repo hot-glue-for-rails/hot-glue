@@ -6,8 +6,8 @@ class EnumField < Field
   end
 
   def spec_make_assertion
-    if(eval("#{singular_class}.respond_to?(:#{name}_labels)"))
-      "expect(page).to have_content(#{singular_class}.#{name}_labels[new_#{name}])"
+    if(eval("#{class_name}.respond_to?(:#{name}_labels)"))
+      "expect(page).to have_content(#{class_name}.#{name}_labels[new_#{name}])"
     else
       "expect(page).to have_content(new_#{name})"
     end
@@ -18,31 +18,33 @@ class EnumField < Field
   end
 
   def spec_list_view_assertion
-    if(eval("#{singular_class}.respond_to?(:#{name}_labels)"))
-      "expect(page).to have_content(#{singular_class}.#{name}_labels[#{singular}#{1}.#{name}])"
+    if(eval("#{class_name}.respond_to?(:#{name}_labels)"))
+      "expect(page).to have_content(#{class_name}.#{name}_labels[#{singular}#{1}.#{name}])"
     else
       "expect(page).to have_content(#{singular}1.#{name})"
     end
   end
 
-  def form_fields_output
-    enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{name}'}[0].sql_type")
+  def form_field_output
+    enum_type = eval("#{class_name}.columns.select{|x| x.name == '#{name}'}[0]").sql_type
 
-    if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
-      enum_definer = "#{singular_class}.#{enum_type}_labels"
+    if eval("defined? #{class_name}.#{enum_type}_labels") == "method"
+      enum_definer = "#{class_name}.#{enum_type}_labels"
     else
-      enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
+      enum_definer = "#{class_name}.defined_enums['#{enum_type}']"
     end
-    return "<%= f.collection_select(:#{name},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: #{singular}.#{name} }, class: 'form-control') %>"
+    #TODO: add testing
+    # TODO: FIX enum_definer here
+    return "<%= f.collection_select(:#{name}, enum_to_collection_select(#{enum_definer}), :key, :value, {selected: #{singular}.#{name} }, class: 'form-control') %>"
   end
 
   def line_field_output
-    enum_type = eval("#{singular_class}.columns.select{|x| x.name == '#{name}'}[0].sql_type")
+    enum_type = eval("#{class_name}.columns.select{|x| x.name == '#{name}'}[0].sql_type")
 
-    if eval("defined? #{singular_class}.#{enum_type}_labels") == "method"
-      enum_definer = "#{singular_class}.#{enum_type}_labels"
+    if eval("defined? #{class_name}.#{enum_type}_labels") == "method"
+      enum_definer = "#{class_name}.#{enum_type}_labels"
     else
-      enum_definer = "#{singular_class}.defined_enums['#{enum_type}']"
+      enum_definer = "#{class_name}.defined_enums['#{enum_type}']"
     end
     "
     <% if #{singular}.#{name}.nil? %>

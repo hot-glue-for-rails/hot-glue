@@ -19,13 +19,4 @@ class TextField < Field
       text_area_output( 65536)
     end
   end
-
-  # TODO: dry with string_field.rb
-  def text_result( sql_type, limit)
-    if sql_type == "varchar"
-      field_output( nil, limit)
-    else
-      text_area_output( 65536)
-    end
-  end
 end

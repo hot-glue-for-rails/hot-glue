@@ -116,7 +116,7 @@ class AssociationField < Field
     assoc_name = name.to_s.gsub("_id","")
     assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
     if assoc.nil?
-      exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+      exit_message = "*spec_helper** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
       exit
     end
 
@@ -135,9 +135,7 @@ class AssociationField < Field
   end
 
   def line_field_output
-
     display_column =  HotGlue.derrive_reference_name(assoc_class.to_s)
-
     "<%= #{singular}.#{assoc}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
   end
 end

@@ -77,12 +77,13 @@ describe HotGlue::ErbTemplate do
       hgi_id: AssociationField.new(layout_strategy: layout_strategy,
                                    form_labels_position: 'before',
                                    ownership_field: "", name: "hgi_id", class_name: "Jkl", alt_lookups: {},
-                                   singular: "Jkl", update_show_only: nil, hawk_keys: options[:hawk_keys],
+                                   singular: generator.singular, update_show_only: nil, hawk_keys: options[:hawk_keys],
                                    auth: "", sample_file_path: nil, attachment_data: nil),
       time_of_day: FieldFactory.new(type: :time, name: "time_of_day", generator: generator).field,
       release_on: FieldFactory.new(type: :date, name: "release_on", generator: generator).field,
       approved_at: FieldFactory.new(type: :datetime, name: "approved_at", generator: generator).field,
       how_many_printed: FieldFactory.new(type: :integer, name: "how_many_printed", generator: generator).field,
+      genre: FieldFactory.new(type: :enum, name: "genre", generator: generator).field,
     }
   end
 
@@ -127,53 +128,83 @@ describe HotGlue::ErbTemplate do
       res = factory_all_form_fields({columns: [:name, :blurb]})
 
       expect(res).to eq("  <div class='scaffold-cell cell--jkl--name' >  \n    <span class='<%= \"alert-danger\" if jkl.errors.details.keys.include?(:name) %>'  style=\"display: inherit;\"  >\n        <%= f.text_field :name, value: jkl.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>\n       \n  \n    </span>\n    <br />\n  </div>\n  <div class='scaffold-cell cell--jkl--blurb' >  \n    <span class='<%= \"alert-danger\" if jkl.errors.details.keys.include?(:blurb) %>'  style=\"display: inherit;\"  >\n        <%= f.text_field :blurb, value: jkl.blurb, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>\n       \n  \n    </span>\n    <br />\n  </div>")
+
+      list_res = factory_all_line_fields({columns: [:name, :blurb]})
+      expect(list_res).to include(" <%= jkl.name %></div>\n<div class=' jkl--blurb' style='flex-basis: 15%'> <%= jkl.blurb %>")
     end
 
     it "should make a text column " do
       res = factory_all_form_fields({columns: [:long_description]})
-
       expect(res).to include("<%= f.text_area :long_description, class: 'form-control', autocomplete: 'off', cols: 40, rows: '5' %>")
+
+      list_res = factory_all_line_fields({columns: [:long_description]})
+
+      expect(list_res).to include("<%= jkl.long_description %>")
+      expect(list_res).to include("class=' jkl--long_description'")
     end
 
     it "should make a float column " do
       res = factory_all_form_fields({columns: [:cost]})
       expect(res).to include("<%= f.text_field :cost, value: jkl.cost, autocomplete: 'off', size: 5,")
+
+
+      list_res = factory_all_line_fields({columns: [:cost]})
+      expect(list_res).to include("<%= jkl.cost %>")
     end
 
     it "should make a integer column " do
       res = factory_all_form_fields({columns: [:how_many_printed]})
 
       expect(res).to include("<%= f.text_field :how_many_printed, value: jkl.how_many_printed, autocomplete: 'off', size: 4, class: 'form-control', type: 'number' %>")
+
+      list_res = factory_all_line_fields({columns: [:how_many_printed]})
+      expect(list_res).to include("<%= jkl.how_many_printed %>")
+
     end
 
 
     it "should make a datetime column" do
       res = factory_all_form_fields({columns: [:approved_at]})
       expect(res).to include("<%= datetime_field_localized(f, :approved_at, jkl.approved_at, 'Approved at', nil) %>")
+
+      list_res = factory_all_line_fields({columns: [:approved_at]})
+      expect(list_res).to include("<%= jkl.approved_at.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>")
     end
 
     it "should make a date column " do
       res = factory_all_form_fields({columns: [:release_on]})
       expect(res).to include("<%= date_field_localized(f, :release_on, jkl.release_on, 'Release on', nil) %>")
+
+      list_res = factory_all_line_fields({columns: [:release_on]})
+      expect(list_res).to include("<%= jkl.release_on %>")
+
     end
 
     it "should make a time column " do
       res = factory_all_form_fields({columns: [:time_of_day]})
       expect(res).to include("<%= time_field_localized(f, :time_of_day, jkl.time_of_day,  'Time of day', nil) %>")
+
+      list_res = factory_all_line_fields({columns: [:release_on]})
+      expect(list_res).to include("<%= jkl.release_on %>")
     end
 
     it "should make a boolean column " do
       res = factory_all_form_fields({columns: [:selected]})
       expect(res).to include("<%= f.radio_button(:selected,  '0', checked: jkl.selected  ? '' : 'checked') %>")
       expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '') %>")
+
+
+      list_res = factory_all_line_fields({columns: [:selected]})
+      expect(list_res).to include("<% elsif jkl.selected %>\n      YES\n    <% else %>\n      NO\n    <% end %>")
     end
 
-    # TODO: fix me
-    # it "should make a enum column " do
-    #   res = factory_all_form_fields({columns: [[:genre]]})
-    #   byebug
-    #   expect(res).to eq("  <div class='col-md-2' >  \n    <span class='<%= \"alert-danger\" if jkl.errors.details.keys.include?(:genre) %>'  style=\"display: inherit;\"  >\n      <%= f.text_field :genre, value: jkl.genre, class: 'form-control', size: 4, type: 'number' %>\n      <label class='small form-text text-muted'>Genre</label>\n    </span>\n    <br />\n  </div>")
-    # end
+    it "should make a enum column " do
+      res = factory_all_form_fields({columns: [:genre]})
+      expect(res).to include(" <%= f.collection_select(:genre, enum_to_collection_select(Jkl.defined_enums['genres']), :key, :value, {selected: jkl.genre },")
+
+      list_res = factory_all_line_fields({columns: [:genre]})
+      expect(list_res).to include("<%=  Jkl.defined_enums['genres'][jkl.genre.to_sym] %>")
+    end
   end
 
   describe "form_labels_position" do
@@ -305,20 +336,43 @@ describe HotGlue::ErbTemplate do
   describe "with an ownership_field" do
   end
 
-  let (:hawk_keys_for_hgi_id) {{hgi_id: {bind_to: ["current_user.hgis"], optional: false }}}
+  describe "assocaciation field" do
 
-  describe "hawked foreign keys" do
-    #  this test is proxy-texting to HotGlue::ErbTemplate#integer_result
-    #
+    let (:hawk_keys_for_hgi_id) {{hgi_id: {bind_to: ["current_user.hgis"], optional: false }}}
 
-    it "should hawk the hgi_id to the current user" do
-      res = factory_all_form_fields({columns: [:hgi_id],
-                                     alt_lookups: {},
-                                     singular_class: Jkl,
-                                     singular: "jkl",
-                                     hawk_keys: hawk_keys_for_hgi_id})
+    describe "edit and list" do
 
-      expect(res).to include("<%= f.collection_select(:hgi_id, current_user.hgis,")
+      it "should render stuff correctly" do
+        res = factory_all_form_fields({columns: [:hgi_id],
+                                       alt_lookups: {},
+                                       singular_class: Jkl,
+                                       singular: "jkl",
+                                       hawk_keys: {}})
+
+        expect(res).to include("<%= f.collection_select(:hgi_id, Hgi.all,")
+
+
+        list_res = factory_all_line_fields({columns: [:hgi_id]})
+        expect(list_res).to include("<%= jkl.hgi.try(:name) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>")
+      end
+    end
+
+
+    describe "hawked foreign keys" do
+      #  this test is proxy-texting to HotGlue::ErbTemplate#integer_result
+      #
+
+      it "should hawk the hgi_id to the current user" do
+        res = factory_all_form_fields({columns: [:hgi_id],
+                                       alt_lookups: {},
+                                       singular_class: Jkl,
+                                       singular: "jkl",
+                                       hawk_keys: hawk_keys_for_hgi_id})
+
+        expect(res).to include("<%= f.collection_select(:hgi_id, current_user.hgis,")
+      end
     end
   end
+
+
 end
