@@ -36,9 +36,6 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 Dummy::Application.initialize!
 
-
-
-
 RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
   config.order = :random
