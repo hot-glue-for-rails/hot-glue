@@ -1,9 +1,0 @@
-<%= turbo_frame_tag "__abc-new" do %>
-  <h3>
-    New Apple
-  </h3>
-  <%= form_with model:  abc, url: abcs_path, method: :post do  |f| %>
-    <%=  render partial: "abcs/form",
-locals: { abc: abc, f: f} %>
- <% end %>
-<% end %>
