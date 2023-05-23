@@ -87,6 +87,4 @@ jobs:
           - RUBYOPT: "-W:no-deprecated -W:no-experimental" # Suppress Rails 6 deprecation warnings for ruby 2.7
           - RAILS_ENV: "test"
           - DATABASE_URL: "postgres://postgres@localhost:5432/test_database_name"
-        run: |
-          bundle install 
-          bundle exec script/test
+        run: bundle install && bundle exec script/test
