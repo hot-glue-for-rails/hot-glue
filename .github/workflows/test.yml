@@ -47,45 +47,42 @@ jobs:
 
 
 
-#  system_tests:
-#    services:
-#      # Label used to access the service container
-#      postgres:
-#        # Docker Hub image
-#        image: postgres
-#        # Provide the password for postgres
-#        env:
-#          POSTGRES_PASSWORD: postgres
-#        # Set health checks to wait until postgres has started
-#        options: >-
-#          --health-cmd pg_isready
-#          --health-interval 10s
-#          --health-timeout 5s
-#          --health-retries 5
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: Set up Ruby
-#        uses: ruby/setup-ruby@v1
-#        with:
-#          # Not needed with a .ruby-version file
-#          # runs 'bundle install' and caches installed gems automatically
-#          bundler-cache: true
-#
-#      - name: Connect to PostgreSQL
-#        # Runs a script that creates a PostgreSQL table, populates
-#        # the table with data, and then retrieves the data.
-#        run: cd dummy && bundle exec rails db:setup && cd ..
-#        # Environment variables used by the `client.js` script to create a new PostgreSQL table.
-#        env:
-#          # The hostname used to communicate with the PostgreSQL service container
-#          POSTGRES_HOST: postgres
-#          # The default PostgreSQL port
-#          POSTGRES_PORT: 5432
-#
-#      - name: Run System Tests
-#        env:
-#          - RUBYOPT: "-W:no-deprecated -W:no-experimental" # Suppress Rails 6 deprecation warnings for ruby 2.7
-#          - RAILS_ENV: "test"
-#          - DATABASE_URL: "postgres://postgres@localhost:5432/test_database_name"
-#        run: bundle install && bundle exec script/test
+  system_tests:
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          # Not needed with a .ruby-version file
+          # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: true
+
+      - name: bundle install
+        run: cd dummy && bundle install && cd ..
+
+      - name: run tests
+        env:
+          RUBYOPT: "-W:no-deprecated -W:no-experimental" # Suppress Rails 6 deprecation warnings for ruby 2.7
+          RAILS_ENV: "test"
+          DATABASE_URL: "postgres://postgres:postgres@localhost:5432/test_database_name"
+
+        run: |
+          cd dummy && bin/setup 
+          bundle install && cd ..
+          script/test
+
