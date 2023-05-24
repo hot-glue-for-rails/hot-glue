@@ -33,10 +33,10 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 # https://stackoverflow.com/questions/76319469/when-i-switch-my-rails-open-source-engine-to-postgres-for-testing-i-get-cant
 #
-begin
+# begin
   Dummy::Application.initialize!
-rescue
-end
+# rescue
+# end
 
 
 RSpec.configure do |config|
