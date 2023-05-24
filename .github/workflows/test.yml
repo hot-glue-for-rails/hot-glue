@@ -42,7 +42,7 @@ jobs:
         run: |
           cd dummy && bin/setup && cd ..
           bundle install 
-          bundle exec rspec
+          bundle exec rspec --fail-fast
 
 
 
