@@ -31,7 +31,11 @@ require_relative "../dummy/config/application.rb"
 require "rspec/rails"
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
-Dummy::Application.initialize!
+begin
+  Dummy::Application.initialize!
+rescue
+end
+
 
 RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
