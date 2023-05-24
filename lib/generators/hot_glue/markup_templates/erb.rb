@@ -81,6 +81,7 @@ module  HotGlue
       result = columns.map{ |column|
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
+            # byebug if columns_map[col].nil?
             field_result = show_only.include?(col.to_sym) ?
                              columns_map[col].form_show_only_output :
                              columns_map[col].form_field_output

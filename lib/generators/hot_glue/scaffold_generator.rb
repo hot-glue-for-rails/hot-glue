@@ -403,6 +403,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @columns_map[col] = this_column_object.field
     end
 
+
     # create the template object
     if  @markup == "erb"
       @template_builder = HotGlue::ErbTemplate.new(
