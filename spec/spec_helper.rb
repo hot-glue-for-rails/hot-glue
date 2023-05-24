@@ -19,7 +19,8 @@ class SimpleCov::Formatter::MergedFormatter
   end
 end
 SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
-
+require_relative "../dummy/config/application.rb"
+Dummy::Application.initialize!
 
 require "rails/all"
 require 'rails/generators'
@@ -30,11 +31,11 @@ Dir["./lib/**/*.rb"].each do |x|
   require(x)
 end
 
-require_relative "../dummy/config/application.rb"
+
 require "rspec/rails"
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
-Dummy::Application.initialize!
+
 
 RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
@@ -50,7 +51,6 @@ RSpec.configure do |config|
   end
 
   config.before {
-
     restore_default_warning_free_config
   }
 end
