@@ -29,3 +29,5 @@ gem "byebug"
 gem "puma", "~> 5.0"
 
 gem "devise"
+
+gem "pg", "~> 1.5"

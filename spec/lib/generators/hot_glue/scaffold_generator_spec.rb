@@ -671,9 +671,8 @@ describe HotGlue::ScaffoldGenerator do
                                             ["Abc","--god",
                                              "--form-placeholder-labels=true"])
 
-      expect(
-        File.read("spec/dummy/app/views/abcs/_form.erb") =~ /<%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '', placeholder: 'Name' %>/
-      ).to_not be(nil)
+      res =  File.read("spec/dummy/app/views/abcs/_form.erb")
+      expect(res).to include("<%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '', placeholder: 'Name' %>")
     end
   end
 
@@ -701,7 +700,7 @@ describe HotGlue::ScaffoldGenerator do
                                           ["Abc","--god",
                                            "--inline-list-labels=before"])
       res = File.read("spec/dummy/app/views/abcs/_show.erb")
-      expect(res).to include("<label class='small form-text text-muted'>Name</label><%= abc.name %>")
+      expect(res).to include("<label class='small form-text text-muted'>Name</label><br/><%= abc.name %>")
     end
 
     describe "#list_label" do

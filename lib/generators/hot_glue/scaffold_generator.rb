@@ -28,7 +28,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :nest_with,
                 :path,  :plural,
                 :sample_file_path,  :singular, :singular_class, :smart_layout,
-                :stacked_downnesting,  :update_show_only
+                :stacked_downnesting,  :update_show_only, :ownership_field,
+                :layout_strategy, :form_placeholder_labels, :form_labels_position
 
   class_option :singular, type: :string, default: nil
   class_option :plural, type: :string, default: nil
@@ -401,8 +402,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
       @columns_map[col] = this_column_object.field
     end
-
-
 
     # create the template object
     if  @markup == "erb"
@@ -1268,7 +1267,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       }.join("\n")
     end
   end
-
 
   def turbo_parental_updates
     @nested_set.collect{| data|

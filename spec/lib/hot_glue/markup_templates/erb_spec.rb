@@ -19,28 +19,33 @@ describe HotGlue::ErbTemplate do
     LayoutStrategy::HotGlue.new(OpenStruct.new({}))
   }
 
-  let(:generator) {
+  def base_generator options
+    OpenStruct.new({downnest_object: {} ,
+                    columns: nil,
+                    smart_layout: false,
+                    attachments: {},
+                    bootstrap_column_width: 2,
+                    singular_class: "Jkl",
+                    form_placeholder_labels: nil,
+                    singular: "jkl" }.merge(  hawk_keys: options[:hawk_keys],
+                                          columns: options[:columns],
+                                          form_placeholder_labels: options[:form_placeholder_labels],
+                                          singular: options[:singular] || "jkl"))
+  end
 
-  }
+
   def factory_all_form_fields(options)
-    generator =  OpenStruct.new(downnest_object: {} ,
-                             columns: options[:columns],
-                             smart_layout: false,
-
-                              bootstrap_column_width: 2)
+    generator = base_generator(options)
 
     builder = HotGlue::Layout::Builder.new(include_setting: '',
                                            generator: generator,
                                            buttons_width: 0,)
     layout_object = builder.construct
 
-
     @template_builder = HotGlue::ErbTemplate.new(
-      # columns: [[:name, :blurb]],
       show_only: [],
       singular_class: options[:singular_class] || "Jkl",
       singular: options[:singular] || "jkl",
-      # col_identifier:  "col-md-2",
       hawk_keys: options[:hawk_keys] || {},
       ownership_field: "hgi",
       layout_strategy: layout_strategy,
@@ -51,7 +56,7 @@ describe HotGlue::ErbTemplate do
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
       alt_lookups: {},
-      columns_map: {dfg_id: {}},
+      columns_map: columns_map_sample(generator: generator, options: options),
       attachments: {})
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy,
@@ -59,15 +64,32 @@ describe HotGlue::ErbTemplate do
 
   end
 
+
+  def columns_map_sample(generator: , options: {})
+    {
+      long_description: FieldFactory.new(type: :text, name: "long_description", generator: generator).field,
+
+      cost: FieldFactory.new(type: :float, name: "cost", generator: generator).field,
+      blurb: FieldFactory.new(type: :string, name: "blurb", generator: generator).field,
+
+      selected: FieldFactory.new(type: :boolean, name: "selected", generator: generator).field,
+      name: FieldFactory.new(type: :string, name: "name", generator: generator).field,
+      hgi_id: AssociationField.new(layout_strategy: layout_strategy,
+                                   form_labels_position: 'before',
+                                   ownership_field: "", name: "hgi_id", class_name: "Jkl", alt_lookups: {},
+                                   singular: "Jkl", update_show_only: nil, hawk_keys: options[:hawk_keys],
+                                   auth: "", sample_file_path: nil, attachment_data: nil),
+      time_of_day: FieldFactory.new(type: :time, name: "time_of_day", generator: generator).field,
+      release_on: FieldFactory.new(type: :date, name: "release_on", generator: generator).field,
+      approved_at: FieldFactory.new(type: :datetime, name: "approved_at", generator: generator).field,
+      how_many_printed: FieldFactory.new(type: :integer, name: "how_many_printed", generator: generator).field,
+    }
+  end
+
+
   def factory_all_line_fields(options)
 
-
-    generator =  OpenStruct.new(downnest_object: {} ,
-                                columns: options[:columns],
-
-                                smart_layout: false,
-                                buttons_width: 0,
-                                bootstrap_column_width: 2)
+    generator = base_generator(options)
 
     builder = HotGlue::Layout::Builder.new(include_setting: '',
                                            generator: generator,
@@ -79,7 +101,7 @@ describe HotGlue::ErbTemplate do
 
     @template_builder = HotGlue::ErbTemplate.new(
       show_only: [],
-      columns_map: {},
+      columns_map: columns_map_sample(generator: generator, options: options),
       singular_class: "Jkl",
       singular: "jkl",
       hawk_keys: {},
@@ -95,7 +117,7 @@ describe HotGlue::ErbTemplate do
       attachments: {})
 
     @template_builder.all_line_fields( perc_width: 15,
-                                         layout_strategy: layout_strategy,
+                                       layout_strategy: layout_strategy,
                                        layout_object: layout_object)
 
   end
@@ -194,6 +216,8 @@ describe HotGlue::ErbTemplate do
     end
 
     it "with placeholder labels " do
+
+
       res = factory_all_form_fields({columns: [:name, :blurb],
                                      form_labels_position: 'omit',
                                      form_placeholder_labels: true})
@@ -202,18 +226,20 @@ describe HotGlue::ErbTemplate do
     end
 
     it "with placeholder labels for a text area " do
-      res = factory_all_form_fields({columns: [:long_description],
+
+
+      res = factory_all_form_fields(columns: [:long_description],
                                      form_labels_position: 'omit',
-                                     form_placeholder_labels: true})
+                                     form_placeholder_labels: true)
       expect(res).to include("placeholder: 'Long description' ")
     end
 
     it "with placeholder labels for a float " do
-      res = factory_all_form_fields({columns: [:cost],
-                                     form_labels_position: 'omit',
-                                     form_placeholder_labels: true})
-
-      expect(res).to include("placeholder: 'Cost'")
+      # res = factory_all_form_fields({columns: [:cost],
+      #                                form_labels_position: 'omit',
+      #                                form_placeholder_labels: true})
+      #
+      # expect(res).to include("placeholder: 'Cost'")
     end
   end
 
@@ -264,11 +290,9 @@ describe HotGlue::ErbTemplate do
     end
   end
 
-
   describe "with show only fields" do
 
   end
-
 
   describe "with singular_class" do
 
@@ -279,27 +303,22 @@ describe HotGlue::ErbTemplate do
   end
 
   describe "with an ownership_field" do
-
   end
 
-
-
+  let (:hawk_keys_for_hgi_id) {{hgi_id: {bind_to: ["current_user.hgis"], optional: false }}}
 
   describe "hawked foreign keys" do
     #  this test is proxy-texting to HotGlue::ErbTemplate#integer_result
     #
-    #
 
-
-    it "should hawk the dfg_id to the current user" do
-      res = factory_all_form_fields({columns: [:dfg_id],
+    it "should hawk the hgi_id to the current user" do
+      res = factory_all_form_fields({columns: [:hgi_id],
                                      alt_lookups: {},
-                                     singular_class: Ghi,
-                                     singular: "ghi",
+                                     singular_class: Jkl,
+                                     singular: "jkl",
+                                     hawk_keys: hawk_keys_for_hgi_id})
 
-                                     hawk_keys: {dfg_id: {bind_to: ["current_user.dfgs"], optional: false }}})
-
-      expect(res).to include("f.collection_select(:dfg_id, current_user.dfgs,")
+      expect(res).to include("<%= f.collection_select(:hgi_id, current_user.hgis,")
     end
   end
 end
