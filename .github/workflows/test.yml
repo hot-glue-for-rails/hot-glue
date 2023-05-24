@@ -40,7 +40,7 @@ jobs:
           DATABASE_URL: "postgres://postgres:postgres@localhost:5432/test_database_name"
 
         run: |
-          cd dummy && bundle exec rails db:create db:setup && cd ..
+          cd dummy && bundle exec rails db:setup && cd ..
           bin/rspec
 
 
