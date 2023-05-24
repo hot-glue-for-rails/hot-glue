@@ -41,7 +41,8 @@ jobs:
 
         run: |
           cd dummy && bin/setup && cd ..
-          bin/rspec
+          bundle install 
+          bundle exec rspec
 
 
 
