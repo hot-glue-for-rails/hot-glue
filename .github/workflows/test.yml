@@ -26,6 +26,8 @@ jobs:
           # Not needed with a .ruby-version file
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
+      - name: bundle install
+        run: cd dummy && bundle install && cd ..
 
       - name: Connect to PostgreSQL
         # Runs a script that creates a PostgreSQL table, populates
@@ -36,8 +38,6 @@ jobs:
           RUBYOPT: "-W:no-deprecated -W:no-experimental" # Suppress Rails 6 deprecation warnings for ruby 2.7
           RAILS_ENV: "test"
           DATABASE_URL: "postgres://postgres@localhost:5432/test_database_name"
-      - name: bundle install
-        run: cd dummy && bundle install && cd ..
 
       - name: run tests
         run: bin/rspec
