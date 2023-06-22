@@ -8,6 +8,17 @@ class TimeField < Field
     "<%= time_field_localized(f, :#{name}, #{singular}.#{name},  '#{ name.to_s.humanize  }', #{auth ? auth+'.timezone' : 'nil'}) %>"
   end
 
+
+
+  def spec_make_assertion
+    "#expect(page).to have_content(new_#{name} .in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone))"
+  end
+
+  def spec_list_view_assertion
+    "#expect(page).to have_content(#{singular}#{1}.#{name})"
+  end
+
+
   def line_field_output
     "<% unless #{singular}.#{name}.nil? %>
       <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone) %>

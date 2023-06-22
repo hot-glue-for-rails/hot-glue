@@ -3,10 +3,10 @@ class Jkl < ApplicationRecord
 
 
   enum genres: {
-    fiction: "Fiction",
-    nonfiction: "Nonfiction",
-    biography: "Biography",
-    science_fiction: "Science fiction",
-    mystery: "Mystery"
+    Fiction: "Fiction",
+    Nonfiction: "Nonfiction",
+    Mystery: "Mystery",
+    Romance: "Romance",
+    Mystery: "Mystery"
   }
 end

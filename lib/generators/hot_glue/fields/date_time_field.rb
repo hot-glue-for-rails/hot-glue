@@ -10,8 +10,7 @@ class DateTimeField < Field
   end
 
   def spec_make_assertion
-
-    "expect(page).to have_content(new_#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone))"
+    "#expect(page).to have_content(new_#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone))"
   end
 
   def spec_setup_let_arg
@@ -19,7 +18,7 @@ class DateTimeField < Field
   end
 
   def spec_list_view_assertion
-    "expect(page).to have_content(#{singular}#{1}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(current_timezone)  )"
+    "#expect(page).to have_content(#{singular}#{1}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(current_timezone)  )"
   end
 
   def form_field_output

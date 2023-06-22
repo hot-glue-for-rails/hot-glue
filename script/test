@@ -18,7 +18,7 @@ cd dummy
 echo "Setting up database..."
 
 bundle install
-rake db:create db:reset db:test:prepare
+rake db:reset db:migrate db:test:prepare
 
 echo "Generating all code for testing..."
 rails generate hot_glue:scaffold Abc --gd
@@ -32,9 +32,9 @@ rails generate hot_glue:scaffold Fruits::Cantelope --gd
 rails generate hot_glue:scaffold Pet --gd
 
 rails generate hot_glue:scaffold Human --gd
-
-#rails generate hot_glue:scaffold User --no-create --self-auth
 #rails generate hot_glue:scaffold Jkl --gd
+#rails generate hot_glue:scaffold User --no-create --self-auth
+#
 #rails generate hot_glue:scaffold Appointment --hawk=pets --gd
 #rails generate hot_glue:scaffold Family --gd
 
