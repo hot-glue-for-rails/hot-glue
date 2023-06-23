@@ -86,7 +86,5 @@ jobs:
           DATABASE_URL: "postgres://postgres:postgres@localhost:5432/test_database_name"
 
         run: |
-          cd dummy && bin/setup 
-          bundle install && cd ..
           script/test
 
