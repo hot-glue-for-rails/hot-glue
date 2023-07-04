@@ -18,7 +18,7 @@ cd dummy
 echo "Setting up database..."
 
 bundle install
-rake db:create db:reset db:test:prepare
+rake db:reset db:migrate db:test:prepare
 
 echo "Generating all code for testing..."
 rails generate hot_glue:scaffold Abc --gd
