@@ -6,6 +6,5 @@ class Jkl < ApplicationRecord
     Nonfiction: "Nonfiction",
     Mystery: "Mystery",
     Romance: "Romance",
-    Mystery: "Mystery"
   }
 end
