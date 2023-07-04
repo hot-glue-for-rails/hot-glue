@@ -15,4 +15,12 @@ class TimeField < Field
     <span class='alert-danger'>MISSING</span>
     <% end %>"
   end
+
+  def spec_make_assertion
+    "#expect(page).to have_content(new_#{name} .in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone))"
+  end
+
+  def spec_list_view_assertion
+    "#expect(page).to have_content(#{singular}#{1}.#{name})"
+  end
 end
