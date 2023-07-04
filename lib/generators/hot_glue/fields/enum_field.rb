@@ -11,7 +11,7 @@ class EnumField < Field
   end
 
   def spec_make_assertion
-    if(eval("#{singular_class}.respond_to?(:#{name}_labels)"))
+    if(eval("#{class_name}.respond_to?(:#{name}_labels)"))
       "expect(page).to have_content(#{singular_class}.#{name}_labels[new_#{name}])"
     else
       "expect(page).to have_content(new_#{name})"

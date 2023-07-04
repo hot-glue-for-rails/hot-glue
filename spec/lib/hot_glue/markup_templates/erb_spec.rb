@@ -175,7 +175,7 @@ describe HotGlue::ErbTemplate do
 
       expect(res).to include('<div class=\'scaffold-cell cell--jkl--genre\' >')
       expect(res).to include('<span class=\'<%= "alert-danger" if jkl.errors.details.keys.include?(:genre) %>')
-      expect(res).to include("<%= f.collection_select(:genre,  enum_to_collection_select(Jkl.defined_enums['integer']), :key, :value, {selected: jkl.genre }, class: 'form-control') %>")
+      expect(res).to include("<%= f.collection_select(:genre,  enum_to_collection_select(Jkl.defined_enums['genres']), :key, :value, {selected: jkl.genre }, class: 'form-control') %>")
     end
   end
 
