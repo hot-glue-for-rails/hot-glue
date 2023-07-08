@@ -4,14 +4,11 @@ clean_generated_code() {
 ./clean_generated_code
 }
 
-
-
 script/clean_generated_code
 
 echo "Integration test suite for Hot Glue..."
-# note that the dummy/ is in the root of the repository
-# these specs generate several controllers & specs and then run the generated
-# specs to test the generated code
+echo "these specs generate several controllers & specs in the dummy app"
+echo "and then run the generated specs to test the generated code"
 
 cd dummy
 
@@ -21,17 +18,17 @@ bundle install
 rake db:drop db:create db:migrate db:test:prepare
 
 echo "Generating all code for testing..."
-rails generate hot_glue:scaffold Abc --gd
+bin/rails generate hot_glue:scaffold Abc --gd
 
-rails generate hot_glue:scaffold Ghi --gd
+bin/rails generate hot_glue:scaffold Ghi --gd
 
-rails generate hot_glue:scaffold Dfg --auth=current_user
+bin/rails generate hot_glue:scaffold Dfg --auth=current_user
 
-rails generate hot_glue:scaffold Fruits::Cantelope --gd
+bin/rails generate hot_glue:scaffold Fruits::Cantelope --gd
 
-rails generate hot_glue:scaffold Pet --gd
+bin/rails generate hot_glue:scaffold Pet --gd
 
-rails generate hot_glue:scaffold Human --gd
+bin/rails generate hot_glue:scaffold Human --gd
 
 #rails generate hot_glue:scaffold User --no-create --self-auth
 #rails generate hot_glue:scaffold Jkl --gd
@@ -42,8 +39,6 @@ rails generate hot_glue:scaffold Human --gd
 # --update-show-only
 # --alt-lookup-foreign-keys
 # --factory-creation
-
-
 
 rspec || exit
 
