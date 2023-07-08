@@ -6,6 +6,26 @@ require_relative '../config/environment'
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails' 
 require 'support/capybara_login.rb'
+
+puts "reloading app..."
+def reload!(print = true)
+  puts 'Reloading ...' if print
+  # Main project directory.
+  root_dir = File.expand_path('..', __dir__)
+  # Directories within the project that should be reloaded.
+  reload_dirs = %w{lib}
+  # Loop through and reload every file in all relevant project directories.
+  reload_dirs.each do |dir|
+    Dir.glob("#{root_dir}/#{dir}/**/*.rb").each { |f| load(f) }
+  end
+  # Return true when complete.
+  true
+end
+reload!
+
+puts "finished reloading app..."
+
+
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
