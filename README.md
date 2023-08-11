@@ -1257,9 +1257,15 @@ end
 - When using big edit, updating a child will now re-render the parent EDIT record automatically.
 
 For example
+`rails generate hot_glue:scafold Invoice --big-edit`
 `rails generate hot_glue:scafold LineItem --nested=invioce`
 
 Whenever the line item is created, updated, or destroyed, the parent invoice record gets (edit action) re-rendered automatically. This happens for the big edit screen of the invoice.
+
+
+- Refactors fields into polymoric objects,
+- adds test coverage for Postgres Enums
+
 
 #### 2023-05-14 - v0.5.14 Delete message flash notice and new flash notice partial
 

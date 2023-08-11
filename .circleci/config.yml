@@ -60,7 +60,9 @@ jobs:
           name: Run system tests
           command: script/test
 
-      - ruby/rspec-test
+      - run:
+          name: Run internal tests
+          command: bundle exec rspec
 
 workflows:
   version: 2
