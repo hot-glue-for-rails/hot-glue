@@ -12,8 +12,6 @@ dump.rdb
 tmp/
 
 
-Gemfile.lock
-
 db/*.sqlite3
 
 dummy/app/views/
