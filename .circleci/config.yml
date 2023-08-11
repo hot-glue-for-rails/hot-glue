@@ -55,9 +55,7 @@ jobs:
       - run:
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
-      - run:
-          name: Load schema
-          command: bin/rails db:schema:load RAILS_ENV=test
+
       - run:
           name: Run system tests
           command: script/test
