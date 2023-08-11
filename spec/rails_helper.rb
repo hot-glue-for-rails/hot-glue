@@ -44,5 +44,7 @@ RSpec.configure do |config|
 end
 
 
-Webdrivers::Chromedriver.required_version = '114.0.5735.90'
+# crashes on circleci
+
+# Webdrivers::Chromedriver.required_version = '114.0.5735.90'
 # https://github.com/titusfortner/webdrivers/issues/247
