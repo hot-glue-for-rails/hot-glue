@@ -89,4 +89,4 @@ end
 Capybara.default_driver = :selenium_chrome_headless
 # Capybara.default_driver = :selenium_chrome
 
-Webdrivers::Chromedriver.required_version = '114.0.5735.90'
+# Webdrivers::Chromedriver.required_version = '114.0.5735.90'
