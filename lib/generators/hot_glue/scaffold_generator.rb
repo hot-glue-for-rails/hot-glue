@@ -667,7 +667,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def filepath_prefix
-    'spec/dummy/' if Rails.env.test?
+    'spec/dummy/' if $INTERNAL_SPECS
   end
 
   def copy_controller_and_spec_files

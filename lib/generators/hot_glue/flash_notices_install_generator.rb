@@ -4,7 +4,7 @@ module HotGlue
 
     def filepath_prefix
       # todo: inject the context
-      'spec/dummy/' if Rails.env.test?
+      'spec/dummy/' if $INTERNAL_SPECS
     end
 
 

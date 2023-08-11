@@ -21,9 +21,9 @@ RSpec.configure do |config|
   #   DatabaseCleaner.clean_with(:truncation)
   # end
   #
-  # config.before(:each) do
-  #   DatabaseCleaner.strategy = :truncation
-  # end
+  config.before(:each) do
+    $INTERNAL_SPECS = true
+  end
 
   # config.before(:each, js: true) do
   #   DatabaseCleaner.strategy = :truncation
@@ -31,9 +31,11 @@ RSpec.configure do |config|
   # config.before(:each) do
   #   DatabaseCleaner.start
   # end
-  # config.after(:each) do
-  #   DatabaseCleaner.clean
-  # end
+
+  config.after(:each) do
+    $INTERNAL_SPECS = false
+  end
+
   # config.before(:all) do
   #   DatabaseCleaner.start
   # end
