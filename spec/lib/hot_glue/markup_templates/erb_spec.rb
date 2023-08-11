@@ -83,6 +83,7 @@ describe HotGlue::ErbTemplate do
       release_on: FieldFactory.new(type: :date, name: "release_on", generator: generator).field,
       approved_at: FieldFactory.new(type: :datetime, name: "approved_at", generator: generator).field,
       how_many_printed: FieldFactory.new(type: :integer, name: "how_many_printed", generator: generator).field,
+      genre: FieldFactory.new(type: :enum, name: "genre", generator: generator).field
     }
   end
 
@@ -168,12 +169,14 @@ describe HotGlue::ErbTemplate do
       expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '') %>")
     end
 
-    # TODO: fix me
-    # it "should make a enum column " do
-    #   res = factory_all_form_fields({columns: [[:genre]]})
-    #   byebug
-    #   expect(res).to eq("  <div class='col-md-2' >  \n    <span class='<%= \"alert-danger\" if jkl.errors.details.keys.include?(:genre) %>'  style=\"display: inherit;\"  >\n      <%= f.text_field :genre, value: jkl.genre, class: 'form-control', size: 4, type: 'number' %>\n      <label class='small form-text text-muted'>Genre</label>\n    </span>\n    <br />\n  </div>")
-    # end
+
+    it "should make a enum column " do
+      res = factory_all_form_fields({columns: [:genre]})
+
+      expect(res).to include('<div class=\'scaffold-cell cell--jkl--genre\' >')
+      expect(res).to include('<span class=\'<%= "alert-danger" if jkl.errors.details.keys.include?(:genre) %>')
+      expect(res).to include("<%= f.collection_select(:genre,  enum_to_collection_select(Jkl.defined_enums['genres']), :key, :value, {selected: jkl.genre }, class: 'form-control') %>")
+    end
   end
 
   describe "form_labels_position" do

@@ -1,0 +1,80 @@
+#  more about orbs: https://circleci.com/docs/2.0/using-orbs/
+version: 2.1
+
+orbs:
+  ruby: circleci/ruby@1.0
+  node: circleci/node@2
+  browser-tools: circleci/browser-tools@1.4.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/ruby:3.2.2-browsers
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
+      - image: redis:6.2.6
+
+    steps:
+      - checkout
+      - ruby/install-deps
+      - node/install-packages:
+          pkg-manager: yarn
+          cache-key: "yarn.lock"
+      - run:
+          name: Build assets
+          command: bundle exec rails assets:precompile
+
+  test:
+    parallelism: 1
+    docker:
+      - image: cimg/ruby:3.2.2-browsers
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
+      - image: redis:6.2.6
+      - image: cimg/postgres:13.7
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
+        environment:
+          POSTGRES_USER: circleci-demo-ruby
+          POSTGRES_DB: helios-dev-shop-test
+          POSTGRES_PASSWORD: ""
+
+    environment:
+      BUNDLE_JOBS: "3"
+      BUNDLE_RETRY: "3"
+      PGHOST: 127.0.0.1
+      PGUSER: circleci-demo-ruby
+      PGPASSWORD: ""
+      RAILS_ENV: test
+
+    steps:
+      - browser-tools/install-chrome
+      - browser-tools/install-chromedriver
+      - checkout
+      - ruby/install-deps
+      - node/install-packages:
+          pkg-manager: yarn
+          cache-key: "yarn.lock"
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: Load schema
+          command: bin/rails db:schema:load RAILS_ENV=test
+      - run:
+          name: Run system tests
+          command: script/test
+
+      - ruby/rspec-test
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
