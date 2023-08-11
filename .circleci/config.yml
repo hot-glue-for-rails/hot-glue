@@ -3,7 +3,6 @@ version: 2.1
 
 orbs:
   ruby: circleci/ruby@1.0
-  node: circleci/node@2
   browser-tools: circleci/browser-tools@1.4.1
 
 jobs:
@@ -18,9 +17,6 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps
-      - node/install-packages:
-          pkg-manager: yarn
-          cache-key: "yarn.lock"
       - run:
           name: Build assets
           command: bundle exec rails assets:precompile
@@ -55,9 +51,7 @@ jobs:
       - browser-tools/install-chromedriver
       - checkout
       - ruby/install-deps
-      - node/install-packages:
-          pkg-manager: yarn
-          cache-key: "yarn.lock"
+
       - run:
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
