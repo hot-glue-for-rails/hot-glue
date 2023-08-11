@@ -1253,7 +1253,8 @@ end
 
 # VERSION HISTORY
 
-#### TBR 
+#### 2023-08-11 - v0.5.15
+
 - When using big edit, updating a child will now re-render the parent EDIT record automatically.
 
 For example
@@ -1263,8 +1264,9 @@ For example
 Whenever the line item is created, updated, or destroyed, the parent invoice record gets (edit action) re-rendered automatically. This happens for the big edit screen of the invoice.
 
 
-- Refactors fields into polymoric objects,
-- adds test coverage for Postgres Enums
+- Refactors fields into polymoric objects
+
+- Adds test coverage for Postgres Enums
 
 
 #### 2023-05-14 - v0.5.14 Delete message flash notice and new flash notice partial
