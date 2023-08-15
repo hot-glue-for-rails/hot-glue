@@ -5,6 +5,7 @@ class FloatField < Field
 
   end
 
+
   def spec_setup_let_arg
     "#{name}: rand(1)*10000"
   end
@@ -15,6 +16,7 @@ class FloatField < Field
 
   def line_field_output
     width = (limit && limit < 40) ? limit : (40)
-    "<%= #{singular}.#{name}%>"
+
+    "<%= #{singular}.#{name} %>"
   end
 end

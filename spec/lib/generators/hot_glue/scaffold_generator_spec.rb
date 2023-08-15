@@ -560,6 +560,7 @@ describe HotGlue::ScaffoldGenerator do
       ).to be(nil)
     end
 
+
     it "should automatically add fields that begin with underscore (_) as show only" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Fruits::Cantelope", "--gd"])
@@ -574,6 +575,16 @@ describe HotGlue::ScaffoldGenerator do
       expect(
         File.read("spec/dummy/app/controllers/cantelopes_controller.rb") =~ /:_a_show_only_field/
       ).to be(nil)
+    end
+
+    it "should accept a modifier in braces [$] after the field name to cast as currency" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Jkl", "--gd", "--show-only=cost[$]"])
+
+
+      res = File.read("spec/dummy/app/views/jkls/_form.erb")
+      expect(res).to include("<%= number_to_currency(jkl.cost) %>")
+
     end
   end
 

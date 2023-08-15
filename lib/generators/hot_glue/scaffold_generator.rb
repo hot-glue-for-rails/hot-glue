@@ -19,16 +19,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   hook_for :form_builder, :as => :scaffold
 
   source_root File.expand_path('templates', __dir__)
-  attr_accessor :alt_lookups, :attachments, :auth,
-                :big_edit, :bootstrap_column_width,
-                :columns,
-                :downnest_children, :downnest_object,
-                :button_icons,
-                :hawk_keys, :layout_object,
-                :nest_with,
-                :path,  :plural,
-                :sample_file_path,  :singular, :singular_class, :smart_layout,
-                :stacked_downnesting,  :update_show_only, :ownership_field,
+  attr_accessor :alt_lookups, :attachments, :auth, :big_edit, :bootstrap_column_width, :columns,
+                :downnest_children, :downnest_object, :button_icons, :hawk_keys, :layout_object,
+                :nest_with, :path,  :plural, :sample_file_path,  :show_only_data, :singular,
+                :singular_class, :smart_layout, :stacked_downnesting,  :update_show_only, :ownership_field,
                 :layout_strategy, :form_placeholder_labels, :form_labels_position
 
   class_option :singular, type: :string, default: nil
@@ -183,10 +177,25 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @include_fields += options['include'].split(":").collect{|x|x.split(",")}.flatten.collect(&:to_sym)
     end
 
-    @show_only = []
+    @show_only_data = {}
     if !options['show_only'].empty?
-      @show_only += options['show_only'].split(",").collect(&:to_sym)
+      show_only_input = options['show_only'].split(",")
+      show_only_input.each do |setting|
+        if setting.include?("[")
+          setting =~ /(.*)\[(.*)\]/
+          key, lookup_as = $1, $2
+          @show_only_data[key.to_sym] = {cast: $2 }
+        else
+          @show_only_data[setting.to_sym] = {cast: nil}
+        end
+      end
     end
+
+    @show_only = @show_only_data.keys.collect(&:to_sym)
+    if @show_only.any?
+      puts "show only field #{@show_only}}"
+    end
+
 
     @update_show_only = []
     if !options['update_show_only'].empty?
@@ -606,7 +615,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     if @attachments.any?
-      puts "adding attachments-as-columns: #{@attachments}"
+      puts "Adding attachments-as-columns: #{@attachments}"
       @attachments.keys.each do |attachment|
         @columns << attachment if !@columns.include?(attachment)
       end

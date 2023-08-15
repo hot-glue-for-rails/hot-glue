@@ -68,7 +68,7 @@ module HotGlue
           raise "Cannot build layout -- too few columns"
         end
 
-        # smart layout: bootstrap_column_width columns per field; 4 column for EACH downnested portals, 2 column for buttons
+        # smart layout: bootstrap_column_width columns per field; 4 column for EACH downnested portal, 2 column for buttons
         if smart_layout
           # automatic control
           #
