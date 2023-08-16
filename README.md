@@ -605,9 +605,7 @@ With Hot Glue in specified grouping or smart layout mode, it automatically attem
 
 Using Bootstrap with neither specified grouping nor smart layouts may make more than 12 columns, which will produce strange results. (Bootstrap is not designed to work with, for example, a 13-column layout.)
 
-You should typically either specify your grouping or use smart layouts when building with Bootstrap, but if your use case does not fit the stacking feature you can specify neither flag and then you may then have to deal with the over-stuffed layouts as explained. 
-
-
+You should typically either specify your grouping or use smart layouts when building with Bootstrap, but if your use case does not fit the stacking feature you can specify neither flag and then you may then have to deal with the over-stuffed layouts as explained.
 
 ### `--smart-layout` (also known as automatic grouping)
 
@@ -655,6 +653,26 @@ Any fields only the 'show-only' list will appear as non-editable on the generate
 IMPORTANT: By default, all fields that begin with an underscore (`_`) are automatically show-only.
 
 This is for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
+
+### `--modify=field1{...},field2{...}`
+
+
+You can apply modification to the viewable (non-edit) display of field using the `--modify` switch.
+
+The syntax is `--modify=cost{$},price{$}`
+
+Here, the `cost` and `price` fields will be displayed as wrapped in `number_to_currency()` when displayed on the list view and when displayed as show-only.
+
+(You will need to separately specify them as show-only if you want them to be non-editable.)
+
+The availabel modifiers are:
+
+| modifier                  | what it does                                                                                                                                                         | can be used on                |   |   |
+|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|---|---|
+| $                         | wraps output in `number_to_currency()`                                                                                                                               | float, integer                |   |   |
+| truthy label\|falsy label | specify a binary switch with a pipe (\|) character if the value is truthy, it will display as "truthy label" if the value is falsy, it will display as "falsy label" | boolean, datetime, date, time |   |   |
+|                           |                                                                                                                                                                      |                               |   |   |
+
 
 
 ### `--update-show-only`
@@ -1253,6 +1271,10 @@ end
 
 # VERSION HISTORY
 
+#### TBR
+
+- Adds `--modidy` flag to turn numbers into currency and apply binary labels (see docs for `--modify` flag)
+
 #### 2023-08-11 - v0.5.15
 
 - When using big edit, updating a child will now re-render the parent EDIT record automatically.
@@ -1262,7 +1284,6 @@ For example
 `rails generate hot_glue:scafold LineItem --nested=invioce`
 
 Whenever the line item is created, updated, or destroyed, the parent invoice record gets (edit action) re-rendered automatically. This happens for the big edit screen of the invoice.
-
 
 - Refactors fields into polymoric objects
 
