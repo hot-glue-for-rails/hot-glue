@@ -579,7 +579,7 @@ describe HotGlue::ScaffoldGenerator do
 
     it "should accept a modifier in braces [$] after the field name to cast as currency" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Jkl", "--gd", "--show-only=cost[$]"])
+                                          ["Jkl", "--gd", "--show-only=cost", "--modify=cost{$}"])
 
 
       res = File.read("spec/dummy/app/views/jkls/_form.erb")

@@ -1,8 +1,8 @@
 class Field
   attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :auth,
                 :assoc_label,  :class_name,  :form_placeholder_labels, :form_labels_position,
-                :hawk_keys,   :layout_strategy, :limit, :name, :object, :sample_file_path,
-                :show_only_data, :singular_class,  :singular, :sql_type, :ownership_field,
+                :hawk_keys,   :layout_strategy, :limit, :modify, :name, :object, :sample_file_path,
+                :singular_class,  :singular, :sql_type, :ownership_field,
                 :update_show_only
 
   def initialize(
@@ -14,12 +14,12 @@ class Field
     form_placeholder_labels: ,
     hawk_keys: nil,
     layout_strategy:  ,
+    modify: ,
     name: ,
     ownership_field: ,
     sample_file_path: nil,
     singular: ,
-    update_show_only: ,
-    show_only_data:
+    update_show_only:
   )
     @name = name
     @layout_strategy = layout_strategy
@@ -33,8 +33,7 @@ class Field
     @form_placeholder_labels = form_placeholder_labels
     @ownership_field = ownership_field
     @form_labels_position = form_labels_position
-    @show_only_data = show_only_data
-
+    @modify = modify
 
     # TODO: remove knowledge of subclasses from Field
     unless self.class == AttachmentField
@@ -80,7 +79,7 @@ class Field
   end
 
   def form_show_only_output
-    if show_only_data[name.to_sym][:cast] == "$"
+    if modify && modify[:cast] && modify[:cast] == "$"
       "<%= number_to_currency(#{singular}.#{name}) %>"
     else
       "<%= #{singular}.#{name} %>"

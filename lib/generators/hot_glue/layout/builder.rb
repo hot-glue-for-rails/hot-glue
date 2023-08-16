@@ -16,6 +16,7 @@ module HotGlue
 
         @generator = generator
 
+        @modify = generator.modify
         @columns = generator.columns
         @smart_layout = generator.smart_layout
         @stacked_downnesting = generator.stacked_downnesting || false
@@ -39,7 +40,8 @@ module HotGlue
           portals:  {
 
           },
-          buttons: { size: @buttons_width}
+          buttons: { size: @buttons_width},
+          modify: @modify
         }
 
         # downnest_object.each do |child, size|
