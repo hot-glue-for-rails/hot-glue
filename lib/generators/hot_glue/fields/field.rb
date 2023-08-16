@@ -78,16 +78,28 @@ class Field
     ""
   end
 
+  def line_field_output
+    viewable_output
+  end
+
   def form_show_only_output
-    if modify && modify[:cast] && modify[:cast] == "$"
-      "<%= number_to_currency(#{singular}.#{name}) %>"
+    viewable_output
+  end
+
+  def viewable_output
+    if modify
+      modified_display_output
     else
       "<%= #{singular}.#{name} %>"
     end
   end
 
-  def line_field_output
-    "<%= #{singular}.#{name} %>"
+  def modified_display_output
+    if  modify[:cast] && modify[:cast] == "$"
+      "<%= number_to_currency(#{singular}.#{name}) %>"
+    elsif modify[:binary]
+      "<%= #{singular}.#{name} ? '#{modify[:binary][:truthy]}' : '#{modify[:binary][:falsy]}' %>"
+    end
   end
 
   def field_output(type = nil, width )
@@ -99,7 +111,10 @@ class Field
     if lines > 5
       lines = 5
     end
-
     "<%= f.text_area :#{name}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}'"  + ( form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "") + " %>"
+  end
+
+  def modify_binary? # safe
+    !!(modify && modify[:binary])
   end
 end

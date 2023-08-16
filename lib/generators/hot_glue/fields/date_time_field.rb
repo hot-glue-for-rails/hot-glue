@@ -26,10 +26,14 @@ class DateTimeField < Field
   end
 
   def line_field_output
-    "<% unless #{singular}.#{name}.nil? %>
+    if modify_binary?
+      "<%= #{singular}.#{name} ? '#{modify[:binary][:truthy]}' : '#{modify[:binary][:truthy]}' %>"
+    else
+      "<% unless #{singular}.#{name}.nil? %>
   <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
   <% else %>
   <span class='alert-danger'>MISSING</span>
   <% end %>"
+    end
   end
 end

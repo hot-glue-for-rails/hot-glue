@@ -14,9 +14,9 @@ class FloatField < Field
     field_output(nil, 5)
   end
 
-  def line_field_output
-    width = (limit && limit < 40) ? limit : (40)
-
-    "<%= #{singular}.#{name} %>"
-  end
+  # def line_field_output
+  #   width = (limit && limit < 40) ? limit : (40)
+  #
+  #   "<%= #{singular}.#{name} %>"
+  # end
 end

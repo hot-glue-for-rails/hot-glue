@@ -199,7 +199,13 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       modify_input.each do |setting|
         setting =~ /(.*){(.*)}/
         key, lookup_as = $1, $2
-        @modify[key.to_sym] =  {cast: $2}
+
+        if ["$"].include?($2)
+          @modify[key.to_sym] =  {cast: $2}
+        elsif $2.include?("|")
+          binary = $2.split("|")
+          @modify[key.to_sym] =  {binary: {truthy: binary[0], falsy: binary[1]}}
+        end
       end
     end
     @update_show_only = []
