@@ -57,6 +57,7 @@ class FieldFactory
                              singular: generator.singular,
                              update_show_only: generator.update_show_only,
                              attachment_data: generator.attachments[name.to_sym],
-                             sample_file_path: generator.sample_file_path)
+                             sample_file_path: generator.sample_file_path,
+                             modify: generator.modify[name.to_sym] || nil )
   end
 end

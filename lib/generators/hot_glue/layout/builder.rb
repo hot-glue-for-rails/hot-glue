@@ -16,6 +16,7 @@ module HotGlue
 
         @generator = generator
 
+        @modify = generator.modify
         @columns = generator.columns
         @smart_layout = generator.smart_layout
         @stacked_downnesting = generator.stacked_downnesting || false
@@ -39,7 +40,8 @@ module HotGlue
           portals:  {
 
           },
-          buttons: { size: @buttons_width}
+          buttons: { size: @buttons_width},
+          modify: @modify
         }
 
         # downnest_object.each do |child, size|
@@ -68,7 +70,7 @@ module HotGlue
           raise "Cannot build layout -- too few columns"
         end
 
-        # smart layout: bootstrap_column_width columns per field; 4 column for EACH downnested portals, 2 column for buttons
+        # smart layout: bootstrap_column_width columns per field; 4 column for EACH downnested portal, 2 column for buttons
         if smart_layout
           # automatic control
           #

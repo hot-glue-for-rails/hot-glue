@@ -560,6 +560,7 @@ describe HotGlue::ScaffoldGenerator do
       ).to be(nil)
     end
 
+
     it "should automatically add fields that begin with underscore (_) as show only" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Fruits::Cantelope", "--gd"])
@@ -574,6 +575,51 @@ describe HotGlue::ScaffoldGenerator do
       expect(
         File.read("spec/dummy/app/controllers/cantelopes_controller.rb") =~ /:_a_show_only_field/
       ).to be(nil)
+    end
+
+
+    it "should accept a parameter modify to display as currency" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Jkl", "--gd", "--show-only=selected", "--modify=selected{on|off}"])
+
+
+      res = File.read("spec/dummy/app/views/jkls/_form.erb")
+      expect(res).to include("<%= jkl.selected ? 'on' : 'off' %>")
+
+    end
+
+  end
+
+  describe "--modify" do
+    it "should accept a parameter --modify=cost{$} to display as currency" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Jkl", "--gd", "--show-only=cost", "--modify=cost{$}"])
+
+
+      res = File.read("spec/dummy/app/views/jkls/_form.erb")
+      expect(res).to include("<%= number_to_currency(jkl.cost) %>")
+
+    end
+
+    it "should accept a parameter modify to display as currency" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Jkl", "--gd",  "--modify=selected{on|off}"])
+
+
+      res = File.read("spec/dummy/app/views/jkls/_form.erb")
+
+      expect(res).to include("<%= f.radio_button(:selected,  '0', checked: jkl.selected  ? '' : 'checked') %>")
+      expect(res).to include("<%= f.label(:selected, value: 'off', for: 'jkl_selected_0') %>")
+      expect(res).to include("<%= f.radio_button(:selected,  '0', checked: jkl.selected  ? '' : 'checked') %>")
+      expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '') %>")
+      expect(res).to include("<%= f.label(:selected, value: 'on', for: 'jkl_selected_1') %>")
+
+
+
+
+      # res = File.read("spec/dummy/app/views/jkls/_line.erb")
+      # byebug
+      # expect(res).to include("<%= jkl.selected ? 'on' : 'off' %>")
     end
   end
 
