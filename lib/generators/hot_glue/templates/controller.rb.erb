@@ -125,11 +125,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
    }.join("/n") %><% end %><%= controller_attachment_orig_filename_pickup_syntax %>
     if @<%= singular_name %>.update(modified_params)
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
-      flash[:notice] = (flash[:notice] || "") << "Saved #{@<%= singular %>.<%= display_class %>}"
+      flash[:notice] = "#{flash[:notice]} Saved \#{@<%= singular %>.<%= display_class %>}"
       flash[:alert] = @hawk_alarm if @hawk_alarm
       render :update
     else
-      flash[:alert] = (flash[:alert] || "") << "<%= singular_name.titlecase %> could not be saved. #{@hawk_alarm}"
+      flash[:alert] = "#{flash[:notice]} <%= singular_name.titlecase %> could not be saved. #{@hawk_alarm}"
       render :update, status: :unprocessable_entity
     end
   end
