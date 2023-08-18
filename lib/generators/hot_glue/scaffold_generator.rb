@@ -1023,6 +1023,29 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
   end
 
+  def insert_into_nav_template
+    # how does this get called(?)
+    nav_file = "#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}"
+    if include_nav_template
+      append_text = "  <li class='nav-item'>
+    <%= link_to '#{@label}', #{path_helper_plural}, class: \"nav-link \#{'active' if nav == '#{singular_name}'}\" %>
+  </li>"
+
+      text = File.read(nav_file)
+      if text.include?(append_text)
+        puts "SKIPPING: Nav link for #{singular_name} already exists in #{nav_file}"
+      else
+        puts "APPENDING: nav link for #{singular_name} #{nav_file}"
+
+        replace = text.gsub(/\<\/ul\>/, append_text + "\n</ul>")
+
+        File.open("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}", "w") { |file|
+          file.puts replace
+        }
+      end
+    end
+  end
+
   def namespace_with_dash
     if @namespace
       "/#{@namespace}"
