@@ -1028,7 +1028,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     nav_file = "#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}"
     if include_nav_template
       append_text = "  <li class='nav-item'>
-    <%= link_to '#{@label}', #{path_helper_plural}, class: \"nav-link \#{'active' if nav == '#{singular_name}'}\" %>
+    <%= link_to '#{@label}', #{path_helper_plural}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
   </li>"
 
       text = File.read(nav_file)
