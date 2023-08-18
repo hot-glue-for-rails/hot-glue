@@ -761,9 +761,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     res
   end
 
+  def nested_path
+    @nested_set.collect{| arg| arg[:plural] + "/\#{#{arg[:singular]}.id}/" }.join("/")
+  end
+
+
   def objest_nest_params_by_id_for_specs
     @nested_set.map { |arg|
-      "#{arg[:singular]}_id: #{arg[:singular]}.id"
+      "#{arg[:singular]}_id: #{arg[:singular] }.id"
     }.join(",\n          ")
   end
 
