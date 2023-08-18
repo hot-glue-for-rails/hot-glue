@@ -91,7 +91,7 @@ describe 'interaction for <%= controller_class_name %>' do
     it "should destroy" do
       visit <%= path_helper_plural %>
       accept_alert do
-        find("form[action='<%= namespace_with_dash %>/<%= plural %>/#{<%= singular %>1.id}'] > input.delete-<%= singular %>-button").click
+        find("form[action='<%= namespace_with_dash %>/<%= nested_path %><%= plural %>/#{<%= singular %>1.id}'] > input.delete-<%= singular %>-button").click
       end
       expect(page).to_not have_content(<%= singular %>1.<%= @display_class %>)
       expect(<%= singular_class %>.where(id: <%= singular %>1.id).count).to eq(0)
