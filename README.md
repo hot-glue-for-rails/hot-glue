@@ -1178,7 +1178,29 @@ Always:
 
 Don't include this last line in your factory code. 
 
+## Nav Templates
+At the namespace level, you can have a file called `_nav.html.erb` to create tabbed bootstrap nav (you'll need to create this file manually).
 
+To create the default template, start by running
+```
+bin/rails generate hot_glue:nav_template --namespace=xyz
+
+```
+this will append the file `_nav.html.erb` to the views folder at `views/xyz`
+
+```
+<ul class='nav nav-tabs'>
+</ul>
+```
+
+Once the file is present, any further builds in this namespace will:
+
+1) Append to the `_nav.html.erb` file, adding a tab for the new built scaffold
+2) Add render to the list view of the built scaffold to include the partial:
+```
+<%= render partial: "owner/nav", locals: {nav: "things"} %>
+```
+(in this example `owner/` is the namespace and `things` is the name of the scaffold being built)
 
 ## Automatic Base Controller
 
@@ -1283,6 +1305,37 @@ end
 
 
 # VERSION HISTORY
+
+#### TBR
+
+• Nav templates (`_nav.html.erb`) are now automatically appended to if they exist. Remember nav template live in the views folder at the root of the *namespace*, which is one folder up from whatever folder is being built.
+If a file exists `_nav.html.erb`, it will get appnded to with content like this:
+
+```
+<li class="nav-item">
+    <%= link_to "Domains", domains_path, class: "nav-link #{'active' if nav == 'domains'}" %>
+  </li>
+```
+
+This append to the `_nav.html.erb` template happens in addition to the partial itself being included from the layout.
+(Also only if it exists, so be sure create it before running the scaffold generators for the namespace. Of course, you only need to create it once for each namespace)
+
+• To create a new `_nav.html.erb` template use
+
+```
+bin/rails generate hot_glue:nav_template --namespace=xyz
+```
+
+Here, you give only the namespace. It will create an empty nav template:
+```
+<ul class='nav nav-tabs'>
+</ul>
+```
+
+• Fixes to specs for datetimes
+
+• Fixes way the flash notices where created that violated frozen string literal
+
 
 #### 2023-08-17 - v0.5.16
 
