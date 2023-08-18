@@ -663,9 +663,22 @@ The syntax is `--modify=cost{$},price{$}`
 
 Here, the `cost` and `price` fields will be displayed as wrapped in `number_to_currency()` when displayed on the list view and when displayed as show-only.
 
-(You will need to separately specify them as show-only if you want them to be non-editable.)
+You can also use a binary modifier, which can apply to booleans, datetimes, times, dates or anything else. When using the binary modify, a specific value is displayed if the field is truthy and another one is display if the field is falsy.
+You specify it using a pipe | character like so:
 
-The availabel modifiers are:
+`--modify=paid_at{paid|unpaid}`
+
+here, even though `paid_at` is a datetime field, it will display as-if it is a binary -- showing either the truthy 
+label or the falsy label depending on if `paid_at` is or is not null in the database.  
+For all fields except booleans, this affects only the viewable output — 
+what you see on the list page and on the edit page for show-only fields.  
+For booleans, it affects those outputs as well as the normal edit output: 
+The labels you specify are used as the labels for the radio buttons that the user can select.
+
+
+You will need to separately specify them as show-only if you want them to be non-editable.
+
+The available modifiers are:
 
 | modifier                  | what it does                                                                                                                                                         | can be used on                |   |   |
 |---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|---|---|
