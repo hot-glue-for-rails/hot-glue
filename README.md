@@ -1284,6 +1284,37 @@ end
 
 # VERSION HISTORY
 
+#### TBR
+
+• Nav templates (`_nav.html.erb`) are now automatically appended to if they exist. Remember nav template live in the views folder at the root of the *namespace*, which is one folder up from whatever folder is being built.
+If a file exists `_nav.html.erb`, it will get appnded to with content like this:
+
+```
+<li class="nav-item">
+    <%= link_to "Domains", domains_path, class: "nav-link #{'active' if nav == 'domains'}" %>
+  </li>
+```
+
+This append to the `_nav.html.erb` template happens in addition to the partial itself being included from the layout.
+(Also only if it exists, so be sure create it before running the scaffold generators for the namespace. Of course, you only need to create it once for each namespace)
+
+• To create a new `_nav.html.erb` template use
+
+```
+rails generate hot_glue:nav_template --namespace=your_namespace
+```
+
+Here, you give only the namespace. It will create an empty nav template:
+```
+<ul class="nav nav-tabs">
+</ul>
+```
+
+• Fixes to specs for datetimes
+
+• Fixes way the flash notices where created that violated frozen string literal
+
+
 #### 2023-08-17 - v0.5.16
 
 - Adds `--modidy` flag to turn numbers into currency and apply binary labels (see docs for `--modify` flag)
