@@ -1271,7 +1271,7 @@ end
 
 # VERSION HISTORY
 
-#### TBR
+#### 2023-08-17 - v0.5.16
 
 - Adds `--modidy` flag to turn numbers into currency and apply binary labels (see docs for `--modify` flag)
 
