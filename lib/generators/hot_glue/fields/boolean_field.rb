@@ -13,7 +13,7 @@ class BooleanField < Field
   end
 
   def spec_list_view_assertion
-    "      " + ["expect(page).to have_content(#{singular}#{1}.#{name} ? 'YES' : 'NO')"].join("\n      ")
+    ["expect(page).to have_content(#{singular}#{1}.#{name} ? 'YES' : 'NO')"].join("\n      ")
   end
   
   
@@ -22,7 +22,7 @@ class BooleanField < Field
       "  <%= f.radio_button(:#{name},  '0', checked: #{singular}.#{name}  ? '' : 'checked') %>\n" +
       "  <%= f.label(:#{name}, value: '#{modify_binary? && modify[:binary][:falsy] || 'No'}', for: '#{singular}_#{name}_0') %>\n" +
       " <br /> <%= f.radio_button(:#{name}, '1',  checked: #{singular}.#{name}  ? 'checked' : '') %>\n" +
-      "  <%= f.label(:#{name}, value: '#{modify_binary? && modify[:binary][:truthy] || 'No'}', for: '#{singular}_#{name}_1') %>\n" +
+      "  <%= f.label(:#{name}, value: '#{modify_binary? && modify[:binary][:truthy] || 'Yes'}', for: '#{singular}_#{name}_1') %>\n" +
       (form_labels_position == 'after' ?  " <br />"  : "")
   end
 

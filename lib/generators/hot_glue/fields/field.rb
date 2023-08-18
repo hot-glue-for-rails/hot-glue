@@ -62,17 +62,32 @@ class Field
     ""
   end
 
+
   def spec_make_assertion
-    "expect(page).to have_content(new_#{name})"
+    if !modify_binary?
+      "expect(page).to have_content(new_#{name})"
+    else
+      "expect(page).to have_content('#{modify[:binary][:truthy]}'"
+    end
   end
+
 
   def spec_setup_let_arg
 
   end
 
-  def spec_list_view_assertion
+  def spec_list_view_natural_assertion
     "expect(page).to have_content(#{singular}#{1}.#{name})"
   end
+
+  def spec_list_view_assertion
+    if modify_binary?
+      "expect(page).to have_content('#{modify[:binary][:truthy]}'"
+    else
+      spec_list_view_natural_assertion
+    end
+  end
+
 
   def spec_related_column_lets
     ""

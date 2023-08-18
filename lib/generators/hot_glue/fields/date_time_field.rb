@@ -10,7 +10,11 @@ class DateTimeField < Field
   end
 
   def spec_make_assertion
-    "expect(page).to have_content(new_#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone))"
+    if !modify_binary?
+      "expect(page).to have_content(new_#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone))"
+    else
+      "expect(page).to have_content('#{modify[:binary][:truthy]}'"
+    end
   end
 
   def spec_setup_let_arg
@@ -18,6 +22,14 @@ class DateTimeField < Field
   end
 
   def spec_list_view_assertion
+    if modify_binary?
+      "expect(page).to have_content('#{modify[:binary][:truthy]}')"
+    else
+      spec_list_view_natural_assertion
+    end
+  end
+
+  def spec_list_view_natural_assertion
     "expect(page).to have_content(#{singular}#{1}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub(' ', ' ') + timezonize(current_timezone) )"
   end
 
@@ -27,7 +39,7 @@ class DateTimeField < Field
 
   def line_field_output
     if modify_binary?
-      "<%= #{singular}.#{name} ? '#{modify[:binary][:truthy]}' : '#{modify[:binary][:truthy]}' %>"
+      modified_display_output
     else
       "<% unless #{singular}.#{name}.nil? %>
   <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
