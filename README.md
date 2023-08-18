@@ -1178,7 +1178,29 @@ Always:
 
 Don't include this last line in your factory code. 
 
+## Nav Templates
+At the namespace level, you can have a file called `_nav.html.erb` to create tabbed bootstrap nav (you'll need to create this file manually).
 
+To create the default template, start by running
+```
+bin/rails generate hot_glue:nav_template --namespace=xyz
+
+```
+this will append the file `_nav.html.erb` to the views folder at `views/xyz`
+
+```
+<ul class='nav nav-tabs'>
+</ul>
+```
+
+Once the file is present, any further builds in this namespace will:
+
+1) Append to the `_nav.html.erb` file, adding a tab for the new built scaffold
+2) Add render to the list view of the built scaffold to include the partial:
+```
+<%= render partial: "owner/nav", locals: {nav: "things"} %>
+```
+(in this example `owner/` is the namespace and `things` is the name of the scaffold being built)
 
 ## Automatic Base Controller
 
@@ -1301,12 +1323,12 @@ This append to the `_nav.html.erb` template happens in addition to the partial i
 • To create a new `_nav.html.erb` template use
 
 ```
-rails generate hot_glue:nav_template --namespace=your_namespace
+bin/rails generate hot_glue:nav_template --namespace=xyz
 ```
 
 Here, you give only the namespace. It will create an empty nav template:
 ```
-<ul class="nav nav-tabs">
+<ul class='nav nav-tabs'>
 </ul>
 ```
 
