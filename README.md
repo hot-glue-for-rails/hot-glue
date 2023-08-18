@@ -1306,7 +1306,7 @@ end
 
 # VERSION HISTORY
 
-#### TBR
+#### 2023-08-18 - v0.5.17
 
 • Nav templates (`_nav.html.erb`) are now automatically appended to if they exist. Remember nav template live in the views folder at the root of the *namespace*, which is one folder up from whatever folder is being built.
 If a file exists `_nav.html.erb`, it will get appnded to with content like this:
