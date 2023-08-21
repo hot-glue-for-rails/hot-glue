@@ -115,7 +115,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @markup = get_default_from_config(key: :markup)
     @sample_file_path = get_default_from_config(key: :sample_file_path)
-    @bootstrap_column_width ||= get_default_from_config(key: :bootstrap_column_width) || 2
+    @bootstrap_column_width ||= options['bootstrap_column_width'].to_i ||
+      get_default_from_config(key: :bootstrap_column_width) || 2
 
     if options['layout']
       layout = options['layout']
