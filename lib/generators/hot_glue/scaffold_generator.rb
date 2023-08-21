@@ -76,7 +76,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :alt_foreign_key_lookup, default: '' #
   class_option :attachments, default: ''
   class_option :stacked_downnesting, default: false
-  class_option :bootstrap_column_width, default: nil # must be nil to detect if user has not passed
+  class_option :bootstrap_column_width, default: 2 # must be nil to detect if user has not passed
   class_option :button_icons, default: nil
   class_option :modify, default: {}
 
