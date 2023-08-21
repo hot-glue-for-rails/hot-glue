@@ -77,7 +77,7 @@ describe 'interaction for <%= controller_class_name %>' do
            eval("#{singular_class}.devise_modules.include?(:confirmable)") && col.to_s == "email"
             "        expect(page).to have_content(#{ singular }1.#{col.to_s})"
       elsif type == :datetime
-            "        expect(page).to have_content(new_#{col.to_s}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone))"
+            "        expect(page).to have_content(new_#{col.to_s}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p %z').gsub('  ', ' '))"
       else
             "        expect(page).to have_content(new_#{col.to_s})"
       end
