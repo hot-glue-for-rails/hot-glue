@@ -44,7 +44,6 @@ class FieldFactory
               AttachmentField
             end
     @class_name = class_name
-
     @field = field_class.new(name: name,
                              layout_strategy: generator.layout_strategy,
                              form_placeholder_labels: generator.form_placeholder_labels,
@@ -58,6 +57,8 @@ class FieldFactory
                              update_show_only: generator.update_show_only,
                              attachment_data: generator.attachments[name.to_sym],
                              sample_file_path: generator.sample_file_path,
-                             modify: generator.modify[name.to_sym] || nil )
+                             modify: generator.modify[name.to_sym] || nil,
+                             display_as: generator.display_as[name.to_sym] || nil,
+                             default_boolean_display: generator.default_boolean_display)
   end
 end

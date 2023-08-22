@@ -17,7 +17,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   source_root File.expand_path('templates', __dir__)
   attr_accessor :alt_lookups, :attachments, :auth, :big_edit, :button_icons, :bootstrap_column_width, :columns,
-                :downnest_children, :downnest_object, :hawk_keys, :layout_object, :modify,
+                :default_boolean_display,
+                :display_as, :downnest_children, :downnest_object, :hawk_keys, :layout_object, :modify,
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting, :update_show_only, :ownership_field,
                 :layout_strategy, :form_placeholder_labels, :form_labels_position
@@ -79,6 +80,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :bootstrap_column_width, default: nil # must be nil to detect if user has not passed
   class_option :button_icons, default: nil
   class_option :modify, default: {}
+  class_option :display_as, default: {}
 
   def initialize(*meta_args)
     super
@@ -118,6 +120,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @bootstrap_column_width ||= options['bootstrap_column_width'] ||
       get_default_from_config(key: :bootstrap_column_width) || 2
 
+
+
+    @default_boolean_display = get_default_from_config(key: :default_boolean_display)
     if options['layout']
       layout = options['layout']
     else
@@ -209,6 +214,19 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         end
       end
     end
+
+    @display_as = {}
+    if !options['display_as'].empty?
+      display_input = options['display_as'].split(",")
+
+      display_input.each do |setting|
+        setting =~ /(.*){(.*)}/
+        key, lookup_as = $1, $2
+        @display_as[key.to_sym] =  {boolean: $2}
+      end
+    end
+
+
     @update_show_only = []
     if !options['update_show_only'].empty?
       @update_show_only += options['update_show_only'].split(",").collect(&:to_sym)

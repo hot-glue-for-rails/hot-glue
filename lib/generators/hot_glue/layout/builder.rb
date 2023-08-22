@@ -17,6 +17,7 @@ module HotGlue
         @generator = generator
 
         @modify = generator.modify
+        @display_as =  generator.display_as
         @columns = generator.columns
         @smart_layout = generator.smart_layout
         @stacked_downnesting = generator.stacked_downnesting || false
@@ -29,6 +30,8 @@ module HotGlue
         @specified_grouping_mode = include_setting.include?(":")
         @bootstrap_column_width = generator.bootstrap_column_width
         @big_edit = generator.big_edit
+        @default_boolean_display = generator.get_default_from_config(key: :default_boolean_display)
+
       end
 
       def construct
@@ -41,7 +44,8 @@ module HotGlue
 
           },
           buttons: { size: @buttons_width},
-          modify: @modify
+          modify: @modify,
+          display: @display_as
         }
 
         # downnest_object.each do |child, size|

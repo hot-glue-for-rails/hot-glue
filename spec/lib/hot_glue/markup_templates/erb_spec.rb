@@ -28,6 +28,7 @@ describe HotGlue::ErbTemplate do
                     singular_class: "Jkl",
                     form_placeholder_labels: nil,
                     modify: {},
+                    get_default_from_config: OpenStruct.new({default_boolean_display:  'radio'}),
                     singular: "jkl" }.merge(  hawk_keys: options[:hawk_keys],
                                           columns: options[:columns],
                                           form_placeholder_labels: options[:form_placeholder_labels],

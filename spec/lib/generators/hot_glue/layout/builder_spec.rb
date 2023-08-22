@@ -76,7 +76,8 @@ describe HotGlue::Layout::Builder do
         generator =  OpenStruct.new(downnest_object: {get_emails_rules: 4} ,
                                     columns: [:api_key, :api_id],
                                     smart_layout: false,
-                                    bootstrap_column_width: 2  )
+                                    bootstrap_column_width: 2,
+                                    get_default_from_config: OpenStruct.new('radio'))
 
         builder = HotGlue::Layout::Builder.new(include_setting: "api_key,api_id:",
                                                generator: generator,
