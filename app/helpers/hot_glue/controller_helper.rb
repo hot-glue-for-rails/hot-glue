@@ -51,21 +51,20 @@ module HotGlue
     end
 
     def modify_date_inputs_on_params(modified_params, current_user_object = nil)
-      # use_timezone = (current_user_object.try(:timezone)) || Time.now.strftime("%z")
+      use_timezone = (current_user_object.try(:timezone)) || server_timezone
+      modified_params = modified_params.tap do |params|
+        params.keys.each{|k|
+          if k.ends_with?("_at") || k.ends_with?("_date")
 
-      # modified_params = modified_params.tap do |params|
-      #   params.keys.each{|k|
-      #     if k.ends_with?("_at") || k.ends_with?("_date")
-      #
-      #       use_timezone
-      #       begin
-      #         params[k] = DateTime.strptime("#{params[k]} #{use_timezone}", '%Y-%m-%dT%H:%M %z').new_offset(0)
-      #       rescue StandardError
-      #
-      #       end
-      #     end
-      #   }
-      # end
+            use_timezone
+            begin
+              params[k] = DateTime.strptime("#{params[k]} #{use_timezone}", '%Y-%m-%dT%H:%M %z').new_offset(0)
+            rescue StandardError
+
+            end
+          end
+        }
+      end
       modified_params
     end
 
