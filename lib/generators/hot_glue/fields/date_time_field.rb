@@ -11,7 +11,7 @@ class DateTimeField < Field
 
   def spec_make_assertion
     if !modify_binary?
-      "expect(page).to have_content(new_#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone))"
+      "expect(page).to have_content(new_#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p %z').gsub('  ', ' '))"
     else
       "expect(page).to have_content('#{modify[:binary][:truthy]}'"
     end
@@ -30,7 +30,7 @@ class DateTimeField < Field
   end
 
   def spec_list_view_natural_assertion
-    "expect(page).to have_content(#{singular}#{1}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ').gsub('  ', ' ') + timezonize(current_timezone) )"
+    "expect(page).to have_content(#{singular}#{1}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p %z').gsub('  ', ' '))"
   end
 
   def form_field_output
@@ -42,7 +42,7 @@ class DateTimeField < Field
       modified_display_output
     else
       "<% unless #{singular}.#{name}.nil? %>
-  <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone) %>
+  <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p %z') %>
   <% else %>
   <span class='alert-danger'>MISSING</span>
   <% end %>"

@@ -28,7 +28,8 @@ module HotGlue
     def current_timezone
       if defined?(current_user)
         if current_user.try(:timezone)
-          Time.now.in_time_zone(current_user.timezone.to_i).strftime("%z").to_i/100
+
+          Time.now.in_time_zone(current_user.timezone.to_i).zone
         else
           server_timezone
         end
@@ -40,36 +41,30 @@ module HotGlue
     def date_to_current_timezone(date, timezone = nil)
       # if the timezone is nil, use the server date'
 
-      if timezone.nil?
-        timezone = Time.now.strftime("%z").to_i/100
-      end
+      # if timezone.nil?
+      #   timezone = Time.now.strftime("%z")
+      # end
 
       return nil if date.nil?
-
       return date.in_time_zone(timezone).strftime("%Y-%m-%dT%H:%M")
-      # begin
-      #
-      # rescue
-      #   return nil
-      # end
+
     end
 
     def modify_date_inputs_on_params(modified_params, current_user_object = nil)
-
-      use_timezone = (current_user_object.try(:timezone)) || Time.now.strftime("%z")
-
-      modified_params = modified_params.tap do |params|
-        params.keys.each{|k|
-          if k.ends_with?("_at") || k.ends_with?("_date")
-
-            begin
-              params[k] = DateTime.strptime("#{params[k]} #{use_timezone}", '%Y-%m-%dT%H:%M %z')
-            rescue StandardError
-
-            end
-          end
-        }
-      end
+      use_timezone = (current_user_object.try(:timezone)) || server_timezone
+      # modified_params = modified_params.tap do |params|
+      #   params.keys.each{|k|
+      #     if k.ends_with?("_at") || k.ends_with?("_date")
+      #
+      #       use_timezone
+      #       begin
+      #         params[k] = DateTime.strptime("#{params[k]} #{use_timezone}", '%Y-%m-%dT%H:%M %z').new_offset(0)
+      #       rescue StandardError
+      #
+      #       end
+      #     end
+      #   }
+      # end
       modified_params
     end
 
