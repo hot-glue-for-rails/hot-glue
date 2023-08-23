@@ -3,6 +3,7 @@
 module HotGlue
   module Layout
     class Builder
+      include DefaultConfigLoader
       attr_reader :include_setting,
                   :downnest_object,
                   :buttons_width, :columns,
@@ -30,7 +31,8 @@ module HotGlue
         @specified_grouping_mode = include_setting.include?(":")
         @bootstrap_column_width = generator.bootstrap_column_width
         @big_edit = generator.big_edit
-        @default_boolean_display = generator.get_default_from_config(key: :default_boolean_display)
+
+        @default_boolean_display = get_default_from_config(key: :default_boolean_display)
 
       end
 
@@ -45,7 +47,7 @@ module HotGlue
           },
           buttons: { size: @buttons_width},
           modify: @modify,
-          display: @display_as
+          display_as: @display_as
         }
 
         # downnest_object.each do |child, size|

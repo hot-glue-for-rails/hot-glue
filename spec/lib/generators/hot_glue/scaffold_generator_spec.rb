@@ -608,10 +608,11 @@ describe HotGlue::ScaffoldGenerator do
 
       res = File.read("spec/dummy/app/views/jkls/_form.erb")
 
-      expect(res).to include("<%= f.radio_button(:selected,  '0', checked: jkl.selected  ? '' : 'checked') %>")
+
+      expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '')")
       expect(res).to include("<%= f.label(:selected, value: 'off', for: 'jkl_selected_0') %>")
-      expect(res).to include("<%= f.radio_button(:selected,  '0', checked: jkl.selected  ? '' : 'checked') %>")
-      expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '') %>")
+      expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '') %>")
+      expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '' , class: '')")
       expect(res).to include("<%= f.label(:selected, value: 'on', for: 'jkl_selected_1') %>")
 
 
@@ -697,7 +698,7 @@ describe HotGlue::ScaffoldGenerator do
 
       res = File.read("spec/dummy/app/views/abcs/_form.erb")
 
-      label_pos = res.index /<label class='small form-text text-muted'>Name\<\/label>/
+      label_pos = res.index /<label class='text-muted small form-text' for=''>Name\<\/label>/
       field_pos = res.index /<%= f.text_field :name, value: abc.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>/
       expect(label_pos < field_pos).to be(true)
     end

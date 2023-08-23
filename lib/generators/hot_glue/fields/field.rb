@@ -148,7 +148,7 @@ class Field
   end
 
   def label_class
-    "text-muted small"
+    "text-muted small form-text"
   end
 
   def label_for

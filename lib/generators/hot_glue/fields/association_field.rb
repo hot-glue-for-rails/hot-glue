@@ -5,7 +5,9 @@ class AssociationField < Field
 
   attr_accessor :assoc_name, :assoc_class, :assoc
 
-  def initialize(name: , class_name: , alt_lookups: , singular: , update_show_only: ,
+  def initialize(alt_lookups: , class_name: , default_boolean_display:, display_as: ,
+                 name: , singular: ,
+                 update_show_only: ,
                  hawk_keys: , auth: , sample_file_path:,  ownership_field: ,
                  attachment_data: nil , layout_strategy: , form_placeholder_labels: nil,
                  form_labels_position:, modify:  )

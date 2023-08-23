@@ -32,5 +32,6 @@ module LayoutStrategy
     def style_with_flex_basis(x); "" ; end
     def form_checkbox_input_class; ""; end
     def form_checkbox_label_class; ""; end
+    def form_checkbox_wrapper_class; ""; end
   end
 end

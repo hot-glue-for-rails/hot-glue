@@ -16,7 +16,7 @@ describe HotGlue::ErbTemplate do
   # t.timestamps
 
   let(:layout_strategy) {
-    LayoutStrategy::HotGlue.new(OpenStruct.new({}))
+    LayoutStrategy::HotGlue.new(OpenStruct.new)
   }
 
   def base_generator options
@@ -26,9 +26,11 @@ describe HotGlue::ErbTemplate do
                     attachments: {},
                     bootstrap_column_width: 2,
                     singular_class: "Jkl",
+                    layout_strategy: layout_strategy,
                     form_placeholder_labels: nil,
                     modify: {},
-                    get_default_from_config: OpenStruct.new({default_boolean_display:  'radio'}),
+                    display_as: {},
+                    default_boolean_display: "radio",
                     singular: "jkl" }.merge(  hawk_keys: options[:hawk_keys],
                                           columns: options[:columns],
                                           form_placeholder_labels: options[:form_placeholder_labels],
@@ -54,6 +56,7 @@ describe HotGlue::ErbTemplate do
       magic_buttons: [],
       small_buttons: false,
       inline_list_labels: 'omit',
+      layout_strategy: layout_strategy,
       form_placeholder_labels: options[:form_placeholder_labels],
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
@@ -76,7 +79,9 @@ describe HotGlue::ErbTemplate do
 
       selected: FieldFactory.new(type: :boolean, name: "selected", generator: generator).field,
       name: FieldFactory.new(type: :string, name: "name", generator: generator).field,
-      hgi_id: AssociationField.new(layout_strategy: layout_strategy,
+      hgi_id: AssociationField.new(
+              default_boolean_display: "radio" , display_as: {},
+              layout_strategy: layout_strategy,
                                    form_labels_position: 'before',
                                    ownership_field: "", name: "hgi_id", class_name: "Jkl", alt_lookups: {},
                                    singular: "Jkl", update_show_only: nil, hawk_keys: options[:hawk_keys],
@@ -165,10 +170,10 @@ describe HotGlue::ErbTemplate do
       expect(res).to include("<%= time_field_localized(f, :time_of_day, jkl.time_of_day,  'Time of day', nil) %>")
     end
 
-    it "should make a boolean column " do
+    it "should make a boolean column" do
       res = factory_all_form_fields({columns: [:selected]})
-      expect(res).to include("<%= f.radio_button(:selected,  '0', checked: jkl.selected  ? '' : 'checked') %>")
-      expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '') %>")
+      expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '') %>")
+      expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '' , class: '') %>")
     end
 
 
@@ -185,8 +190,7 @@ describe HotGlue::ErbTemplate do
     it "with 'before' should make the labels appear before the field" do
       res = factory_all_form_fields({columns: [:name, :blurb],
                                      form_labels_position: 'before'})
-
-      label_pos = res.index /<label class='small form-text text-muted'>Name/
+      label_pos = res.index /<label class='text-muted small form-text' for=''>Name/
       field_pos = res.index /<%= f.text_field :name,/
       expect(label_pos < field_pos).to be(true)
     end
@@ -195,7 +199,7 @@ describe HotGlue::ErbTemplate do
       res = factory_all_form_fields({columns: [:name, :blurb],
                                          form_labels_position: 'after'}
       )
-      label_pos = res.index /<label class='small form-text text-muted'>Name/
+      label_pos = res.index /<label class='text-muted small form-text' for=''>Name/
       field_pos = res.index /<%= f.text_field :name,/
       expect(label_pos > field_pos).to be(true)
     end
@@ -293,6 +297,10 @@ describe HotGlue::ErbTemplate do
       expect(res).to_not include("<label class='small form-text text-muted'>Blurb</label>")
       expect(res).to_not include("<label class='small form-text text-muted'>Name</label>")
     end
+  end
+
+  describe "boolean display" do
+
   end
 
   describe "with show only fields" do

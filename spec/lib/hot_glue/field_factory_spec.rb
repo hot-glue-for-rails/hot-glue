@@ -6,6 +6,8 @@ describe FieldFactory do
                           name: "how_many",
                           generator: OpenStruct.new({
                                                   modify: {},
+                                                  display_as: {},
+                                                  default_boolean_display: 'radio',
                                                   form_labels_position: nil,
                                                   singular_class: "Hgi",
                                                   layout_strategy: nil,

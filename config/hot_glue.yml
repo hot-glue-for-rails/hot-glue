@@ -1,5 +1,5 @@
 ---
 :layout: hotglue
 :markup: erb
-
+:default_boolean_display: radio
 :sample_file_path: spec/files/computer_code.jpg
