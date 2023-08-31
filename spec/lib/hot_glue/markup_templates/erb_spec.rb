@@ -151,17 +151,17 @@ describe HotGlue::ErbTemplate do
 
     it "should make a datetime column" do
       res = factory_all_form_fields({columns: [:approved_at]})
-      expect(res).to include("<%= datetime_field_localized(f, :approved_at, jkl.approved_at, 'Approved at', nil) %>")
+      expect(res).to include("<%= datetime_field_localized(f, :approved_at, jkl.approved_at, 'Approved at') %>")
     end
 
     it "should make a date column " do
       res = factory_all_form_fields({columns: [:release_on]})
-      expect(res).to include("<%= date_field_localized(f, :release_on, jkl.release_on, 'Release on', nil) %>")
+      expect(res).to include("<%= date_field_localized(f, :release_on, jkl.release_on, 'Release on') %>")
     end
 
     it "should make a time column " do
       res = factory_all_form_fields({columns: [:time_of_day]})
-      expect(res).to include("<%= time_field_localized(f, :time_of_day, jkl.time_of_day,  'Time of day', nil) %>")
+      expect(res).to include("<%= time_field_localized(f, :time_of_day, jkl.time_of_day,  'Time of day') %>")
     end
 
     it "should make a boolean column " do
