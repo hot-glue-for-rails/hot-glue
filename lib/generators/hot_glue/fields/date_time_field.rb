@@ -11,7 +11,7 @@ class DateTimeField < Field
 
   def spec_make_assertion
     if !modify_binary?
-      "expect(page).to have_content(new_#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p %z').gsub('  ', ' '))"
+      "expect(page).to have_content(new_#{name}.in_time_zone(testing_timezone).strftime('%m/%d/%Y @ %l:%M %p %Z').gsub('  ', ' '))"
     else
       "expect(page).to have_content('#{modify[:binary][:truthy]}'"
     end
@@ -30,7 +30,7 @@ class DateTimeField < Field
   end
 
   def spec_list_view_natural_assertion
-    "expect(page).to have_content(#{singular}#{1}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p %z').gsub('  ', ' '))"
+    "expect(page).to have_content(#{singular}#{1}.#{name}.in_time_zone(testing_timezone).strftime('%m/%d/%Y @ %l:%M %p %Z').gsub('  ', ' '))"
   end
 
   def form_field_output

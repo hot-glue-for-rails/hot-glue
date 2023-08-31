@@ -5,7 +5,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   helper :hot_glue
   include HotGlue::ControllerHelper
 
-  <% unless @auth_identifier == '' || @god %>before_action :<%= auth_root %><% end %><% if any_nested? %>
+  <% unless @god %>before_action :<%= "authenticate_" + @auth_identifier.split(".")[0] + "!" %><% end %><% if any_nested? %>
     <% nest_chain = [] %> <% @nested_set.each { |arg|
 
     if auth_identifier == arg[:singular]

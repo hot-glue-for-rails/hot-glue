@@ -155,6 +155,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @controller_build_folder_singular = singular
 
     @auth = options['auth'] || "current_user"
+
+    @god = options['god'] || options['gd'] || false
     @auth_identifier = options['auth_identifier'] || (!@god && @auth.gsub("current_", "")) || nil
 
     if options['nest']
@@ -257,7 +259,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       raise HotGlue::Error, "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
     end
 
-    @god = options['god'] || options['gd'] || false
     @specs_only = options['specs_only'] || false
 
     @no_specs = options['no_specs'] || false
@@ -293,7 +294,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if @god
       @auth = nil
     end
-
     # when in self auth, the object is the same as the authenticated object
 
     if @auth && auth_identifier == @singular
@@ -646,9 +646,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
   end
 
-  def auth_root
-    "authenticate_" + @auth_identifier.split(".")[0] + "!"
-  end
+
 
   def formats
     [format]
