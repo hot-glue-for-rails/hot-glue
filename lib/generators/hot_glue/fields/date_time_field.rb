@@ -34,7 +34,7 @@ class DateTimeField < Field
   end
 
   def form_field_output
-    "<%= datetime_field_localized(f, :#{name}, #{singular}.#{name}, '#{ name.to_s.humanize }', #{auth ? auth+'.timezone' : 'nil'}) %>"
+    "<%= datetime_field_localized(f, :#{name}, #{singular}.#{name}, '#{ name.to_s.humanize }') %>"
   end
 
   def line_field_output
@@ -42,7 +42,7 @@ class DateTimeField < Field
       modified_display_output
     else
       "<% unless #{singular}.#{name}.nil? %>
-  <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p %z') %>
+  <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p %Z') %>
   <% else %>
   <span class='alert-danger'>MISSING</span>
   <% end %>"

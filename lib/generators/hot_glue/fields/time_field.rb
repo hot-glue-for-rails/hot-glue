@@ -5,7 +5,7 @@ class TimeField < Field
   end
 
   def form_field_output
-    "<%= time_field_localized(f, :#{name}, #{singular}.#{name},  '#{ name.to_s.humanize  }', #{auth ? auth+'.timezone' : 'nil'}) %>"
+    "<%= time_field_localized(f, :#{name}, #{singular}.#{name},  '#{ name.to_s.humanize  }') %>"
   end
 
   def line_field_output

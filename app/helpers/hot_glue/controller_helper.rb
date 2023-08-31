@@ -5,10 +5,11 @@ module HotGlue
       (tz >= 0 ? "+" : "-") + sprintf('%02d',tz.abs) + ":00"
     end
 
-    def datetime_field_localized(form_object, field_name, value, label, timezone = nil )
+    def datetime_field_localized(form_object, field_name, value, label )
+      current_timezone
       form_object.text_field(field_name, class: 'form-control',
                                     type: 'datetime-local',
-                                    value: date_to_current_timezone(value, timezone))  + timezonize(timezone)
+                                    value: date_to_current_timezone(value, current_timezone))  + timezonize(current_timezone)
     end
 
 
@@ -18,53 +19,50 @@ module HotGlue
                                     value: value )
     end
 
-    def time_field_localized(form_object, field_name, value, label, timezone = nil )
+    def time_field_localized(form_object, field_name, value, label )
       form_object.text_field(field_name, class: 'form-control',
                                     type: 'time',
-                                    value: date_to_current_timezone(value, timezone)) + timezonize(timezone)
+                                    value: date_to_current_timezone(value, current_timezone)) + timezonize(current_timezone)
 
     end
 
     def current_timezone
+      # returns a TimeZone (https://apidock.com/rails/TimeZone) object
       if defined?(current_user)
         if current_user.try(:timezone)
-
           Time.now.in_time_zone(current_user.timezone.to_i).zone
         else
-          server_timezone
+          Time.zone.name
         end
       else
-        server_timezone
+        Time.zone.name
       end
     end
 
     def date_to_current_timezone(date, timezone = nil)
-      # if the timezone is nil, use the server date'
-
-      # if timezone.nil?
-      #   timezone = Time.now.strftime("%z")
-      # end
-
-      return nil if date.nil?
-      return date.in_time_zone(timezone).strftime("%Y-%m-%dT%H:%M")
-
+      # used for displaying when in EDIT  mode
+      # (this format is how the browser expectes to receive the value='' of the input field)
+      if date.nil?
+        return nil
+      else
+        return date.in_time_zone(timezone).strftime("%Y-%m-%dT%H:%M")
+      end
     end
 
     def modify_date_inputs_on_params(modified_params, current_user_object = nil)
-      use_timezone = (current_user_object.try(:timezone)) || server_timezone
-      # modified_params = modified_params.tap do |params|
-      #   params.keys.each{|k|
-      #     if k.ends_with?("_at") || k.ends_with?("_date")
-      #
-      #       use_timezone
-      #       begin
-      #         params[k] = DateTime.strptime("#{params[k]} #{use_timezone}", '%Y-%m-%dT%H:%M %z').new_offset(0)
-      #       rescue StandardError
-      #
-      #       end
-      #     end
-      #   }
-      # end
+      use_offset = (current_user_object.try(:timezone)) || server_timezone_offset
+
+      modified_params = modified_params.tap do |params|
+        params.keys.each{|k|
+          if k.ends_with?("_at") || k.ends_with?("_date")
+            begin
+              params[k] = DateTime.strptime("#{params[k]} #{use_timezone}", '%Y-%m-%dT%H:%M %z').new_offset(0)
+            rescue StandardError
+
+            end
+          end
+        }
+      end
       modified_params
     end
 
@@ -89,7 +87,7 @@ module HotGlue
 
     private
 
-    def server_timezone
+    def server_timezone_offset # returns integer of hours to add/subtract from UTC
       Time.now.strftime("%z").to_i/100
     end
   end
