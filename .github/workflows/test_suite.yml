@@ -39,13 +39,8 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 18
 
-      - name: npm install
-        run: npm install
+
         
       - name: Set up database schema
         run: bin/rails db:schema:load
