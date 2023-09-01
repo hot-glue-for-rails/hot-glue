@@ -65,7 +65,9 @@ module HotGlue
           end
           if include_me
             begin
-              params[k] = DateTime.strptime("#{params[k]} #{use_offset}", '%Y-%m-%dT%H:%M %z').new_offset(0)
+              if use_offset != 0
+                params[k] = DateTime.strptime("#{params[k]} #{use_offset}", '%Y-%m-%dT%H:%M %z').new_offset(0)
+              end
             rescue StandardError
 
             end
@@ -96,7 +98,7 @@ module HotGlue
     private
 
     def server_timezone_offset # returns integer of hours to add/subtract from UTC
-      Time.now.strftime("%z").to_i/100
+      Time.now.in_time_zone(Rails.application.config.time_zone).strftime("%z").to_i/100
     end
   end
 end
