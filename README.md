@@ -1306,6 +1306,15 @@ end
 
 # VERSION HISTORY
 
+
+#### TBR - v0.5.18
+
+- Fixes to timezone handling for datetimes and times. Note that the timezone aware input behavior is only applied to datetimes. Times are passed through to the database as set. 
+- For datetimes, when a user is inputing a datetime,  the timezone is presumed from the Rails config. 
+- (This is the default behavior for Rails.) 
+
+
+
 #### 2023-08-18 - v0.5.17
 
 • Nav templates (`_nav.html.erb`) are now automatically appended to if they exist. Remember nav template live in the views folder at the root of the *namespace*, which is one folder up from whatever folder is being built.
