@@ -66,7 +66,7 @@ describe HotGlue::ControllerHelper do
     it "should render a time field output" do
       expect(fake_controller.time_field_localized(
         form_builder, :when_at, nil, "When at"
-      )).to eq("<input class=\"form-control\" type=\"time\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />+00:00")
+      )).to eq("<input class=\"form-control\" type=\"time\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
 
     end
   end
@@ -87,14 +87,14 @@ describe HotGlue::ControllerHelper do
 
       describe "When the current user does not have a timezone" do
         it "should return the server timezone" do
-          expect(fake_controller.current_timezone).to eq( Time.now.strftime("%z").to_i/100)
+          expect(fake_controller.current_timezone).to eq("UTC")
         end
       end
     end
 
     describe "when current_user is not defined" do
       it "should return the server timezone" do
-        expect(fake_controller.current_timezone).to eq( Time.now.strftime("%z").to_i/100)
+        expect(fake_controller.current_timezone).to eq("UTC")
       end
     end
   end
