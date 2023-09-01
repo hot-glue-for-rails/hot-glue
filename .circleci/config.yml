@@ -3,7 +3,7 @@ version: 2.1
 
 orbs:
   ruby: circleci/ruby@1.0
-  browser-tools: circleci/browser-tools@1.4.1
+  browser-tools: circleci/browser-tools@1.4.4
 
 jobs:
   build:
@@ -47,7 +47,15 @@ jobs:
       RAILS_ENV: test
 
     steps:
-      - browser-tools/install-chrome
+      - run: sudo apt-get update
+      - browser-tools/install-browser-tools:
+          chrome-version: 116.0.5845.96 # TODO: remove when chromedriver downloads are fixed
+          replace-existing-chrome: true
+      - browser-tools/install-chrome:
+          # TODO remove following line when fixed https://github.com/CircleCI-Public/browser-tools-orb/issues/90
+          chrome-version: 116.0.5845.96
+          replace-existing: true
+
       - browser-tools/install-chromedriver
       - checkout
       - ruby/install-deps
