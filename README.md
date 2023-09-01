@@ -1303,16 +1303,16 @@ end
 # VERSION HISTORY
 
 #### TBR - v0.5.18
-- fixes timezones use system time; (#93)
-- fixes timezones to be presumed from system time; fixes variables be more clear if they are TimeZone objects (https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html) or are UTC offset (integers -/+ from UTC)
-- tweaks to spec assertions for DateTime and Time fields
-- timezone fixes; removes randomness causing race conditions in the datetime object specs
-- fixes issue where setting bootstrap-column-width was not preferred if… (#88)
+- fixes timezones to use the Rails configured timezone: in config/application.rb, add 
+```
+config.time_zone = 'Eastern Time (US & Canada)'
+```
+(#93)
+fixes variables be more clear if they are TimeZone objects (https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html) or are UTC offset (integers -/+ from UTC)
+- fixes spec assertions for DateTime and Time fields
+- removes randomness causing race conditions in the datetime object specs
+**- fixes issue where setting bootstrap-column-width was not preferred if… (#88)**
 - fixes flash notice output
-- removes  `.github/workflows/test.yml`
-
-
-
 
 
 #### 2023-08-18 - v0.5.17
