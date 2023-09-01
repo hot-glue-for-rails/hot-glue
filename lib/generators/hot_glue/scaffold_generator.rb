@@ -818,7 +818,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def datetime_fields_list
-    @columns.select{|col| @the_object.columns_hash[col.to_s].type == :datetime}
+    @columns.select do |col|
+      if @the_object.columns_hash[col.to_s]
+        @the_object.columns_hash[col.to_s].type == :datetime
+      end
+    end
   end
 
   def form_path_new_helper
