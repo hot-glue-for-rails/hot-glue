@@ -19,8 +19,8 @@ describe 'interaction for <%= controller_class_name %>' do
   before do
     login_as(<%= @auth %>)
   end <% end %> <% if any_datetime_fields? %>
-  let(:current_timezone) {
-    <%= @auth_identifier %>.try(:timezone) || Time.now.strftime("%z").to_i/100
+  let(:testing_timezone) {
+    Rails.application.config.time_zone
   }<% end %>
   describe "index" do
     it "should show me the list" do
@@ -59,30 +59,14 @@ describe 'interaction for <%= controller_class_name %>' do
 <%= capybara_make_updates(:update) %>
       click_button "Save"
       within("turbo-frame#<%= @namespace %>__#{dom_id(<%= singular %>1)} ") do
-<%= ((@columns - @attachments.keys.collect(&:to_sym)) - (@show_only+@update_show_only)).map { |col|
-      type = eval("#{singular_class}.columns_hash['#{col}']").type
-
-      if type == :uuid || (type == :integer && col.to_s.ends_with?("_id"))
-        assoc = col.to_s.gsub('_id', '')
-        class_name = eval("#{@singular_class}.reflect_on_association(:#{assoc})").class_name
-      "        expect(page).to have_content(#{assoc}1.#{HotGlue.derrive_reference_name(class_name)})"
-
-      elsif type == :boolean
-      '        expect(page).to have_content(new_' + col.to_s + ' ? "YES" : "NO")'
-
-      elsif type == :enum && eval("#{singular_class}.respond_to?(:#{col}_labels)")
-       "        expect(page).to have_content(#{singular_class}.#{col}_labels[new_#{col}])"
-      elsif type == :string && eval("#{singular_class}.respond_to?(:devise_modules)") &&
-           #devise confirmable makes email updates go into unconfirmed_email
-           eval("#{singular_class}.devise_modules.include?(:confirmable)") && col.to_s == "email"
-            "        expect(page).to have_content(#{ singular }1.#{col.to_s})"
-      elsif type == :datetime
-            "        expect(page).to have_content(new_#{col.to_s}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p %z').gsub('  ', ' '))"
-      else
-            "        expect(page).to have_content(new_#{col.to_s})"
-      end
-    }.compact.join("\n")
-    %>
+<%= "        " + @columns_map.map{ |col, col_object|
+  if @attachments.keys.collect(&:to_sym).include?(col)
+  elsif @show_only.include?(col)
+  else
+      col_object.spec_make_assertion
+  end
+ }.compact.join("\n        ")
+  %>
       end
     end
   end <% end %>

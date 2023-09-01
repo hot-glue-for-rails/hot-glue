@@ -1159,13 +1159,13 @@ factory = AgentFactory.new(find_or_create_by_email: agent_company_params[:__look
                             params: modified_params)
 ```
 
-Here the new AgentFactory will recieve any variables by keyword argument, and since you're specifying the calling code here, Hot Glue does not dictate your factory's setup.
+Here the new AgentFactory will receive any variables by keyword argument, and since you're specifying the calling code here, Hot Glue does not dictate your factory's setup.
 However, two special variables are in scope which you can use in your calling code.
 
 `*_params` (where * is the name of the thing you are building)
-`modified_params` a variable that has been transmogrified for the timezone aware input
+`modified_params`
 
-Either one must be recieved by your factory for your factory to create data based off the inputted data. 
+Either one must be received by your factory for your factory to create data based off the inputted data. 
 
 Rememebr, `*_params` has the input params passed only the through the sanitizer, and modified_params has it passed through the timezone aware mechanism and other Hot Glue-specific defaults.
 
@@ -1304,6 +1304,15 @@ end
 
 
 # VERSION HISTORY
+
+
+#### TBR - v0.5.18
+
+- Fixes to timezone handling for datetimes and times. Note that the timezone aware input behavior is only applied to datetimes. Times are passed through to the database as set. 
+- For datetimes, when a user is inputing a datetime,  the timezone is presumed from the Rails config. 
+- (This is the default behavior for Rails.) 
+
+
 
 #### 2023-08-18 - v0.5.17
 
