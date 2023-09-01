@@ -10,7 +10,7 @@ class TimeField < Field
 
   def line_field_output
     "<% unless #{singular}.#{name}.nil? %>
-      <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone) %>
+      <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%l:%M %p ') %>
      <% else %>
     <span class='alert-danger'>MISSING</span>
     <% end %>"

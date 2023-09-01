@@ -817,6 +817,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  nested_set: @nested_set)
   end
 
+  def datetime_fields_list
+    @columns.select{|col| @the_object.columns_hash[col.to_s].type == :datetime}
+  end
+
   def form_path_new_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @controller_build_folder,
