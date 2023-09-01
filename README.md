@@ -1179,14 +1179,14 @@ Always:
 Don't include this last line in your factory code. 
 
 ## Nav Templates
-At the namespace level, you can have a file called `_nav.html.erb` to create tabbed bootstrap nav (you'll need to create this file manually).
+At the namespace level, you can have a file called `_nav.html.erb` to create tabbed bootstrap nav 
 
-To create the default template, start by running
+To create the file for the first time (at each namespace), start by running
 ```
 bin/rails generate hot_glue:nav_template --namespace=xyz
-
 ```
-this will append the file `_nav.html.erb` to the views folder at `views/xyz`
+
+This will append the file `_nav.html.erb` to the views folder at `views/xyz`. To begin, this file contains only the following:
 
 ```
 <ul class='nav nav-tabs'>
@@ -1195,19 +1195,18 @@ this will append the file `_nav.html.erb` to the views folder at `views/xyz`
 
 Once the file is present, any further builds in this namespace will:
 
-1) Append to the `_nav.html.erb` file, adding a tab for the new built scaffold
-2) Add render to the list view of the built scaffold to include the partial:
+1) Append to this `_nav.html.erb` file, adding a tab for the new built scaffold
+2) On the list view of the scaffold being built, it will include a render to the _nav partial, passing the name of the currently-viewed thing as the local variable `nav` (this is how the nav template knows which tab to make active). 
 ```
 <%= render partial: "owner/nav", locals: {nav: "things"} %>
 ```
-(in this example `owner/` is the namespace and `things` is the name of the scaffold being built)
+(In this example `owner/` is the namespace and `things` is the name of the scaffold being built)
 
 ## Automatic Base Controller
 
-HotGlue will copy a file named base_controller.rb to the same folder where it tries to create any controller, unless such a file exists there already.
+Hot Glue will copy a file named `base_controller.rb` to the same folder where it tries to create any controller (so to the namespace), unless such a file exists there already.
 
-The created controller will always have this base controller as its subclass. You are encouraged to implement functionality common to the *namespace* (shared between the controllers in the namespace) using this technique.
-
+The created controller will always have this base controller as its subclass. You are encouraged to implement functionality common to all the controllers in the *namespace* in the base class. For example, authorizing your user to access that part of the app. 
 
 ## Special Table Labels
 
