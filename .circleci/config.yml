@@ -50,6 +50,7 @@ jobs:
       - run: sudo apt-get update
       - browser-tools/install-browser-tools:
           chrome-version: 116.0.5845.96 # TODO: remove when chromedriver downloads are fixed
+          replace-existing-chrome: true
       - browser-tools/install-chrome:
           # TODO remove following line when fixed https://github.com/CircleCI-Public/browser-tools-orb/issues/90
           chrome-version: 116.0.5845.96
