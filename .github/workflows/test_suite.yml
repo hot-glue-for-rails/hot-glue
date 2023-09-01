@@ -39,11 +39,6 @@ jobs:
         with:
           bundler-cache: true
 
-
-
-        
-      - name: Set up database schema
-        run: bin/rails db:schema:load
       - name: internal tests
         run: bundle exec rspec
       - name: system tests
