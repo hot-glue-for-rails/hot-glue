@@ -53,6 +53,8 @@ jobs:
       - browser-tools/install-chrome:
           # TODO remove following line when fixed https://github.com/CircleCI-Public/browser-tools-orb/issues/90
           chrome-version: 116.0.5845.96
+          replace-existing: true
+
       - browser-tools/install-chromedriver
       - checkout
       - ruby/install-deps
