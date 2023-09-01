@@ -4,7 +4,7 @@ class DateTimeField < Field
   end
 
   def spec_setup_and_change_act(which_partial = nil)
-    "      " + "new_#{name} = DateTime.current + (rand(100).days) \n" +
+    "      " + "new_#{name} = DateTime.current + 1.year \n" +
     '      ' + "find(\"[name='#{testing_name}[#{ name.to_s }]']\").fill_in(with: new_#{name.to_s})"
 
   end
@@ -18,7 +18,7 @@ class DateTimeField < Field
   end
 
   def spec_setup_let_arg
-    "#{name}: DateTime.current + rand(1000).seconds"
+    "#{name}: DateTime.current + 1.day"
   end
 
   def spec_list_view_assertion

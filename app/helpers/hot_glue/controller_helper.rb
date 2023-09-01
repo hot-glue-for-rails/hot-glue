@@ -20,9 +20,10 @@ module HotGlue
     end
 
     def time_field_localized(form_object, field_name, value, label )
+      current_timezone
       form_object.text_field(field_name, class: 'form-control',
                                     type: 'time',
-                                    value: date_to_current_timezone(value, current_timezone)) + timezonize(current_timezone)
+                                    value: value && value.strftime("%H:%M"))
 
     end
 
@@ -32,10 +33,12 @@ module HotGlue
         if current_user.try(:timezone)
           Time.now.in_time_zone(current_user.timezone.to_i).zone
         else
-          Time.zone.name
+          Rails.application.config.time_zone
+          # Time.zone.name
         end
       else
-        Time.zone.name
+        Rails.application.config.time_zone
+        # Time.zone.name
       end
     end
 
