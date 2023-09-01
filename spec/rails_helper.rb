@@ -45,8 +45,3 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 end
 
-
-# crashes on circleci
-
-# Webdrivers::Chromedriver.required_version = '114.0.5735.90'
-# https://github.com/titusfortner/webdrivers/issues/247
