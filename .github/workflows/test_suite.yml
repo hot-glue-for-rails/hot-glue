@@ -49,6 +49,8 @@ jobs:
         
       - name: Set up database schema
         run: bin/rails db:schema:load
-      - name: Run tests
-        run: bin/rake
+      - name: internal tests
+        run: bundle exec rspec
+      - name: system tests
+        run: script/test
 
