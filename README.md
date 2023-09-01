@@ -1303,10 +1303,19 @@ end
 # VERSION HISTORY
 
 #### TBR - v0.5.18
-- fixes timezones to use the Rails configured timezone: in config/application.rb, add 
+- there two ways to use Hot Glue timezone aware datetimes:
+- (1) with current users who have timezone set (will be preferred if available)
+- (2) without current user timezone and no global timezone set for your app
+- (3) without current user timezone and global timezone set for your app
+
+- For #2, all datetimes will display in UTC timezone. 
+- 
+- For #3, be sure to configure in `config/application.rb` this: 
 ```
 config.time_zone = 'Eastern Time (US & Canada)'
 ```
+This should be your business's default timezone.
+
 (#93)
 fixes variables be more clear if they are TimeZone objects (https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html) or are UTC offset (integers -/+ from UTC)
 - fixes spec assertions for DateTime and Time fields
