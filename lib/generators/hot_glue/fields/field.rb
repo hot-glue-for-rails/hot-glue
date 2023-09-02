@@ -139,9 +139,8 @@ class Field
   end
 
   def display_boolean_as
-
     if ! default_boolean_display
-      raise "Starting with 0.5.18 you must set default_boolean_display in config/hot_glue.yml to 'radio', 'checkbox', or 'switch'. For parity with legacy behavior, use radio."
+      default_boolean_display = "radio"
     end
 
     display_as && display_as[:boolean] || default_boolean_display

@@ -672,9 +672,8 @@ here, even though `paid_at` is a datetime field, it will display as-if it is a b
 label or the falsy label depending on if `paid_at` is or is not null in the database.  
 For all fields except booleans, this affects only the viewable output — 
 what you see on the list page and on the edit page for show-only fields.  
-For booleans, it affects those outputs as well as the normal edit output: 
-The labels you specify are used as the labels for the radio buttons that the user can select.
-
+For booleans shown as radio buttons, it affects those outputs as well as the normal view output.
+For booleans shown as checkboxes or switches, it affects only the view output as the truthy and falsy labels are not displays in editbale view.
 
 You will need to separately specify them as show-only if you want them to be non-editable.
 
@@ -1299,30 +1298,31 @@ end
 
 ```
 
-
 # VERSION HISTORY
 
-#### TBR - v0.5.19
-Given a table generated with this schema:
-rails generate model Thing abc:boolean dfg:boolean hij:boolean klm_at:datetime
+#### 2023-09-03 - v0.5.19
 
-• Use new flag `--display-as` to determine how the booleans will be displayed: checkbox, radio, or switch
+Given a table generated with this schema:
+```
+rails generate model Thing abc:boolean dfg:boolean hij:boolean klm_at:datetime
+```
+
+• You can now use new flag `--display-as` to determine how the booleans will be displayed: checkbox, radio, or switch
 
 rails generate hot_glue:scaffold Thing --include=abc,dfg,hij,klm_at --god --modify='klm_at{yes|no}' --display-as='abc{checkbox},dfg{radio},hij{switch}'
-
-starting with this version, you must specify a default in config/hot_glue.yml
-
+You may specify a default `default_boolean_display` in `config/hot_glue.yml`, like so:
 :default_boolean_display: 'radio'
-• The options are checkbox, radio, or switch. please note that before this upgrade to booleans, all booleans displayed as what is now called 'radio'
+
+(The options are checkbox, radio, or switch.)
+If none is given and no default is specified, legacy display behavior will be used (radio buttons)
 
 ![Screenshot 2023-08-22 at 7 40 44 PM](https://github.com/hot-glue-for-rails/hot-glue/assets/59002/ba076cb0-fa40-4b68-a1a0-cab496670e00)
 
-
-You still use the --modify flag to determine the truthy and falsy values, which are also used as the labels on the editable screen if you have selected radio
-
+You still use the `--modify` flag to determine the truthy and falsy labels, which are also used as the truth and false when a boolean is displays as radio button, as shown in the `klm_at` field above. (switches and checkboxes simply display with the field label and do not use the truthy and falsy labels)
 
 
-#### 2023-09-01 - v0.5.18
+
+#### 2023-09-02 - v0.5.18
 - there three ways Hot Glue deals with Datetime fields:
 - 
 - (1) with current users who have `timezone` method (field or method)
