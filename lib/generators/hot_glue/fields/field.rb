@@ -139,11 +139,16 @@ class Field
   end
 
   def display_boolean_as
-    if ! default_boolean_display
-      default_boolean_display = "radio"
+
+    if ! @default_boolean_display
+      @default_boolean_display = "radio"
     end
 
-    display_as && display_as[:boolean] || default_boolean_display
+    if display_as
+      return display_as[:boolean] || "radio"
+    else
+      return @default_boolean_display
+    end
   end
 
   def label_class

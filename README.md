@@ -1310,6 +1310,7 @@ rails generate model Thing abc:boolean dfg:boolean hij:boolean klm_at:datetime
 • You can now use new flag `--display-as` to determine how the booleans will be displayed: checkbox, radio, or switch
 
 rails generate hot_glue:scaffold Thing --include=abc,dfg,hij,klm_at --god --modify='klm_at{yes|no}' --display-as='abc{checkbox},dfg{radio},hij{switch}'
+
 You may specify a default `default_boolean_display` in `config/hot_glue.yml`, like so:
 :default_boolean_display: 'radio'
 

@@ -37,6 +37,9 @@ class BooleanField < Field
   end
 
   def form_field_display
+    if display_boolean_as.nil?
+      byebug
+    end
     "<div class='#{@layout_strategy.form_checkbox_wrapper_class} #{'form-switch' if display_boolean_as == 'switch'}'>\n" +
       (if display_boolean_as == 'radio'
       radio_button_display
