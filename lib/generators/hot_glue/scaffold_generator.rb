@@ -959,7 +959,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def current_user_object
-    options['auth'] || "current_user"
+    default_current_user = options['auth'] || "current_user"
+    if eval("defined?(#{default_current_user})")
+      default_current_user
+    else
+      "nil"
+    end
   end
 
   def no_devise_installed
