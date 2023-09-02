@@ -1300,7 +1300,7 @@ end
 
 # VERSION HISTORY
 
-#### 2023-09-03 - v0.5.19
+#### 2023-09-02 - v0.5.19
 
 Given a table generated with this schema:
 ```
@@ -1323,7 +1323,7 @@ You still use the `--modify` flag to determine the truthy and falsy labels, whic
 
 
 
-#### 2023-09-02 - v0.5.18
+#### 2023-09-01 - v0.5.18
 - there three ways Hot Glue deals with Datetime fields:
 - 
 - (1) with current users who have `timezone` method (field or method)
