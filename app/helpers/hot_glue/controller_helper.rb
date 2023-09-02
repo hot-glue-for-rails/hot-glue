@@ -31,7 +31,9 @@ module HotGlue
       # returns a TimeZone (https://apidock.com/rails/TimeZone) object
       if defined?(current_user)
         if current_user.try(:timezone)
-          Time.now.in_time_zone(current_user.timezone.to_i).zone
+          current_user.timezone
+
+          # Time.now.in_time_zone(current_user.timezone.to_i).zone
         else
           Rails.application.config.time_zone
           # Time.zone.name
@@ -64,11 +66,18 @@ module HotGlue
             include_me = field_list.include?(k.to_sym)
           end
           if include_me
-            begin
-              if use_offset != 0
+            if use_offset != 0
+              puts "changing #{params[k]}"
+
+              if use_offset.is_a? String
+                puts "parsing #{use_offset}"
+                zone = DateTime.now.in_time_zone(use_offset).zone
+                params[k] = DateTime.parse(params[k].gsub("T", " ") + " #{zone}")
+              else
+                puts "parsing #{use_offset}"
                 params[k] = DateTime.strptime("#{params[k]} #{use_offset}", '%Y-%m-%dT%H:%M %z').new_offset(0)
               end
-            rescue StandardError
+              puts "changed #{params[k]}"
 
             end
           end

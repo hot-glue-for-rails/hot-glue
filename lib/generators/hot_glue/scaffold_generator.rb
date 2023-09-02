@@ -958,6 +958,15 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @auth
   end
 
+  def current_user_object
+    default_current_user = options['auth'] || "current_user"
+    if eval("defined?(#{default_current_user})")
+      default_current_user
+    else
+      "nil"
+    end
+  end
+
   def no_devise_installed
     !Gem::Specification.sort_by { |g| [g.name.downcase, g.version] }.group_by { |g| g.name }['devise']
   end
