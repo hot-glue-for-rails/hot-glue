@@ -614,15 +614,43 @@ describe HotGlue::ScaffoldGenerator do
       expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '') %>")
       expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '' , class: '')")
       expect(res).to include("<%= f.label(:selected, value: 'on', for: 'jkl_selected_1') %>")
-
-
-
-
-      # res = File.read("spec/dummy/app/views/jkls/_line.erb")
-      # byebug
-      # expect(res).to include("<%= jkl.selected ? 'on' : 'off' %>")
     end
   end
+
+  describe "--display" do
+    it "should let me specify a boolean as a radio" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Jkl", "--gd",  "--include=selected", "--display-as=selected{radio}", "--modify=selected{on|off}"])
+
+      res = File.read("spec/dummy/app/views/jkls/_form.erb")
+      expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '')")
+      expect(res).to include("<%= f.label(:selected, value: 'off', for: 'jkl_selected_0') %>")
+      expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '') %>")
+      expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '' , class: '')")
+      expect(res).to include("<%= f.label(:selected, value: 'on', for: 'jkl_selected_1') %>")
+
+    end
+
+    it "should let me specify a boolean as a checkbox" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Jkl", "--gd",  "--include=selected", "--display-as=selected{checkbox}"])
+
+      res = File.read("spec/dummy/app/views/jkls/_form.erb")
+
+      expect(res).to include("<%= f.check_box(:selected, class: '', id: 'jkl_selected', checked: jkl.selected) %>")
+    end
+
+    it "should let me specify a booleans as a switch" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Jkl", "--gd",  "--include=selected", "--display-as=selected{switch}" ])
+
+      res = File.read("spec/dummy/app/views/jkls/_form.erb")
+      expect(res).to include("<%= f.check_box(:selected, class: '', role: 'switch', id: 'jkl_selected', checked: jkl.selected) %>")
+
+    end
+  end
+
+
 
   describe "ujs syntax" do
     it "should make detele with 'confirm': true for ujs_syntax=true" do

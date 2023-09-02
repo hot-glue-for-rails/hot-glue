@@ -44,6 +44,7 @@ class FieldFactory
               AttachmentField
             end
     @class_name = class_name
+
     @field = field_class.new(name: name,
                              layout_strategy: generator.layout_strategy,
                              form_placeholder_labels: generator.form_placeholder_labels,

@@ -29,7 +29,7 @@ describe HotGlue::ErbTemplate do
                     layout_strategy: layout_strategy,
                     form_placeholder_labels: nil,
                     modify: {},
-                    display_as: {},
+                    display_as: options[:display_as] || {},
                     default_boolean_display: "radio",
                     singular: "jkl" }.merge(  hawk_keys: options[:hawk_keys],
                                           columns: options[:columns],
@@ -40,14 +40,13 @@ describe HotGlue::ErbTemplate do
 
   def factory_all_form_fields(options)
     generator = base_generator(options)
-
     builder = HotGlue::Layout::Builder.new(include_setting: '',
                                            generator: generator,
                                            buttons_width: 0,)
     layout_object = builder.construct
 
     @template_builder = HotGlue::ErbTemplate.new(
-      show_only: [],
+      show_only: options[:show_only] || [],
       singular_class: options[:singular_class] || "Jkl",
       singular: options[:singular] || "jkl",
       hawk_keys: options[:hawk_keys] || {},
@@ -300,23 +299,48 @@ describe HotGlue::ErbTemplate do
   end
 
   describe "boolean display" do
+    it "should render checkboxes" do
+      res = factory_all_form_fields({columns: [:selected],
+                                     display_as: {selected: {boolean: 'checkbox'}},
+                                     no_list_heading: true,
+                                     inline_list_labels: 'omit'})
 
+      expect(res).to include("<%= f.check_box(:selected, class: '', id: 'jkl_selected', checked: jkl.selected) %>")
+    end
+
+    it "should render radio buttons" do
+      res = factory_all_form_fields({columns: [:selected],
+                                     display_as: {selected: {boolean: 'radio'}},
+                                     no_list_heading: true,
+                                     inline_list_labels: 'omit'})
+
+      expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '') %>")
+      expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '' , class: '') %>")
+
+    end
+
+
+    it "should render switches buttons" do
+      res = factory_all_form_fields({columns: [:selected],
+                                     display_as: {selected: {boolean: 'switch'}},
+                                     no_list_heading: true,
+                                     inline_list_labels: 'omit'})
+
+      expect(res).to include("<%= f.check_box(:selected, class: '', role: 'switch', id: 'jkl_selected', checked: jkl.selected) %>")
+    end
   end
 
   describe "with show only fields" do
+    it "should render the show only fields as viewable on the form" do
+      res = factory_all_form_fields({columns: [:long_description],
+                                     show_only: [:long_description],
+                                     no_list_heading: true,
+                                     inline_list_labels: 'omit'})
 
+      expect(res).to include("<%= jkl.long_description %>")
+    end
   end
 
-  describe "with singular_class" do
-
-  end
-
-  describe "with a col_identifier" do
-
-  end
-
-  describe "with an ownership_field" do
-  end
 
   let (:hawk_keys_for_hgi_id) {{hgi_id: {bind_to: ["current_user.hgis"], optional: false }}}
 

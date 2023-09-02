@@ -29,11 +29,11 @@ class BooleanField < Field
   end
 
   def checkbox_display
-    "<%= f.check_box(:#{name}, class: '#{@layout_strategy.form_checkbox_input_class}', id: '#{singular}_#{name}') %>\n"
+    "<%= f.check_box(:#{name}, class: '#{@layout_strategy.form_checkbox_input_class}', id: '#{singular}_#{name}', checked: #{singular}.#{name}) %>\n"
   end
 
   def switch_display
-    "<%= f.check_box(:#{name}, class: '#{@layout_strategy.form_checkbox_input_class}',  id: '#{singular}_#{name}', role: 'switch') %>\n"
+    "<%= f.check_box(:#{name}, class: '#{@layout_strategy.form_checkbox_input_class}', role: 'switch', id: '#{singular}_#{name}', checked: #{singular}.#{name}) %>\n"
   end
 
   def form_field_display
