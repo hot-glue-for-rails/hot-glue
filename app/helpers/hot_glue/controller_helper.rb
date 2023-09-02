@@ -31,7 +31,9 @@ module HotGlue
       # returns a TimeZone (https://apidock.com/rails/TimeZone) object
       if defined?(current_user)
         if current_user.try(:timezone)
-          Time.now.in_time_zone(current_user.timezone.to_i).zone
+          current_user.timezone
+
+          # Time.now.in_time_zone(current_user.timezone.to_i).zone
         else
           Rails.application.config.time_zone
           # Time.zone.name
@@ -52,15 +54,30 @@ module HotGlue
       end
     end
 
-    def modify_date_inputs_on_params(modified_params, current_user_object = nil)
+    def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = nil)
       use_offset = (current_user_object.try(:timezone)) || server_timezone_offset
 
       modified_params = modified_params.tap do |params|
         params.keys.each{|k|
-          if k.ends_with?("_at") || k.ends_with?("_date")
-            begin
-              params[k] = DateTime.strptime("#{params[k]} #{use_timezone}", '%Y-%m-%dT%H:%M %z').new_offset(0)
-            rescue StandardError
+
+          if field_list.nil? # legacy pre v0.5.18 behavior
+            include_me = k.ends_with?("_at") || k.ends_with?("_date")
+          else
+            include_me = field_list.include?(k.to_sym)
+          end
+          if include_me
+            if use_offset != 0
+              puts "changing #{params[k]}"
+
+              if use_offset.is_a? String
+                puts "parsing #{use_offset}"
+                zone = DateTime.now.in_time_zone(use_offset).zone
+                params[k] = DateTime.parse(params[k].gsub("T", " ") + " #{zone}")
+              else
+                puts "parsing #{use_offset}"
+                params[k] = DateTime.strptime("#{params[k]} #{use_offset}", '%Y-%m-%dT%H:%M %z').new_offset(0)
+              end
+              puts "changed #{params[k]}"
 
             end
           end
@@ -68,7 +85,6 @@ module HotGlue
       end
       modified_params
     end
-
 
     def hawk_params(hawk_schema, modified_params)
       @hawk_alarm = ""
@@ -91,7 +107,7 @@ module HotGlue
     private
 
     def server_timezone_offset # returns integer of hours to add/subtract from UTC
-      Time.now.strftime("%z").to_i/100
+      Time.now.in_time_zone(Rails.application.config.time_zone).strftime("%z").to_i/100
     end
   end
 end

@@ -1302,17 +1302,34 @@ end
 
 # VERSION HISTORY
 
-#### TBR - v0.5.18
-- fixes timezones use system time; (#93)
-- fixes timezones to be presumed from system time; fixes variables be more clear if they are TimeZone objects (https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html) or are UTC offset (integers -/+ from UTC)
-- tweaks to spec assertions for DateTime and Time fields
-- timezone fixes; removes randomness causing race conditions in the datetime object specs
-- fixes issue where setting bootstrap-column-width was not preferred if… (#88)
+#### 2023-09-01 - v0.5.18
+- there three ways Hot Glue deals with Datetime fields:
+- 
+- (1) with current users who have `timezone` method (field or method)
+- (2) without current user timezone and no global timezone set for your app
+- (3) without current user timezone and global timezone set for your app
+
+- For #1, previously this method returned a time zone offset (integer). After v0.5.18, the preferred return value is a Timezone string, but legacy implementation returning offset values will continue to work. 
+  Your user objects should have a field called `timezone` which should be a string.
+- Note that daylight savings time is accounted for in this implementation. 
+
+- For #2 (your user does not have a timezone field and you _have not_ set the timezone globally), all datetimes will display in UTC timezone. 
+
+- For #3  (your user does not have a timezone field but you _have_ set the timezone globally), your datetimes will display in the Rails-specified timezone.
+
+- be sure to configure in `config/application.rb` this: 
+```
+config.time_zone = 'Eastern Time (US & Canada)'
+```
+This should be your business's default timezone.
+
+
+(#93)
+fixes variables be more clear if they are TimeZone objects (https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html) or are UTC offset (integers -/+ from UTC)
+- fixes spec assertions for DateTime and Time fields
+- removes randomness causing race conditions in the datetime object specs
+**- fixes issue where setting bootstrap-column-width was not preferred if… (#88)**
 - fixes flash notice output
-- removes  `.github/workflows/test.yml`
-
-
-
 
 
 #### 2023-08-18 - v0.5.17

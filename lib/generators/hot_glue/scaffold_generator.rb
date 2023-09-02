@@ -835,6 +835,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  nested_set: @nested_set)
   end
 
+  def datetime_fields_list
+    @columns.select do |col|
+      if @the_object.columns_hash[col.to_s]
+        @the_object.columns_hash[col.to_s].type == :datetime
+      end
+    end
+  end
+
   def form_path_new_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @controller_build_folder,
@@ -966,6 +974,15 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def auth_object
     @auth
+  end
+
+  def current_user_object
+    default_current_user = options['auth'] || "current_user"
+    if eval("defined?(#{default_current_user})")
+      default_current_user
+    else
+      "nil"
+    end
   end
 
   def no_devise_installed
