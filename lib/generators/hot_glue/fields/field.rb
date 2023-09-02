@@ -1,6 +1,6 @@
 class Field
   attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :auth,
-                :assoc_label,  :class_name,  :form_placeholder_labels, :form_labels_position,
+                :assoc_label,  :class_name, :default_boolean_display, :display_as, :form_placeholder_labels, :form_labels_position,
                 :hawk_keys,   :layout_strategy, :limit, :modify, :name, :object, :sample_file_path,
                 :singular_class,  :singular, :sql_type, :ownership_field,
                 :update_show_only
@@ -10,6 +10,8 @@ class Field
     alt_lookups: ,
     attachment_data: nil,
     class_name: ,
+    default_boolean_display: ,
+    display_as: ,
     form_labels_position:,
     form_placeholder_labels: ,
     hawk_keys: nil,
@@ -34,6 +36,9 @@ class Field
     @ownership_field = ownership_field
     @form_labels_position = form_labels_position
     @modify = modify
+    @display_as = display_as
+
+    @default_boolean_display = default_boolean_display
 
     # TODO: remove knowledge of subclasses from Field
     unless self.class == AttachmentField
@@ -131,5 +136,22 @@ class Field
 
   def modify_binary? # safe
     !!(modify && modify[:binary])
+  end
+
+  def display_boolean_as
+
+    if ! default_boolean_display
+      raise "Starting with 0.5.18 you must set default_boolean_display in config/hot_glue.yml to 'radio', 'checkbox', or 'switch'. For parity with legacy behavior, use radio."
+    end
+
+    display_as && display_as[:boolean] || default_boolean_display
+  end
+
+  def label_class
+    "text-muted small form-text"
+  end
+
+  def label_for
+
   end
 end

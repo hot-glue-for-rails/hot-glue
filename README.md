@@ -1302,6 +1302,26 @@ end
 
 # VERSION HISTORY
 
+#### TBR - v0.5.19
+Given a table generated with this schema:
+rails generate model Thing abc:boolean dfg:boolean hij:boolean klm_at:datetime
+
+• Use new flag `--display-as` to determine how the booleans will be displayed: checkbox, radio, or switch
+
+rails generate hot_glue:scaffold Thing --include=abc,dfg,hij,klm_at --god --modify='klm_at{yes|no}' --display-as='abc{checkbox},dfg{radio},hij{switch}'
+
+starting with this version, you must specify a default in config/hot_glue.yml
+
+:default_boolean_display: 'radio'
+• The options are checkbox, radio, or switch. please note that before this upgrade to booleans, all booleans displayed as what is now called 'radio'
+
+![Screenshot 2023-08-22 at 7 40 44 PM](https://github.com/hot-glue-for-rails/hot-glue/assets/59002/ba076cb0-fa40-4b68-a1a0-cab496670e00)
+
+
+You still use the --modify flag to determine the truthy and falsy values, which are also used as the labels on the editable screen if you have selected radio
+
+
+
 #### 2023-09-01 - v0.5.18
 - there three ways Hot Glue deals with Datetime fields:
 - 

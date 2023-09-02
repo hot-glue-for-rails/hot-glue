@@ -2,15 +2,18 @@ require 'rails_helper'
 
 
 describe HotGlue::Layout::Builder do
-  describe "#initialize" do
-    let(:builder) {HotGlue::Layout::Builder.new(include_setting: nil,
-                                                 downnest_object: {},
-                                                 no_edit: false,
-                                                 no_delete: false,
-                                                 columns: [],
-                                                 smart_layout: true)
-    }
-  end
+
+
+
+  # describe "#initialize" do
+  #   let(:builder) {HotGlue::Layout::Builder.new(include_setting: nil,
+  #                                                downnest_object: {},
+  #                                                no_edit: false,
+  #                                                no_delete: false,
+  #                                                columns: [],
+  #                                                smart_layout: true)
+  #   }
+  # end
 
   describe "#construct" do
     describe "without smart layouts" do
@@ -44,6 +47,7 @@ describe HotGlue::Layout::Builder do
                                               [:time_of_day, :selected, :genre]]
                                            },
                                 portals: {},
+                                display_as: nil,
                                 buttons: {:size=>2},
                                 modify: nil })
 
@@ -76,8 +80,9 @@ describe HotGlue::Layout::Builder do
         generator =  OpenStruct.new(downnest_object: {get_emails_rules: 4} ,
                                     columns: [:api_key, :api_id],
                                     smart_layout: false,
-                                    bootstrap_column_width: 2  )
+                                    bootstrap_column_width: 2)
 
+        #
         builder = HotGlue::Layout::Builder.new(include_setting: "api_key,api_id:",
                                                generator: generator,
                                                buttons_width: 2)
@@ -87,6 +92,7 @@ describe HotGlue::Layout::Builder do
         expect(result[:portals][:get_emails_rules][:size]).to eq(4)
       end
     end
+
 
     describe "with smart layouts" do
       describe "when not using semicolons" do
@@ -112,7 +118,6 @@ describe HotGlue::Layout::Builder do
                                       buttons_width: 0,
                                       bootstrap_column_width: 2,
                                       include_setting: "api_key,api_id:")
-
           builder = HotGlue::Layout::Builder.new(include_setting: '',
                                                  generator: generator,
                                                  buttons_width: 0)

@@ -56,4 +56,16 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   def page_end
     '</div> </div>'
   end
+
+  def form_checkbox_input_class
+    "form-check-input"
+  end
+
+  def form_checkbox_wrapper_class
+    "form-check"
+  end
+
+  def form_checkbox_label_class
+    "form-check-label"
+  end
 end

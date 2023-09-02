@@ -87,7 +87,11 @@ module  HotGlue
 
             field_error_name = columns_map[col].field_error_name
 
-            the_label = "\n<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+
+            label_class = columns_map[col].label_class
+            label_for = columns_map[col].label_for
+
+            the_label = "\n<label class='#{label_class}' for='#{label_for}'>#{col.to_s.humanize}</label>"
             show_only_open = ""
             show_only_close = ""
 
