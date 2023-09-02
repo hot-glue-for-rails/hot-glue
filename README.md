@@ -1302,7 +1302,7 @@ end
 
 # VERSION HISTORY
 
-#### TBR - v0.5.18
+#### 2023-09-01 - v0.5.18
 - there three ways Hot Glue deals with Datetime fields:
 - 
 - (1) with current users who have `timezone` method (field or method)
