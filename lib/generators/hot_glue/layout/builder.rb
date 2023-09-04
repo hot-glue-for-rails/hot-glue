@@ -12,7 +12,7 @@ module HotGlue
 
       def initialize(generator: ,
                      include_setting: ,
-                     buttons_width:    )
+                     buttons_width:  )
 
 
         @generator = generator
@@ -29,7 +29,7 @@ module HotGlue
 
         @no_buttons = @buttons_width == 0
         @specified_grouping_mode = include_setting.include?(":")
-        @bootstrap_column_width = generator.bootstrap_column_width
+        @bootstrap_column_width = generator.bootstrap_column_width.to_i
         @big_edit = generator.big_edit
 
         @default_boolean_display = get_default_from_config(key: :default_boolean_display)
