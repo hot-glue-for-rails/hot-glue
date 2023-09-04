@@ -5,7 +5,7 @@ module HotGlue
       (tz >= 0 ? "+" : "-") + sprintf('%02d',tz.abs) + ":00"
     end
 
-    def datetime_field_localized(form_object, field_name, value, label )
+    def datetime_field_localized(form_object, field_name, value, label, nothing = nil )
       current_timezone
       form_object.text_field(field_name, class: 'form-control',
                                     type: 'datetime-local',
