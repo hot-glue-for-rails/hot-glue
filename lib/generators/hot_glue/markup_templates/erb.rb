@@ -81,6 +81,8 @@ module  HotGlue
       result = columns.map{ |column|
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
+            # add feature for dynamic show only
+            # must detect from Pundit policy if the field is editable
             field_result = show_only.include?(col.to_sym) ?
                              columns_map[col].form_show_only_output :
                              columns_map[col].form_field_output
