@@ -75,15 +75,11 @@ For Hot Glue, you will need:
 
 Section #1 is to create a new Rails app. (Or you can do that yourself.)
 
-Section #2 is to setup Rspec, FactoryBot, and Faker.
+Section #2 is to setup Rspec, FactoryBot, and Faker — choose 2B for Rspec0
 
-Section #4 is optional but highly recommended.
+Skip #3 and #4 is optional. #5 is optional but recommended. 
 
-Section #5 is where you will pick a CSS Framework (Bootstrap, Tailwind, or none)
-
-Section #6 is for two support gems (Kaminari) for Hot Glue
-
-Section #7 is for Hot Glue itself
+Sectoin #6 is for Hot Glue itself, and Section #7 is for Kaminari
 
 You will also need section #8 to setup Devise if you want authentication.
 
