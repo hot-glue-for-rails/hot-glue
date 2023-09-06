@@ -675,19 +675,64 @@ The available modifiers are:
 ### `--pundit`
 If you enable Pundit, your controllers will looks for a Policy that matches the name of the thing being built.
 
-Unlike what you see in the Pundit's documentation*, Hot gloe works if you create methods `*_able?` on your Pundit policy for each field-level access control.
+**Realtime Field-level Access**
+Hot Glue gives you automatic field level access control if you create `*_able?` methods for each field on your Pundit policy.
 
-The `*_able?` method should return true or false depending on whether or not the field can be edited.
+(Although this is not what Pundit recommend for field level access control, it has been implemented this way, see below for more.)
+
+The `*_able?` method should return true or false depending on whether or not the field can be edited. (No distinction is made between the different contexts. You may check if the record is new using `new_record?`. Notice that this is called for 4 out of 5 of the controller's actions:  new, create, edit, update; not destroy, which operates on the whole record. For new and edit it is used only to determine the display output.)
+
+Add one `*_able?` method to the policy for each field you want to allow field-level access control. 
+
+Replace `*` with the name of the field (remember to include `_id` for foreign keys).
 
 When the method returns true, the field will be displayed to the user (and allowed) for editing. 
 
 When the method returns false, the field will be displayed as read-only (viewable) to the user.
 
-If you don't enable `--pundit`, you  can set it globally by using the default
-`:pundit_default:`
+If you don't enable `--pundit`, you can set it globally by using the default
+`:pundit_default:` (all builds in that project will use Pundit)
 
 If Pundit is disabled, only the show only/update show only lists (below) will be used to determine if a field is editable/viewable.
-*Note: I did not follow the standard Pundit pattern of using `permitted_attributes` here because that would cause Unpermitted attrinbutes exceptions. Insteat, this strategy allows the attributes but uses Pundit to restrict access, catching for errors and displaying an informative error message to the user. Although you are welcome to use the `permitted_attributes` on your policies, they do not have this feature and will cause exceptions to be thrown. 
+*Note: I did not follow the standard Pundit pattern of using `permitted_attributes` here because that would cause Unpermitted attributes exceptions. 
+Instead, this strategy allows the attributes through the params method but uses Pundit to restrict access inside the actions. 
+This catches the exception and displays an informative error message to the user. 
+Although you are welcome to use the `permitted_attributes` on your policies (passing them through into the controller params method as the Pundit documentation suggests), doing it this way does have the catch & redisplay feature and will instead cause exceptions to be thrown in your controller, which is why Hot Glue does not use them.
+
+Here's an example `ThingPolicy` that would allow editing the name field only of the thing is not sent as indicated by the sent_at being nil
+
+In other words, you can edit its name until you send it, then its name cannot be edited any longer. 
+
+The methods you see for initialize of the Policy and it's subclass Scope are boilerplate for Pundit policies.
+
+You should copy them into your own polices, and edit the `name_able?` method to suit your needs.
+
+Use this pattern to provide field-level access control that con combine both the record's existing values and who is making the action. 
+
+This flips the fields into viewable-only when they can't be edited, simply based on the policy, no additional work necessary.
+
+Because Hot Glue detects the `*_able?` methods at build time, if you add them to your policy, you will have to rebuild your scaffold. 
+
+```
+class ThingPolicy < ApplicationPolicy
+  def initialize(user, record)
+    @user = user
+    @record = record
+  end
+  
+  def name_able?
+    @record.sent_at.nil?
+  end
+  
+  class Scope < Scope
+    attr_reader :user, :scope
+    def initialize(user, scope)
+      @user = user
+      @scope = scope
+    end
+  end
+end
+```
 
 
 ### `--show-only=`
