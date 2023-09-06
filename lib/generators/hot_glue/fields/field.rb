@@ -115,7 +115,7 @@ class Field
   end
 
   def modified_display_output
-    if  modify[:cast] && modify[:cast] == "$"
+    if modify[:cast] && modify[:cast] == "$"
       "<%= number_to_currency(#{singular}.#{name}) %>"
     elsif modify[:binary]
       "<%= #{singular}.#{name} ? '#{modify[:binary][:truthy]}' : '#{modify[:binary][:falsy]}' %>"

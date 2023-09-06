@@ -150,7 +150,13 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       <%= @update_alt_lookups.collect{|key, data|
    "    @#{ singular_name }.#{key.gsub("_id", "")} = #{key.gsub("_id", "")}"
    }.join("/n") %><% end %><%= controller_attachment_orig_filename_pickup_syntax %>
+    <% if @pundit %>
+    if @<%= singular_name %>.attributes = modified_params
+        authorize @<%= singular_name %>
+        @<%= singular_name %>.save
+    <% else %>
     if @<%= singular_name %>.update(modified_params)
+    <% end %>
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
       flash[:notice] = "#{flash[:notice]} Saved #{@<%= singular %>.<%= display_class %>}"
       flash[:alert] = @hawk_alarm if @hawk_alarm

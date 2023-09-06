@@ -641,15 +641,6 @@ This is what would happen if 9 fields, specified in the order A,B,C,D,E,F,G,H,I,
 
 
 
-### `--show-only=`
-(separate field names by COMMA)
-
-Any fields only the 'show-only' list will appear as non-editable on the generated form for both new & edit actions. (visible only)
-
-IMPORTANT: By default, all fields that begin with an underscore (`_`) are automatically show-only.
-
-This is for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
-
 ### `--modify=field1{...},field2{...}`
 
 
@@ -681,12 +672,41 @@ The available modifiers are:
 | truthy label\|falsy label | specify a binary switch with a pipe (\|) character if the value is truthy, it will display as "truthy label" if the value is falsy, it will display as "falsy label" | boolean, datetime, date, time |   |   |
 |                           |                                                                                                                                                                      |                               |   |   |
 
+### `--pundit`
+If you enable Pundit, your controllers will looks for a Policy that matches the name of the thing being built.
+
+Unlike what you see in the Pundit's documentation*, Hot gloe works if you create methods `*_able?` on your Pundit policy for each field-level access control.
+
+The `*_able?` method should return true or false depending on whether or not the field can be edited.
+
+When the method returns true, the field will be displayed to the user (and allowed) for editing. 
+
+When the method returns false, the field will be displayed as read-only (viewable) to the user.
+
+If you don't enable `--pundit`, you  can set it globally by using the default
+`:pundit_default:`
+
+If Pundit is disabled, only the show only/update show only lists (below) will be used to determine if a field is editable/viewable.
+*Note: I did not follow the standard Pundit pattern of using `permitted_attributes` here because that would cause Unpermitted attrinbutes exceptions. Insteat, this strategy allows the attributes but uses Pundit to restrict access, catching for errors and displaying an informative error message to the user. Although you are welcome to use the `permitted_attributes` on your policies, they do not have this feature and will cause exceptions to be thrown. 
+
+
+### `--show-only=`
+(separate field names by COMMA)
+
+• Make this field appear as viewable only all actions. (visible only)
+• When set on this list, it will override any Pundit policy even when Pundit would otherwise allow the access.
+
+IMPORTANT: By default, all fields that begin with an underscore (`_`) are automatically show-only.
+
+This is for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
 
 
 ### `--update-show-only`
 (separate field names by COMMA)
 
-Fields on the `update show only`  (and not on the `show only` list) will appear as non-editible only for the **edit** action, but will still allow entry for the **create** action.
+• Make this field appear as viewable only for only edit/update action. (allowed for new/create)
+• When set on this list, it will override any Pundit policy for edit/update actions even when Pundit would otherwise allow the access.
+
 
 Note that Hot Glue still generates a singular partial (`_form`) for both actions, but your form will now contain statements like:
 
