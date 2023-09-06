@@ -673,27 +673,28 @@ The available modifiers are:
 |                           |                                                                                                                                                                      |                               |   |   |
 
 ### `--pundit`
-If you enable Pundit, your controllers will looks for a Policy that matches the name of the thing being built.
+If you enable Pundit, your controllers will look for a Policy that matches the name of the thing being built.
 
 **Realtime Field-level Access**
-Hot Glue gives you automatic field level access control if you create `*_able?` methods for each field on your Pundit policy.
+Hot Glue gives you automatic field level access control if you create `*_able?` methods for each field you'd like to control on your Pundit policy.
 
-(Although this is not what Pundit recommend for field level access control, it has been implemented this way, see below for more.)
+(Although this is not what Pundit recommends for field level access control, it has been implemented this way to provide field-by-field user feedback to the user shown in red just like Rails validation errors are currently shown. This is is only hypothetical, because the interface correctly shows the field as viewable or editable anyway, making bad entry only something that could be achieved through a mistake or hacking. Nevertheless, rest assured that if there was a input mistake-- like a user having a field editable when it shouldn't be, the backend policy would guard against the disallowed input and show an error message.)
 
-The `*_able?` method should return true or false depending on whether or not the field can be edited. (No distinction is made between the different contexts. You may check if the record is new using `new_record?`. Notice that this is called for 4 out of 5 of the controller's actions:  new, create, edit, update; not destroy, which operates on the whole record. For new and edit it is used only to determine the display output.)
+The `*_able?` method should return true or false depending on whether or not the field can be edited. (No distinction is made between the different contexts. You may check if the record is new using `new_record?`.
 
+The `*_able?` method is used by Hot Glue only on the new and edit actions, but you should incorporate it into the policy's `update?` method as in the example, which will extend other operations since Hot Glue will use the policy to authorize the action
 Add one `*_able?` method to the policy for each field you want to allow field-level access control. 
 
-Replace `*` with the name of the field (remember to include `_id` for foreign keys).
+Replace `*` with the name of the field you want under access control. Remember to include `_id` for foreign keys. You do not need it for any field you don't want under access control.
 
-When the method returns true, the field will be displayed to the user (and allowed) for editing. When the method returns false, the field will be displayed as read-only (viewable) to the user.
+When the method returns true, the field will be displayed to the user (and allowed) for editing. 
+When the method returns false, the field will be displayed as read-only (viewable) to the user.
 
 Important: These special fields determine *only* display behavior (new and edit), not create and update. 
-For create & update field-level access control, you must also implement the `update?` method on the Policy. 
 
-Notice how in the example policy below, the `update?` method uses the `name_able?` method when it is checking if the name field can be updated. (It is up to you to implement this detail in your `update?` methods on your policy.)
+For create & update field-level access control, you must also implement the `update?` method on the Policy. Notice how in the example policy below, the `update?` method uses the `name_able?` method when it is checking if the name field can be updated, tying the feature together.
 
-You can set Pundit to be enabled globally on the whole project in `config/hot_glue.yml` (then you can leave off the `--pundit` flag from the scaffold command)
+You can set Pundit to be enabled globally on the whole project for every build in `config/hot_glue.yml` (then you can leave off the `--pundit` flag from the scaffold command)
 `:pundit_default:` (all builds in that project will use Pundit)
 
 
