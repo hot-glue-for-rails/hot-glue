@@ -61,7 +61,8 @@ describe HotGlue::ErbTemplate do
       update_show_only: [],
       alt_lookups: {},
       columns_map: columns_map_sample(generator: generator, options: options),
-      attachments: {})
+      attachments: {},
+      pundit: options[:pundit])
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy,
                                        layout_object: layout_object)
@@ -121,7 +122,8 @@ describe HotGlue::ErbTemplate do
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
       alt_lookups: [],
-      attachments: {})
+      attachments: {},
+      pundit: options[:pundit])
 
     @template_builder.all_line_fields( perc_width: 15,
                                        layout_strategy: layout_strategy,
@@ -290,7 +292,7 @@ describe HotGlue::ErbTemplate do
     it "should show labels when --inline-list-labels" do
       res = factory_all_line_fields({columns: [:name, :blurb, :cost],
                                      no_list_heading: true,
-                                     inline_list_labels: 'omit'})
+                                     inline_list_labels: 'omit', pundit: nil})
 
       expect(res).to_not include("<label class='small form-text text-muted'>Cost</label>")
       expect(res).to_not include("<label class='small form-text text-muted'>Blurb</label>")
