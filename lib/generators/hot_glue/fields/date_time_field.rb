@@ -37,7 +37,7 @@ class DateTimeField < Field
     "<%= datetime_field_localized(f, :#{name}, #{singular}.#{name}, '#{ name.to_s.humanize }') %>"
   end
 
-  def line_field_output
+  def viewable_output
     if modify_binary?
       modified_display_output
     else

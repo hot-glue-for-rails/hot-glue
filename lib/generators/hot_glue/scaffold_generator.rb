@@ -21,7 +21,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :display_as, :downnest_children, :downnest_object, :hawk_keys, :layout_object, :modify,
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting, :update_show_only, :ownership_field,
-                :layout_strategy, :form_placeholder_labels, :form_labels_position
+                :layout_strategy, :form_placeholder_labels, :form_labels_position, :pundit
 
   class_option :singular, type: :string, default: nil
   class_option :plural, type: :string, default: nil
@@ -81,6 +81,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :button_icons, default: nil
   class_option :modify, default: {}
   class_option :display_as, default: {}
+  class_option :pundit, default: nil
 
   def initialize(*meta_args)
     super
@@ -295,6 +296,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @display_list_after_update = options['display_list_after_update'] || false
     @smart_layout = options['smart_layout']
 
+    @pundit = options['pundit']
+    if @pundit.nil?
+      @pundit = get_default_from_config(key: :pundit_default)
+    end
+
+
     if options['include'].include?(":") && @smart_layout
       raise HotGlue::Error, "You specified both --smart-layout and also specified grouping mode (there is a : character in your field include list); you must remove the colon(s) from your --include tag or remove the --smart-layout option"
     end
@@ -443,7 +450,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         form_placeholder_labels: @form_placeholder_labels,
         alt_lookups: @alt_lookups,
         attachments: @attachments,
-        columns_map: @columns_map
+        columns_map: @columns_map,
+        pundit: @pundit,
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")
@@ -806,7 +814,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       show_only_list = which_partial == :create ? @show_only : (@update_show_only + @show_only)
 
       if show_only_list.include?(col)
-        "      page.should have_no_selector(:css, \"[name='#{testing_name}[#{ col.to_s }]'\")"
+        # TODO: decide if this should get re-implemeneted
+        # "      page.should have_no_selector(:css, \"[name='#{testing_name}[#{ col.to_s }]'\")"
       else
         col_obj.spec_setup_and_change_act(which_partial)
       end

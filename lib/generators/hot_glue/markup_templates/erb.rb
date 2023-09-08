@@ -8,7 +8,7 @@ module  HotGlue
                   :inline_list_labels, :layout_object,
                   :columns,  :col_identifier, :singular,
                   :form_placeholder_labels, :hawk_keys, :update_show_only,
-                  :alt_lookups, :attachments, :show_only, :columns_map
+                  :alt_lookups, :attachments, :show_only, :columns_map, :pundit
 
 
       def initialize(singular:, singular_class: ,
@@ -17,7 +17,7 @@ module  HotGlue
                    ownership_field: , form_labels_position: ,
                    inline_list_labels: ,
                    form_placeholder_labels:, hawk_keys: ,
-                   update_show_only:, alt_lookups: , attachments: , columns_map: )
+                   update_show_only:, alt_lookups: , attachments: , columns_map:, pundit: )
 
       @singular = singular
       @singular_class = singular_class
@@ -28,6 +28,7 @@ module  HotGlue
       @small_buttons = small_buttons
       @layout_strategy = layout_strategy
       @show_only = show_only
+      @pundit = pundit
       @ownership_field = ownership_field
 
       @form_labels_position = form_labels_position
@@ -81,30 +82,34 @@ module  HotGlue
       result = columns.map{ |column|
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
-            field_result = show_only.include?(col.to_sym) ?
-                             columns_map[col].form_show_only_output :
-                             columns_map[col].form_field_output
 
             field_error_name = columns_map[col].field_error_name
-
 
             label_class = columns_map[col].label_class
             label_for = columns_map[col].label_for
 
             the_label = "\n<label class='#{label_class}' for='#{label_for}'>#{col.to_s.humanize}</label>"
-            show_only_open = ""
-            show_only_close = ""
 
-            if update_show_only.include?(col)
-              show_only_open = "<% if action_name == 'edit' %>" +
-                show_only_result(type: type, col: col, singular: singular) + "<% else %>"
-              show_only_close = "<% end %>"
-            end
+
+            field_result =
+              if show_only.include?(col)
+                columns_map[col].form_show_only_output
+              elsif update_show_only.include?(col) && !@pundit
+                "<% if action_name == 'edit' %>" + columns_map[col].form_show_only_output + "<% else %>" + columns_map[col].form_field_output + "<% end %>"
+              elsif update_show_only.include?(col) && @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
+                "<% if action_name == 'create' && policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_show_only_output + "<% else %>" + columns_map[col].form_field_output + "<% end %>"
+
+                             # show only on the update action overrides any pundit policy
+            elsif @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
+              "<% if policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output  + "<% end %>"
+            else
+              columns_map[col].form_field_output
+                           end
 
             add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
                                     add_spaces_each_line( (form_labels_position == 'before' ? the_label : "") +
-                                                            show_only_open + field_result + show_only_close +
-                                                            (form_labels_position == 'after' ? the_label : "")   , 4) +
+                                                        +  field_result +
+                                        (form_labels_position == 'after' ? the_label : "")   , 4) +
                                     "\n  </span>\n  <br />", 2)
 
           }.join("") + "\n  </div>"

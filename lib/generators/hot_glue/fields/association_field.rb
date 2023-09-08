@@ -116,7 +116,7 @@ class AssociationField < Field
 
   def form_show_only_output
     assoc_name = name.to_s.gsub("_id","")
-    assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+    assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
     if assoc.nil?
       exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
       exit

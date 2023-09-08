@@ -75,15 +75,11 @@ For Hot Glue, you will need:
 
 Section #1 is to create a new Rails app. (Or you can do that yourself.)
 
-Section #2 is to setup Rspec, FactoryBot, and Faker.
+Section #2 is to setup Rspec, FactoryBot, and Faker — choose 2B for Rspec0
 
-Section #4 is optional but highly recommended.
+Skip #3 and #4 is optional. #5 is optional but recommended. 
 
-Section #5 is where you will pick a CSS Framework (Bootstrap, Tailwind, or none)
-
-Section #6 is for two support gems (Kaminari) for Hot Glue
-
-Section #7 is for Hot Glue itself
+Sectoin #6 is for Hot Glue itself, and Section #7 is for Kaminari
 
 You will also need section #8 to setup Devise if you want authentication.
 
@@ -645,15 +641,6 @@ This is what would happen if 9 fields, specified in the order A,B,C,D,E,F,G,H,I,
 
 
 
-### `--show-only=`
-(separate field names by COMMA)
-
-Any fields only the 'show-only' list will appear as non-editable on the generated form for both new & edit actions. (visible only)
-
-IMPORTANT: By default, all fields that begin with an underscore (`_`) are automatically show-only.
-
-This is for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
-
 ### `--modify=field1{...},field2{...}`
 
 
@@ -685,12 +672,92 @@ The available modifiers are:
 | truthy label\|falsy label | specify a binary switch with a pipe (\|) character if the value is truthy, it will display as "truthy label" if the value is falsy, it will display as "falsy label" | boolean, datetime, date, time |   |   |
 |                           |                                                                                                                                                                      |                               |   |   |
 
+### `--pundit`
+If you enable Pundit, your controllers will look for a Policy that matches the name of the thing being built.
+
+**Realtime Field-level Access**
+Hot Glue gives you automatic field level access control if you create `*_able?` methods for each field you'd like to control on your Pundit policy.
+
+(Although this is not what Pundit recommends for field level access control, it has been implemented this way to provide field-by-field user feedback to the user shown in red just like Rails validation errors are currently shown. This is is only hypothetical, because the interface correctly shows the field as viewable or editable anyway, making bad entry only something that could be achieved through a mistake or hacking. Nevertheless, rest assured that if there was a input mistake-- like a user having a field editable when it shouldn't be, the backend policy would guard against the disallowed input and show an error message.)
+
+The `*_able?` method should return true or false depending on whether or not the field can be edited. (No distinction is made between the different contexts. You may check if the record is new using `new_record?`.
+
+The `*_able?` method is used by Hot Glue only on the new and edit actions, but you should incorporate it into the policy's `update?` method as in the example, which will extend other operations since Hot Glue will use the policy to authorize the action
+Add one `*_able?` method to the policy for each field you want to allow field-level access control. 
+
+Replace `*` with the name of the field you want under access control. Remember to include `_id` for foreign keys. You do not need it for any field you don't want under access control.
+
+When the method returns true, the field will be displayed to the user (and allowed) for editing. 
+When the method returns false, the field will be displayed as read-only (viewable) to the user.
+
+Important: These special fields determine *only* display behavior (new and edit), not create and update. 
+
+For create & update field-level access control, you must also implement the `update?` method on the Policy. Notice how in the example policy below, the `update?` method uses the `name_able?` method when it is checking if the name field can be updated, tying the feature together.
+
+You can set Pundit to be enabled globally on the whole project for every build in `config/hot_glue.yml` (then you can leave off the `--pundit` flag from the scaffold command)
+`:pundit_default:` (all builds in that project will use Pundit)
+
+
+Here's an example `ThingPolicy` that would allow **editing the name field** only if:
+• the current user is an admin
+• the sent_at date is nil (meaning it has not been sent yet)
+
+For your policies, copy the `initialize` method of both the outer class (`ThingPolicy`) and the inner class (`Scope`) exactly as shown below.
+
+
+```
+class ThingPolicy < ApplicationPolicy
+  def initialize(user, record)
+    @user = user
+    @record = record
+  end
+  
+  def name_able?
+    @record.sent_at.nil?
+  end
+  
+  def update?
+     if !@user.is_admin?
+       return false
+    elsif record.name_changed? && !name_able?
+      record.errors.add(:name, "cannot be changed.")
+      return false
+    else
+      return true
+    end
+  end
+  
+  class Scope < Scope
+    attr_reader :user, :scope
+    def initialize(user, scope)
+      @user = user
+      @scope = scope
+    end
+  end
+end
+```
+
+
+Because Hot Glue detects the `*_able?` methods at build time, if you add them to your policy, you will have to rebuild your scaffold.
+
+
+### `--show-only=`
+(separate field names by COMMA)
+
+• Make this field appear as viewable only all actions. (visible only)
+• When set on this list, it will override any Pundit policy even when Pundit would otherwise allow the access.
+
+IMPORTANT: By default, all fields that begin with an underscore (`_`) are automatically show-only.
+
+This is for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
 
 
 ### `--update-show-only`
 (separate field names by COMMA)
 
-Fields on the `update show only`  (and not on the `show only` list) will appear as non-editible only for the **edit** action, but will still allow entry for the **create** action.
+• Make this field appear as viewable only for the edit action (and not allowed in the update action). 
+• When set on this list, it will override any Pundit policy for edit/update actions even when Pundit would otherwise allow the access.
+
 
 Note that Hot Glue still generates a singular partial (`_form`) for both actions, but your form will now contain statements like:
 
@@ -704,6 +771,35 @@ Note that Hot Glue still generates a singular partial (`_form`) for both actions
 
 This works for both regular fields, association fields, and alt lookup fields.
 
+
+When mixing the show only, update show only, and Pundit features, notice that the show only + update show only will act to override whatever the policy might say.
+
+Remember, the show only list is specified using `--show-only` and the update show only list is specified using `--update-show-only`.
+
+'Viewable' means it displays as view-only (not editable) even on the form. In this context, 'viewable' means 'read-only'. It does not mean 'visible'. 
+
+That's because when the field is **not viewable**, then it is editable or inputable. This may seem counter-intuitive for a standard interpretation of the word 'viewable,' but consider that Hot Glue has been carefully designed this way. If you do not want the field to appear at all, then you simply remove it using the exclude list or don't specify it in your include list. If the field is being built at all, Hot Glue assumes your users want to see or edit it. Other special cases are beyond the scope of Hot Glue but can easily be added using direct customization of the code. 
+
+Without Pundit:
+|                                          | on new screen | on edit screen |
+|------------------------------------------|---------------|----------------|
+| for a field on the show only list        | viewable      | viewable       |
+| for a field on the update show only list | inputable     | viewable       |
+| for all other fields                     | inputable     | inputable      |
+
+
+With Pundit:
+|                                          | on new screen | on edit screen |
+|------------------------------------------|---------------|----------------|
+| for a field on the show only list        | viewable      | viewable       |
+| for a field on the update show only list | check policy  | viewable       |
+| for all other fields                     | check policy  | check policy   |
+|                                          |               |                |
+
+Remember, if there's a corresponding `*_able?` method on the policy, it will be used to determine if the field is **editable** or not in the cases where 'check policy' is above.
+(where `*` is the name of your field)
+
+As shown in the method `name_able?` of the example ThingPolicy above, if this field on your policy returns true, the field will be editable. If it returns false, the field will be viewable (read-only).
 
 
 ### `--ujs_syntax=true` (Default is set automatically based on whether you have turbo-rails installed)

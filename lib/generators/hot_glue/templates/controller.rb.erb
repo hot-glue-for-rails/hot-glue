@@ -65,21 +65,29 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @<%= singular_name %> = (<%= auth_object.gsub("@",'') %><%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set.any? && @nested_set[0][:optional] %>)<% if @nested_set.any? && @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %>
   end<% end %>
 
-  def load_all_<%= plural %><% if !@self_auth %>
+  def load_all_<%= plural %><% if @pundit %>
+    @<%= plural_name %> =  policy_scope(<%= class_name %>).page(params[:page])<%= n_plus_one_includes %>
+    authorize @<%= plural_name %>.all<% else %> <% if !@self_auth %>
     @<%= plural_name %> = <%= object_scope.gsub("@",'') %>.page(params[:page])<%= n_plus_one_includes %><%= " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] %><% if @nested_set[0] &&  @nested_set[0][:optional] %>
     @<%= plural_name %> = <%= class_name %>.all<% end %><% else %>
     @<%= plural_name %> = <%= class_name %>.where(id: <%= auth_object.gsub("@",'') %>.id)<%= n_plus_one_includes %> # returns iterable even though this <%= singular_name %> is only allowed access to themselves<% end %>
+    <% end %>
   end
 
   def index
-    load_all_<%= plural %>
+    load_all_<%= plural %><% if @pundit %>
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = "You are not authorized to perform this action."<% end %>
   end
 
 <% if create_action %>  def new<% if @object_owner_sym %>
-    @<%= singular_name %> = <%= class_name  %>.new(<%  if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% elsif @object_owner_optional && any_nested? %>
-    @<%= singular_name %> = <%= class_name  %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}))<% else %>
-    @<%= singular_name %> = <%= class_name  %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)
-   <% end %>
+    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name %><% if @pundit %>)<% end %>.new(<%  if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% elsif @object_owner_optional && any_nested? %>
+    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name  %><% if @pundit %>)<% end %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}))<% else %>
+    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name  %><% if @pundit %>)<% end %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% end %>
+    <% if @pundit %>authorize @<%= singular_name %><% end %><% if @pundit %>
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = "You are not authorized to perform this action."
+    render :index<% end %>
   end
 
   def create
@@ -106,12 +114,18 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     else
       flash[:alert] = "Oops, your <%= singular_name %> could not be created. #{@hawk_alarm}"
       render :create, status: :unprocessable_entity
-    end
+    end<% if @pundit %>
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = "Creating <%= singular %> not authorized. #{@<%= singular %>.errors.collect{|k| "#{k.attribute} #{k.message}"}.join(" ")} #{flash[:notice]} "
+    render :index <% end %>
   end
 
 <% end %>
 <% unless @no_edit %>  def edit
-    render :edit
+    render :edit<% if @pundit %>
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = "Editing #{@<%= singular %>.<%= display_class %>} not authorized."
+    render :index <% end %>
   end
 
 <% end %><% if @build_update_action %>  def update
@@ -120,7 +134,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
        }.join("\n") %><% end %> <% merge_lookups = @alt_lookups.filter{|key,d| ! @update_show_only.include?(key.to_sym) }.collect{|key, data| "#{key.gsub("_id", "")}: #{key.gsub("_id", "")}" }.join(",") %>
     <% @magic_buttons.each { |button| %>@<%= singular_name %>.<%= button %>! if <%= singular_name %>_params[:__<%= button %>]
     <% } %>
-    modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup<%= controller_update_params_tap_away_alt_lookups  %>, <%= current_user_object %>, <%= datetime_fields_list %>) <% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
+    modified_params = modify_date_inputs_on_params(<% if @update_show_only %>update_<% end %><%= singular_name %>_params.dup<%= controller_update_params_tap_away_alt_lookups  %>, <%= current_user_object %>, <%= datetime_fields_list %>) <% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
     modified_params = modified_params.merge(<%= @object_owner_sym %>: <%= @object_owner_eval %>) <% elsif @object_owner_optional && any_nested? %>
     modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% elsif !@object_owner_eval.empty? %>
     modified_params = modified_params.merge(<%= @object_owner_eval %>) <% end %><%  if !merge_lookups.empty?  %>
@@ -136,7 +150,13 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       <%= @update_alt_lookups.collect{|key, data|
    "    @#{ singular_name }.#{key.gsub("_id", "")} = #{key.gsub("_id", "")}"
    }.join("/n") %><% end %><%= controller_attachment_orig_filename_pickup_syntax %>
+    <% if @pundit %>
+    if @<%= singular_name %>.attributes = modified_params
+        authorize @<%= singular_name %>
+        @<%= singular_name %>.save
+    <% else %>
     if @<%= singular_name %>.update(modified_params)
+    <% end %>
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
       flash[:notice] = "#{flash[:notice]} Saved #{@<%= singular %>.<%= display_class %>}"
       flash[:alert] = @hawk_alarm if @hawk_alarm
@@ -144,22 +164,33 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     else
       flash[:alert] = "#{flash[:notice]} <%= singular_name.titlecase %> could not be saved. #{@hawk_alarm}"
       render :update, status: :unprocessable_entity
-    end
+    end<% if @pundit %>
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = "Updating #{@<%= singular_name %>.<%= display_class %>} not authorized. "
+    render :update<% end %>
   end
 
 <% end %><% if destroy_action %>  def destroy
+    <% if @pundit %>authorize @<%= singular_name %><% end %>
     begin
       @<%=singular_name%>.destroy
       flash[:notice] = '<%= singular_name.titlecase %> successfully deleted'
     rescue StandardError => e
       flash[:alert] = '<%= singular_name.titlecase %> could not be deleted'
     end <%= post_action_parental_updates %>
-    load_all_<%= plural %>
+    load_all_<%= plural %><% if @pundit %>
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = "Deleting #{@<%= singular_name %>.<%= display_class %>} not authorized. "
+    render :update<% end %>
   end<% end %>
 
   def <%=singular_name%>_params
-    params.require(:<%= testing_name %>).permit(<%= (fields_filtered_for_email_lookups - @show_only) + @magic_buttons.collect{|x| "__#{x}".to_sym }%>)
-  end
+    params.require(:<%= testing_name %>).permit(<%= (fields_filtered_for_email_lookups - @show_only ) + @magic_buttons.collect{|x| "__#{x}".to_sym }%>)
+  end<% if @update_show_only %>
+
+  def update_<%=singular_name%>_params
+    params.require(:<%= testing_name %>).permit(<%= (fields_filtered_for_email_lookups - @update_show_only) + @magic_buttons.collect{|x| "__#{x}".to_sym }%>)
+  end<% end %>
 
   def namespace
     <% if @namespace %>'<%= @namespace %>/'<% else %><% end %>

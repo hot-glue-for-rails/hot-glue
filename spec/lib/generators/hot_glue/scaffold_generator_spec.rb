@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+
+
 describe HotGlue::ScaffoldGenerator do
   before(:each) do
     remove_everything
@@ -534,31 +536,164 @@ describe HotGlue::ScaffoldGenerator do
     end
   end
 
+  describe "with pundit" do
+    class DfgPolicy
+      def initialize(user, dfg)
 
-  describe "--show-only" do
-    it "should make the show only fields visible only" do
-      response = Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Dfg","--show-only=name"])
+      end
 
-      expect(
-        File.read("spec/dummy/app/views/dfgs/_form.erb") =~ /f\.text_field :name/
-      ).to be(nil)
+      def cantelope_id_able?
+        true
+      end
 
-      res = File.read("spec/dummy/app/views/dfgs/_form.erb")
-      expect(res).to include("<%= dfg.name %>")
+      class Scope
+        def initialize(user, scope)
 
+        end
+      end
     end
 
-    it "should not include the show-only fields in the allowed parameters" do
+    describe "--show-only" do
+      it "should make the show only fields visible only" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--show-only=name", "--pundit"])
 
-      response = Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Dfg","--show-only=name"])
+        expect(
+          File.read("spec/dummy/app/views/dfgs/_form.erb") =~ /f\.text_field :name/
+        ).to be(nil)
 
+        res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+        expect(res).to include("<%= dfg.name %>")
+      end
 
-      expect(
-        File.read("spec/dummy/app/controllers/dfgs_controller.rb") =~ /.permit\( \[:name/
-      ).to be(nil)
+      it "if not on the show only list and there is a *_able? method on the policy, it should delegate to pundit " do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--show-only=name", "--pundit"])
+
+        col = "name"
+        res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+
+         expect(res).to include("<% if policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: @dfg.cantelope_id }, class: 'form-control') %>\n      <% else %><%= dfg.cantelope.name %><% end %>")
+      end
+
+      it "should not include the show-only fields in the allowed parameters" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--show-only=name", "--pundit"])
+        res = File.read("spec/dummy/app/controllers/dfgs_controller.rb")
+
+        expect(res).to include("def update_dfg_params")
+        expect(res).to include("def dfg_params\n    params.require(:dfg).permit([:cantelope_id])")
+      end
     end
+
+
+    describe "--update-show-only" do
+      # note that on the fake Pundit policy there is a method `cantelope_id_able?` but no method `name_able?`
+      it "should make the show only fields viewable on the edit action but inputable on the create action" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--update-show-only=cantelope_id", "--pundit"])
+
+        res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+
+        expect(res).to include("<% if action_name == 'create' && policy(@dfg).cantelope_id_able? %><%= dfg.cantelope.name %><% else %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: @dfg.cantelope_id }, class: 'form-control') %>\n      <% end %>")
+      end
+
+      it "should not include the update show-only fields in the allowed parameters" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--include=name,cantelope_id", "--update-show-only=name", "--pundit"])
+
+        res = File.read("spec/dummy/app/controllers/dfgs_controller.rb")
+        expect(res).to include("def update_dfg_params")
+
+        expect(res).to include("def update_dfg_params\n    params.require(:dfg).permit([:cantelope_id])")
+        expect(res).to include("def update_dfg_params\n    params.require(:dfg).permit([:cantelope_id])")
+      end
+
+
+      it "should default to be editable" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--include=name,cantelope_id", "--update-show-only=name", "--pundit"])
+
+        res = File.read("spec/dummy/app/controllers/dfgs_controller.rb")
+        expect(res).to include("def update_dfg_params")
+        expect(res).to include("def dfg_params\n    params.require(:dfg).permit([:name, :cantelope_id])")
+        expect(res).to include("def update_dfg_params\n    params.require(:dfg).permit([:cantelope_id])")
+      end
+    end
+  end
+
+  describe "without pundit" do
+    describe "--show-only" do
+      it "should make the show only fields visible only" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--show-only=name", "--pundit"])
+
+        expect(
+          File.read("spec/dummy/app/views/dfgs/_form.erb") =~ /f\.text_field :name/
+        ).to be(nil)
+
+        res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+        expect(res).to include("<%= dfg.name %>")
+      end
+
+      it "should delegate to pundit if not" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg", "--include=cantelope_id", "--pundit"])
+
+        col = "name"
+
+        res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+        expect(res).to include("<% if policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: @dfg.cantelope_id }, class: 'form-control') %>")
+      end
+    end
+
+    describe "--show-only " do
+      it "should make the show only fields visible only" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--show-only=name"])
+        expect(
+          File.read("spec/dummy/app/views/dfgs/_form.erb") =~ /f\.text_field :name/
+        ).to be(nil)
+
+        res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+        expect(res).to include("<%= dfg.name %>")
+      end
+
+      it "should not include the show-only fields in the allowed parameters" do
+        response = Rails::Generators.invoke("hot_glue:scaffold",
+                                            ["Dfg","--show-only=name"])
+
+        res = File.read("spec/dummy/app/controllers/dfgs_controller.rb")
+        expect(res).to include(" def dfg_params\n    params.require(:dfg).permit([:cantelope_id])")
+      end
+
+
+      describe "--update-show-only" do
+        it "should make the show only fields viewable on the edit action but inputable on the create action" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--update-show-only=name"])
+
+          res  = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res).to include("<% if action_name == 'edit' %><%= dfg.name %><% else %>  <%= f.text_field :name, value: dfg.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>\n       \n      <% end %>")
+
+          res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+
+          expect(res).to include("<%= f.text_field :name, value: dfg.name, autocomplete: 'off', ")
+        end
+
+        it "should not include the update show-only fields in the allowed parameters for the create action but not the update action" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--update-show-only=name"])
+          res = File.read("spec/dummy/app/controllers/dfgs_controller.rb")
+          expect(res).to include("def update_dfg_params")
+
+          expect(res).to_not include("def dfg_params\n    params.require(:dfg).permit([:name])")
+          expect(res).to_not include("def update_dfg_params\n    params.require(:dfg).permit([:name, :cantelope_id])")
+          expect(res).to include("def update_dfg_params\n    params.require(:dfg).permit([:cantelope_id])")
+        end
+      end
+    end
+
 
 
     it "should automatically add fields that begin with underscore (_) as show only" do
@@ -572,9 +707,9 @@ describe HotGlue::ScaffoldGenerator do
 
       res = File.read("spec/dummy/app/views/cantelopes/_form.erb")
       expect(res).to include("<%= cantelope._a_show_only_field %>")
-      expect(
-        File.read("spec/dummy/app/controllers/cantelopes_controller.rb") =~ /:_a_show_only_field/
-      ).to be(nil)
+
+      res2 = File.read("spec/dummy/app/controllers/cantelopes_controller.rb")
+      expect(res2).to include(":_a_show_only_field")
     end
 
 
