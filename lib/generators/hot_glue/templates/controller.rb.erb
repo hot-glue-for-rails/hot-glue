@@ -171,7 +171,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
 <% end %><% if destroy_action %>  def destroy
-    <% if @pundit %>autorize @<%= singular_name %><% end %>
+    <% if @pundit %>authorize @<%= singular_name %><% end %>
     begin
       @<%=singular_name%>.destroy
       flash[:notice] = '<%= singular_name.titlecase %> successfully deleted'

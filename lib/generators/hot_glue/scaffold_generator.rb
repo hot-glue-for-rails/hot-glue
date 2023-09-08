@@ -814,7 +814,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       show_only_list = which_partial == :create ? @show_only : (@update_show_only + @show_only)
 
       if show_only_list.include?(col)
-        "      page.should have_no_selector(:css, \"[name='#{testing_name}[#{ col.to_s }]'\")"
+        # TODO: decide if this should get re-implemeneted
+        # "      page.should have_no_selector(:css, \"[name='#{testing_name}[#{ col.to_s }]'\")"
       else
         col_obj.spec_setup_and_change_act(which_partial)
       end
