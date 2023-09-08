@@ -82,9 +82,6 @@ module  HotGlue
       result = columns.map{ |column|
         "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
-            field_result = show_only.include?(col.to_sym) ?
-                             columns_map[col].form_show_only_output :
-                             columns_map[col].form_field_output
 
             field_error_name = columns_map[col].field_error_name
 
@@ -92,31 +89,23 @@ module  HotGlue
             label_for = columns_map[col].label_for
 
             the_label = "\n<label class='#{label_class}' for='#{label_for}'>#{col.to_s.humanize}</label>"
-            show_only_open = ""
-            show_only_close = ""
-            # puts eval("#{singular_class}Policy").instance_methods
 
 
-            # TODO: should pundit override the show only setting or should the
-            # show only setting override the pundit policy?
-
-            if update_show_only.include?(col)
+            field_result = if show_only.include?(col)
+               columns_map[col].form_show_only_output
+            elsif update_show_only.include?(col)
               # show only on the update action overrides any pundit policy
-              show_only_open = "<% if action_name == 'edit' %>" +
-                columns_map[col].line_field_output + "<% else %>"
-              show_only_close = "<% end %>"
-            elsif @pundit && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
-              show_only_open = "<% if policy(@#{singular}).#{col}_able? %>"
-              show_only_close = "<% else %>" + columns_map[col].line_field_output + "<% end %>"
+              "<% if action_name == 'edit' %>" + columns_map[col].form_show_only_output + "<% else %>" + columns_map[col].form_field_output + "<% end %>"
+            elsif @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
+              "<% if policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output  + "<% end %>"
             else
-              show_only_open = ""
-              show_only_close = ""
-            end
+              columns_map[col].form_field_output
+                           end
 
             add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
                                     add_spaces_each_line( (form_labels_position == 'before' ? the_label : "") +
-                                                            show_only_open + field_result + show_only_close +
-                                                            (form_labels_position == 'after' ? the_label : "")   , 4) +
+                                                        +  field_result +
+                                        (form_labels_position == 'after' ? the_label : "")   , 4) +
                                     "\n  </span>\n  <br />", 2)
 
           }.join("") + "\n  </div>"

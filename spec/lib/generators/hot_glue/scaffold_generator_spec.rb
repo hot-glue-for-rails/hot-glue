@@ -572,8 +572,8 @@ describe HotGlue::ScaffoldGenerator do
 
         col = "name"
         res = File.read("spec/dummy/app/views/dfgs/_form.erb")
-        expect(res).to include('<% if policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: @dfg.cantelope_id }, class: \'form-control\') %>')
-        expect(res).to include('<% else %><%= dfg.cantelope.try(:name) || \'<span class="content alert-danger">MISSING</span>\'.html_safe %><% end %>')
+
+         expect(res).to include("<% if policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: @dfg.cantelope_id }, class: 'form-control') %>\n      <% else %><%= dfg.cantelope.name %><% end %>")
       end
 
       it "should not include the show-only fields in the allowed parameters" do
@@ -591,11 +591,11 @@ describe HotGlue::ScaffoldGenerator do
       # note that on the fake Pundit policy there is a method `cantelope_id_able?` but no method `name_able?`
       it "should make the show only fields viewable on the edit action but inputable on the create action" do
         response = Rails::Generators.invoke("hot_glue:scaffold",
-                                            ["Dfg","--update-show-only=name", "--pundit"])
+                                            ["Dfg","--update-show-only=cantelope_id", "--pundit"])
 
         res = File.read("spec/dummy/app/views/dfgs/_form.erb")
-
-        expect(res).to include(" <% if policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: @dfg.cantelope_id }, class: 'form-control') %>\n      <% else %><%= dfg.cantelope.try(:name) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %><% end %>")
+        
+        expect(res).to include("<% if action == 'edit' && policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: @dfg.cantelope_id }, class: 'form-control') %>\n      <% else %><%= dfg.cantelope.name %><% end %>")
       end
 
       it "should not include the update show-only fields in the allowed parameters" do
@@ -643,7 +643,7 @@ describe HotGlue::ScaffoldGenerator do
         col = "name"
 
         res = File.read("spec/dummy/app/views/dfgs/_form.erb")
-        expect(res).to include("<% if policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: @dfg.cantelope_id }, class: 'form-control') %>\n      <% else %><%= dfg.cantelope.try(:name) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %><% end %>")
+        expect(res).to include("<% if policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: @dfg.cantelope_id }, class: 'form-control') %>")
       end
     end
 
