@@ -99,14 +99,13 @@ module  HotGlue
 
             # TODO: should pundit override the show only setting or should the
             # show only setting override the pundit policy?
-            #
             if update_show_only.include?(col)
               # show only on the update action overrides any pundit policy
               show_only_open = "<% if action_name == 'edit' %>" +
                 columns_map[col].line_field_output + "<% else %>"
               show_only_close = "<% end %>"
             elsif @pundit && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
-              show_only_open = "<% if policy(eva('@#{singular}')).#{col}_able? %>"
+              show_only_open = "<% if policy(@#{singular}).#{col}_able? %>"
               show_only_close = "<% else %>" + columns_map[col].line_field_output + "<% end %>"
             else
               show_only_open = ""
