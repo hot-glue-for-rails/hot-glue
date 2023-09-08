@@ -1396,6 +1396,12 @@ end
 
 # VERSION HISTORY
 
+#### 2023-09-08 - v0.5.20
+`--pundit` authorization
+• Will look for a `XyzPolicy` class and method on your class named `*_able?` matching the fields on your object. See Pundit section for details.
+• Field-level access control (can determine which fields are editble or viewable based on the record or current user or combination factors)
+• The field-level access control doesn't show the fields as editable to the user if they can't be edited by the user (it shows them as view-only). 
+
 #### 2023-09-02 - v0.5.19
 
 Given a table generated with this schema:
