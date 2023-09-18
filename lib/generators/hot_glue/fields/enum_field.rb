@@ -1,7 +1,7 @@
 class EnumField < Field
   def spec_setup_and_change_act(which_partial = nil)
     # what is the enum name
-    "      list_of_#{enum_type} = #{class_name}.defined_enums['#{enum_type}'].keys \n" +
+    "      list_of_#{enum_type} = #{class_name}.defined_enums['#{name}'].keys \n" +
       "      " + "new_#{name} = list_of_#{enum_type}[rand(list_of_#{enum_type}.length)].to_s \n" +
       '      find("select[name=\'' + singular + '[' + name + ']\']  option[value=\'#{new_' + name + '}\']").select_option'
   end
@@ -33,10 +33,10 @@ class EnumField < Field
   def form_field_output
     enum_type = eval("#{class_name}.columns.select{|x| x.name == '#{name}'}[0].sql_type")
 
-    if eval("defined? #{class_name}.#{enum_type}_labels") == "method"
-      enum_definer = "#{class_name}.#{enum_type}_labels"
+    if eval("defined? #{class_name}.#{name}_labels") == "method"
+      enum_definer = "#{class_name}.#{name}_labels"
     else
-      enum_definer = "#{class_name}.defined_enums['#{enum_type}']"
+      enum_definer = "#{class_name}.defined_enums['#{name}']"
     end
     return "<%= f.collection_select(:#{name},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: #{singular}.#{name} }, class: 'form-control') %>"
   end
@@ -47,7 +47,7 @@ class EnumField < Field
     if eval("defined? #{class_name}.#{enum_type}_labels") == "method"
       enum_definer = "#{class_name}.#{enum_type}_labels"
     else
-      enum_definer = "#{class_name}.defined_enums['#{enum_type}']"
+      enum_definer = "#{class_name}.defined_enums['#{name}']"
     end
     "
     <% if #{singular}.#{name}.nil? %>
