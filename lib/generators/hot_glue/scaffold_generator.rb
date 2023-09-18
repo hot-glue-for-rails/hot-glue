@@ -43,6 +43,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :no_create, type: :boolean, default: false
   class_option :no_edit, type: :boolean, default: false
   class_option :no_list, type: :boolean, default: false
+  class_option :no_controller, type: :boolean, default: false
+  class_option :no_list, type: :boolean, default: false
   class_option :no_paginate, type: :boolean, default: false
   class_option :big_edit, type: :boolean, default: false
   class_option :show_only, type: :string, default: ""
@@ -288,6 +290,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @big_edit = options['big_edit']
 
     @no_edit = options['no_edit'] || false
+    @no_list = options['no_list'] || false
+    @no_controller = options['no_controller'] || false
     @no_list = options['no_list'] || false
     @no_list_label = options['no_list_label'] || false
     @no_list_heading = options['no_list_heading'] || false
@@ -688,7 +692,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def copy_controller_and_spec_files
     @default_colspan = @columns.size
-    unless @specs_only
+    unless @specs_only || @no_controller
       template "controller.rb.erb", File.join("#{filepath_prefix}app/controllers#{namespace_with_dash}", "#{@controller_build_folder}_controller.rb")
       if @namespace
         begin
@@ -1120,6 +1124,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if !(@no_edit && @no_create)
       res << '_form'
     end
+
+    if @no_list
+      res -= %w{_list _line index}
+    end
+
     res
   end
 
