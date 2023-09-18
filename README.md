@@ -909,6 +909,14 @@ Omits new & create actions.
 
 Omits delete button & destroy action.
 
+### `--no-controller`
+
+Omits controller.
+
+### `--no-list`
+
+Omits list views. 
+
 ### `--big-edit`
 
 If you do not want inline editing of your list items but instead want to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
@@ -1395,6 +1403,14 @@ end
 ```
 
 # VERSION HISTORY
+
+
+#### TBR 
+- Removes `@` symbols using instance variables in `_edit` partials and in the enum syntax
+- fixes in system_spec.rb.erb
+- Adds flags --no-controller --no-list
+- adds regen code to a file in the views folder REGENERATE.md if you have set --no-controller
+
 
 #### 2023-09-08 - v0.5.20
 `--pundit` authorization
