@@ -15,7 +15,7 @@ describe 'interaction for <%= controller_class_name %>' do
   <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<% end %>
 <%= spec_related_column_lets %>
   let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )}
-<%= objest_nest_factory_setup %> <% unless @god || @existing_content.include?("login_as")%>
+<%= objest_nest_factory_setup %> <% unless @god || (@existing_content && @existing_content.include?("login_as")) %>
   before do
     login_as(<%= @auth %>)
   end <% end %> <% if any_datetime_fields? %>
