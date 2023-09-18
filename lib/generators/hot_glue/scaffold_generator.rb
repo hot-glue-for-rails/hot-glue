@@ -870,7 +870,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  nested_set: @nested_set,
                                  with_params: true,
                                  put_form: true,
-                                 top_level: true)
+                                 top_level: false)
   end
 
   def delete_path_helper
