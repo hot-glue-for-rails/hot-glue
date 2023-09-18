@@ -1025,6 +1025,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def copy_view_files
     return if @specs_only
+
+    if @no_controller
+      File.write("#{Rails.root}/app/views/#{namespace_with_trailing_dash}/#{plural}/REGENERATE.md", regenerate_me_code)
+    end
+
     all_views.each do |view|
       formats.each do |format|
         source_filename = cc_filename_with_extensions("#{@markup}/#{view}", "#{@markup}")
