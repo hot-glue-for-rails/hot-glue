@@ -70,7 +70,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     authorize @<%= plural_name %>.all<% else %> <% if !@self_auth %>
     @<%= plural_name %> = <%= object_scope.gsub("@",'') %>.page(params[:page])<%= n_plus_one_includes %><%= " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] %><% if @nested_set[0] &&  @nested_set[0][:optional] %>
     @<%= plural_name %> = <%= class_name %>.all<% end %><% else %>
-    @<%= plural_name %> = <%= class_name %>.where(id: <%= auth_object.gsub("@",'') %>.id)<%= n_plus_one_includes %> # returns iterable even though this <%= singular_name %> is only allowed access to themselves<% end %>
+    @<%= plural_name %> = <%= class_name %>.where(id: <%= auth_object.gsub("@",'') %>.id)<%= n_plus_one_includes %><% end %>
     <% end %>
   end
 
