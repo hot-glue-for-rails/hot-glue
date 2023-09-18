@@ -24,7 +24,7 @@ gem "sprockets-rails"
 gem "importmap-rails"
 gem "stimulus-rails"
 gem "turbo-rails"
-gem "byebug"
+
 
 gem "puma", "~> 5.0"
 
