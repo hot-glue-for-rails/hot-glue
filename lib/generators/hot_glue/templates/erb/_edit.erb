@@ -3,7 +3,7 @@
   <\% if <%= singular %>.errors.any? %>
   <\%= render(partial: "<%= namespace_with_trailing_dash %>errors", locals: {resource: <%= singular %> }) %>
   <\% end %>
-
+  <h2>Editing <\%= <%= singular %>.<%= display_class %> %></h2>
   <\%= form_with model: <%= singular %>, url: <%= form_path_edit_helper %> do |f| %>
   <\%=  render partial: "<%= namespace_with_trailing_dash + @controller_build_folder + "/" %>form",  locals: {:<%=  singular  %> => <%= singular %>, f: f}<%= @nested_set.collect{|arg| ".merge(#{arg[:singular]} ? {#{arg[:singular]}: #{arg[:singular]}} : {})" }.join %> \%>
   <\% end %>
