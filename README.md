@@ -1405,7 +1405,7 @@ end
 # VERSION HISTORY
 
 
-#### TBR 
+#### 2023-09-18 - v0.5.21
 - Removes `@` symbols using instance variables in `_edit` partials and in the enum syntax
 - fixes in system_spec.rb.erb
 - Adds flags --no-controller --no-list
