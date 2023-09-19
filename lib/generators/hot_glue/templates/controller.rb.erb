@@ -1,6 +1,8 @@
 class <%= controller_class_name %> < <%= controller_descends_from %>
   # regenerate this controller with
-  # <%= regenerate_me_code %>
+  <% if defined?(RuboCop) %># rubocop:disable Layout/LineLength
+  <% end %># <%= regenerate_me_code %><% if defined?(RuboCop) %>
+  # rubocop:enable Layout/LineLength <% end %>
 
   helper :hot_glue
   include HotGlue::ControllerHelper
@@ -59,6 +61,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       @<%= singular_name %> = <%= object_scope.gsub("@",'') %>.find(params[:id])
     else <% end %>@<%= singular_name %> = <%= object_scope %>.find(params[:id])<% if @nested_set[0] && @nested_set[0][:optional]  %>
     end<% end %>
+    <% if @pundit %>authorize @<%= singular_name %><% end %>
   end
   <% else %>
   def load_<%= singular_name %>
