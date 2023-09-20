@@ -1404,6 +1404,13 @@ end
 
 # VERSION HISTORY
 
+#### 2023-09-20- v0.5.22
+- adds back magic button tap-away params in the controller
+- changes creation of flash[:notice] in update method
+- adds pundit authorization for edit action in the edit method itself
+- adds a crude show method that redirects to the edit (Hot Glue takes the opinionated stance that show routes should not really exist. This addition makes it so that when the user is on the show route and re-loads the browse window, they don't see a route error)
+- adds RuboCop detection; omits the regen code at the top of the controller from line length cop 
+- fixes for specs
 
 #### 2023-09-18 - v0.5.21
 - Removes `@` symbols using instance variables in `_edit` partials and in the enum syntax
