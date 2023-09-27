@@ -597,7 +597,8 @@ describe HotGlue::ScaffoldGenerator do
                                             ["Dfg","--update-show-only=cantelope_id",
                                              "--pundit"])
         res = File.read("spec/dummy/app/views/dfgs/_form.erb")
-        expect(res).to include("<% if action_name == 'create' && policy(@dfg).cantelope_id_able? %><%= dfg.cantelope.name %><% else %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: dfg.cantelope_id }, class: 'form-control') %>\n      <% end %>")
+        expect(res).to include("<% if action_name == 'new' && policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: dfg.cantelope_id }, class: 'form-control') %>")
+        expect(res).to include("<% else %><%= dfg.cantelope.name %><% end %>")
       end
 
       it "should not include the update show-only fields in the allowed parameters" do
