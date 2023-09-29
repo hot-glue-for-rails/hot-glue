@@ -206,6 +206,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @modify = {}
     if !options['modify'].empty?
+
       modify_input = options['modify'].split(",")
       modify_input.each do |setting|
         setting =~ /(.*){(.*)}/
@@ -216,6 +217,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         elsif $2.include?("|")
           binary = $2.split("|")
           @modify[key.to_sym] =  {binary: {truthy: binary[0], falsy: binary[1]}}
+        elsif $2 == "partial"
+          @modify[key.to_sym] =  {enum: :partials}
+
+        else
+          raise "unknown modification direction #{$2}"
         end
       end
     end

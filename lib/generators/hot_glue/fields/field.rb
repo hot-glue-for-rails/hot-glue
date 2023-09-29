@@ -119,6 +119,8 @@ class Field
       "<%= number_to_currency(#{singular}.#{name}) %>"
     elsif modify[:binary]
       "<%= #{singular}.#{name} ? '#{modify[:binary][:truthy]}' : '#{modify[:binary][:falsy]}' %>"
+    elsif modify[:enum]
+      "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
     end
   end
 

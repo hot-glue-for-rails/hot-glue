@@ -142,7 +142,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
 <% end %><% if @build_update_action %>  def update
-    flash[:notice] = ""
+    flash[:notice] = +''
     flash[:alert] = nil
 <% if @alt_lookups.filter{|key,d| ! @update_show_only.include?(key.to_sym) }.any? %><%= @alt_lookups.filter{|key,d| ! @update_show_only.include?(key.to_sym) }.collect{|key, data|
     "    #{data[:assoc].downcase} = #{data[:assoc]}.#{data[:with_create] ? "find_or_create_by" : "find_by"}(#{data[:lookup_as]}: #{ singular_name }_params[:__lookup_#{data[:lookup_as]}])\n"

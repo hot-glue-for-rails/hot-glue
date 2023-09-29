@@ -1404,6 +1404,39 @@ end
 
 # VERSION HISTORY
 
+#### TBR - v0.5.23
+
+- You can now use the modify flag on enum type fields to display a partial (you must define) with the same name of that enum.
+ `--modify=status{partial}`
+
+(where `status` is a field defined as an enum on your table)
+
+- Before, enums render like this:
+`<%= domain.status %>`
+(or, if you use custom labels:)
+`<%= Domain.status_labels(domain.status)`
+
+- After, you if you use the modify flag and modify the enum to 'partial', your view will render:
+```
+<%= render partial: thing.status, locals: {thing: thing} %>
+```
+(In this example `Thing` is the name of the model being built.)
+
+You will now need to create one partial for each enum option that you have defined.
+
+Assuming your Thing enum is defined like sO
+```
+enum :status {abc: 'abc', dfg: 'dfg', hgk: 'hgk'}
+```
+
+You then would create three partials in the `things` directory:
+```
+_abc.html.erb
+_dfg.html.erb
+_hgk.html.erb
+```
+
+
 #### 2023-09-20- v0.5.22
 - adds back magic button tap-away params in the controller
 - changes creation of flash[:notice] in update method

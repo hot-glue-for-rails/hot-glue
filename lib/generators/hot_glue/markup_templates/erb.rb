@@ -104,11 +104,10 @@ module  HotGlue
               "<% if policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output  + "<% end %>"
             else
               columns_map[col].form_field_output
-                           end
-
+            end
             add_spaces_each_line( "\n  <span class='<%= \"alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
-                                    add_spaces_each_line( (form_labels_position == 'before' ? the_label : "") +
-                                                        +  field_result +
+                                    add_spaces_each_line( (form_labels_position == 'before' ? the_label || "" : "") +
+                                                        +  " <br />\n" + field_result +
                                         (form_labels_position == 'after' ? the_label : "")   , 4) +
                                     "\n  </span>\n  <br />", 2)
 
