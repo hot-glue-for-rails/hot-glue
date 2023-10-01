@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hot-glue (0.5.22)
+    hot-glue (0.5.23)
       ffaker (~> 2.16)
       kaminari (~> 1.2)
       rails (> 5.1)
@@ -146,7 +146,7 @@ GEM
       net-protocol
     net-protocol (0.2.1)
       timeout
-    net-smtp (0.3.3)
+    net-smtp (0.4.0)
       net-protocol
     nio4r (2.5.8)
     nokogiri (1.13.9)
