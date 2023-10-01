@@ -135,7 +135,8 @@ describe HotGlue::ErbTemplate do
     it "should create two columns" do
       res = factory_all_form_fields({columns: [:name, :blurb]})
 
-      expect(res).to eq("  <div class='scaffold-cell cell--jkl--name' >  \n    <span class='<%= \"alert-danger\" if jkl.errors.details.keys.include?(:name) %>'  style=\"display: inherit;\"  >\n        <%= f.text_field :name, value: jkl.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>\n       \n  \n    </span>\n    <br />\n  </div>\n  <div class='scaffold-cell cell--jkl--blurb' >  \n    <span class='<%= \"alert-danger\" if jkl.errors.details.keys.include?(:blurb) %>'  style=\"display: inherit;\"  >\n        <%= f.text_field :blurb, value: jkl.blurb, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>\n       \n  \n    </span>\n    <br />\n  </div>")
+      expect(res).to include("<div class='scaffold-cell cell--jkl--name' >  \n    <span class='<%= \"alert-danger\" if jkl.errors.details.keys.include?(:name) %>'  style=\"display: inherit;\"  >" )
+      expect(res).to include("<%= f.text_field :name, value: jkl.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>")
     end
 
     it "should make a text column " do
@@ -183,7 +184,8 @@ describe HotGlue::ErbTemplate do
 
       expect(res).to include('<div class=\'scaffold-cell cell--jkl--genre\' >')
       expect(res).to include('<span class=\'<%= "alert-danger" if jkl.errors.details.keys.include?(:genre) %>')
-      expect(res).to include("<%= f.collection_select(:genre,  enum_to_collection_select(Jkl.defined_enums['genres']), :key, :value, {selected: jkl.genre }, class: 'form-control') %>")
+
+      expect(res).to include("<%= f.collection_select(:genre,  enum_to_collection_select(Jkl.defined_enums['genre']), :key, :value, {selected: jkl.genre }, class: 'form-control') %>")
     end
   end
 

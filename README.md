@@ -1404,6 +1404,54 @@ end
 
 # VERSION HISTORY
 
+#### 2023-10-01 - v0.5.23
+
+- You can now use the modify flag on enum type fields to display a partial with the same name of that enum type.
+
+`--modify=status{partials}`
+
+Here, `status` is an enum field on your table; you must use the exact string `partials` when using this feature.
+
+You're telling Hot Glue to build scaffold that will display the `status` enum field as a partial. 
+
+It will look for a partial in the same build directory, whose name matches to the value of the enum. You will need to create a partial _for each enum option_ that you have defined.
+
+Remember when defining enums Rails will patch methods on your objects with the name of the enum types, so you must avoid namespace collisions with existing Ruby or Rails methods that are common to all objects -- like, for example, `new`.
+
+- Before this feature, enums always rendered like this on the show page:
+`<%= domain.status %>`
+(or, if you use custom labels:)
+`<%= Domain.status_labels(domain.status)`
+
+- After, you if you use the `--modify` flag and modify the enum to 'partials', your show output will render:
+```
+<%= render partial: thing.status, locals: {thing: thing} %>
+```
+(In this example `Thing` is the name of the model being built.)
+
+Your form will also render the partial, but after the collection_select used to create the drop-down.
+(This implementation has the draw-back that there is no immediate switch between the partials when changing the drop-down)
+
+Assuming your Thing enum is defined like so:
+```
+enum :status {abc: 'abc', dfg: 'dfg', hgk: 'hgk'}
+```
+
+You then would create three partials in the `things` directory. Make sure to create a partial for each defined enum, or else your app will crash when it tries to render a record with that enum.
+```
+_abc.html.erb
+_dfg.html.erb
+_hgk.html.erb
+```
+
+If your enum is on the show-only list, then the drop-down does not appear (but the partial is rendered).
+
+Proof-of-concept can be found here:
+https://github.com/hot-glue-for-rails/HGEnumWithPartials1
+
+Remember to see the section marked 'A Note About Enums' for more about working with Rails 7 enums.
+
+
 #### 2023-09-20- v0.5.22
 - adds back magic button tap-away params in the controller
 - changes creation of flash[:notice] in update method

@@ -16,7 +16,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_17_162618) do
 
   # Custom types defined in this database.
   # Note that some types may not work with other database engines. Be careful if changing database.
-  create_enum "genres", ["Fiction", "Nonfiction", "Mystery", "Romance", "Novel"]
+  create_enum "genre", ["Fiction", "Nonfiction", "Mystery", "Romance", "Novel"]
 
   create_table "abcs", force: :cascade do |t|
     t.string "name"
@@ -139,7 +139,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_17_162618) do
     t.date "release_on"
     t.time "time_of_day"
     t.boolean "selected"
-    t.enum "genre", enum_type: "genres"
+    t.enum "genre", enum_type: "genre"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
