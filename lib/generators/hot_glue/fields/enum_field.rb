@@ -38,12 +38,13 @@ class EnumField < Field
       enum_definer = "#{class_name}.defined_enums['#{name}']"
     end
 
-    byebug
-    if modify[name].keys.include?(:enum)
-    else
-      "<%= f.collection_select(:#{name},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: #{singular}.#{name} }, class: 'form-control') %>"
+    res = "<%= f.collection_select(:#{name},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: #{singular}.#{name} }, class: 'form-control') %>"
 
+
+    if modify && modify[:enum] == :partials
+      res << partial_render
     end
+    res
   end
 
   def line_field_output
@@ -54,13 +55,24 @@ class EnumField < Field
     else
       enum_definer = "#{class_name}.defined_enums['#{name}']"
     end
-    "
+
+    res = "
     <% if #{singular}.#{name}.nil? %>
-        <span class='alert-danger'>MISSING</span>
-    <% else %>
-      <%=  #{enum_definer}[#{singular}.#{name}.to_sym] %>
-    <% end %>
-"
+        <span class='alert-danger'>Missing #{name}</span>
+    <% else %>"
+
+    if modify && modify[:enum] == :partials
+      res << partial_render
+    else
+      res << "<%=  #{enum_definer}[#{singular}.#{name}.to_sym] %>"
+    end
+
+    res << "<% end %>"
+    res
+  end
+
+  def partial_render
+    "<%=  render partial: #{singular}.#{name}, locals: { #{singular}: #{singular} } %>"
   end
 
 
