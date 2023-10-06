@@ -2,9 +2,9 @@
  if (eval(@singular_class).instance_methods.include?(display_class.to_s))
   item1_addOns << "#{display_class}: FFaker::Name.name"
  end
-item1_addOns << ", " + @columns_map.collect{|col, col_object|
+item1_addOns << ", \n                          " + @columns_map.collect{|col, col_object|
   col_object.spec_setup_let_arg
-}.compact.join(", ")
+}.compact.join(", \n                          ")
 %>require 'rails_helper'
 
 describe 'interaction for <%= controller_class_name %>' do
@@ -14,7 +14,18 @@ describe 'interaction for <%= controller_class_name %>' do
   <%= @existing_content %>
   <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<% end %>
 <%= spec_related_column_lets %>
-  let!(:<%= singular %>1) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )}
+  let!(:<%= singular %>1) {
+    <%= singular %> = create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )
+<%= @attachments.collect{ |attachment|
+    "    #{singular}.#{ attachment[0].to_s }.attach(
+      io: File.open('spec/fixtures/glass_button.png'),
+      filename: 'glass_button.png',
+      content_type: 'image/png')"
+     }.join("\n")
+   %>
+    <%=singular%>.save!
+    <%=singular%>
+  }
 <%= objest_nest_factory_setup %> <% unless @god || (@existing_content && @existing_content.include?("login_as")) %>
   before do
     login_as(<%= @auth %>)
