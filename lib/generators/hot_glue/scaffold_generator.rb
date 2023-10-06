@@ -722,6 +722,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           @existing_content = existing_content[(existing_content =~ /\#HOTGLUE-SAVESTART/)..(existing_content =~ /\#HOTGLUE-END/) - 1]
           @existing_content << "#HOTGLUE-END"
 
+        else
+          @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
         end
         existing_file.rewind
       else
@@ -769,7 +771,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def regenerate_me_code
-    "rails generate hot_glue:scaffold #{ @meta_args[0][0] } #{@meta_args[1].collect { |x| x.gsub(/\s*=\s*([\S\s]+)/, '=\'\1\'') }.join(" ")}"
+    "bin/rails generate hot_glue:scaffold #{ @meta_args[0][0] } #{@meta_args[1].collect { |x| x.gsub(/\s*=\s*([\S\s]+)/, '=\'\1\'') }.join(" ")}"
   end
 
   def object_parent_mapping_as_argument_for_specs
