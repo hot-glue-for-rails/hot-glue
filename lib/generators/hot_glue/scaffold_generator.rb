@@ -715,19 +715,19 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       if File.exist?(dest_file)
         existing_file = File.open(dest_file)
         existing_content = existing_file.read
-        if existing_content =~ /\#HOTGLUE-SAVESTART/
-          if existing_content !~ /\#HOTGLUE-END/
-            raise "Your file at #{dest_file} contains a #HOTGLUE-SAVESTART marker without #HOTGLUE-END"
+        if existing_content =~ /\# HOTGLUE-SAVESTART/
+          if existing_content !~ /\# HOTGLUE-END/
+            raise "Your file at #{dest_file} contains a # HOTGLUE-SAVESTART marker without # HOTGLUE-END"
           end
-          @existing_content = existing_content[(existing_content =~ /\#HOTGLUE-SAVESTART/)..(existing_content =~ /\#HOTGLUE-END/) - 1]
-          @existing_content << "#HOTGLUE-END"
+          @existing_content = existing_content[(existing_content =~ /\# HOTGLUE-SAVESTART/)..(existing_content =~ /\# HOTGLUE-END/) - 1]
+          @existing_content << "# HOTGLUE-END"
 
         else
-          @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
+          @existing_content = "  # HOTGLUE-SAVESTART\n  # HOTGLUE-END"
         end
         existing_file.rewind
       else
-        @existing_content = "  #HOTGLUE-SAVESTART\n  #HOTGLUE-END"
+        @existing_content = "  # HOTGLUE-SAVESTART\n  # HOTGLUE-END"
       end
 
       template "system_spec.rb.erb", dest_file
