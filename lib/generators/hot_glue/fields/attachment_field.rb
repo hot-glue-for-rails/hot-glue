@@ -14,7 +14,17 @@ class AttachmentField < Field
     nil
   end
 
-  def spec_setup_and_change_act(which_partial = nil)
+  def spec_list_view_natural_assertion
+    "within('div.#{singular}--#{name}') do
+        img = page.find('img')
+        expect(img['src']).to end_with('glass_button.png')
+      end"
+
+    # "expect(page).to have_content(#{singular}#{1}.#{name})"
+  end
+
+
+def spec_setup_and_change_act(which_partial = nil)
     "      attach_file(\"#{singular}[#{name.to_s}]\", \"#{sample_file_path}\")"
   end
 
