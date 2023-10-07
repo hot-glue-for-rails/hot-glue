@@ -16,7 +16,7 @@ class TextField < Field
     if sql_type == "varchar" || sql_type == "character varying"
       field_output( nil, limit || 40)
     else
-      text_area_output( 65536)
+      text_area_output( 65536, extra_classes: (modify_as == {tinymce: 1} ? " tinymce" : "" ))
     end
   end
 
