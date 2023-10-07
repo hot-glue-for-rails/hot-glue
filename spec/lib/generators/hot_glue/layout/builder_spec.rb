@@ -49,7 +49,7 @@ describe HotGlue::Layout::Builder do
                                 portals: {},
                                 display_as: nil,
                                 buttons: {:size=>2},
-                                modify: nil })
+                                modify_as: nil })
 
         end
       end

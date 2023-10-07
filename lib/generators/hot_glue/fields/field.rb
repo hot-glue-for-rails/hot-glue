@@ -1,6 +1,7 @@
 class Field
   attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :auth,
-                :assoc_label,  :class_name, :default_boolean_display, :display_as, :form_placeholder_labels, :form_labels_position,
+                :assoc_label,  :class_name, :default_boolean_display, :display_as, :form_placeholder_labels,
+                :form_labels_position,
                 :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :object, :sample_file_path,
                 :singular_class,  :singular, :sql_type, :ownership_field,
                 :update_show_only
