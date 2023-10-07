@@ -17,7 +17,7 @@ module HotGlue
 
         @generator = generator
 
-        @modify = generator.modify
+        @modify_as = generator.modify_as
         @display_as =  generator.display_as
         @columns = generator.columns
         @smart_layout = generator.smart_layout
@@ -46,7 +46,7 @@ module HotGlue
 
           },
           buttons: { size: @buttons_width},
-          modify: @modify,
+          modify_as: @modify_as,
           display_as: @display_as
         }
 

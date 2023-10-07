@@ -23,9 +23,9 @@ class BooleanField < Field
 
   def radio_button_display
     "  <%= f.radio_button(:#{name}, '0', checked: #{singular}.#{name}  ? '' : 'checked', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
-      "  <%= f.label(:#{name}, value: '#{modify_binary? && modify[:binary][:falsy] || 'No'}', for: '#{singular}_#{name}_0') %>\n" +
+      "  <%= f.label(:#{name}, value: '#{modify_binary? && modify_as[:binary][:falsy] || 'No'}', for: '#{singular}_#{name}_0') %>\n" +
       " <br /> <%= f.radio_button(:#{name}, '1',  checked: #{singular}.#{name}  ? 'checked' : '' , class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
-      "  <%= f.label(:#{name}, value: '#{modify_binary? && modify[:binary][:truthy] || 'Yes'}', for: '#{singular}_#{name}_1') %>\n"
+      "  <%= f.label(:#{name}, value: '#{modify_binary? && modify_as[:binary][:truthy] || 'Yes'}', for: '#{singular}_#{name}_1') %>\n"
   end
 
   def checkbox_display
@@ -60,9 +60,9 @@ class BooleanField < Field
       "<% if #{singular}.#{name}.nil? %>
         <span class='alert-danger'>MISSING</span>
     <% elsif #{singular}.#{name} %>
-      #{modify[:binary][:truthy]}
+      #{modify_as[:binary][:truthy]}
     <% else %>
-      #{modify[:binary][:falsy]}
+      #{modify_as[:binary][:falsy]}
     <% end %>"
     else
       "<% if #{singular}.#{name}.nil? %>
