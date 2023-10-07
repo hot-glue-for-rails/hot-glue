@@ -1465,10 +1465,12 @@ bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 #### TBR -
 
 • TinyMCE implementation
+
 • In the behavior specs, there is a code marker (start & end) where you can insert custom code that gets saved between 
 build. The start code maker has changed from `#HOTGLUE-SAVESTART` to `# HOTGLUE-SAVESTART`
 and the end code marker has changed from `#HOTGLUE-END` to `# HOTGLUE-END`. This now conforms to Rubocop. 
 Be sure to do find & replace in your existing projects to keep your custom code.
+
 
 
 #### 2023-10-01 - v0.5.23

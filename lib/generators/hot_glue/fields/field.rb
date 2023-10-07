@@ -1,7 +1,8 @@
 class Field
   attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :auth,
-                :assoc_label,  :class_name, :default_boolean_display, :display_as, :form_placeholder_labels, :form_labels_position,
-                :hawk_keys,   :layout_strategy, :limit, :modify, :name, :object, :sample_file_path,
+                :assoc_label,  :class_name, :default_boolean_display, :display_as, :form_placeholder_labels,
+                :form_labels_position,
+                :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :object, :sample_file_path,
                 :singular_class,  :singular, :sql_type, :ownership_field,
                 :update_show_only
 
@@ -16,7 +17,7 @@ class Field
     form_placeholder_labels: ,
     hawk_keys: nil,
     layout_strategy:  ,
-    modify: ,
+    modify_as: ,   #note non-standard naming as to avoid collision with Ruby reserved word modify
     name: ,
     ownership_field: ,
     sample_file_path: nil,
@@ -35,7 +36,7 @@ class Field
     @form_placeholder_labels = form_placeholder_labels
     @ownership_field = ownership_field
     @form_labels_position = form_labels_position
-    @modify = modify
+    @modify_as = modify_as
     @display_as = display_as
 
     @default_boolean_display = default_boolean_display
@@ -72,7 +73,7 @@ class Field
     if !modify_binary?
       "expect(page).to have_content(new_#{name})"
     else
-      "expect(page).to have_content('#{modify[:binary][:truthy]}'"
+      "expect(page).to have_content('#{modify_as[:binary][:truthy]}'"
     end
   end
 
@@ -87,7 +88,7 @@ class Field
 
   def spec_list_view_assertion
     if modify_binary?
-      "expect(page).to have_content('#{modify[:binary][:truthy]}'"
+      "expect(page).to have_content('#{modify_as[:binary][:truthy]}'"
     else
       spec_list_view_natural_assertion
     end
@@ -107,7 +108,7 @@ class Field
   end
 
   def viewable_output
-    if modify
+    if modify_as
       modified_display_output
     else
       "<%= #{singular}.#{name} %>"
@@ -115,11 +116,13 @@ class Field
   end
 
   def modified_display_output
-    if modify[:cast] && modify[:cast] == "$"
+    if modify_as[:cast] && modify_as[:cast] == "$"
       "<%= number_to_currency(#{singular}.#{name}) %>"
-    elsif modify[:binary]
-      "<%= #{singular}.#{name} ? '#{modify[:binary][:truthy]}' : '#{modify[:binary][:falsy]}' %>"
-    elsif modify[:enum]
+    elsif modify_as[:binary]
+      "<%= #{singular}.#{name} ? '#{modify_as[:binary][:truthy]}' : '#{modify_as[:binary][:falsy]}' %>"
+    elsif modify_as[:tinymce]
+
+    elsif modify_as[:enum]
       "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
     end
   end
@@ -128,16 +131,16 @@ class Field
     "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  +  " %>\n " + "\n"
   end
 
-  def text_area_output(field_length )
+  def text_area_output(field_length, extra_classes: "")
     lines = field_length % 40
     if lines > 5
       lines = 5
     end
-    "<%= f.text_area :#{name}, class: 'form-control', autocomplete: 'off', cols: 40, rows: '#{lines}'"  + ( form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "") + " %>"
+    "<%= f.text_area :#{name}, class: 'form-control#{extra_classes}', autocomplete: 'off', cols: 40, rows: '#{lines}'"  + ( form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "") + " %>"
   end
 
   def modify_binary? # safe
-    !!(modify && modify[:binary])
+    !!(modify_as && modify_as[:binary])
   end
 
   def display_boolean_as
