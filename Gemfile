@@ -31,5 +31,3 @@ gem "puma", "~> 5.0"
 gem "devise"
 
 gem "pg", "~> 1.5"
-
-gem "rspec_junit_formatter", "~> 0.6.0"
