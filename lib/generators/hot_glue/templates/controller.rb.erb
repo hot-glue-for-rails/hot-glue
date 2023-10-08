@@ -79,7 +79,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   def index
     load_all_<%= plural %><% if @pundit %>
   rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized to perform this action."<% end %>
+    flash[:alert] = "You are not authorized to perform this action."
+    render "layouts/error"<% end %>
   end
 
 <% if create_action %>  def new<% if @object_owner_sym %>
