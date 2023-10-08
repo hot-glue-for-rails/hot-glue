@@ -1466,17 +1466,14 @@ bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 
 #### 2023-10-07 - v0.5.24
 
-• TinyMCE implementation. See 'TinyMCE' above. 
-
-Note: I plan to also implement ActionText as an alternative in the future. However, because TinyMCE is implemented with a `text` field type an ActionText is implemented with a Rails-specific `rich_text` field type, the two mechanisms will be incompatible with one another. TinyMCE has an annoying drawback in how it works with Turbo refreshes (not very consistently), and style of loading Javascript is discordant with Rails moving forward. So I am leaving this implementation as experimental. 
-
-• Spec Savestart code: In the behavior specs, there is a code marker (start & end) where you can insert custom code that gets saved between 
+- TinyMCE implementation. See 'TinyMCE' above.
+Note: I plan to also implement ActionText as an alternative in the future. However, because TinyMCE is implemented with a `text` field type an ActionText is implemented with a Rails-specific `rich_text` field type, the two mechanisms will be incompatible with one another. TinyMCE has an annoying drawback in how it works with Turbo refreshes (not very consistently), and style of loading Javascript is discordant with Rails moving forward. So I am leaving this implementation as experimental.
+- Spec Savestart code: In the behavior specs, there is a code marker (start & end) where you can insert custom code that gets saved between 
 build. The start code maker has changed from `#HOTGLUE-SAVESTART` to `# HOTGLUE-SAVESTART`
 and the end code marker has changed from `#HOTGLUE-END` to `# HOTGLUE-END`. This now conforms to Rubocop. 
 Be sure to do find & replace in your existing projects to keep your custom code.
-
-• Fix for specs for attachment fields. If you have attachments fields, you must have a sample file at `spec/fixtures/glass_button.png`
-
+- Fix for specs for attachment fields. If you have attachments fields, you must have a sample file at `spec/fixtures/glass_button.png`
+- Pundit now correctly protects the `index` action (authorize was missing before)
 
 #### 2023-10-01 - v0.5.23
 
