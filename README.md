@@ -1402,7 +1402,76 @@ end
 
 ```
 
+
+### TinyMCE
+1. `bundle add tinymce-rails` to add it to your Gemfile
+
+2. Add this inside of your `<head>` tag (at the bottom is fine)
+```
+    <%= tinymce_assets %>
+```
+3. Then, also inside of your `<head>` tag, add this:
+```
+ <script>
+      TinyMCERails.configuration.default = {
+        selector: "textarea.tinymce",
+        cache_suffix: "?v=6.7.0",
+        menubar: "insert view format table tools",
+        toolbar: ["bold italic | link | undo redo | forecolor backcolor | bullist numlist outdent indent | table | uploadimage | code"],
+        plugins: "table,fullscreen,image,code,searchreplace,wordcount,visualblocks,visualchars,link,charmap,directionality,nonbreaking,media,advlist,autolink,lists",
+        images_upload_url: "/uploader/image"
+      };
+      
+    </script>
+```
+
+(Note that the `tinymce_assets` helper method provided by the Gem method generates its own script tags so don't try to put that helper inside the other code.)
+
+
+Generate a stimulus controller
+```
+rails generate stimulus TinyMceController
+```
+
+
+Replace the boilerplate with:
+```
+import { Controller } from "@hotwired/stimulus"
+
+// Connects to data-controller="tiny-mce"
+export default class extends Controller {
+  connect() {
+    TinyMCERails.initialize('default', {
+      convert_urls: true,
+      uploadimage: true
+    });
+  }
+}
+
+```
+
+When generating text_area fields only, you may now use `--modify` with the modifier `tinymce`. 
+
+For example, to display the field `my_story` on the object `Thing`, you'd generate with:
+
+```
+bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
+```
+
+
+
 # VERSION HISTORY
+
+#### TBR -
+
+• TinyMCE implementation
+
+• In the behavior specs, there is a code marker (start & end) where you can insert custom code that gets saved between 
+build. The start code maker has changed from `#HOTGLUE-SAVESTART` to `# HOTGLUE-SAVESTART`
+and the end code marker has changed from `#HOTGLUE-END` to `# HOTGLUE-END`. This now conforms to Rubocop. 
+Be sure to do find & replace in your existing projects to keep your custom code.
+
+
 
 #### 2023-10-01 - v0.5.23
 

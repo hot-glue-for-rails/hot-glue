@@ -18,7 +18,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   source_root File.expand_path('templates', __dir__)
   attr_accessor :alt_lookups, :attachments, :auth, :big_edit, :button_icons, :bootstrap_column_width, :columns,
                 :default_boolean_display,
-                :display_as, :downnest_children, :downnest_object, :hawk_keys, :layout_object, :modify,
+                :display_as, :downnest_children, :downnest_object, :hawk_keys, :layout_object,
+                :modify_as,
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting, :update_show_only, :ownership_field,
                 :layout_strategy, :form_placeholder_labels, :form_labels_position, :pundit
@@ -204,7 +205,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       puts "show only field #{@show_only}}"
     end
 
-    @modify = {}
+    @modify_as = {}
     if !options['modify'].empty?
 
       modify_input = options['modify'].split(",")
@@ -213,13 +214,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         key, lookup_as = $1, $2
 
         if ["$"].include?($2)
-          @modify[key.to_sym] =  {cast: $2}
+          @modify_as[key.to_sym] =  {cast: $2}
         elsif $2.include?("|")
           binary = $2.split("|")
-          @modify[key.to_sym] =  {binary: {truthy: binary[0], falsy: binary[1]}}
+          @modify_as[key.to_sym] =  {binary: {truthy: binary[0], falsy: binary[1]}}
         elsif $2 == "partial"
-          @modify[key.to_sym] =  {enum: :partials}
-
+          @modify_as[key.to_sym] =  {enum: :partials}
+        elsif $2 == "tinymce"
+          @modify_as[key.to_sym] =  {tinymce: 1}
         else
           raise "unknown modification direction #{$2}"
         end

@@ -5,7 +5,7 @@ describe FieldFactory do
     ff = FieldFactory.new(type: :integer,
                           name: "how_many",
                           generator: OpenStruct.new({
-                                                  modify: {},
+                                                  modify_as: {},
                                                   display_as: {},
                                                   default_boolean_display: 'radio',
                                                   form_labels_position: nil,

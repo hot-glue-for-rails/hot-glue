@@ -41,7 +41,7 @@ class EnumField < Field
     res = "<%= f.collection_select(:#{name},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: #{singular}.#{name} }, class: 'form-control') %>"
 
 
-    if modify && modify[:enum] == :partials
+    if modify_as && modify_as[:enum] == :partials
       res << partial_render
     end
     res
@@ -61,7 +61,7 @@ class EnumField < Field
         <span class='alert-danger'>Missing #{name}</span>
     <% else %>"
 
-    if modify && modify[:enum] == :partials
+    if modify_as && modify_as[:enum] == :partials
       res << partial_render
     else
       res << "<%=  #{enum_definer}[#{singular}.#{name}.to_sym] %>"
