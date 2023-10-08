@@ -664,13 +664,16 @@ For booleans shown as checkboxes or switches, it affects only the view output as
 
 You will need to separately specify them as show-only if you want them to be non-editable.
 
-The available modifiers are:
+Notice that each modifiers can be used with specific field types. 
 
-| modifier                  | what it does                                                                                                                                                         | can be used on                |   |   |
-|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|---|---|
-| $                         | wraps output in `number_to_currency()`                                                                                                                               | float, integer                |   |   |
-| truthy label\|falsy label | specify a binary switch with a pipe (\|) character if the value is truthy, it will display as "truthy label" if the value is falsy, it will display as "falsy label" | boolean, datetime, date, time |   |   |
-|                           |                                                                                                                                                                      |                               |   |   |
+| user modifier                 | what it does                                                                                                                                                     | Field types                       |   |   |
+|-------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|---|---|
+| $                             | wraps output in `number_to_currency()`                                                                                                                           | floats and integers               |   |   |
+| (truthy label)\|(falsy label) | specify a binary switch with a pipe (\|) character if the value is truthy, it will display as "truthy label" if the value is falsy, it will display as "falsy label" | booleans, datetimes, dates, times |   |    |
+| partials                      | applies to enums only, you must have a partial whose name matches each enum type                                                                                 | enums only                        |   |   |
+| tinymce                       | applies to text fields only, be sure to setup TineMCE globally                                                                                                   | text fields only                  |    |   |
+
+Except for "(truthy label)" and "(falsy label)" which represent the labels you should specify separated by the pipe character (|), use the modifier exactly as shown.
 
 ### `--pundit`
 If you enable Pundit, your controllers will look for a Policy that matches the name of the thing being built.
@@ -1412,7 +1415,7 @@ end
 ```
 3. Then, also inside of your `<head>` tag, add this:
 ```
- <script>
+<script>
       TinyMCERails.configuration.default = {
         selector: "textarea.tinymce",
         cache_suffix: "?v=6.7.0",
@@ -1421,36 +1424,37 @@ end
         plugins: "table,fullscreen,image,code,searchreplace,wordcount,visualblocks,visualchars,link,charmap,directionality,nonbreaking,media,advlist,autolink,lists",
         images_upload_url: "/uploader/image"
       };
-      
+
     </script>
 ```
 
-(Note that the `tinymce_assets` helper method provided by the Gem method generates its own script tags so don't try to put that helper inside the other code.)
+Then to `application.js` add
 
-
-Generate a stimulus controller
 ```
-rails generate stimulus TinyMceController
+import "./tinymce_init"
+
 ```
 
+create a file `tinymce_init.js` with this content
 
-Replace the boilerplate with:
 ```
-import { Controller } from "@hotwired/stimulus"
-
-// Connects to data-controller="tiny-mce"
-export default class extends Controller {
-  connect() {
-    TinyMCERails.initialize('default', {
-      convert_urls: true,
-      uploadimage: true
-    });
-  }
+const reinitTiny = () => {
+  tinymce.init({
+    selector: 'textarea.tinymce', // Add the appropriate selector for your textareas
+    // Other TinyMCE configuration options
+  });
 }
 
+window.addEventListener('turbo:before-fetch-response', () => {
+  tinymce.remove();
+  tinymce.init({selector:'textarea.tinymce'});
+})
+
+window.addEventListener('turbo:frame-render', reinitTiny)
+window.addEventListener('turbo:render', reinitTiny)
 ```
 
-When generating text_area fields only, you may now use `--modify` with the modifier `tinymce`. 
+Once you have completed this setup, you can now use `--modify` with the modifier `tinymce`. 
 
 For example, to display the field `my_story` on the object `Thing`, you'd generate with:
 
@@ -1458,19 +1462,20 @@ For example, to display the field `my_story` on the object `Thing`, you'd genera
 bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 ```
 
-
-
 # VERSION HISTORY
 
-#### TBR -
+#### 2023-10-07 - v0.5.24
 
-• TinyMCE implementation
+• TinyMCE implementation. See 'TinyMCE' above. 
 
-• In the behavior specs, there is a code marker (start & end) where you can insert custom code that gets saved between 
+Note: I plan to also implement ActionText as an alternative in the future. However, because TinyMCE is implemented with a `text` field type an ActionText is implemented with a Rails-specific `rich_text` field type, the two mechanisms will be incompatible with one another. TinyMCE has an annoying drawback in how it works with Turbo refreshes (not very consistently), and style of loading Javascript is discordant with Rails moving forward. So I am leaving this implementation as experimental. 
+
+• Spec Savestart code: In the behavior specs, there is a code marker (start & end) where you can insert custom code that gets saved between 
 build. The start code maker has changed from `#HOTGLUE-SAVESTART` to `# HOTGLUE-SAVESTART`
 and the end code marker has changed from `#HOTGLUE-END` to `# HOTGLUE-END`. This now conforms to Rubocop. 
 Be sure to do find & replace in your existing projects to keep your custom code.
 
+• Fix for specs for attachment fields. If you have attachments fields, you must have a sample file at `spec/fixtures/glass_button.png`
 
 
 #### 2023-10-01 - v0.5.23
