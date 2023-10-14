@@ -68,7 +68,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
 
   def load_all_<%= plural %><% if @pundit %>
-    @<%= plural_name %> =  policy_scope(<%= class_name %>).page(params[:page])<%= n_plus_one_includes %>
+    @<%= plural_name %> =  policy_scope(<%= object_scope %>).page(params[:page])<%= n_plus_one_includes %>
     authorize @<%= plural_name %>.all<% else %> <% if !@self_auth %>
     @<%= plural_name %> = <%= object_scope.gsub("@",'') %>.page(params[:page])<%= n_plus_one_includes %><%= " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] %><% if @nested_set[0] &&  @nested_set[0][:optional] %>
     @<%= plural_name %> = <%= class_name %>.all<% end %><% else %>
