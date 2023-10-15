@@ -22,7 +22,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :modify_as,
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting, :update_show_only, :ownership_field,
-                :layout_strategy, :form_placeholder_labels, :form_labels_position, :pundit
+                :layout_strategy, :form_placeholder_labels, :form_labels_position, :pundit,
+                :self_auth
 
   class_option :singular, type: :string, default: nil
   class_option :plural, type: :string, default: nil
@@ -746,6 +747,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def testing_name
     singular_class.gsub("::", "_").underscore
+  end
+
+  def factory_testing_name
+    if !@self_auth
+      "#{testing_name}1"
+    else
+      "current_#{testing_name}"
+    end
   end
 
   def spec_related_column_lets

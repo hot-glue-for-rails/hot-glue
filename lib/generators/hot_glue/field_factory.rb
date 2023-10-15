@@ -55,6 +55,7 @@ class FieldFactory
                              class_name: generator.singular_class,
                              alt_lookups: generator.alt_lookups,
                              singular: generator.singular,
+                             self_auth: generator.self_auth,
                              update_show_only: generator.update_show_only,
                              attachment_data: generator.attachments[name.to_sym],
                              sample_file_path: generator.sample_file_path,
