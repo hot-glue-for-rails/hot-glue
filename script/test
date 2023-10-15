@@ -30,7 +30,7 @@ bin/rails generate hot_glue:scaffold Pet --gd
 
 bin/rails generate hot_glue:scaffold Human --gd
 
-rails generate hot_glue:scaffold User --no-create --self-auth
+bin/rails generate hot_glue:scaffold User --no-create --self-auth
 
 
 #rails generate hot_glue:scaffold Jkl --gd
