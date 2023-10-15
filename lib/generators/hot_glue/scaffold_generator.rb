@@ -751,9 +751,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def factory_testing_name
     if !@self_auth
-      "#{testing_name}1"
+      "#{singular}1"
     else
-      "current_#{testing_name}"
+      "current_#{singular}"
     end
   end
 
