@@ -3,6 +3,7 @@ class Field
                 :assoc_label,  :class_name, :default_boolean_display, :display_as, :form_placeholder_labels,
                 :form_labels_position,
                 :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :object, :sample_file_path,
+                :self_auth,
                 :singular_class,  :singular, :sql_type, :ownership_field,
                 :update_show_only
 
@@ -22,7 +23,8 @@ class Field
     ownership_field: ,
     sample_file_path: nil,
     singular: ,
-    update_show_only:
+    update_show_only:,
+    self_auth:
   )
     @name = name
     @layout_strategy = layout_strategy
@@ -39,6 +41,7 @@ class Field
     @modify_as = modify_as
     @display_as = display_as
 
+    @self_auth = self_auth
     @default_boolean_display = default_boolean_display
 
     # TODO: remove knowledge of subclasses from Field
@@ -83,7 +86,11 @@ class Field
   end
 
   def spec_list_view_natural_assertion
-    "expect(page).to have_content(#{singular}#{1}.#{name})"
+    if !self_auth
+      "expect(page).to have_content(#{singular}#{1}.#{name})"
+    else
+      "expect(page).to have_content(current_#{singular}.#{name})"
+    end
   end
 
   def spec_list_view_assertion

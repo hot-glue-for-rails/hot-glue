@@ -1968,7 +1968,5 @@ To run only the internal specs, use
 
 `rspec spec`
 
-Internal Test coverage as of 2023-02-10 (v0.5.7)
-
-<img width="1202" alt="Screen Shot 2023-02-10 at 4 43 59 PM" src="https://user-images.githubusercontent.com/59002/218204736-5740505b-1ec8-456f-b0fb-9c359f6f7037.png">
-
+Internal Test coverage as of 2023-10-15 (v0.5.24)
+All Files ( 86.29% covered at 75.64 hits/line )

@@ -14,7 +14,7 @@ describe 'interaction for <%= controller_class_name %>' do
   <%= @existing_content %>
   <% unless @god %>let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<% end %>
 <%= spec_related_column_lets %>
-  let!(:<%= singular %>1) {
+ <% unless @self_auth %> let!(:<%= singular %>1) {
     <%= singular %> = create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> <%= item1_addOns %> )
 <%= @attachments.collect{ |attachment|
     "    #{singular}.#{ attachment[0].to_s }.attach(
@@ -25,7 +25,7 @@ describe 'interaction for <%= controller_class_name %>' do
    %>
     <%=singular%>.save!
     <%=singular%>
-  }
+  }<% end %>
 <%= objest_nest_factory_setup %> <% unless @god || (@existing_content && @existing_content.include?("login_as")) %>
   before do
     login_as(<%= @auth %>)
@@ -64,25 +64,25 @@ describe 'interaction for <%= controller_class_name %>' do
   describe "edit & update" do
     it "should return an editable form" do
       visit <%= path_helper_plural %>
-      find("a.edit-<%= singular %>-button[href='/<%= namespace_with_slash %><%= plural %>/#{<%= singular %>1.id}/edit']").click
+      find("a.edit-<%= singular %>-button[href='/<%= namespace_with_slash %><%= plural %>/#{<%= factory_testing_name %>.id}/edit']").click
 
-      expect(page).to have_content("Editing #{<%= singular %>1.<%= @display_class %>.squish || "(no name)"}")
+      expect(page).to have_content("Editing #{<%= factory_testing_name %>.<%= @display_class %>.squish || "(no name)"}")
 <%= capybara_make_updates(:update) %>
       click_button "Save"
-      within("turbo-frame#<%= @namespace %>__#{dom_id(<%= singular %>1)} ") do
+      within("turbo-frame#<%= @namespace %>__#{dom_id(<%= factory_testing_name %>)} ") do
 <%= "        " + @columns_map.map{ |col, col_object|
   if @attachments.keys.collect(&:to_sym).include?(col)
   elsif @show_only.include?(col)
   else
       col_object.spec_make_assertion
   end
- }.compact.join("\n        ")
+ }.compact.join("\n       ")
   %>
       end
     end
-  end <% end %>
+  end <% end %><% if destroy_action %>
 
-<% unless @no_delete %>  describe "destroy" do
+  describe "destroy" do
     it "should destroy" do
       visit <%= path_helper_plural %>
       accept_alert do
