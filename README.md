@@ -1478,9 +1478,9 @@ bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 
 A new flag `--paginate-per-page-selector` (default false) will allow you to show a small drop-down to let the user choose 10, 25, or 100 results per page.
 
-To get pagination to work, you have either #1 OR #2 below. #1 will replace the templates in app/views/kaminari so don't do that if you have modified them since first generating them out of Kaminari.
+To get pagination to work, choose either #1 OR #2 below. #1 will replace the templates in app/views/kaminari so don't do that if you have modified them since first generating them out of Kaminari.
 
-1. replace the kaminari gem with my fork and regenerate your templates
+1. Replace the kaminari gem with my fork and regenerate your templates
 bundle remove kaminari
 bundle add kaminari --git="https://github.com/jasonfb/kaminari.git" --branch="master"
 bundle install
