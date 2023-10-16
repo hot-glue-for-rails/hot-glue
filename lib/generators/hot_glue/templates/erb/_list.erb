@@ -51,6 +51,12 @@
       <%= @nested_set.collect{|arg| "      .merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join("\n") %>
         %>
       <\% end %>
+      <% if @paginate_per_page_selector %>
+        <\%= form_with url: things_path, method: :get do |f| %>
+           Show per page
+        <\%= f.collection_select  "per", [10, 25, 100], :to_s, :to_s, {prompt: true, selected: params[:per]}, {onChange: "this.form.submit();"} %>
+        <\% end %>
+      <% end %>
     <%=  @no_paginate ? "" : paginate %>
   <% end  %>
   </div>
