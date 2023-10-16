@@ -894,9 +894,14 @@ Produces ONLY the controller spec file, nothing else.
 Produces all the files except the spec file.
 
 
-### `--no-paginate`
+### `--no-paginate` (default: false)
 
 Omits pagination. (All list views have pagination by default.)
+
+### `--paginate-per-page-selector` (default: false)
+
+Show a small drop-down below the list to let the user choose 10, 25, or 100 results per page.
+
 
 ### `--no-list`
 
@@ -1463,6 +1468,29 @@ bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 ```
 
 # VERSION HISTORY
+
+#### 2023-10-16 - v0.5.25
+
+- Fixes scoping on Pundit-built controllers; even when using pundit we should still wrap to the current build's own ownership scope (#132
+- don't write to the nav file if we're building a nested controller (#134)
+- adds system specs for self-auth feature
+- Pagination Fixes:
+
+A new flag `--paginate-per-page-selector` (default false) will allow you to show a small drop-down to let the user choose 10, 25, or 100 results per page.
+
+To get pagination to work, choose either #1 OR #2 below. #1 will replace the templates in app/views/kaminari so don't do that if you have modified them since first generating them out of Kaminari.
+
+1. Replace the kaminari gem with my fork and regenerate your templates
+bundle remove kaminari
+bundle add kaminari --git="https://github.com/jasonfb/kaminari.git" --branch="master"
+bundle install
+rm -rf app/views/kaminari
+rails g kaminari:config
+
+
+2. Go into app/views/kaminari/ and modify each template in this folder by adding ` 'data-turbo-action': 'advance'` to all of the links (which mostly appear in this code as the `link_to_unless` helper-- add the parameter onto the end of the calls to those helpers.) 
+
+
 
 #### 2023-10-07 - v0.5.24
 
