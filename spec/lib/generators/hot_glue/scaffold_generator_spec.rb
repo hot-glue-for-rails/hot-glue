@@ -443,7 +443,7 @@ describe HotGlue::ScaffoldGenerator do
               file = File.read("spec/dummy/app/views/users/_show.erb")
 
               expect(file).to include("<div class='col-sm-2 user--email'> <%= user.email %></div>")
-              expect(file).to include("<div class='col-sm-2 user--family_id'> <%= user.family.try(:name) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %></div>")
+              expect(file).to include("<div class='col-sm-2 user--family_id'> <%= user.family.try(:name) || '<span class=\"content\">MISSING</span>'.html_safe %></div>")
             end
           end
 

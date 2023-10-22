@@ -38,7 +38,7 @@ class BooleanField < Field
 
   def form_field_display
     if display_boolean_as.nil?
-      byebug
+
     end
     "<div class='#{@layout_strategy.form_checkbox_wrapper_class} #{'form-switch' if display_boolean_as == 'switch'}'>\n" +
       (if display_boolean_as == 'radio'
@@ -58,7 +58,7 @@ class BooleanField < Field
   def line_field_output
     if modify_binary?
       "<% if #{singular}.#{name}.nil? %>
-        <span class='alert-danger'>MISSING</span>
+        <span class=''>MISSING</span>
     <% elsif #{singular}.#{name} %>
       #{modify_as[:binary][:truthy]}
     <% else %>
@@ -66,7 +66,7 @@ class BooleanField < Field
     <% end %>"
     else
       "<% if #{singular}.#{name}.nil? %>
-        <span class='alert-danger'>MISSING</span>
+        <span class=''>MISSING</span>
     <% elsif #{singular}.#{name} %>
       YES
     <% else %>

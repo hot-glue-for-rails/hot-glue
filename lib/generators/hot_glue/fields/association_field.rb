@@ -111,7 +111,7 @@ class AssociationField < Field
   end
 
   def field_error_name
-    name
+    assoc_name
   end
 
   def form_show_only_output
@@ -140,6 +140,6 @@ class AssociationField < Field
 
     display_column =  HotGlue.derrive_reference_name(assoc_class.to_s)
 
-    "<%= #{singular}.#{assoc}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe %>"
+    "<%= #{singular}.#{assoc}.try(:#{display_column}) || '<span class=\"content \">MISSING</span>'.html_safe %>"
   end
 end
