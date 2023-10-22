@@ -137,7 +137,7 @@ describe HotGlue::ErbTemplate do
     it "should create two columns" do
       res = factory_all_form_fields({columns: [:name, :blurb]})
 
-      expect(res).to include("<div class='scaffold-cell cell--jkl--name' >  \n    <span class='<%= \"alert-danger\" if jkl.errors.details.keys.include?(:name) %>'  style=\"display: inherit;\"  >" )
+      expect(res).to include("<div class='scaffold-cell cell--jkl--name' >  \n    <span class='<%= \"alert alert-danger\" if jkl.errors.details.keys.include?(:name) %>'  style=\"display: inherit;\"  >" )
       expect(res).to include("<%= f.text_field :name, value: jkl.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>")
     end
 
@@ -185,7 +185,7 @@ describe HotGlue::ErbTemplate do
       res = factory_all_form_fields({columns: [:genre]})
 
       expect(res).to include('<div class=\'scaffold-cell cell--jkl--genre\' >')
-      expect(res).to include('<span class=\'<%= "alert-danger" if jkl.errors.details.keys.include?(:genre) %>')
+      expect(res).to include('<span class=\'<%= "alert alert-danger" if jkl.errors.details.keys.include?(:genre) %>')
 
       expect(res).to include("<%= f.collection_select(:genre,  enum_to_collection_select(Jkl.defined_enums['genre']), :key, :value, {selected: jkl.genre }, class: 'form-control') %>")
     end

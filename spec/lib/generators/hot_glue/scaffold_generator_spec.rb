@@ -441,9 +441,8 @@ describe HotGlue::ScaffoldGenerator do
 
 
               file = File.read("spec/dummy/app/views/users/_show.erb")
-
               expect(file).to include("<div class='col-sm-2 user--email'> <%= user.email %></div>")
-              expect(file).to include("<div class='col-sm-2 user--family_id'> <%= user.family.try(:name) || '<span class=\"content\">MISSING</span>'.html_safe %></div>")
+              expect(file).to include("<div class='col-sm-2 user--family_id'> <%= user.family.try(:name) || '<span class=\"content \">MISSING</span>'.html_safe %></div>")
             end
           end
 
@@ -597,7 +596,7 @@ describe HotGlue::ScaffoldGenerator do
                                             ["Dfg","--update-show-only=cantelope_id",
                                              "--pundit"])
         res = File.read("spec/dummy/app/views/dfgs/_form.erb")
-        expect(res).to include("<% if action_name == 'new' && policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: dfg.cantelope_id }, class: 'form-control') %>")
+        expect(res).to include("<% if @action == 'new' && policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, {prompt: true, selected: dfg.cantelope_id }, class: 'form-control') %>")
         expect(res).to include("<% else %><%= dfg.cantelope.name %><% end %>")
       end
 
@@ -677,7 +676,7 @@ describe HotGlue::ScaffoldGenerator do
                                               ["Dfg","--update-show-only=name"])
 
           res  = File.read("spec/dummy/app/views/dfgs/_form.erb")
-          expect(res).to include("<% if action_name == 'edit' %><%= dfg.name %><% else %>  <%= f.text_field :name, value: dfg.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>\n       \n      <% end %>")
+          expect(res).to include("<% if @action == 'edit' %><%= dfg.name %><% else %>  <%= f.text_field :name, value: dfg.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>\n       \n      <% end %>")
 
           res = File.read("spec/dummy/app/views/dfgs/_form.erb")
 
