@@ -17,7 +17,7 @@ class DateField < Field
     "<% unless #{singular}.#{name}.nil? %>
       <%= #{singular}.#{name} %>
     <% else %>
-      <span class='alert-danger'>MISSING</span>
+      <span class=''>MISSING</span>
     <% end %>"
   end
 end

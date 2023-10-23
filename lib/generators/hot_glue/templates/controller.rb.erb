@@ -91,6 +91,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name  %><% if @pundit %>)<% end %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}))<% else %>
     @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name  %><% if @pundit %>)<% end %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% end %>
     <% if @pundit %>authorize @<%= singular_name %><% end %><% if @pundit %>
+    @action = "new"
   rescue Pundit::NotAuthorizedError
     flash[:alert] = "You are not authorized to perform this action."
     render :index<% end %>
@@ -119,6 +120,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       render :create
     else
       flash[:alert] = "Oops, your <%= singular_name %> could not be created. #{@hawk_alarm}"
+      @action = "new"
       render :create, status: :unprocessable_entity
     end<% if @pundit %>
   rescue Pundit::NotAuthorizedError
@@ -139,6 +141,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   def edit<% if @pundit  %>
     authorize @<%= singular_name %><% end %>
+    @action = "edit"
     render :edit<% if @pundit %>
   rescue Pundit::NotAuthorizedError
     flash[:alert] = "Editing #{@<%= singular %>.<%= display_class %>} not authorized."
@@ -186,6 +189,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       render :update
     else
       flash[:alert] = "<%= singular_name.titlecase %> could not be saved. #{@hawk_alarm}"
+      @action = "edit"
       render :update, status: :unprocessable_entity
     end<% if @pundit %>
   rescue Pundit::NotAuthorizedError

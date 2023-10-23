@@ -13,7 +13,7 @@ class DateTimeField < Field
     if !modify_binary?
       "expect(page).to have_content(new_#{name}.in_time_zone(testing_timezone).strftime('%m/%d/%Y @ %l:%M %p %Z').gsub('  ', ' '))"
     else
-      "expect(page).to have_content('#{modify[:binary][:truthy]}'"
+      "expect(page).to have_content('#{modify_as[:binary][:truthy]}'"
     end
   end
 
@@ -23,7 +23,7 @@ class DateTimeField < Field
 
   def spec_list_view_assertion
     if modify_binary?
-      "expect(page).to have_content('#{modify[:binary][:truthy]}')"
+      "expect(page).to have_content('#{modify_as[:binary][:truthy]}')"
     else
       spec_list_view_natural_assertion
     end
@@ -44,7 +44,7 @@ class DateTimeField < Field
       "<% unless #{singular}.#{name}.nil? %>
   <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p %Z') %>
   <% else %>
-  <span class='alert-danger'>MISSING</span>
+  <span class=''>MISSING</span>
   <% end %>"
     end
   end

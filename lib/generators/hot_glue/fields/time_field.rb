@@ -12,7 +12,7 @@ class TimeField < Field
     "<% unless #{singular}.#{name}.nil? %>
       <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%l:%M %p ') %>
      <% else %>
-    <span class='alert-danger'>MISSING</span>
+    <span class=''>MISSING</span>
     <% end %>"
   end
 
