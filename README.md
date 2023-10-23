@@ -1469,6 +1469,17 @@ bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 
 # VERSION HISTORY
 
+
+#### 2023-10-23 - v0.5.26
+
+Various fixes:
+- fixed alert (danger) classes for bootstrap 5 ('alert alert-danger' was just 'alert-danger')
+- switches to use a self-defined instance var @action instead of action_name; this is so I can 
+  switch it back to 'new' or 'edit' upon a failure re-display to have the view behave the expected way
+- fix in create.turbo_stream.erb for failure redisplay (was not working)
+- fixes syntax error (in generated code) in edit.erb when there was a nested set
+
+
 #### 2023-10-16 - v0.5.25
 
 - Fixes scoping on Pundit-built controllers; even when using pundit we should still wrap to the current build's own ownership scope (#132
