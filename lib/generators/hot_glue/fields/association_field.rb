@@ -83,7 +83,19 @@ class AssociationField < Field
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
 
 
-    if @alt_lookups.keys.include?(name.to_s)
+    if modify_as[:fk_typeahead]
+         # TODO:
+         # what the search url
+         # what's the name of the foreign thing
+         # which fields on the foreign thing are we searching against
+         #
+         '<div class="search" data-controller="search" data-search-url-value="<%= authors_search_index_url %>" data-search-search-results-outlet="#search-results">
+              <%= text_field_tag :query, "", placeholder: "Search people by author name", class: "search__input", data: { action: "keyup->search#fetchResults keydown->search#navigateResults", search_target: "query" }, autofocus: true, autocomplete: "off" %>
+      <div data-search-target="results"></div>
+    </div>'
+
+   # TODO: DEPRECATE ALT LOOKUP FUNCTIONALITY!!!!
+    elsif @alt_lookups.keys.include?(name.to_s)
       alt = @alt_lookups[name.to_s][:lookup_as]
       "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" %>"
     else
