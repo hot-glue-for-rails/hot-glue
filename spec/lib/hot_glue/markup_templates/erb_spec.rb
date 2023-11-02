@@ -32,6 +32,7 @@ describe HotGlue::ErbTemplate do
                     display_as: options[:display_as] || {},
                     default_boolean_display: "radio",
                     self_auth: false,
+                    namespace: nil,
                     singular: "jkl" }.merge(  hawk_keys: options[:hawk_keys],
                                           columns: options[:columns],
                                           form_placeholder_labels: options[:form_placeholder_labels],
@@ -81,6 +82,7 @@ describe HotGlue::ErbTemplate do
       selected: FieldFactory.new(type: :boolean, name: "selected", generator: generator).field,
       name: FieldFactory.new(type: :string, name: "name", generator: generator).field,
       hgi_id: AssociationField.new(
+              namespace: nil,
               self_auth: false,
               default_boolean_display: "radio" , display_as: {},
               layout_strategy: layout_strategy,

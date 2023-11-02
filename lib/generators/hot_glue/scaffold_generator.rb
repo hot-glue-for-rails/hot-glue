@@ -23,7 +23,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting, :update_show_only, :ownership_field,
                 :layout_strategy, :form_placeholder_labels, :form_labels_position, :pundit,
-                :self_auth
+                :self_auth, :namespace
 
   class_option :singular, type: :string, default: nil
   class_option :plural, type: :string, default: nil
@@ -272,7 +272,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @update_show_only.include?(key) ?
         { key: value }
         : nil }.compact
-
+    byebug
     @label = options['label'] || (eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") : singular.gsub("_", " ").titleize)
     @list_label_heading = options['list_label_heading'] || (eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase)
 

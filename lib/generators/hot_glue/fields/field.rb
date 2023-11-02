@@ -2,7 +2,8 @@ class Field
   attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :auth,
                 :assoc_label,  :class_name, :default_boolean_display, :display_as, :form_placeholder_labels,
                 :form_labels_position,
-                :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :object, :sample_file_path,
+                :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :namespace,
+                :object, :sample_file_path,
                 :self_auth,
                 :singular_class,  :singular, :sql_type, :ownership_field,
                 :update_show_only
@@ -24,7 +25,8 @@ class Field
     sample_file_path: nil,
     singular: ,
     update_show_only:,
-    self_auth:
+    self_auth:,
+    namespace:
   )
     @name = name
     @layout_strategy = layout_strategy
@@ -40,6 +42,7 @@ class Field
     @form_labels_position = form_labels_position
     @modify_as = modify_as
     @display_as = display_as
+    @namespace = namespace
 
     @self_auth = self_auth
     @default_boolean_display = default_boolean_display

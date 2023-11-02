@@ -10,7 +10,7 @@ class AssociationField < Field
                  update_show_only: ,
                  hawk_keys: , auth: , sample_file_path:,  ownership_field: ,
                  attachment_data: nil , layout_strategy: , form_placeholder_labels: nil,
-                 form_labels_position:, modify_as: , self_auth: )
+                 form_labels_position:, modify_as: , self_auth: , namespace: )
     super
 
     @assoc_model = eval("#{class_name}.reflect_on_association(:#{assoc})")
@@ -82,17 +82,17 @@ class AssociationField < Field
     assoc_name = name.to_s.gsub("_id","")
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
 
-
-    if modify_as[:fk_typeahead]
+    if modify_as && modify_as[:fk_typeahead]
          # TODO:
          # what the search url
          # what's the name of the foreign thing
          # which fields on the foreign thing are we searching against
-         #
-         '<div class="search" data-controller="search" data-search-url-value="<%= authors_search_index_url %>" data-search-search-results-outlet="#search-results">
-              <%= text_field_tag :query, "", placeholder: "Search people by author name", class: "search__input", data: { action: "keyup->search#fetchResults keydown->search#navigateResults", search_target: "query" }, autofocus: true, autocomplete: "off" %>
-      <div data-search-target="results"></div>
-    </div>'
+
+         search_url  = "#{namespace ? namespace + "_" : ""}_search_index_path"
+         "<div class='search' data-controller='search' data-search-url-value='<%= #{search_url} =>' data-search-search-results-outlet='#search-results'>
+              <%= text_field_tag :query, '', placeholder: 'Search people by author name', class: 'search__input', data: { action: 'keyup->search#fetchResults keydown->search#navigateResults', search_target: 'query' }, autofocus: true, autocomplete: 'off' %>
+      <div data-search-target='results'></div>
+    </div>"
 
    # TODO: DEPRECATE ALT LOOKUP FUNCTIONALITY!!!!
     elsif @alt_lookups.keys.include?(name.to_s)
