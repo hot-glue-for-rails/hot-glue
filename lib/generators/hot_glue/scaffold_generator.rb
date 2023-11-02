@@ -23,7 +23,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting, :update_show_only, :ownership_field,
                 :layout_strategy, :form_placeholder_labels, :form_labels_position, :pundit,
-                :self_auth
+                :self_auth, :namespace_value
+  # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
+  # so we use namespace_value instead
 
   class_option :singular, type: :string, default: nil
   class_option :plural, type: :string, default: nil
@@ -160,6 +162,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @plural = options['plural'] || @singular.pluralize # respects what you set in inflections.rb, to override, use plural option
     @namespace = options['namespace'] || nil
+    @namespace_value = @namespace
     use_controller_name = plural.titleize.gsub(" ", "")
     @controller_build_name = ((@namespace.titleize.gsub(" ", "") + "::" if @namespace) || "") + use_controller_name + "Controller"
     @controller_build_folder = use_controller_name.underscore

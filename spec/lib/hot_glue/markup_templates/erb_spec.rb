@@ -83,6 +83,7 @@ describe HotGlue::ErbTemplate do
       hgi_id: AssociationField.new(
               self_auth: false,
               default_boolean_display: "radio" , display_as: {},
+              namespace: nil,
               layout_strategy: layout_strategy,
                                    form_labels_position: 'before',
                                    ownership_field: "", name: "hgi_id", class_name: "Jkl", alt_lookups: {},

@@ -24,7 +24,8 @@ class Field
     sample_file_path: nil,
     singular: ,
     update_show_only:,
-    self_auth:
+    self_auth:,
+    namespace:
   )
     @name = name
     @layout_strategy = layout_strategy

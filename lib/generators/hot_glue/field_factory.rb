@@ -61,6 +61,7 @@ class FieldFactory
                              sample_file_path: generator.sample_file_path,
                              modify_as: generator.modify_as[name.to_sym] || nil,
                              display_as: generator.display_as[name.to_sym] || nil,
-                             default_boolean_display: generator.default_boolean_display)
+                             default_boolean_display: generator.default_boolean_display,
+                             namespace: generator.namespace_value)
   end
 end
