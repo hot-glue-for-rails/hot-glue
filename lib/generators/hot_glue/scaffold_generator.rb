@@ -227,6 +227,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           @modify_as[key.to_sym] =  {enum: :partials}
         elsif $2 == "tinymce"
           @modify_as[key.to_sym] =  {tinymce: 1}
+        elsif $2 == "typeahead"
+          @modify_as[key.to_sym] =  {typeahead: 1}
         else
           raise "unknown modification direction #{$2}"
         end
