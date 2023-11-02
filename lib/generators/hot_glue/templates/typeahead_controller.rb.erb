@@ -1,10 +1,9 @@
 class <%= ((@namespace.titleize.gsub(" ", "") + "::" if @namespace) || "") + @plural.titleize.gsub(" ", "") + "TypeaheadController" %> < <%= controller_descends_from %>
   def index
-    name = params[:query]
+    query = params[:query]
 
-    # TODO: here is an example of a two-field search against the queried input
-    # is this what we want?
-    @<%= @plural %> = <%= @singular.titleize.gsub(" ", "") %>.where("LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ?", "%#{name.downcase}%" , "%#{name.downcase}%").limit(10)
+    @<%= @plural %> = <%= @singular.titleize.gsub(" ", "") %>.where("<%= @search_by.collect{|search| "LOWER(#{search}) LIKE ?" }.join(" OR ") %>", <%= @search_by.collect{|search| "query.downcase" }.join(", ") %>).limit(10)
+
     render layout: false
   end
 end
