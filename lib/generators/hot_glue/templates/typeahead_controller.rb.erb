@@ -2,7 +2,7 @@ class <%= ((@namespace.titleize.gsub(" ", "") + "::" if @namespace) || "") + @pl
   def index
     query = params[:query]
 
-    @<%= @plural %> = <%= @singular.titleize.gsub(" ", "") %>.where("<%= @search_by.collect{|search| "LOWER(#{search}) LIKE ?" }.join(" OR ") %>", <%= @search_by.collect{|search| "query.downcase" }.join(", ") %>).limit(10)
+    @<%= @plural %> = <%= @singular.titleize.gsub(" ", "") %>.where("<%= @search_by.collect{|search| "LOWER(#{search}) LIKE ?" }.join(" OR ") %>", <%= @search_by.collect{|search|  "\"%\#{query.downcase}%\"" }.join(", ") %>).limit(10)
 
     render layout: false
   end

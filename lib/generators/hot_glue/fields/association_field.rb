@@ -88,11 +88,23 @@ class AssociationField < Field
          # what's the name of the foreign thing
          # which fields on the foreign thing are we searching against
 
+
+
          search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.plural_name}_typeahead_index_url"
-         "<div class='search' data-controller='search' data-search-url-value='<%= #{search_url} %>' data-search-search-results-outlet='#search-results'>
-              <%= text_field_tag :query, '', placeholder: 'Search people by author name', class: 'search__input', data: { action: 'keyup->search#fetchResults keydown->search#navigateResults', search_target: 'query' }, autofocus: true, autocomplete: 'off' %>
-      <div data-search-target='results'></div>
-    </div>"
+
+         "<div class='typeahead typeahead--book--author_id'
+           data-controller='search'
+           data-search-url-value='<%= #{search_url} %>'
+           data-search-search-results-outlet='#search-results'>
+          <%= text_field_tag :#{assoc.plural_name}_query, '', placeholder: 'Search #{assoc.plural_name}', class: 'search__input',
+                             data: { action: 'keyup->search#fetchResults keydown->search#navigateResults', search_target: 'query' },
+                             autofocus: true,
+                             autocomplete: 'off',
+                             value: book.author.name %>
+          <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.#{assoc.name}.id, 'data-search-target': 'hiddenFormValue' %>
+          <div data-search-target='results'></div>"
+
+
 
          # TODO: DEPRECATE ALT LOOKUP FUNCTIONALITY!!!!
     elsif @alt_lookups.keys.include?(name.to_s)
