@@ -772,7 +772,7 @@ Note that Hot Glue still generates a singular partial (`_form`) for both actions
  <% end %>
 ```
 
-This works for both regular fields, association fields, and alt lookup fields.
+This works for both regular fields, association fields.
 
 
 When mixing the show only, update show only, and Pundit features, notice that the show only + update show only will act to override whatever the policy might say.
@@ -952,38 +952,6 @@ This happens using two interconnected mechanisms:
 2) by appending **model callbacks**, we can automatically broadcast updates to the users who are using the Hot Glue scaffold. The model callbacks (after_update_commit and after_destroy_commit) get appended automatically to the top of your model file. Each model callback targets the scaffold being built (so just this scaffold), using its namespace, and renders the line partial (or destroys the content in the case of delete) from the scaffolding.
 
 please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
-
-
-### `--alt-foreign-key-lookup` (Foreign Key Lookups)
-
-Example #1
-`--alt-foreign-key-lookup=user_id{email}`
-
-Let's assume a `Company` `has_many :company_users` and also a `Company` `has_many :users, through: :company_users`
-
-Normally, you would be constructing a CompanyUsers downnest portal on the Company page. (Showing you only CompanyUsers associated with that company.)
-
-A drop down of _all users in the_ database will be display on the screen where you create a new CompanyUser (join) record.
-
-Let's say instead you don't want to expose the full list of all users to this controller, but instead make your user enter the full email address of the user to identify them.
-
-Instead of a drop-down, the interface will present an input box for the user to supply an *search by* email.
-
-Example #2
-```
---alt-foreign-key-lookup='agent_id{email+}'
-```
-
-First, assume the current able has a `belongs_to` association for `agent_id` to a foreign model, `Agent`
-
-Here, we would build a scaffold that would treat the foreign key `agent_id` as an alt lookup, allowing the user to search for foreign records by email (the agent's email).
-
-The `+` symbol indicates to automatically make a new `agent` record (without it, the agent_id will be set to nil if there is no associated agent record found -- this may cause the update to fail, unless `optional: true` is on the belongs_to association.)
-
-
-
-** Note: Current implementation does not work in conjunction with hawked associations to protect against users from accessing associated records not within scope.**
-TODO: make it work with hawked associations to protect against users from accessing associated records not within scope
 
 
 ## "Thing" Label
@@ -1256,7 +1224,7 @@ end
 ```
 
 
-If you are using factory creation along with with alt lookups, be sure your factory code creates a local variable that follows this name
+be sure your factory code creates a local variable that follows this name
 
 **<downcase association name>**_factory.<downcase association name>
 

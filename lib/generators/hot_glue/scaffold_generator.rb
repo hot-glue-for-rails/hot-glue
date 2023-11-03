@@ -688,7 +688,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         "    @#{singular } = factory.#{singular}"
     end
   end
-  
+
   def formats
     [format]
   end
