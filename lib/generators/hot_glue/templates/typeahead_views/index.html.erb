@@ -1,8 +1,9 @@
 
 <div class="typeahead-results__<%= @plural %>"
-     data-search-results-search-outlet=".typeahead--book--<%= @singular %>_id"
-     data-controller="search-results" data-search-results-current-class="search__result--current" >
-  <ul class="search__results" data-search-results-target="result">
+     data-controller="typeahead-results"
+     data-typeahead-results-typeahead-outlet=".typeahead--book--<%= @singular %>_id"
+     data-typeahead-results-current-class="search__result--current" >
+  <ul class="search__results" data-typeahead-results-target="result">
     <\% if @<%= @plural %>.any? %>
       <\%= render partial: "<%= @singular %>", collection: @<%= @plural %> %>
     <\% else %>

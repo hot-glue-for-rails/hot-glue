@@ -460,7 +460,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       if field.is_a?(AssociationField)
         if @modify_as && @modify_as[key] && @modify_as[key][:typeahead]
           assoc_name = field.assoc_name
-          file_path = "#{namespace ? namspace + "/" : ""}#{assoc_name.pluralize}_typeahead_controller.rb"
+          file_path = "app/controllers/#{namespace ? namspace + "/" : ""}#{assoc_name.pluralize}_typeahead_controller.rb"
+
           if ! File.exist?(file_path)
 
             assoc_model = eval("#{class_name}.reflect_on_association(:#{field.assoc_name})")

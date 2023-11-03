@@ -83,26 +83,19 @@ class AssociationField < Field
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
 
     if modify_as && modify_as[:typeahead]
-         # TODO:
-         # what the search url
-         # what's the name of the foreign thing
-         # which fields on the foreign thing are we searching against
-
-
-
          search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.plural_name}_typeahead_index_url"
 
-         "<div class='typeahead typeahead--book--author_id'
-           data-controller='search'
-           data-search-url-value='<%= #{search_url} %>'
-           data-search-search-results-outlet='#search-results'>
+         "<div class='typeahead typeahead--#{singular}--#{assoc.name}_id'
+           data-controller='typeahead'
+           data-typeahead-url-value='<%= #{search_url} %>'
+           data-typeahead-typeahead-results-outlet='#search-results'>
            <%= text_field_tag :#{assoc.plural_name}_query, '', placeholder: 'Search #{assoc.plural_name}', class: 'search__input',
-                             data: { action: 'keyup->search#fetchResults keydown->search#navigateResults', search_target: 'query' },
+                             data: { action: 'keyup->typeahead#fetchResults keydown->typeahead#navigateResults', typeahead_target: 'query' },
                              autofocus: true,
                              autocomplete: 'off',
                              value: book.author.name %>
-           <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.#{assoc.name}.id, 'data-search-target': 'hiddenFormValue' %>
-           <div data-search-target='results'></div>
+           <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.#{assoc.name}.id, 'data-typeahead-target': 'hiddenFormValue' %>
+           <div data-typeahead-target='results'></div>
          </div>"
 
 
