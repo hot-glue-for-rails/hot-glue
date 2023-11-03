@@ -5,7 +5,7 @@ class AssociationField < Field
 
   attr_accessor :assoc_name, :assoc_class, :assoc
 
-  def initialize(alt_lookups: , class_name: , default_boolean_display:, display_as: ,
+  def initialize( class_name: , default_boolean_display:, display_as: ,
                  name: , singular: ,
                  update_show_only: ,
                  hawk_keys: , auth: , sample_file_path:,  ownership_field: ,
@@ -48,10 +48,7 @@ class AssociationField < Field
 
   def spec_setup_and_change_act(which_partial)
     if which_partial == :update && update_show_only.include?(name)
-      # do not update tests
-    elsif alt_lookups.keys.include?(name.to_s)
-      lookup = alt_lookups[name.to_s][:lookup_as]
-      "      find(\"[name='#{singular}[__lookup_#{lookup}]']\").fill_in( with: #{assoc}1.#{lookup} )"
+
     else
       "      #{name}_selector = find(\"[name='#{singular}[#{name}]']\").click \n" +
       "      #{name}_selector.first('option', text: #{assoc}1.name).select_option"
@@ -97,13 +94,6 @@ class AssociationField < Field
            <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.#{assoc.name}.id, 'data-typeahead-target': 'hiddenFormValue' %>
            <div data-typeahead-target='results'></div>
          </div>"
-
-
-
-         # TODO: DEPRECATE ALT LOOKUP FUNCTIONALITY!!!!
-    elsif @alt_lookups.keys.include?(name.to_s)
-      alt = @alt_lookups[name.to_s][:lookup_as]
-      "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" %>"
     else
       if assoc.nil?
         exit_message = "*** Oops. on the #{class_name} object, there doesn't seem to be an association called '#{assoc_name}'"

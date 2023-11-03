@@ -9,7 +9,6 @@ class Field
 
   def initialize(
     auth: ,
-    alt_lookups: ,
     attachment_data: nil,
     class_name: ,
     default_boolean_display: ,

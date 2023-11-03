@@ -53,7 +53,6 @@ class FieldFactory
                              hawk_keys: generator.hawk_keys,
                              auth: generator.auth,
                              class_name: generator.singular_class,
-                             alt_lookups: generator.alt_lookups,
                              singular: generator.singular,
                              self_auth: generator.self_auth,
                              update_show_only: generator.update_show_only,

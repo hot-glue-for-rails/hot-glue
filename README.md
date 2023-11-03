@@ -1410,6 +1410,33 @@ end
 
 ```
 
+### Typeahead Foreign Keys
+
+Let's go back to the first Books & Authors example.
+assuming you have created
+`bin/rails generate model Book title:string author_id:integer`
+and
+`bin/rails generate model Author name:string`
+and also added `has_many :books` to Author and `belongs_to :author` to Book
+
+
+You can now use a typeahead when editing the book. Instead of displaying the authors in a drop-down list, the authors will appear in a searchable typehead.
+
+You will do these three things:
+
+1. As a one-time setup step for your app, run
+`bin/rails generate hot_glue:install_typeahead`
+2. When generating a scaffold you want to make a typeahead association, use `--modify='parent_id{typeahead}'` where `parent_id` is the foreign key
+`bin/rails generate hot_glue:scaffold Book --include=title,author_id --modify='author_id{typeahead}'`
+3. Within each namespace, you will generate a special typeahead controller (it exists for the associated object to be searched on
+`bin/rails generate hot_glue:typehead Author`
+This will create a controller for `AuthorsTypeaheadController` that will allow text search against any *string* field on the `Author` model.
+This special generator takes flags `--namespace` as the normal generator and also `--search-by` to let you specify the list of fields you want to search by.
+
+Your new and edit views that were built on books now give you a search box for the author spot. Notice that just making the selection
+puts the value into the search box and the id into a hidden field.
+
+You need to making a selection *and* click "Save" to update the record.
 
 ### TinyMCE
 1. `bundle add tinymce-rails` to add it to your Gemfile
@@ -1468,6 +1495,26 @@ bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 ```
 
 # VERSION HISTORY
+
+#### 2023-11-03 - v0.6.0
+
+Typeahead Associations
+
+You can now use a typeahead when editing any foreign key.
+
+Instead of displaying the foreign key in a drop-down list, the associated record is now selectable 
+from a searchable typehead input. 
+
+The typeahead is implemented with a native Stimulus JS pair of controllers and is a modern & clean replacement to the old typeahead options.
+
+1. As a one-time setup step for your app, run
+   `bin/rails generate hot_glue:install_typeahead`
+2. When generating a scaffold you want to make a typeahead association, use `--modify='parent_id{typeahead}'` where `parent_id` is the foreign key
+   `bin/rails generate hot_glue:scaffold Book --include=title,author_id --modify='author_id{typeahead}'`
+3. Within each namespace, you will generate a special typeahead controller (it exists for the associated object to be searched on
+   `bin/rails generate hot_glue:typehead Author`
+   This will create a controller for `AuthorsTypeaheadController` that will allow text search against any *string* field on the `Author` model.
+   This special generator takes flags `--namespace` like the normal generator and also `--search-by` to let you specify the list of fields you want to search by.
 
 
 #### 2023-10-23 - v0.5.26

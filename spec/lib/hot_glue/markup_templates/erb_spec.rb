@@ -60,7 +60,6 @@ describe HotGlue::ErbTemplate do
       form_placeholder_labels: options[:form_placeholder_labels],
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
-      alt_lookups: {},
       columns_map: columns_map_sample(generator: generator, options: options),
       attachments: {},
       pundit: options[:pundit])
@@ -86,7 +85,7 @@ describe HotGlue::ErbTemplate do
               namespace: nil,
               layout_strategy: layout_strategy,
                                    form_labels_position: 'before',
-                                   ownership_field: "", name: "hgi_id", class_name: "Jkl", alt_lookups: {},
+                                   ownership_field: "", name: "hgi_id", class_name: "Jkl",
                                    singular: "Jkl", update_show_only: nil, hawk_keys: options[:hawk_keys],
                                    auth: "", sample_file_path: nil, attachment_data: nil, modify_as: {}),
       time_of_day: FieldFactory.new(type: :time, name: "time_of_day", generator: generator).field,
@@ -124,7 +123,6 @@ describe HotGlue::ErbTemplate do
       form_placeholder_labels: options[:form_placeholder_labels],
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
-      alt_lookups: [],
       attachments: {},
       pundit: options[:pundit])
 
@@ -357,7 +355,6 @@ describe HotGlue::ErbTemplate do
 
     it "should hawk the hgi_id to the current user" do
       res = factory_all_form_fields({columns: [:hgi_id],
-                                     alt_lookups: {},
                                      singular_class: Jkl,
                                      singular: "jkl",
                                      hawk_keys: hawk_keys_for_hgi_id})
