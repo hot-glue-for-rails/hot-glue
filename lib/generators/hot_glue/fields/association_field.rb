@@ -90,8 +90,8 @@ class AssociationField < Field
                              data: { action: 'keyup->typeahead#fetchResults keydown->typeahead#navigateResults', typeahead_target: 'query' },
                              autofocus: true,
                              autocomplete: 'off',
-                             value: book.author.name %>
-           <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.#{assoc.name}.id, 'data-typeahead-target': 'hiddenFormValue' %>
+                             value: #{singular}.try(:#{assoc.name}).try(:name) %>
+           <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.try(:#{assoc.name}).try(:id), 'data-typeahead-target': 'hiddenFormValue' %>
            <div data-typeahead-target='results'></div>
          </div>"
     else
