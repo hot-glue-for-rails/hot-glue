@@ -96,13 +96,14 @@ class AssociationField < Field
            data-controller='search'
            data-search-url-value='<%= #{search_url} %>'
            data-search-search-results-outlet='#search-results'>
-          <%= text_field_tag :#{assoc.plural_name}_query, '', placeholder: 'Search #{assoc.plural_name}', class: 'search__input',
+           <%= text_field_tag :#{assoc.plural_name}_query, '', placeholder: 'Search #{assoc.plural_name}', class: 'search__input',
                              data: { action: 'keyup->search#fetchResults keydown->search#navigateResults', search_target: 'query' },
                              autofocus: true,
                              autocomplete: 'off',
                              value: book.author.name %>
-          <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.#{assoc.name}.id, 'data-search-target': 'hiddenFormValue' %>
-          <div data-search-target='results'></div>"
+           <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.#{assoc.name}.id, 'data-search-target': 'hiddenFormValue' %>
+           <div data-search-target='results'></div>
+         </div>"
 
 
 

@@ -229,6 +229,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           @modify_as[key.to_sym] =  {tinymce: 1}
         elsif $2 == "typeahead"
           @modify_as[key.to_sym] =  {typeahead: 1}
+
+
         else
           raise "unknown modification direction #{$2}"
         end
@@ -452,6 +454,24 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         @associations << field.assoc_name.to_sym
       end
       @columns_map[col] = this_column_object.field
+    end
+
+    @columns_map.each do |key, field|
+      if field.is_a?(AssociationField)
+        if @modify_as && @modify_as[key] && @modify_as[key][:typeahead]
+          assoc_name = field.assoc_name
+          file_path = "#{namespace ? namspace + "/" : ""}#{assoc_name.pluralize}_typeahead_controller.rb"
+          if ! File.exist?(file_path)
+
+            assoc_model = eval("#{class_name}.reflect_on_association(:#{field.assoc_name})")
+            assoc_class = assoc_model.class_name
+            puts "##############################################"
+            puts "WARNING: you specified --modify=#{key}{typeahead} but there is no file at `#{file_path}`; please create one with:"
+            puts "bin/rails generate hot_glue:typeahead #{assoc_class} #{namespace ? " --namespace=\#{namespace}" : ""}"
+            puts "##############################################"
+          end
+        end
+      end
     end
 
     # create the template object

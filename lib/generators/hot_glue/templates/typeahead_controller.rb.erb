@@ -1,4 +1,9 @@
 class <%= ((@namespace.titleize.gsub(" ", "") + "::" if @namespace) || "") + @plural.titleize.gsub(" ", "") + "TypeaheadController" %> < <%= controller_descends_from %>
+  # regenerate this controller with
+  <% if defined?(RuboCop) %># rubocop:disable Layout/LineLength
+  <% end %># <%= regenerate_me_code %><% if defined?(RuboCop) %>
+  # rubocop:enable Layout/LineLength <% end %>
+
   def index
     query = params[:query]
 

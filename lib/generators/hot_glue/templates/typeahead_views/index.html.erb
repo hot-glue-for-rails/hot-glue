@@ -1,0 +1,12 @@
+
+<div class="typeahead-results__<%= @plural %>"
+     data-search-results-search-outlet=".typeahead--book--<%= @singular %>_id"
+     data-controller="search-results" data-search-results-current-class="search__result--current" >
+  <ul class="search__results" data-search-results-target="result">
+    <\% if @<%= @plural %>.any? %>
+      <\%= render partial: "<%= @singular %>", collection: @<%= @plural %> %>
+    <\% else %>
+      <li class="search__result search__result--empty">No results</li>
+    <\% end %>
+  </ul>
+</div>
