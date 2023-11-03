@@ -1484,7 +1484,7 @@ The typeahead is implemented with a native Stimulus JS pair of controllers and i
    This will create a controller for `AuthorsTypeaheadController` that will allow text search against any *string* field on the `Author` model.
    This special generator takes flags `--namespace` like the normal generator and also `--search-by` to let you specify the list of fields you want to search by.
 
-The example Books & Authors with typeahead is here:
+The example Books & Authors app with typeahead is here:
 
 https://github.com/hot-glue-for-rails/BooksAndAuthorsWithTypeahead2
 
