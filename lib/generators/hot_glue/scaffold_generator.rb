@@ -258,27 +258,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # instead of a drop-down for the foreign entity, a text field will be presented
     # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
 
-    # alt_lookups_entry = options['alt_foreign_key_lookup'].split(",")
-    # @alt_lookups = {}
-    # @alt_foreign_key_lookup = alt_lookups_entry.each do |setting|
-    #   setting =~ /(.*){(.*)}/
-    #   key, lookup_as = $1, $2
-    #   assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id", "")}).class_name")
-    #
-    #   data = { lookup_as: lookup_as.gsub("+", ""),
-    #            assoc: assoc,
-    #            with_create: lookup_as.include?("+") }
-    #   @alt_lookups[key] = data
-    # end
-
-    # puts "------ ALT LOOKUPS for #{@alt_lookups}"
-
-
-    # @update_alt_lookups = @alt_lookups.collect { |key, value|
-    #   @update_show_only.include?(key) ?
-    #     { key: value }
-    #     : nil }.compact
-
     @label = options['label'] || (eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") : singular.gsub("_", " ").titleize)
     @list_label_heading = options['list_label_heading'] || (eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase)
 
@@ -702,10 +681,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def creation_syntax
-    # merge_with = @alt_lookups.collect { |key, data|
-    #   "#{data[:assoc].downcase}: #{data[:assoc].downcase}_factory.#{data[:assoc].downcase}"
-    # }.join(", ")
-
     if @factory_creation == ''
       "@#{singular } = #{ class_name }.create(modified_params)"
     else
@@ -713,9 +688,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         "    @#{singular } = factory.#{singular}"
     end
   end
-
-
-
+  
   def formats
     [format]
   end
