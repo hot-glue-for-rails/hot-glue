@@ -8,7 +8,7 @@ module  HotGlue
                   :inline_list_labels, :layout_object,
                   :columns,  :col_identifier, :singular,
                   :form_placeholder_labels, :hawk_keys, :update_show_only,
-                  :alt_lookups, :attachments, :show_only, :columns_map, :pundit
+                  :attachments, :show_only, :columns_map, :pundit
 
 
       def initialize(singular:, singular_class: ,
@@ -17,7 +17,7 @@ module  HotGlue
                    ownership_field: , form_labels_position: ,
                    inline_list_labels: ,
                    form_placeholder_labels:, hawk_keys: ,
-                   update_show_only:, alt_lookups: , attachments: , columns_map:, pundit: )
+                   update_show_only:, attachments: , columns_map:, pundit: )
 
       @singular = singular
       @singular_class = singular_class
@@ -38,7 +38,6 @@ module  HotGlue
       @form_placeholder_labels = form_placeholder_labels
       @hawk_keys = hawk_keys
       @update_show_only = update_show_only
-      @alt_lookups = alt_lookups
       @attachments = attachments
     end
 

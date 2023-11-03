@@ -5,11 +5,10 @@ class Field
                 :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :object, :sample_file_path,
                 :self_auth,
                 :singular_class,  :singular, :sql_type, :ownership_field,
-                :update_show_only
+                :update_show_only, :namespace
 
   def initialize(
     auth: ,
-    alt_lookups: ,
     attachment_data: nil,
     class_name: ,
     default_boolean_display: ,
@@ -24,7 +23,8 @@ class Field
     sample_file_path: nil,
     singular: ,
     update_show_only:,
-    self_auth:
+    self_auth:,
+    namespace:
   )
     @name = name
     @layout_strategy = layout_strategy
@@ -43,6 +43,7 @@ class Field
 
     @self_auth = self_auth
     @default_boolean_display = default_boolean_display
+    @namesapce = namespace
 
     # TODO: remove knowledge of subclasses from Field
     unless self.class == AttachmentField

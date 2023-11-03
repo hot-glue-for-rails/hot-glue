@@ -53,7 +53,6 @@ class FieldFactory
                              hawk_keys: generator.hawk_keys,
                              auth: generator.auth,
                              class_name: generator.singular_class,
-                             alt_lookups: generator.alt_lookups,
                              singular: generator.singular,
                              self_auth: generator.self_auth,
                              update_show_only: generator.update_show_only,
@@ -61,6 +60,7 @@ class FieldFactory
                              sample_file_path: generator.sample_file_path,
                              modify_as: generator.modify_as[name.to_sym] || nil,
                              display_as: generator.display_as[name.to_sym] || nil,
-                             default_boolean_display: generator.default_boolean_display)
+                             default_boolean_display: generator.default_boolean_display,
+                             namespace: generator.namespace_value)
   end
 end

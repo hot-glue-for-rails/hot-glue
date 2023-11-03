@@ -16,14 +16,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   hook_for :form_builder, :as => :scaffold
 
   source_root File.expand_path('templates', __dir__)
-  attr_accessor :alt_lookups, :attachments, :auth, :big_edit, :button_icons, :bootstrap_column_width, :columns,
+  attr_accessor :attachments, :auth, :big_edit, :button_icons, :bootstrap_column_width, :columns,
                 :default_boolean_display,
                 :display_as, :downnest_children, :downnest_object, :hawk_keys, :layout_object,
                 :modify_as,
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting, :update_show_only, :ownership_field,
                 :layout_strategy, :form_placeholder_labels, :form_labels_position, :pundit,
-                :self_auth
+                :self_auth, :namespace_value
+  # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
+  # so we use namespace_value instead
 
   class_option :singular, type: :string, default: nil
   class_option :plural, type: :string, default: nil
@@ -160,6 +162,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @plural = options['plural'] || @singular.pluralize # respects what you set in inflections.rb, to override, use plural option
     @namespace = options['namespace'] || nil
+    @namespace_value = @namespace
     use_controller_name = plural.titleize.gsub(" ", "")
     @controller_build_name = ((@namespace.titleize.gsub(" ", "") + "::" if @namespace) || "") + use_controller_name + "Controller"
     @controller_build_folder = use_controller_name.underscore
@@ -224,6 +227,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           @modify_as[key.to_sym] =  {enum: :partials}
         elsif $2 == "tinymce"
           @modify_as[key.to_sym] =  {tinymce: 1}
+        elsif $2 == "typeahead"
+          @modify_as[key.to_sym] =  {typeahead: 1}
+
+
         else
           raise "unknown modification direction #{$2}"
         end
@@ -250,26 +257,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # syntax should be xyz_id{xyz_email},abc_id{abc_email}
     # instead of a drop-down for the foreign entity, a text field will be presented
     # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
-
-    alt_lookups_entry = options['alt_foreign_key_lookup'].split(",")
-    @alt_lookups = {}
-    @alt_foreign_key_lookup = alt_lookups_entry.each do |setting|
-      setting =~ /(.*){(.*)}/
-      key, lookup_as = $1, $2
-      assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id", "")}).class_name")
-
-      data = { lookup_as: lookup_as.gsub("+", ""),
-               assoc: assoc,
-               with_create: lookup_as.include?("+") }
-      @alt_lookups[key] = data
-    end
-
-    puts "------ ALT LOOKUPS for #{@alt_lookups}"
-
-    @update_alt_lookups = @alt_lookups.collect { |key, value|
-      @update_show_only.include?(key) ?
-        { key: value }
-        : nil }.compact
 
     @label = options['label'] || (eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") : singular.gsub("_", " ").titleize)
     @list_label_heading = options['list_label_heading'] || (eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").upcase)
@@ -449,6 +436,25 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @columns_map[col] = this_column_object.field
     end
 
+    @columns_map.each do |key, field|
+      if field.is_a?(AssociationField)
+        if @modify_as && @modify_as[key] && @modify_as[key][:typeahead]
+          assoc_name = field.assoc_name
+          file_path = "app/controllers/#{namespace ? namspace + "/" : ""}#{assoc_name.pluralize}_typeahead_controller.rb"
+
+          if ! File.exist?(file_path)
+
+            assoc_model = eval("#{class_name}.reflect_on_association(:#{field.assoc_name})")
+            assoc_class = assoc_model.class_name
+            puts "##############################################"
+            puts "WARNING: you specified --modify=#{key}{typeahead} but there is no file at `#{file_path}`; please create one with:"
+            puts "bin/rails generate hot_glue:typeahead #{assoc_class} #{namespace ? " --namespace=\#{namespace}" : ""}"
+            puts "##############################################"
+          end
+        end
+      end
+    end
+
     # create the template object
     if @markup == "erb"
       @template_builder = HotGlue::ErbTemplate.new(
@@ -464,7 +470,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         ownership_field: @ownership_field,
         form_labels_position: @form_labels_position,
         form_placeholder_labels: @form_placeholder_labels,
-        alt_lookups: @alt_lookups,
         attachments: @attachments,
         columns_map: @columns_map,
         pundit: @pundit,
@@ -672,23 +677,17 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def fields_filtered_for_email_lookups
-    @columns.reject { |c| @alt_lookups.keys.include?(c) } + @alt_lookups.values.map { |v| ("__lookup_#{v[:lookup_as]}").to_sym }
+    @columns
   end
 
   def creation_syntax
-    merge_with = @alt_lookups.collect { |key, data|
-      "#{data[:assoc].downcase}: #{data[:assoc].downcase}_factory.#{data[:assoc].downcase}"
-    }.join(", ")
-
     if @factory_creation == ''
-      "@#{singular } = #{ class_name }.create(modified_params#{'.merge(' + merge_with + ')' if !merge_with.empty?})"
+      "@#{singular } = #{ class_name }.create(modified_params)"
     else
       "#{@factory_creation}\n" +
         "    @#{singular } = factory.#{singular}"
     end
   end
-
-
 
   def formats
     [format]
@@ -1285,11 +1284,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     }.join("")
   end
 
-  def controller_update_params_tap_away_alt_lookups
-    @alt_lookups.collect { |key, data|
-      ".tap{ |ary| ary.delete('__lookup_#{data[:lookup_as]}') }"
-    }.join("")
-  end
+
 
   def nested_for_turbo_id_list_constructor
     if @nested_set.any?
