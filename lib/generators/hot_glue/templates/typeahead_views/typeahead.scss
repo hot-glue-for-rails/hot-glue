@@ -10,7 +10,9 @@
   box-sizing: border-box;
 }
 
-
+[data-typeahead-target="results"] {
+  position: absolute;
+}
 
 .search__results {
   border: 1px solid gray;
