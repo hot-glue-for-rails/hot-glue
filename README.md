@@ -64,7 +64,7 @@ _If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github.com/jasonf
 
 ## The Super-Quick Setup
 
-https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-quick-scripts/
+https://jasonfleetwoodboldt.com/courses/stepping-up-rails/jason-fleetwood-boldts-rails-cookbook/
 
 Copy & paste the whole code block from each section into your terminal. Remember, there is a small "Copy" button at the top-right of each code block to help you copy & paste the script into your terminal. 
 
