@@ -292,10 +292,21 @@ Alternatively, you can define your own driver like so:
 
 # HOT GLUE DOCS
 
+Remember: Use `bin/rails generate model Thing` to generate models. Then add `has_many`, `belongs_to`, and _migrate your database_ before building the scaffold with Hot Glue.
+
+You will also need every Rails model to contain _either_ a database column _or_ an object-level method named one of these five things:
+`name`
+`to_label`
+`full_name`
+`display_name`
+`email`
+
+If your database doesn't contain one of these five, add a method to your model using `def to_label`. This will be used as the default label for the object throughout the Hot Glue build system. 
+
 ## First Argument
 (no double slash)
 
-TitleCase class name of the thing you want to build a scaffoling for.
+TitleCase class name of the thing you want to build a scaffolding for.
 
 ```
 ./bin/rails generate hot_glue:scaffold Thing
