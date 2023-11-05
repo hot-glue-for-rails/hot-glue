@@ -70,7 +70,7 @@ Copy & paste the whole code block from each section into your terminal. Remember
 
 These are the sections you need, you can ignore any others:
 
-* Section 1B for a new JS Bundling app, then skip down to 
+* Section 1A for a new JS Bundling app, then skip down to 
 * Section 2B: Rspec + Friends
 * Section 2B-Capy: Capybara for Rspec, then skip down to 
 * Section 3 for a welcome controller
