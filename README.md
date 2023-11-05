@@ -66,22 +66,19 @@ _If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github.com/jasonf
 
 https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-quick-scripts/
 
-Copy & paste the whole code block from each section into your terminal. (Pick only ONE option for each section.)
+Copy & paste the whole code block from each section into your terminal. Remember, there is a small "Copy" button at the top-right of each code block to help you copy & paste the script into your terminal. 
 
+These are the sections you need, you can ignore any others:
 
-From section #1 (`rails new`), choose either (1) ImportMap Rails, (2) JSBundling, or (3) Shakapacker. 
-
-For Hot Glue, you will need:
-
-Section #1 is to create a new Rails app. (Or you can do that yourself.)
-
-Section #2 is to setup Rspec, FactoryBot, and Faker — choose 2B for Rspec0
-
-Skip #3 and #4 is optional. #5 is optional but recommended. 
-
-Sectoin #6 is for Hot Glue itself, and Section #7 is for Kaminari
-
-You will also need section #8 to setup Devise if you want authentication.
+• Section 1B for a new JS Bundling app, then skip down to 
+• Section Section 2B: Rspec + Friends
+• Section 2B-Capy: Capybara for Rspec, then skip down to 
+• Section 3 for a welcome controller
+( you can skip everything in Section 4 )
+• Section 5 for debugging tools
+• _Section 6 is the Hot Glue installer itself_ (this gem) - for Bootstrap, choose section 6A
+• Section 7A to install Bootstrap along with CSSBundling
+• Section 8 to set up Devise if you want authentication. (See how Hot Glue interacts with Devise below.)
 
 
 ## Step-By-Step Setup
