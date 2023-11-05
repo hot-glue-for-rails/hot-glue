@@ -70,16 +70,17 @@ Copy & paste the whole code block from each section into your terminal. Remember
 
 These are the sections you need, you can ignore any others:
 
-• Section 1B for a new JS Bundling app, then skip down to 
-• Section Section 2B: Rspec + Friends
-• Section 2B-Capy: Capybara for Rspec, then skip down to 
-• Section 3 for a welcome controller
+* Section 1B for a new JS Bundling app, then skip down to 
+* Section 2B: Rspec + Friends
+* Section 2B-Capy: Capybara for Rspec, then skip down to 
+* Section 3 for a welcome controller
 ( you can skip everything in Section 4 )
-• Section 5 for debugging tools
-• _Section 6 is the Hot Glue installer itself_ (this gem) - for Bootstrap, choose section 6A
-• Section 7A to install Bootstrap along with CSSBundling
-• Section 8 to set up Devise if you want authentication. (See how Hot Glue interacts with Devise below.)
+* Section 5 for debugging tools
+* _Section 6 is the Hot Glue installer itself_ (this gem) - for Bootstrap, choose section 6A
+* Section 7A to install Bootstrap along with CSSBundling
+* Section 8 to set up Devise if you want authentication. (See how Hot Glue interacts with Devise below.)
 
+If you do this through the quick setup above, you can then skip down past the next section to the "HOT GLUE DOCS" below. 
 
 ## Step-By-Step Setup
 
