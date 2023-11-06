@@ -1402,7 +1402,7 @@ You can now use a typeahead when editing the book. Instead of displaying the aut
 You will do these three things:
 
 1. As a one-time setup step for your app, run
-`bin/rails generate hot_glue:install_typeahead`
+`bin/rails generate hot_glue:typeahead_install`
 2. When generating a scaffold you want to make a typeahead association, use `--modify='parent_id{typeahead}'` where `parent_id` is the foreign key
 `bin/rails generate hot_glue:scaffold Book --include=title,author_id --modify='author_id{typeahead}'`
 3. Within each namespace, you will generate a special typeahead controller (it exists for the associated object to be searched on
@@ -1485,7 +1485,7 @@ from a searchable typehead input.
 The typeahead is implemented with a native Stimulus JS pair of controllers and is a modern & clean replacement to the old typeahead options.
 
 1. As a one-time setup step for your app, run
-   `bin/rails generate hot_glue:install_typeahead`
+   `bin/rails generate hot_glue:typeahead_install`
 2. When generating a scaffold you want to make a typeahead association, use `--modify='parent_id{typeahead}'` where `parent_id` is the foreign key
    `bin/rails generate hot_glue:scaffold Book --include=title,author_id --modify='author_id{typeahead}'`
 3. Within each namespace, you will generate a special typeahead controller (it exists for the associated object to be searched on
