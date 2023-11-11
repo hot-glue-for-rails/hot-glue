@@ -81,7 +81,7 @@ class AssociationField < Field
 
     if modify_as && modify_as[:typeahead]
       search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.plural_name}_typeahead_index_url"
-      "<div class='typeahead typeahead--#{singular}--#{assoc.name}_id'
+      "<div class='typeahead typeahead--#{assoc.name}_id'
       data-controller='typeahead'
       data-typeahead-url-value='<%= #{search_url} %>'
       data-typeahead-typeahead-results-outlet='#search-results'>
@@ -92,6 +92,7 @@ class AssociationField < Field
                      value: #{singular}.try(:#{assoc.name}).try(:name) %>
       <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.try(:#{assoc.name}).try(:id), 'data-typeahead-target': 'hiddenFormValue' %>
       <div data-typeahead-target='results'></div>
+      <div data-typeahead-target='classIdentifier' data-id=\"typeahead--#{assoc_name}_id\"></div>
       </div>"
     else
       if assoc.nil?
