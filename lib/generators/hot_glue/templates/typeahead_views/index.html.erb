@@ -1,7 +1,7 @@
 
 <div class="typeahead-results__<%= @plural %>"
      data-controller="typeahead-results"
-     data-typeahead-results-typeahead-outlet=".typeahead--book--<%= @singular %>_id"
+     data-typeahead-results-typeahead-outlet=".typeahead--<%= @singular %>_id"
      data-typeahead-results-current-class="search__result--current" >
   <ul class="search__results" data-typeahead-results-target="result">
     <\% if @<%= @plural %>.any? %>

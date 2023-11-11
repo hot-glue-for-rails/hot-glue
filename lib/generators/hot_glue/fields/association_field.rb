@@ -80,20 +80,19 @@ class AssociationField < Field
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
 
     if modify_as && modify_as[:typeahead]
-         search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.plural_name}_typeahead_index_url"
-
-         "<div class='typeahead typeahead--#{singular}--#{assoc.name}_id'
-           data-controller='typeahead'
-           data-typeahead-url-value='<%= #{search_url} %>'
-           data-typeahead-typeahead-results-outlet='#search-results'>
-           <%= text_field_tag :#{assoc.plural_name}_query, '', placeholder: 'Search #{assoc.plural_name}', class: 'search__input',
-                             data: { action: 'keyup->typeahead#fetchResults keydown->typeahead#navigateResults', typeahead_target: 'query' },
-                             autofocus: true,
-                             autocomplete: 'off',
-                             value: #{singular}.try(:#{assoc.name}).try(:name) %>
-           <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.try(:#{assoc.name}).try(:id), 'data-typeahead-target': 'hiddenFormValue' %>
-           <div data-typeahead-target='results'></div>
-         </div>"
+      search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.plural_name}_typeahead_index_url"
+      "<div class='typeahead typeahead--#{singular}--#{assoc.name}_id'
+      data-controller='typeahead'
+      data-typeahead-url-value='<%= #{search_url} %>'
+      data-typeahead-typeahead-results-outlet='#search-results'>
+      <%= text_field_tag :#{assoc.plural_name}_query, '', placeholder: 'Search #{assoc.plural_name}', class: 'search__input',
+                     data: { action: 'keyup->typeahead#fetchResults keydown->typeahead#navigateResults', typeahead_target: 'query' },
+                     autofocus: true,
+                     autocomplete: 'off',
+                     value: #{singular}.try(:#{assoc.name}).try(:name) %>
+      <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.try(:#{assoc.name}).try(:id), 'data-typeahead-target': 'hiddenFormValue' %>
+      <div data-typeahead-target='results'></div>
+      </div>"
     else
       if assoc.nil?
         exit_message = "*** Oops. on the #{class_name} object, there doesn't seem to be an association called '#{assoc_name}'"

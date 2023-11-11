@@ -43,7 +43,7 @@ class Field
 
     @self_auth = self_auth
     @default_boolean_display = default_boolean_display
-    @namesapce = namespace
+    @namespace = namespace
 
     # TODO: remove knowledge of subclasses from Field
     unless self.class == AttachmentField
