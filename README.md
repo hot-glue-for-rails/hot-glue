@@ -1406,7 +1406,7 @@ You will do these three things:
 2. When generating a scaffold you want to make a typeahead association, use `--modify='parent_id{typeahead}'` where `parent_id` is the foreign key
 `bin/rails generate hot_glue:scaffold Book --include=title,author_id --modify='author_id{typeahead}'`
 3. Within each namespace, you will generate a special typeahead controller (it exists for the associated object to be searched on
-`bin/rails generate hot_glue:typehead Author`
+`bin/rails generate hot_glue:typeahead Author`
 This will create a controller for `AuthorsTypeaheadController` that will allow text search against any *string* field on the `Author` model.
 This special generator takes flags `--namespace` as the normal generator and also `--search-by` to let you specify the list of fields you want to search by.
 
