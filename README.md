@@ -681,8 +681,9 @@ Notice that each modifiers can be used with specific field types.
 | (truthy label)\|(falsy label) | specify a binary switch with a pipe (\|) character if the value is truthy, it will display as "truthy label" if the value is falsy, it will display as "falsy label" | booleans, datetimes, dates, times |   |    |
 | partials                      | applies to enums only, you must have a partial whose name matches each enum type                                                                                 | enums only                        |   |   |
 | tinymce                       | applies to text fields only, be sure to setup TineMCE globally                                                                                                   | text fields only                  |    |   |
+| typeahead                     | turns a foreign key (only) into a searchable typeahead field                                                                                                     | foreign keys only                 |   |   |
 
-Except for "(truthy label)" and "(falsy label)" which represent the labels you should specify separated by the pipe character (|), use the modifier exactly as shown.
+Except for "(truthy label)" and "(falsy label)" which use the special syntax, use the modifier _exactly_ as it is named.
 
 ### `--pundit`
 If you enable Pundit, your controllers will look for a Policy that matches the name of the thing being built.
