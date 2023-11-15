@@ -62,7 +62,8 @@ describe HotGlue::ErbTemplate do
       update_show_only: [],
       columns_map: columns_map_sample(generator: generator, options: options),
       attachments: {},
-      pundit: options[:pundit])
+      pundit: options[:pundit],
+      related_sets: [])
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy,
                                        layout_object: layout_object)
