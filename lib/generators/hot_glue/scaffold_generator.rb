@@ -1330,8 +1330,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def n_plus_one_includes
-    if @associations.any? || @attachments.any?
-      ".includes(" + (@associations.map { |x| x } + @attachments.collect { |k, v| "#{k}_attachment" }).map { |x| ":#{x.to_s}" }.join(", ") + ")"
+    if @associations.any? || @attachments.any? || @related_sets.any?
+      ".includes(" + (@associations.map { |x| x } + @attachments.collect { |k, v| "#{k}_attachment" } ).map { |x| ":#{x.to_s}" }.join(", ") + ")"
     else
       ""
     end
