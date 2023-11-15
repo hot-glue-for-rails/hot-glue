@@ -23,7 +23,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting, :update_show_only, :ownership_field,
                 :layout_strategy, :form_placeholder_labels, :form_labels_position, :pundit,
-                :self_auth, :namespace_value
+                :self_auth, :namespace_value, :related_sets
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -89,6 +89,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :modify, default: {}
   class_option :display_as, default: {}
   class_option :pundit, default: nil
+  class_option :related_sets, default: ''
 
   def initialize(*meta_args)
     super
@@ -370,6 +371,23 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       puts "NESTING: #{@nested_set}"
     end
 
+    # related_sets
+    related_set_input = options['related_sets'].split(",")
+    @related_sets = []
+    related_set_input.each do |setting|
+      @related_sets << setting.to_sym
+    end
+
+    if @related_sets.any?
+      puts "RELATED SETS: #{@related_sets}"
+
+      # @related_sets.each do |related_set|
+      #   if ! eval("#{singular_class}.reflect_on_association(:#{related_set})")
+      #     raise "You specified a related set #{related_set} but there is no association on #{singular_class} for #{related_set}; please add a `has_and_belongs_to_many :#{related_set}` OR a `has_many :#{related_set}, through: ...` to the #{singular_class} model"
+      #   end
+      # end
+    end
+
     # OBJECT OWNERSHIP & NESTING
     @reference_name = HotGlue.derrive_reference_name(singular_class)
     if @auth && @self_auth
@@ -409,13 +427,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
+
+
+
     # build a new polymorphic object
     @associations = []
     @columns_map = {}
     @columns.each do |col|
-      if !(@the_object.columns_hash.keys.include?(col.to_s) || @attachments.keys.include?(col))
-        raise "couldn't find #{col} in either field list or attachments list"
-      end
+      # if !(@the_object.columns_hash.keys.include?(col.to_s) || @attachments.keys.include?(col))
+      #   raise "couldn't find #{col} in either field list or attachments list"
+      # end
 
       if col.to_s.starts_with?("_")
         @show_only << col
@@ -425,6 +446,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         type = @the_object.columns_hash[col.to_s].type
       elsif @attachments.keys.include?(col)
         type = :attachment
+      elsif @related_sets.include?(col)
+        type = :related_set
+      else
+        raise "couldn't find #{col} in either field list, attachments, or related sets"
       end
       this_column_object = FieldFactory.new(name: col.to_s,
                                             generator: self,
@@ -455,6 +480,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
     end
 
+
+
     # create the template object
     if @markup == "erb"
       @template_builder = HotGlue::ErbTemplate.new(
@@ -473,6 +500,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         attachments: @attachments,
         columns_map: @columns_map,
         pundit: @pundit,
+        related_sets: @related_sets
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")
@@ -657,6 +685,13 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
       check_if_sample_file_is_present
     end
+
+    if @related_sets.any?
+      @related_sets.each do |related_set|
+        @columns << related_set if !@columns.include?(related_set)
+        puts "Adding related set :#{related_set} as-a-column"
+      end
+    end
   end
 
   def check_if_sample_file_is_present
@@ -676,8 +711,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     puts ""
   end
 
-  def fields_filtered_for_email_lookups
-    @columns
+  def fields_filtered_for_strong_params
+    @columns - @related_sets
   end
 
   def creation_syntax
@@ -1342,7 +1377,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def any_datetime_fields?
-    (@columns - @attachments.keys.collect(&:to_sym)).collect { |col| eval("#{singular_class}.columns_hash['#{col}']").type }.include?(:datetime)
+    (@columns - @attachments.keys.collect(&:to_sym) - @related_sets).collect { |col| eval("#{singular_class}.columns_hash['#{col}']").type }.include?(:datetime)
   end
 
   def post_action_parental_updates

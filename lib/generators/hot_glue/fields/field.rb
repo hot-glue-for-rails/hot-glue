@@ -46,7 +46,7 @@ class Field
     @namespace = namespace
 
     # TODO: remove knowledge of subclasses from Field
-    unless self.class == AttachmentField
+    unless self.class == AttachmentField || self.class == RelatedSetField
       @sql_type = eval("#{class_name}.columns_hash['#{name}']").sql_type
       @limit = eval("#{class_name}.columns_hash['#{name}']").limit
     end
@@ -54,6 +54,10 @@ class Field
 
   def getName
     @name
+  end
+
+  def form_field_output
+    raise "superclass must implement"
   end
 
   def field_error_name

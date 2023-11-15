@@ -8,7 +8,7 @@ module  HotGlue
                   :inline_list_labels, :layout_object,
                   :columns,  :col_identifier, :singular,
                   :form_placeholder_labels, :hawk_keys, :update_show_only,
-                  :attachments, :show_only, :columns_map, :pundit
+                  :attachments, :show_only, :columns_map, :pundit, :related_sets
 
 
       def initialize(singular:, singular_class: ,
@@ -17,7 +17,7 @@ module  HotGlue
                    ownership_field: , form_labels_position: ,
                    inline_list_labels: ,
                    form_placeholder_labels:, hawk_keys: ,
-                   update_show_only:, attachments: , columns_map:, pundit: )
+                   update_show_only:, attachments: , columns_map:, pundit:, related_sets:  )
 
       @singular = singular
       @singular_class = singular_class
@@ -39,6 +39,7 @@ module  HotGlue
       @hawk_keys = hawk_keys
       @update_show_only = update_show_only
       @attachments = attachments
+      @related_sets = related_sets
     end
 
     def add_spaces_each_line(text, num_spaces)
@@ -150,7 +151,7 @@ module  HotGlue
 
         "<div class='#{col_identifier} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
         column.map { |col|
-          if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col)
+          if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
           end
           field_output = columns_map[col].line_field_output

@@ -10,6 +10,8 @@ require_relative "fields/text_field"
 require_relative "fields/time_field"
 require_relative "fields/uuid_field"
 require_relative "fields/attachment_field"
+require_relative "fields/related_set_field"
+
 
 
 class FieldFactory
@@ -42,6 +44,8 @@ class FieldFactory
               EnumField
             when :attachment
               AttachmentField
+            when :related_set
+              RelatedSetField
             end
     @class_name = class_name
     @field = field_class.new(name: name,
