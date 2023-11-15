@@ -10,6 +10,8 @@ require_relative "fields/text_field"
 require_relative "fields/time_field"
 require_relative "fields/uuid_field"
 require_relative "fields/attachment_field"
+require_relative "fields/related_set_field"
+
 
 
 class FieldFactory
@@ -42,8 +44,11 @@ class FieldFactory
               EnumField
             when :attachment
               AttachmentField
+            when :related_set
+              RelatedSetField
             end
     @class_name = class_name
+
     @field = field_class.new(name: name,
                              layout_strategy: generator.layout_strategy,
                              form_placeholder_labels: generator.form_placeholder_labels,
@@ -60,6 +65,7 @@ class FieldFactory
                              modify_as: generator.modify_as[name.to_sym] || nil,
                              display_as: generator.display_as[name.to_sym] || nil,
                              default_boolean_display: generator.default_boolean_display,
-                             namespace: generator.namespace_value)
+                             namespace: generator.namespace_value,
+                             pundit: generator.pundit )
   end
 end

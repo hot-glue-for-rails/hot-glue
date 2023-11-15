@@ -62,7 +62,8 @@ describe HotGlue::ErbTemplate do
       update_show_only: [],
       columns_map: columns_map_sample(generator: generator, options: options),
       attachments: {},
-      pundit: options[:pundit])
+      pundit: options[:pundit],
+      related_sets: [])
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy,
                                        layout_object: layout_object)
@@ -87,7 +88,7 @@ describe HotGlue::ErbTemplate do
                                    form_labels_position: 'before',
                                    ownership_field: "", name: "hgi_id", class_name: "Jkl",
                                    singular: "Jkl", update_show_only: nil, hawk_keys: options[:hawk_keys],
-                                   auth: "", sample_file_path: nil, attachment_data: nil, modify_as: {}),
+                                   auth: "", sample_file_path: nil, attachment_data: nil, modify_as: {}, pundit: false),
       time_of_day: FieldFactory.new(type: :time, name: "time_of_day", generator: generator).field,
       release_on: FieldFactory.new(type: :date, name: "release_on", generator: generator).field,
       approved_at: FieldFactory.new(type: :datetime, name: "approved_at", generator: generator).field,
@@ -124,7 +125,8 @@ describe HotGlue::ErbTemplate do
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
       attachments: {},
-      pundit: options[:pundit])
+      pundit: options[:pundit],
+      related_sets: [])
 
     @template_builder.all_line_fields( perc_width: 15,
                                        layout_strategy: layout_strategy,

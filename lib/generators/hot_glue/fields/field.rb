@@ -5,7 +5,7 @@ class Field
                 :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :object, :sample_file_path,
                 :self_auth,
                 :singular_class,  :singular, :sql_type, :ownership_field,
-                :update_show_only, :namespace
+                :update_show_only, :namespace, :pundit
 
   def initialize(
     auth: ,
@@ -24,7 +24,8 @@ class Field
     singular: ,
     update_show_only:,
     self_auth:,
-    namespace:
+    namespace:,
+    pundit:
   )
     @name = name
     @layout_strategy = layout_strategy
@@ -40,13 +41,14 @@ class Field
     @form_labels_position = form_labels_position
     @modify_as = modify_as
     @display_as = display_as
+    @pundit = pundit
 
     @self_auth = self_auth
     @default_boolean_display = default_boolean_display
     @namespace = namespace
 
     # TODO: remove knowledge of subclasses from Field
-    unless self.class == AttachmentField
+    unless self.class == AttachmentField || self.class == RelatedSetField
       @sql_type = eval("#{class_name}.columns_hash['#{name}']").sql_type
       @limit = eval("#{class_name}.columns_hash['#{name}']").limit
     end
@@ -54,6 +56,10 @@ class Field
 
   def getName
     @name
+  end
+
+  def form_field_output
+    raise "superclass must implement"
   end
 
   def field_error_name
