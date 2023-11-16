@@ -964,6 +964,25 @@ This happens using two interconnected mechanisms:
 please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
 
 
+### `--related-sets`
+
+Used to show a checkbox set of related records. The relationship should be a `has_and_belongs_to_many` or a `has_many through:` from the object being built.
+
+Consider the classic example of three tables: users, user_roles, and roles
+
+User `has_many :user_roles`; UserRole `belongs_to :user` and `belongs_to :role`; and Role `has_many :user_roles` and `has_many :user, through: :user_roles`
+
+We'll generate a scaffold to edit the users table. A checkbox set of related roles will also appear to allow editing of roles. (In this example, the only field to be edited is the email field.)
+
+```
+rails generate hot_glue:scaffold User --related-sets=roles --include=email,roles --gd
+```
+
+Note this leaves open a privileged escalation attack (a security vulnerability).
+
+To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see Example #16 in the [https://school.jfbcodes.com/8188](Hot Glue Tutorial).
+
+
 ## "Thing" Label
 
 Note that on a per model basis, you can also globally omit the label or set a unique label value using
@@ -1473,6 +1492,29 @@ bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 ```
 
 # VERSION HISTORY
+
+#### v0.6.1 - `--related-sets`
+
+Used to show a checkbox set of related records. The relationship should be a `has_and_belongs_to_many` or a `has_many through:` from the object being built.
+
+Consider the classic example of three tables: users, user_roles, and roles
+
+User `has_many :user_roles`; UserRole `belongs_to :user` and `belongs_to :role`; and Role `has_many :user_roles` and `has_many :user, through: :user_roles`
+
+We'll generate a scaffold to edit the users table. A checkbox set of related roles will also appear to allow editing of roles. (In this example, the only field to be edited is the email field.)
+
+```
+rails generate hot_glue:scaffold User --related-sets=roles --include=email,roles --gd
+```
+
+
+
+Note this leaves open a privileged escalation attack (a security vulnerability).
+
+To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see Example #16 in the [https://school.jfbcodes.com/8188](Hot Glue Tutorial).
+
+
+#### v0.6.0.1 - small tweaks to typeahead
 
 #### 2023-11-03 - v0.6.0
 

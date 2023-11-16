@@ -72,7 +72,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   <% end %>def load_all_<%= plural %><% if @pundit %>
     @<%= plural_name %> =  policy_scope(<%= object_scope %>).page(params[:page])<%= n_plus_one_includes %><%= ".per(per)" if @paginate_per_page_selector %>
-    authorize @<%= plural_name %>.all<% else %> <% if !@self_auth %>
+    <% else %> <% if !@self_auth %>
     @<%= plural_name %> = <%= object_scope.gsub("@",'') %><%= n_plus_one_includes %>.page(params[:page])<%= ".per(per)" if @paginate_per_page_selector %><%= " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] %><% if @nested_set[0] &&  @nested_set[0][:optional] %>
     @<%= plural_name %> = <%= class_name %>.all<% end %><% else %>
     @<%= plural_name %> = <%= class_name %>.where(id: <%= auth_object.gsub("@",'') %>.id)<%= n_plus_one_includes %>.page(params[:page])<%= ".per(per)" if @paginate_per_page_selector %><% end %>
@@ -80,7 +80,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
   def index
-    load_all_<%= plural %><% if @pundit %>
+    load_all_<%= plural %><% if @pundit %><% if @pundit %>
+    authorize @<%= plural_name %><% end %>
   rescue Pundit::NotAuthorizedError
     flash[:alert] = "You are not authorized to perform this action."
     render "layouts/error"<% end %>
@@ -94,19 +95,23 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @action = "new"
   rescue Pundit::NotAuthorizedError
     flash[:alert] = "You are not authorized to perform this action."
+    load_all_users
     render :index<% end %>
   end
 
   def create
     modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup, <%= current_user_object %>, <%= datetime_fields_list %>) <% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
     modified_params = modified_params.merge(<%= @object_owner_sym %>: <%= @object_owner_eval %>) <% elsif @object_owner_optional && any_nested? %>
-    modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% elsif !@object_owner_eval.empty? %>
+    modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% elsif !@object_owner_eval.empty? && !@god %>
     modified_params = modified_params.merge(<%= @object_owner_eval %>) <% end %>
 
       <% if @hawk_keys.any? %>
     modified_params = hawk_params({<%= hawk_to_ruby %>}, modified_params)<% end %>
-      <%= controller_attachment_orig_filename_pickup_syntax %>
+    <%= controller_attachment_orig_filename_pickup_syntax %>
     <%= creation_syntax %>
+    <% @related_sets.each do |key, related_set| %>
+    check_<%= related_set[:association_ids_method].to_s %>_permissions(modified_params, :create)<% end %>
+    authorize @<%= singular %>
 
     if @<%= singular_name %>.save
       flash[:notice] = "Successfully created #{@<%= singular %>.<%= display_class %>}"
@@ -152,17 +157,19 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       flash[:notice] << "<% singular %> <%= button.titlecase %>."
     end
     <% end %>
+    <% @related_sets.each do |key, related_set| %>
     modified_params = modify_date_inputs_on_params(<% if @update_show_only %>update_<% end %><%= singular_name %>_params.dup<%= controller_update_params_tap_away_magic_buttons  %>, <%= current_user_object %>, <%= datetime_fields_list %>) <% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
     modified_params = modified_params.merge(<%= @object_owner_sym %>: <%= @object_owner_eval %>) <% elsif @object_owner_optional && any_nested? %>
-    modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% elsif ! @object_owner_eval.empty?  && !@self_auth%>
+    modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% elsif ! @object_owner_eval.empty?  && !@self_auth && ! @god%>
     modified_params = modified_params.merge(<%= @object_owner_eval %>) <% end %>
+    check_<%= related_set[:association_ids_method].to_s %>_permissions(modified_params, :update)<% end %>
 
     <% if @hawk_keys.any? %>    modified_params = hawk_params({<%= hawk_to_ruby %>}, modified_params)<% end %>
       <%= controller_attachment_orig_filename_pickup_syntax %>
     <% if @pundit %>
     if @<%= singular_name %>.attributes = modified_params
-        authorize @<%= singular_name %>
-        @<%= singular_name %>.save
+      authorize @<%= singular_name %>
+      @<%= singular_name %>.save
     <% else %>
     if @<%= singular_name %>.update(modified_params)
     <% end %>
@@ -194,12 +201,23 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     render :update<% end %>
   end<% end %>
 
+<% @related_sets.each do |key, rs| %>
+  def check_<%= rs[:association_ids_method] %>_permissions(modified_params, action)
+    if modified_params[:<%= rs[:association_ids_method] %>].present? && modified_params[:<%= rs[:association_ids_method] %>] != @<%= singular %>.<%= rs[:association_ids_method] %>
+      # authorize the <%= rs[:association_ids_method] %> change using special modified_relations: {<%= rs[:association_ids_method] %>: modified_params[:<%= rs[:association_ids_method] %>>]} syntax for Pundit
+      if ! <%= singular_class %>Policy.new(current_user, @<%= singular %>, modified_relations: {role_ids: modified_params[:<%= rs[:association_ids_method] %>]}).method("#{action}?".to_sym).call
+        authorize @<%= singular %>, "#{action}?".to_sym
+        raise Pundit::NotAuthorizedError, message: @<%= singular %>.errors.collect{|k| "#{k.attribute} #{k.message}"}.join(" ")
+      end
+    end
+  end<% end %>
+
   def <%=singular_name%>_params
-    params.require(:<%= testing_name %>).permit(<%= ((fields_filtered_for_strong_params - @show_only ) + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|rs| eval("#{singular_class}.reflect_on_association(:#{rs.to_sym})").class_name.underscore + "_ids: []"}.join(", ") if @related_sets.any? %>)
+    params.require(:<%= testing_name %>).permit(<%= ((fields_filtered_for_strong_params - @show_only ) + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %>)
   end<% if @update_show_only %>
 
   def update_<%=singular_name%>_params
-    params.require(:<%= testing_name %>).permit(<%= ((fields_filtered_for_strong_params - @update_show_only)  + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|rs| eval("#{singular_class}.reflect_on_association(:#{rs.to_sym})").class_name.underscore + "_ids: []"}.join(", ") if @related_sets.any? %>)
+    params.require(:<%= testing_name %>).permit(<%= ((fields_filtered_for_strong_params - @update_show_only)  + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %>)
   end<% end %>
 
   def namespace

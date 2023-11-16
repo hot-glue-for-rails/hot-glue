@@ -321,7 +321,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     if @god
-      @auth = nil
+      # @auth = nil
     end
     # when in self auth, the object is the same as the authenticated object
 
@@ -373,19 +373,20 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     # related_sets
     related_set_input = options['related_sets'].split(",")
-    @related_sets = []
+    @related_sets = {}
     related_set_input.each do |setting|
-      @related_sets << setting.to_sym
+      name = setting.to_sym
+      association_ids_method = eval("#{singular_class}.reflect_on_association(:#{setting.to_sym})").class_name.underscore + "_ids"
+      class_name = eval("#{singular_class}.reflect_on_association(:#{setting.to_sym})").class_name
+
+      @related_sets[setting.to_sym] =   { name: setting.to_sym,
+                          association_ids_method: association_ids_method,
+                          class_name: class_name }
     end
 
     if @related_sets.any?
       puts "RELATED SETS: #{@related_sets}"
 
-      # @related_sets.each do |related_set|
-      #   if ! eval("#{singular_class}.reflect_on_association(:#{related_set})")
-      #     raise "You specified a related set #{related_set} but there is no association on #{singular_class} for #{related_set}; please add a `has_and_belongs_to_many :#{related_set}` OR a `has_many :#{related_set}, through: ...` to the #{singular_class} model"
-      #   end
-      # end
     end
 
     # OBJECT OWNERSHIP & NESTING
@@ -446,7 +447,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         type = @the_object.columns_hash[col.to_s].type
       elsif @attachments.keys.include?(col)
         type = :attachment
-      elsif @related_sets.include?(col)
+      elsif @related_sets.keys.include?(col)
         type = :related_set
       else
         raise "couldn't find #{col} in either field list, attachments, or related sets"
@@ -635,6 +636,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def identify_object_owner
+    return if @god
     auth_assoc = @auth && @auth.gsub("current_", "")
 
     if @object_owner_sym && !@self_auth
@@ -687,9 +689,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     if @related_sets.any?
-      @related_sets.each do |related_set|
-        @columns << related_set if !@columns.include?(related_set)
-        puts "Adding related set :#{related_set} as-a-column"
+      @related_sets.each do |key, related_set|
+        @columns << related_set[:name] if !@columns.include?(related_set[:name])
+        puts "Adding related set :#{related_set[:name]} as-a-column"
       end
     end
   end
@@ -712,12 +714,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def fields_filtered_for_strong_params
-    @columns - @related_sets
+    @columns - @related_sets.collect{|key, set| set[:name]}
   end
 
   def creation_syntax
     if @factory_creation == ''
-      "@#{singular } = #{ class_name }.create(modified_params)"
+      "@#{singular } = #{ class_name }.new(modified_params)"
     else
       "#{@factory_creation}\n" +
         "    @#{singular } = factory.#{singular}"
@@ -1004,7 +1006,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def object_scope
-    if @auth
+    if @auth && !@god
       if @nested_set.none?
         @auth + ".#{plural}"
       else
@@ -1377,7 +1379,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def any_datetime_fields?
-    (@columns - @attachments.keys.collect(&:to_sym) - @related_sets).collect { |col| eval("#{singular_class}.columns_hash['#{col}']").type }.include?(:datetime)
+    (@columns - @attachments.keys.collect(&:to_sym) - @related_sets.keys ).collect { |col| eval("#{singular_class}.columns_hash['#{col}']").type }.include?(:datetime)
   end
 
   def post_action_parental_updates

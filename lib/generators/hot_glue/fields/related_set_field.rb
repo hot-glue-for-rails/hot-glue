@@ -35,7 +35,7 @@ class RelatedSetField < Field
 
 
   def form_field_output
-    " <%= f.collection_check_boxes :#{association_ids_method}, #{association_class_name}.all, :id, :label do |m| %>
+    " <%= f.collection_check_boxes :#{association_ids_method}, #{association_class_name}.all, :id, :label, {}, {disabled: ! #{class_name}Policy.new(#{auth}, @#{singular}).role_ids_able?} do |m| %>
       <%= m.check_box %> <%= m.label %><br />
     <% end %>"
   end
