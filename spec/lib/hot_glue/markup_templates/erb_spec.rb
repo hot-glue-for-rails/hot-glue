@@ -125,7 +125,8 @@ describe HotGlue::ErbTemplate do
       form_labels_position: options[:form_labels_position],
       update_show_only: [],
       attachments: {},
-      pundit: options[:pundit])
+      pundit: options[:pundit],
+      related_sets: [])
 
     @template_builder.all_line_fields( perc_width: 15,
                                        layout_strategy: layout_strategy,
