@@ -31,7 +31,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :plural, type: :string, default: nil
   class_option :singular_class, type: :string, default: nil
   class_option :nest, type: :string, default: nil # DEPRECATED —— DO NOT USE
-  class_option :nested, type: :string, default: ""
+  class_option :within, type: :string, default: ""
+  class_option :nested, type: :string, default: "" # DEPRECATED —— DO NOT  USE
 
   class_option :namespace, type: :string, default: nil
   class_option :auth, type: :string, default: nil
@@ -177,8 +178,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if options['nest']
       raise HotGlue::Error, "STOP: the flag --nest has been replaced with --nested; please re-run using the --nested flag"
     end
-    @nested = (!options['nested'].empty? && options['nested']) || nil
+    if !options['nested'].empty?
+      raise HotGlue::Error, "STOP: the flag --nested has been replaced with --within; please re-run using the --within flag"
+    end
+    @within = (!options['within'].empty? && options['nested']) || nil
     @singular_class = args.first # note this is the full class name with a model namespace
+
 
     setup_attachments
 
@@ -350,16 +355,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     # NEST CHAIN
     # new syntax
-    # @nested_set = [
+    # @within_set = [
     # {
     #    singular: ...,
     #    plural: ...,
     #    optional: false
     # }]
-    @nested_set = []
+    @within_set = []
 
-    if !@nested.nil?
-      @nested_set = @nested.split("/").collect { |arg|
+    if !@within.nil?
+      @within_set = @within.split("/").collect { |arg|
         is_optional = arg.start_with?("~")
         arg.gsub!("~", "")
         {
@@ -368,7 +373,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           optional: is_optional
         }
       }
-      puts "NESTING: #{@nested_set}"
+      puts "NESTING: #{@within_set}"
     end
 
     # related_sets
@@ -397,7 +402,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @object_owner_optional = false
       @object_owner_name = @auth.gsub("current_", "").to_s
 
-    elsif @auth && !@self_auth && @nested_set.none? && !@auth.include?(".")
+    elsif @auth && !@self_auth && @within_set.none? && !@auth.include?(".")
       @object_owner_sym = @auth.gsub("current_", "").to_sym
       @object_owner_eval = @auth
       @object_owner_optional = false
@@ -407,11 +412,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @object_owner_sym = nil
       @object_owner_eval = @auth
     else
-      if @nested_set.any?
-        @object_owner_sym = @nested_set.last[:singular].to_sym
-        @object_owner_eval = "@#{@nested_set.last[:singular]}"
-        @object_owner_name = @nested_set.last[:singular]
-        @object_owner_optional = @nested_set.last[:optional]
+      if @within_set.any?
+        @object_owner_sym = @within_set.last[:singular].to_sym
+        @object_owner_eval = "@#{@within_set.last[:singular]}"
+        @object_owner_name = @within_set.last[:singular]
+        @object_owner_optional = @within_set.last[:optional]
       else
         @object_owner_sym = nil
         @object_owner_eval = ""
@@ -514,7 +519,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                            buttons_width: buttons_width)
     @layout_object = builder.construct
 
-    @menu_file_exists = true if @nested_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
+    @menu_file_exists = true if @within_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
     @turbo_streams = !!options['with_turbo_streams']
   end
@@ -645,7 +650,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
       if assoc
         @ownership_field = assoc.name.to_s + "_id"
-      elsif !@nested_set.any?
+      elsif !@within_set.any?
         exit_message = "*** Oops: It looks like is no association `#{@object_owner_sym}` from the object #{@singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
         raise(HotGlue::Error, exit_message)
 
@@ -831,8 +836,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     if @self_auth
       ""
-    elsif @nested_set.any? && !@nested_set.last[:optional]
-      ", " + @nested_set.last[:singular] + ": " + @nested_set.last[:singular]
+    elsif @within_set.any? && !@within_set.last[:optional]
+      ", " + @within_set.last[:singular] + ": " + @within_set.last[:singular]
     elsif @auth && !@god
       ", #{@auth_identifier}: #{@auth}"
     end
@@ -844,7 +849,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       last_parent = ", #{@auth_identifier}: #{@auth}"
     end
 
-    @nested_set.each do |arg|
+    @within_set.each do |arg|
       res << "  let(:#{arg[:singular]}) {create(:#{arg[:singular]} #{last_parent} )}\n"
       last_parent = ", #{arg[:singular]}: #{arg[:singular]}"
     end
@@ -852,12 +857,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def nested_path
-    @nested_set.collect{| arg| arg[:plural] + "/\#{#{arg[:singular]}.id}/" }.join("/")
+    @within_set.collect{| arg| arg[:plural] + "/\#{#{arg[:singular]}.id}/" }.join("/")
   end
 
 
   def objest_nest_params_by_id_for_specs
-    @nested_set.map { |arg|
+    @within_set.map { |arg|
       "#{arg[:singular]}_id: #{arg[:singular] }.id"
     }.join(",\n          ")
   end
@@ -888,16 +893,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def path_helper_args
-    if @nested_set.any? && @nested
-      [(@nested_set).collect { |a| "#{a[:singular]}" }, singular].join(",")
+    if @within_set.any? && @within
+      [(@within_set).collect { |a| "#{a[:singular]}" }, singular].join(",")
     else
       singular
     end
   end
 
   def path_helper_singular
-    if @nested
-      "#{@namespace + "_" if @namespace}#{(@nested_set.collect { |x| x[:singular] }.join("_") + "_" if @nested_set.any?)}#{@controller_build_folder_singular}_path"
+    if @within
+      "#{@namespace + "_" if @namespace}#{(@within_set.collect { |x| x[:singular] }.join("_") + "_" if @within_set.any?)}#{@controller_build_folder_singular}_path"
     else
       "#{@namespace + "_" if @namespace}#{@controller_build_folder_singular}_path"
     end
@@ -906,7 +911,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def path_helper_plural
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @controller_build_folder,
-                                 nested_set: @nested_set)
+                                 nested_set: @within_set)
   end
 
   def datetime_fields_list
@@ -920,7 +925,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def form_path_new_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @controller_build_folder,
-                                 nested_set: @nested_set,
+                                 nested_set: @within_set,
                                  with_params: true,
                                  top_level: false)
   end
@@ -928,7 +933,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def form_path_edit_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @singular,
-                                 nested_set: @nested_set,
+                                 nested_set: @within_set,
                                  with_params: true,
                                  put_form: true,
                                  top_level: false)
@@ -937,7 +942,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def delete_path_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @singular,
-                                 nested_set: @nested_set,
+                                 nested_set: @within_set,
                                  with_params: true,
                                  put_form: true)
   end
@@ -945,7 +950,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def edit_path_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @singular,
-                                 nested_set: @nested_set,
+                                 nested_set: @within_set,
                                  modifier: "edit_",
                                  with_params: true,
                                  put_form: true)
@@ -953,7 +958,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def path_arity
     res = ""
-    if @nested_set.any? && @nested
+    if @within_set.any? && @within
       res << nested_objects_arity + ", "
     end
     res << "@" + singular
@@ -974,22 +979,22 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def new_path_name
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: singular,
-                                 nested_set: @nested_set,
+                                 nested_set: @within_set,
                                  modifier: "new_",
                                  with_params: true)
   end
 
   def nested_assignments
-    return "" if @nested_set.none?
-    @nested_set.map { |a| "#{a}: #{a}" }.join(", ") # metaprgramming into Ruby hash
+    return "" if @within_set.none?
+    @within_set.map { |a| "#{a}: #{a}" }.join(", ") # metaprgramming into Ruby hash
   end
 
   def nested_assignments_top_level # this is by accessing the instance variable-- only use at top level
-    @nested_set.map { |a| "#{a[:singular]}" }.join(", ") # metaprgramming into Ruby hash
+    @within_set.map { |a| "#{a[:singular]}" }.join(", ") # metaprgramming into Ruby hash
   end
 
   def nest_assignments_operator(top_level = false, leading_comma = false)
-    if @nested_set.any?
+    if @within_set.any?
       "#{", " if leading_comma}#{top_level ? nested_assignments_top_level : nested_assignments }"
     else
       ""
@@ -1001,25 +1006,25 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def nested_objects_arity
-    @nested_set.map { |a| "@#{a[:singular]}" }.join(", ")
+    @within_set.map { |a| "@#{a[:singular]}" }.join(", ")
   end
 
   def nested_arity_for_path
-    [@nested_set[0..-1].collect { |a| "@#{a[:singular]}" }].join(", ") # metaprgramming into arity for the Rails path helper
+    [@within_set[0..-1].collect { |a| "@#{a[:singular]}" }].join(", ") # metaprgramming into arity for the Rails path helper
   end
 
   def object_scope
     if @auth && !@god
-      if @nested_set.none?
+      if @within_set.none?
         @auth + ".#{plural}"
       else
-        "@" + @nested_set.last[:singular] + ".#{plural}"
+        "@" + @within_set.last[:singular] + ".#{plural}"
       end
     else
-      if @nested_set.none?
+      if @within_set.none?
         @singular_class
       else
-        "@" + @nested_set.last[:singular] + ".#{plural}"
+        "@" + @within_set.last[:singular] + ".#{plural}"
       end
     end
   end
@@ -1028,10 +1033,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if @auth
       if @self_auth
         @singular_class + ".where(id: #{@auth}.id)"
-      elsif @nested_set.none?
+      elsif @within_set.none?
         @auth + ".#{plural}"
       else
-        "@" + @nested_set.last[:singular] + ".#{plural}"
+        "@" + @within_set.last[:singular] + ".#{plural}"
       end
     else
       @singular_class + ".all"
@@ -1039,7 +1044,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def any_nested?
-    @nested_set.any?
+    @within_set.any?
   end
 
   def all_objects_variable
@@ -1067,7 +1072,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @template_builder.magic_button_output(
       path: HotGlue.optionalized_ternary(namespace: @namespace,
                                          target: @singular,
-                                         nested_set: @nested_set,
+                                         nested_set: @within_set,
                                          with_params: true,
                                          put_form: true),
       singular: singular,
@@ -1144,7 +1149,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def insert_into_nav_template
     # how does this get called(?)
     nav_file = "#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}"
-    if include_nav_template && @nested_set.none?
+    if include_nav_template && @within_set.none?
       append_text = "  <li class='nav-item'>
     <%= link_to '#{@list_label_heading}', #{path_helper_plural}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
   </li>"
@@ -1327,7 +1332,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
   def nested_for_turbo_id_list_constructor
-    if @nested_set.any?
+    if @within_set.any?
       '+ (((\'__\' + nested_for) if defined?(nested_for)) || "")'
     else
       ""
@@ -1345,10 +1350,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def nested_for_turbo_nested_constructor(top_level = true)
     instance_symbol = "@" if top_level
     instance_symbol = "" if !top_level
-    if @nested_set.none?
+    if @within_set.none?
       "\"\""
     else
-      @nested_set.collect { |arg|
+      @within_set.collect { |arg|
         "(((\"__#{arg[:singular]}-\#{" + "@" + arg[:singular] + ".id}\") if @" + arg[:singular] + ") || \"\")"
       }.join(" + ")
     end
@@ -1357,10 +1362,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def nested_for_assignments_constructor(top_level = true)
     instance_symbol = "@" if top_level
     instance_symbol = "" if !top_level
-    if @nested_set.none?
+    if @within_set.none?
       ""
     else
-      ", \n    nested_for: \"" + @nested_set.collect { |a| "#{a[:singular]}-" + '#{' + instance_symbol + a[:singular] + ".id}" }.join("__") + "\""
+      ", \n    nested_for: \"" + @within_set.collect { |a| "#{a[:singular]}-" + '#{' + instance_symbol + a[:singular] + ".id}" }.join("__") + "\""
     end
   end
 
@@ -1386,8 +1391,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def post_action_parental_updates
-    if @nested_set.any?
-      "\n" + @nested_set.collect { |data|
+    if @within_set.any?
+      "\n" + @within_set.collect { |data|
         parent = data[:singular]
         "@#{singular}.#{parent}.reload"
       }.join("\n")
@@ -1395,7 +1400,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def turbo_parental_updates
-    @nested_set.collect { |data|
+    @within_set.collect { |data|
       "<%= turbo_stream.replace \"#{@namespace + '__' if @namespace}\#{dom_id(@#{data[:singular]})}\" do %>
     <%= render partial: \"#{@namespace}/#{data[:plural]}/edit\", locals: {#{data[:singular]}: @#{singular}.#{data[:singular]}.reload} %>
   <% end %>"

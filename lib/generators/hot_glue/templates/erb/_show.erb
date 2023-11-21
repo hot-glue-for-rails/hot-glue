@@ -16,8 +16,8 @@
         <%= @singular %>: <%= @singular %>,
         <%= downnest_object_name %>: <%= @singular %>.<%= downnest %>
       }
-      .merge({nested_for: "<% if @nested_set.any? %>#{nested_for + "__" if defined?(nested_for)}<% end %><%= @singular %>-#{<%= @singular %>.id}"})
-      <%= @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {} )"}.join("\n") %>
+      .merge({nested_for: "<% if @within_set.any? %>#{nested_for + "__" if defined?(nested_for)}<% end %><%= @singular %>-#{<%= @singular %>.id}"})
+      <%= @within_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {} )"}.join("\n") %>
     \%>
     <% if !@stacked_downnesting %></div><% end %>
   <% end %>

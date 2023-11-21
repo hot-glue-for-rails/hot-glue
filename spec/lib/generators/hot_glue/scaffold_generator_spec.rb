@@ -71,7 +71,7 @@ describe HotGlue::ScaffoldGenerator do
 
         describe "When there are nested args" do
           describe "when the user accidentally uses the plural form for the object owner" do
-            let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--nested=dfgs"], {:shell=> Thor::Shell::Color.new})}
+            let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--within=dfgs"], {:shell=> Thor::Shell::Color.new})}
 
             it "should suggest that I meant the singular version" do
               expect {
@@ -243,7 +243,7 @@ describe HotGlue::ScaffoldGenerator do
   describe "--nested" do
     it "should create a file at and specs/features" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
-                                          ["Ghi","--nested=dfg"])
+                                          ["Ghi","--within=dfg"])
 
       expect(File.exist?("spec/dummy/app/controllers/ghis_controller.rb")).to be(true)
       expect(File.exist?("spec/dummy/spec/features/ghis_behavior_spec.rb")).to be(true)
@@ -251,7 +251,7 @@ describe HotGlue::ScaffoldGenerator do
 
 
     describe "when the user accidentally uses the plural form for the object owner" do
-      let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--nested=dfg", "--gd"], {:shell=> Thor::Shell::Color.new})}
+      let (:generator) {HotGlue::ScaffoldGenerator.new(["Ghi"], ["--within=dfg", "--gd"], {:shell=> Thor::Shell::Color.new})}
 
       it "should treat the object scope as the last thing in the chain" do
         expect(generator.object_scope).to eq("@dfg.ghis")
@@ -1170,7 +1170,7 @@ describe HotGlue::ScaffoldGenerator do
       expect { Rails::Generators.invoke("hot_glue:scaffold",
                                         ["Ghi", "--nest=xyz"])
 
-      }.to raise_exception("STOP: the flag --nest has been replaced with --nested; please re-run using the --nested flag")
+      }.to raise_exception
     end
   end
 

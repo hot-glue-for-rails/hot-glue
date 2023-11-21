@@ -4,6 +4,6 @@
   </h3>
   <\%= form_with model:  <%= singular %>, url: <%= form_path_new_helper %>, method: :post do  |f| \%>
     <\%=  render partial: "<%= namespace_with_slash +  @controller_build_folder %>/form",
-locals: { <%=  singular %>: <%= singular %>, f: f}<%= @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}}: {})" }.join %> \%>
+locals: { <%=  singular %>: <%= singular %>, f: f}<%= @within_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}}: {})" }.join %> \%>
  <\% end %>
 <\% end %>

@@ -1,7 +1,7 @@
 <%= turbo_parental_updates %>
 
 <\%= turbo_stream.update "<%= @namespace %>__<%= plural %>-list" + <%= nested_for_turbo_nested_constructor %> do %>
-  <\%= render partial: "list", locals: {<%=plural%>: @<%=plural%> }<%= @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {nested_for: \"" + arg[:singular] + "-\#{@" + arg[:singular] + ".id}\"" + ", " + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> \%>
+  <\%= render partial: "list", locals: {<%=plural%>: @<%=plural%> }<%= @within_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {nested_for: \"" + arg[:singular] + "-\#{@" + arg[:singular] + ".id}\"" + ", " + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> \%>
 <\% end %>
 
 <\%= turbo_stream.update "flash_notices" do %>

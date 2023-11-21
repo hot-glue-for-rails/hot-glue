@@ -1,1 +1,1 @@
-<\%= render partial: "new_form", locals: {<%= singular %>: @<%=singular%>}<%= @nested_set.collect{|arg| ".merge(@#{arg[:singular]} ? {#{arg[:singular]}: @#{arg[:singular]}} : {})" }.join %> %>
+<\%= render partial: "new_form", locals: {<%= singular %>: @<%=singular%>}<%= @within_set.collect{|arg| ".merge(@#{arg[:singular]} ? {#{arg[:singular]}: @#{arg[:singular]}} : {})" }.join %> %>

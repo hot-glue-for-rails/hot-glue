@@ -5,7 +5,7 @@
   <% if include_nav_template %><\%= render partial: "<%= nav_template %>", locals: {nav: "<%= @plural %>"} %><% end %>
 
   <\%= render partial: '<%= list_path_partial %>',
-    locals: {<%= plural %>: @<%= plural %>}<%= @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {nested_for: \"" + arg[:singular] + "-\#{@" + arg[:singular] + ".id}\"" + ", " + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> \%>
+    locals: {<%= plural %>: @<%= plural %>}<%= @within_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {nested_for: \"" + arg[:singular] + "-\#{@" + arg[:singular] + ".id}\"" + ", " + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> \%>
 
   <%= @layout_strategy.page_end %>
 </div>

@@ -1,12 +1,12 @@
 <\%= turbo_frame_tag "<%= @namespace %>__<%= plural %>-list" <%= nested_for_turbo_id_list_constructor %>  do %>
   <div class="<%= @container_name %> <%= @layout_strategy.list_classes %>">
-    <% unless @no_list  || @no_list_label || (@nested_set.any? && !@nested_set.collect{|x| x[:optional]}.any?)  %>
+    <% unless @no_list  || @no_list_label || (@within_set.any? && !@within_set.collect{|x| x[:optional]}.any?)  %>
       <% unless list_label.nil? %><h4>
         <%= list_label %>
       </h4><% end %>
     <% end %>
 
-    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  @controller_build_folder + '/new_button", locals: {}' + @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join()  + ' %\>'.gsub('\\',"")  %><br /><% end %>
+    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  @controller_build_folder + '/new_button", locals: {}' + @within_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join()  + ' %\>'.gsub('\\',"")  %><br /><% end %>
 
     <% unless @no_list %>
       <% unless @no_list_heading %>
@@ -48,7 +48,7 @@
       <\% <%= plural %>.each do |<%= singular %>| %>
         <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %>}
             .merge(defined?(nested_for) ? {nested_for: nested_for} : {})
-      <%= @nested_set.collect{|arg| "      .merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join("\n") %>
+      <%= @within_set.collect{|arg| "      .merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join("\n") %>
         %>
       <\% end %>
       <% if @paginate_per_page_selector %>
