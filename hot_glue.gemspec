@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.version     = HotGlue::Version::CURRENT
   spec.license     = 'Nonstandard'
   spec.date        = Time.now.strftime("%Y-%m-%d")
-  spec.summary     = "A gem to build Tubro Rails scaffolding."
+  spec.summary     = "A gem to build Turbo Rails scaffolding."
   spec.description = "Simple, plug & play Rails scaffold building companion for Turbo-Rails and Hotwire"
   spec.authors     = ["Jason Fleetwood-Boldt"]
   spec.email       = 'code@jasonfb.net'
