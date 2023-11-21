@@ -1507,12 +1507,17 @@ We'll generate a scaffold to edit the users table. A checkbox set of related rol
 rails generate hot_glue:scaffold User --related-sets=roles --include=email,roles --gd
 ```
 
+Note that when making a scaffold like this, you may leave open a privileged escalation attack (a security vulnerability).
 
+To fix this, you'll need to use Pundit with special syntax designed for this purpose. 
 
-Note this leaves open a privileged escalation attack (a security vulnerability).
+For a complete solution, please see Example #16 in the [https://school.jfbcodes.com/8188](Hot Glue Tutorial).
 
-To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see Example #16 in the [https://school.jfbcodes.com/8188](Hot Glue Tutorial).
+Without Pundit, due to a quirk in how this code works with ActiveRecord, all update operates to the related sets table are permitted (and go through), even if the update operation otherwise fails validation for the fields on the object. (ActiveRecord doesn't seem to have a way to validate the related sets directly.)
 
+In this case, your update actions may update the relate sets table but fail to update the current object.
+
+Using this feature with Pundit will fix this problem, and it is achieved with a (hacky) implementation that performs a pre-check for each related set against the Pundit policy. 
 
 #### v0.6.0.1 - small tweaks to typeahead
 
