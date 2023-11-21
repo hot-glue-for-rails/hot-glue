@@ -1493,7 +1493,7 @@ bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 
 # VERSION HISTORY
 
-#### v0.6.1 - `--related-sets`
+#### 2023-11-21 - v0.6.1 - `--related-sets`
 
 Used to show a checkbox set of related records. The relationship should be a `has_and_belongs_to_many` or a `has_many through:` from the object being built.
 
@@ -1511,7 +1511,7 @@ Note that when making a scaffold like this, you may leave open a privileged esca
 
 To fix this, you'll need to use Pundit with special syntax designed for this purpose. 
 
-For a complete solution, please see Example #16 in the [https://school.jfbcodes.com/8188](Hot Glue Tutorial).
+For a complete solution, please see Example 17 in the [Hot Glue Tutorial](https://school.jfbcodes.com/8188).
 
 Without Pundit, due to a quirk in how this code works with ActiveRecord, all update operates to the related sets table are permitted (and go through), even if the update operation otherwise fails validation for the fields on the object. (ActiveRecord doesn't seem to have a way to validate the related sets directly.)
 
