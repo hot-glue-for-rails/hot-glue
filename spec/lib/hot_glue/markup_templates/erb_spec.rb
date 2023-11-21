@@ -88,7 +88,7 @@ describe HotGlue::ErbTemplate do
                                    form_labels_position: 'before',
                                    ownership_field: "", name: "hgi_id", class_name: "Jkl",
                                    singular: "Jkl", update_show_only: nil, hawk_keys: options[:hawk_keys],
-                                   auth: "", sample_file_path: nil, attachment_data: nil, modify_as: {}),
+                                   auth: "", sample_file_path: nil, attachment_data: nil, modify_as: {}, pundit: false),
       time_of_day: FieldFactory.new(type: :time, name: "time_of_day", generator: generator).field,
       release_on: FieldFactory.new(type: :date, name: "release_on", generator: generator).field,
       approved_at: FieldFactory.new(type: :datetime, name: "approved_at", generator: generator).field,

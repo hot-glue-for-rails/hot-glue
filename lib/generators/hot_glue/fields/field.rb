@@ -5,7 +5,7 @@ class Field
                 :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :object, :sample_file_path,
                 :self_auth,
                 :singular_class,  :singular, :sql_type, :ownership_field,
-                :update_show_only, :namespace
+                :update_show_only, :namespace, :pundit
 
   def initialize(
     auth: ,
@@ -24,7 +24,8 @@ class Field
     singular: ,
     update_show_only:,
     self_auth:,
-    namespace:
+    namespace:,
+    pundit:
   )
     @name = name
     @layout_strategy = layout_strategy
@@ -40,6 +41,7 @@ class Field
     @form_labels_position = form_labels_position
     @modify_as = modify_as
     @display_as = display_as
+    @pundit = pundit
 
     @self_auth = self_auth
     @default_boolean_display = default_boolean_display

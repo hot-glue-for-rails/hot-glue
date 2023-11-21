@@ -65,6 +65,7 @@ class FieldFactory
                              modify_as: generator.modify_as[name.to_sym] || nil,
                              display_as: generator.display_as[name.to_sym] || nil,
                              default_boolean_display: generator.default_boolean_display,
-                             namespace: generator.namespace_value)
+                             namespace: generator.namespace_value,
+                             pundit: generator.pundit )
   end
 end

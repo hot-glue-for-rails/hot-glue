@@ -689,6 +689,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     if @related_sets.any?
+      if !@pundit
+        puts "********************\nWARNING: You are using --related-sets without using Pundit. This makes the set fully accessible. Use Pundit to prevent a privileged escalation vulnerability\n********************\n"
+      end
       @related_sets.each do |key, related_set|
         @columns << related_set[:name] if !@columns.include?(related_set[:name])
         puts "Adding related set :#{related_set[:name]} as-a-column"

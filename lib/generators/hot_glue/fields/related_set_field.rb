@@ -7,7 +7,7 @@ class RelatedSetField < Field
                   update_show_only: ,
                   hawk_keys: , auth: , sample_file_path:,  ownership_field: ,
                   attachment_data: nil , layout_strategy: , form_placeholder_labels: nil,
-                  form_labels_position:, modify_as: , self_auth: , namespace: )
+                  form_labels_position:, modify_as: , self_auth: , namespace:, pundit:)
     super
 
     @related_set_model = eval("#{class_name}.reflect_on_association(:#{name})")
@@ -35,7 +35,11 @@ class RelatedSetField < Field
 
 
   def form_field_output
-    " <%= f.collection_check_boxes :#{association_ids_method}, #{association_class_name}.all, :id, :label, {}, {disabled: ! #{class_name}Policy.new(#{auth}, @#{singular}).role_ids_able?} do |m| %>
+    disabled_syntax = +""
+    if pundit
+      disabled_syntax << ", {disabled: ! #{class_name}Policy.new(#{auth}, @#{singular}).role_ids_able?}"
+    end
+    " <%= f.collection_check_boxes :#{association_ids_method}, #{association_class_name}.all, :id, :label, {}#{disabled_syntax} do |m| %>
       <%= m.check_box %> <%= m.label %><br />
     <% end %>"
   end
