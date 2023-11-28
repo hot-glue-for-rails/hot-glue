@@ -980,7 +980,7 @@ rails generate hot_glue:scaffold User --related-sets=roles --include=email,roles
 
 Note this leaves open a privileged escalation attack (a security vulnerability).
 
-To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see Example #16 in the [https://school.jfbcodes.com/8188](Hot Glue Tutorial).
+To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see [Example #16 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
 
 
 ## "Thing" Label
