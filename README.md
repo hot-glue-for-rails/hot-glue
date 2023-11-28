@@ -691,11 +691,14 @@ If you enable Pundit, your controllers will look for a Policy that matches the n
 **Realtime Field-level Access**
 Hot Glue gives you automatic field level access control if you create `*_able?` methods for each field you'd like to control on your Pundit policy.
 
-(Although this is not what Pundit recommends for field level access control, it has been implemented this way to provide field-by-field user feedback to the user shown in red just like Rails validation errors are currently shown. A user having access to input text into a field they shouldn't have access to is *only hypothetical*, because the Hot Glue will correctly show the the user connect edit was view-only anyway, making unallowed entry only something that could be achieved through a mistake or hacking. Nevertheless, rest assured that if there was a input mistake-- like a user having a field editable when it shouldn't be, the backend policy would guard against the disallowed input and show an error message.)
+(Although this is not what Pundit recommends for field level access control, it has been implemented this way to provide field-by-field user feedback to the user shown in red just like Rails validation errors are currently shown. A user having access to input text into a field they shouldn't have access to is *only hypothetical*, because the Hot Glue will correctly show the the user connect edit was view-only anyway, making unallowed entry only something that could be achieved through a mistake or hacking. Nevertheless, rest assured that if there was a input mistake-- like a user having a field editable when it shouldn't be, if you implement your backend policy correctly with an `update?` method guards against the disallowed input, your user will show an error message and the record will not be updated.)
 
-The `*_able?` method should return true or false depending on whether or not the field can be edited. (No distinction is made between the different contexts. You may check if the record is new using `new_record?`.
+The `*_able?` method should return true or false depending on whether or not the field can be edited. No distinction is made between the `new` and `edit` contexts. You may check if the record is new using `new_record?`.
 
-The `*_able?` method is used by Hot Glue only on the new and edit actions, but you should incorporate it into the policy's `update?` method as in the example, which will extend other operations since Hot Glue will use the policy to authorize the action
+
+**The `*_able?` method is used by Hot Glue only on the new and edit actions. You must incorporate it into the policy's `update?` method as in the example, or else no guard will check prevent the user doesn't pass a value to input it anyway.**
+
+
 Add one `*_able?` method to the policy for each field you want to allow field-level access control. 
 
 Replace `*` with the name of the field you want under access control. Remember to include `_id` for foreign keys. You do not need it for any field you don't want under access control.
