@@ -1348,7 +1348,7 @@ Child portals have the headings omitted automatically (there is a heading identi
 - Enum - displayed as a drop-down list (defined the enum values on your model). 
   - For Rails 6 see https://jasonfleetwoodboldt.com/courses/stepping-up-rails/enumerated-types-in-rails-and-postgres/
   - You must specify the enum definition both in your model and also in your database migration for both Rails 6 + Rails 7
-  - You can modify an enum so that instead of a drop down list, it displays a partial view that you must build. See the [https://github.com/hot-glue-for-rails/hot-glue#2023-10-01---v0523](v0.5.23 Release notes) for details.
+  - You can modify an enum so that instead of a drop down list, it displays a partial view that you must build. See the [v0.5.23 Release notes](https://github.com/hot-glue-for-rails/hot-glue#2023-10-01---v0523) for details.
 
 
 
@@ -1396,7 +1396,7 @@ def self.status_labels
 
 Now, your labels will show up on the front-end as defined in the `_labels` ("Is currently pending", etc) instead of the database-values.
 
-You can modify an enum so that instead of a drop down list, it displays a partial view that you must build. See the [https://github.com/hot-glue-for-rails/hot-glue#2023-10-01---v0523](v0.5.23 Release notes) for details.
+You can modify an enum so that instead of a drop down list, it displays a partial view that you must build. See the [v0.5.23 Release notes](https://github.com/hot-glue-for-rails/hot-glue#2023-10-01---v0523) for details.
 
 ### Validation Magic
 
