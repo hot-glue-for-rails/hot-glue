@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary     = "A gem to build Turbo Rails scaffolding."
   spec.description = "Simple, plug & play Rails scaffold building companion for Turbo-Rails and Hotwire"
   spec.authors     = ["Jason Fleetwood-Boldt"]
-  spec.email       = 'code@jasonfb.net'
+  spec.email       = 'hello@jfbcodes.com'
 
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
     files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|dummy)}) || f.match(%r{(gemspec|gem)$}) }

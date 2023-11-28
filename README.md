@@ -38,7 +38,7 @@ Other than the opinionated differences and additional features, Hot Glue produce
 
 # Get Hot Glue
 
-## [GET THE COURSE TODAY](https://school.jasonfleetwoodboldt.com/8188/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
+## [GET THE COURSE TODAY](https://school.jfbcodes.com/8188/?utm_source=github.com&utm_campaign=github_hot_glue_readme_page) **only $60 USD!**
 
 
 ---
@@ -522,7 +522,7 @@ The short form looks like this. It presumes there is a 'pets' association from `
 
 (The long form equivalent of this would be `--hawk=pet_id{current_user.pets}`)
 
-This is covered in [Example #3 in the Hot Glue Tutorial](https://school.jasonfleetwoodboldt.com/8188)
+This is covered in [Example #3 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
 
 To hawk to a scope that is not the currently authenticated user, use the long form with `{...}` 
 to specify the scope. Be sure to note to add the association name itself, like `users`: 
@@ -532,7 +532,7 @@ to specify the scope. Be sure to note to add the association name itself, like `
 This would hawk the Appointment's `user_id` key to any users who are within the scope of the 
 current_user's has_many association (so, for any other "my" family, would be `current_user.family.users`). 
 
-This is covered in [Example #4 in the Hot Glue Tutorial](https://school.jasonfleetwoodboldt.com/8188)
+This is covered in [Example #4 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
 
 
 ### `--plural=`
@@ -1910,8 +1910,8 @@ License check has been removed (Hot Glue is now free to use for hobbyists and in
 #### 2022-03-23 - v0.5.2 - Hawked Foreign Keys
 
  - You can now protect your foreign keys from malicious input and also restrict the scope of drop downs to show only records with the specified access control restriction.
- - [Example #3](https://school.jasonfleetwoodboldt.com/8188) in the Hot Glue Tutorial shows you how to use the hawk to limit the scope to the logged in user.
- - [Example #4](https://school.jasonfleetwoodboldt.com/8188) in the Hot Glue Tutorial shows how to hawk to a non-usual scope, the inverse of the current user's belongs_to (that is, hawk the scope to X where current_user `belongs_to :x`)
+ - [Example #3](https://school.jfbcodes.com/8188) in the Hot Glue Tutorial shows you how to use the hawk to limit the scope to the logged in user.
+ - [Example #4](https://school.jfbcodes.com/8188) in the Hot Glue Tutorial shows how to hawk to a non-usual scope, the inverse of the current user's belongs_to (that is, hawk the scope to X where current_user `belongs_to :x`)
  
 
 #### 2022-03-12  - v0.5.1 - Inline List Labels
