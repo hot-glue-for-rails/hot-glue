@@ -1,9 +1,12 @@
+require_relative './default_config_loader'
+
 module HotGlue
   class TypeaheadGenerator < Rails::Generators::Base
     source_root File.expand_path('templates', __dir__)
     class_option :namespace, type: :string, default: nil
     class_option :search_by, type: :string, default: nil
 
+    include DefaultConfigLoader
     def filepath_prefix
       # todo: inject the context
       'spec/dummy/' if $INTERNAL_SPECS
@@ -19,9 +22,10 @@ module HotGlue
         puts message
         raise(HotGlue::Error, message)
       end
+      @pundit = get_default_from_config(key: :pundit_default)
 
       @singular = args.first.tableize.singularize
-
+      @class_name = args.first
       @plural = args.first.tableize.pluralize
       @namespace = options['namespace']
 

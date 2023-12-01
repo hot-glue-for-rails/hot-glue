@@ -78,9 +78,8 @@ class AssociationField < Field
   def form_field_output
     assoc_name = name.to_s.gsub("_id","")
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
-
     if modify_as && modify_as[:typeahead]
-      search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.plural_name}_typeahead_index_url"
+      search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
       "<div class='typeahead typeahead--#{assoc.name}_id'
       data-controller='typeahead'
       data-typeahead-url-value='<%= #{search_url} %>'
