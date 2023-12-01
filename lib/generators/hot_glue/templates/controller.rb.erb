@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class <%= controller_class_name %> < <%= controller_descends_from %>
   # regenerate this controller with
   <% if defined?(RuboCop) %># rubocop:disable Layout/LineLength
@@ -20,7 +22,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
      nest_chain << arg %>
   before_action :<%= arg[:singular] %><%= ", if: -> { params.include?(:#{arg[:singular]}_id) }" if arg[:optional] %><% } %><% end %>
-  before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
+  before_action :load_<%= singular_name %>, only: %i[show edit update destroy]
   after_action -> { flash.discard }, if: -> { request.format.symbol == :turbo_stream }
   <% if @nested_set.any? %>def <%= @nested_set[0][:singular] %><% if @god
        next_object = nil
@@ -83,18 +85,18 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     load_all_<%= plural %><% if @pundit %><% if @pundit %>
     authorize @<%= plural_name %><% end %>
   rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized to perform this action."
-    render "layouts/error"<% end %>
+    flash[:alert] = 'You are not authorized to perform this action.'
+    render 'layouts/error'<% end %>
   end
 
 <% if create_action %>  def new<% if @object_owner_sym %>
-    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name %><% if @pundit %>)<% end %>.new(<%  if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% elsif @object_owner_optional && any_nested? %>
+    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name %><% if @pundit %>)<% end %>.new<% if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>(<%= @object_owner_sym %>: <%= @object_owner_eval %>)<% end %><% elsif @object_owner_optional && any_nested? %>
     @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name  %><% if @pundit %>)<% end %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}))<% else %>
     @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name  %><% if @pundit %>)<% end %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% end %>
     <% if @pundit %>authorize @<%= singular_name %><% end %><% if @pundit %>
-    @action = "new"
+    @action = 'new'
   rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized to perform this action."
+    flash[:alert] = 'You are not authorized to perform this action.'
     load_all_users
     render :index<% end %>
   end
@@ -112,36 +114,39 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <% if @pundit %><% @related_sets.each do |key, related_set| %>
     check_<%= related_set[:association_ids_method].to_s %>_permissions(modified_params, :create)<% end %><% end %>
     <% if @pundit %>authorize @<%= singular %><% end %>
-
-    if @<%= singular_name %>.save
+    <%= @code_before_create ? "\n    " + @code_before_create.gsub(";", "\n") : "" %>
+    if @<%= singular_name %>.save<%= @code_after_create ? ("\n      " + @code_after_create.gsub(";", "\n"))  : ""%>
       flash[:notice] = "Successfully created #{@<%= singular %>.<%= display_class %>}"
       <%= post_action_parental_updates %>
       load_all_<%= plural %>
       render :create
     else
       flash[:alert] = "Oops, your <%= singular_name %> could not be created. #{@hawk_alarm}"
-      @action = "new"
+      @action = 'new'
       render :create, status: :unprocessable_entity
     end<% if @pundit %>
   rescue Pundit::NotAuthorizedError
-    flash[:alert] = "Creating <%= singular %> not authorized. #{@<%= singular %>.errors.collect{|k| "#{k.attribute} #{k.message}"}.join(" ")} #{flash[:notice]} "
+    flash[:alert] = "Creating <%= singular %> not authorized. " +
+      @<%= singular %>.errors.collect{|k| "#{k.attribute} #{k.message}"}.join(" ") +
+      "#{flash[:notice]} "
     render :index <% end %>
   end
 
 <% end %>
 <% unless @no_edit %>
   def show
+    <% if @pundit %>authorize @<% singular %><% end %>
     redirect_to <%=   HotGlue.optionalized_ternary(namespace: @namespace,
                                  target:  @singular,
                                  nested_set: @nested_set,
-                                 modifier: "edit_",
+                                 modifier: 'edit_',
                                  with_params: true,
                                  put_form: true).gsub("(#{singular}", "(@#{singular}") %>
   end
 
   def edit<% if @pundit  %>
     authorize @<%= singular_name %><% end %>
-    @action = "edit"
+    @action = 'edit'
     render :edit<% if @pundit %>
   rescue Pundit::NotAuthorizedError
     flash[:alert] = "Editing #{@<%= singular %>.<%= display_class %>} not authorized."
@@ -180,7 +185,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       render :update
     else
       flash[:alert] = "<%= singular_name.titlecase %> could not be saved. #{@hawk_alarm}"
-      @action = "edit"
+      @action = 'edit'
       render :update, status: :unprocessable_entity
     end<% if @pundit %>
   rescue Pundit::NotAuthorizedError
