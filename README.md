@@ -1502,6 +1502,35 @@ bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 
 # VERSION HISTORY
 
+#### 2023-12-01 - TBR
+
+• Fixess to typeahead when using Pundit
+
+• New Code Before/After Create Hooks
+
+`--code-before-create`
+`--code-after-create`
+
+Insert some code into the `create` action. 
+
+The before create code is called after authorization but before save (which creates the record, or fails validation). 
+
+The after create code is called after the record is saved (and thus has an id).
+
+Both should be wrapped in quotation marks when specified in the command line, and use semicolons to separate multiple lines of code.
+(Notice the funky indentation of the lines in the generated code. Adjust you input to get the indentation correct.)
+
+• New Automatic Pickup Partial Includes for `_edit` and `_new` Screens
+
+If you have a partial already in the view folder called `_edit_within_form.html.erb`, it with get included within the edit form. You can use any of the objects by local variable name or the special `f` local variable to access the form itself.
+This partial is good for including extra functionality in the form, like interactive widgets or hidden fields.
+If you have a partial already in the view folder called `_edit_after_form.html.erb`, it with get included **_after_** the edit form. You can use any of the objects by local variable name. This partial should do operations outside of the form's update action, like a different form entirely.
+
+TODO: implement for _new Screens
+
+Remember, these operate as automatic pickups so the detection for your unique partials happens at buildtime. This means that if you add these partials later, you must rebuild. 
+
+
 #### 2023-11-21 - v0.6.1 - `--related-sets`
 
 Used to show a checkbox set of related records. The relationship should be a `has_and_belongs_to_many` or a `has_many through:` from the object being built.

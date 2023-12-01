@@ -90,6 +90,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :display_as, default: {}
   class_option :pundit, default: nil
   class_option :related_sets, default: ''
+  class_option :code_before_create, default: nil
+  class_option :code_after_create, default: nil
 
   def initialize(*meta_args)
     super
@@ -426,6 +428,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @no_field_form = true
     end
 
+    @code_before_create = options['code_before_create']
+    @code_before_create
+
+    @code_after_create = options['code_after_create']
+    @code_after_create
+
     buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
 
@@ -743,6 +751,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def copy_controller_and_spec_files
     @default_colspan = @columns.size
+
     unless @specs_only || @no_controller
       template "controller.rb.erb", File.join("#{filepath_prefix}app/controllers#{namespace_with_dash}", "#{@controller_build_folder}_controller.rb")
       if @namespace
@@ -1086,6 +1095,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def copy_view_files
     return if @specs_only
+    @edit_within_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_edit_within_form.html.#{@markup}")
+    @edit_after_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_edit_within_form.html.#{@markup}")
 
     if @no_controller
       File.write("#{Rails.root}/app/views/#{namespace_with_trailing_dash}/#{plural}/REGENERATE.md", regenerate_me_code)
