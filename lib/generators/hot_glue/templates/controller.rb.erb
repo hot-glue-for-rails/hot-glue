@@ -126,16 +126,16 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       render :create, status: :unprocessable_entity
     end<% if @pundit %>
   rescue Pundit::NotAuthorizedError
-    flash[:alert] = "Creating <%= singular %> not authorized. " +
-      @<%= singular %>.errors.collect{|k| "#{k.attribute} #{k.message}"}.join(" ") +
-      "#{flash[:notice]} "
+    flash[:alert] << 'Creating organization not authorized. '
+    flash[:alert] << @<%= singular %>.errors.collect{|k| "#{k.attribute} #{k.message}"}.join(" ")
+    flash[:alert] << flash[:notice]
     render :index <% end %>
   end
 
 <% end %>
 <% unless @no_edit %>
   def show
-    <% if @pundit %>authorize @<% singular %><% end %>
+    <% if @pundit %>authorize @<%= singular %><% end %>
     redirect_to <%=   HotGlue.optionalized_ternary(namespace: @namespace,
                                  target:  @singular,
                                  nested_set: @nested_set,
@@ -209,9 +209,13 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
 <% if @pundit %><% @related_sets.each do |key, rs| %>
   def check_<%= rs[:association_ids_method] %>_permissions(modified_params, action)
-    if modified_params[:<%= rs[:association_ids_method] %>].present? && modified_params[:<%= rs[:association_ids_method] %>] != @<%= singular %>.<%= rs[:association_ids_method] %>
-      # authorize the <%= rs[:association_ids_method] %> change using special modified_relations: {<%= rs[:association_ids_method] %>: modified_params[:<%= rs[:association_ids_method] %>>]} syntax for Pundit
-      if ! <%= singular_class %>Policy.new(current_user, @<%= singular %>, modified_relations: {role_ids: modified_params[:<%= rs[:association_ids_method] %>]}).method("#{action}?".to_sym).call
+    if modified_params[:<%= rs[:association_ids_method] %>].present? &&
+      modified_params[:<%= rs[:association_ids_method] %>] != @<%= singular %>.<%= rs[:association_ids_method] %>
+      # authorize the <%= rs[:association_ids_method] %> change using special modified_relations: {
+      # <%= rs[:association_ids_method] %>: modified_params[:<%= rs[:association_ids_method] %>>]} syntax for Pundit
+      if ! <%= singular_class %>Policy.new(current_user, @<%= singular %>,
+          modified_relations: {role_ids: modified_params[:<%= rs[:association_ids_method] %>]
+        }).method("#{action}?".to_sym).call
         authorize @<%= singular %>, "#{action}?".to_sym
         raise Pundit::NotAuthorizedError, message: @<%= singular %>.errors.collect{|k| "#{k.attribute} #{k.message}"}.join(" ")
       end
