@@ -92,6 +92,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :related_sets, default: ''
   class_option :code_before_create, default: nil
   class_option :code_after_create, default: nil
+  class_option :code_before_update, default: nil
+  class_option :code_after_update, default: nil
 
   def initialize(*meta_args)
     super
@@ -429,10 +431,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     @code_before_create = options['code_before_create']
-    @code_before_create
-
     @code_after_create = options['code_after_create']
-    @code_after_create
+    @code_before_update = options['code_before_update']
+    @code_after_update = options['code_after_update']
 
     buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
@@ -732,8 +733,17 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if @factory_creation == ''
       "@#{singular } = #{ class_name }.new(modified_params)"
     else
-      "#{@factory_creation}\n" +
-        "    @#{singular } = factory.#{singular}"
+      res = +"begin
+      #{@factory_creation}
+      "
+      res << "\n" + "@#{singular} = factory.#{singular}" unless res.include?("@#{singular} = factory.#{singular}")
+      res << "flash[:notice] = \"Successfully created \#{@#{singular}.name}\" unless @#{singular}.new_record?
+    rescue ActiveRecord::RecordInvalid
+      @#{singular} = factory.#{singular}
+      flash[:alert] = \"Oops, your #{singular} could not be created. #{@hawk_alarm}\"
+      @action = 'new'
+    end"
+      res
     end
   end
 
@@ -1097,6 +1107,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     return if @specs_only
     @edit_within_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_edit_within_form.html.#{@markup}")
     @edit_after_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_edit_within_form.html.#{@markup}")
+    @new_within_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_new_within_form.html.#{@markup}")
+    @new_after_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_new_within_form.html.#{@markup}")
 
     if @no_controller
       File.write("#{Rails.root}/app/views/#{namespace_with_trailing_dash}/#{plural}/REGENERATE.md", regenerate_me_code)

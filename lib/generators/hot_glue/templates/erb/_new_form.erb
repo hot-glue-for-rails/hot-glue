@@ -5,5 +5,8 @@
   <\%= form_with model:  <%= singular %>, url: <%= form_path_new_helper %>, method: :post do  |f| \%>
     <\%=  render partial: "<%= namespace_with_slash +  @controller_build_folder %>/form",
 locals: { <%=  singular %>: <%= singular %>, f: f}<%= @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}}: {})" }.join %> \%>
- <\% end %>
+
+<% if @new_within_form_partial %><\%= render partial: "new_within_form", locals: {f: f, <%=  singular  %>: <%= singular %>}<%= @nested_set.collect{|arg| ".merge(#{arg[:singular]} ? {#{arg[:singular]}: #{arg[:singular]}} : {})" }.join %> %><% end %>
+<\% end %>
+<% if @new_after_form_partial %><\%= render partial: "new_after_form", locals: {<%=  singular  %>: <%= singular %>}<%= @nested_set.collect{|arg| ".merge(#{arg[:singular]} ? {#{arg[:singular]}: #{arg[:singular]}} : {})" }.join %> %><% end %>
 <\% end %>

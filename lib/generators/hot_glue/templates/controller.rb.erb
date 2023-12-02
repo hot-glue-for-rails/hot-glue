@@ -171,14 +171,17 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     check_<%= related_set[:association_ids_method].to_s %>_permissions(modified_params, :update)<% end %><% end %>
 
     <% if @hawk_keys.any? %>    modified_params = hawk_params({<%= hawk_to_ruby %>}, modified_params)<% end %>
-      <%= controller_attachment_orig_filename_pickup_syntax %>
+    <%= controller_attachment_orig_filename_pickup_syntax %>
     <% if @pundit %>
     if @<%= singular_name %>.attributes = modified_params
       authorize @<%= singular_name %>
+      <%= @code_before_update ? "\n    " + @code_before_update.gsub(";", "\n") : "" %>
       @<%= singular_name %>.save
     <% else %>
+    <%= @code_before_update ? "\n    " + @code_before_update.gsub(";", "\n") : "" %>
     if @<%= singular_name %>.update(modified_params)
     <% end %>
+      <%= @code_after_update ? "\n    " + @code_after_update.gsub(";", "\n") : "" %>
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
       flash[:notice] << "Saved #{@<%= singular %>.<%= display_class %>}"
       flash[:alert] = @hawk_alarm if @hawk_alarm

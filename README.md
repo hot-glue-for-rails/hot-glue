@@ -1051,6 +1051,20 @@ Use `before` to make the labels come before or `after` to make them come after. 
 Omits the heading of column names that appears above the 1st row of data.
 
 
+
+`--code-before-create`
+`--code-after-create`
+`--code-before-update`
+`--code-after-update`
+
+Insert some code into the `create` action or `update` actions.
+The **before code** is called _after authorization_ but _before saving_ (which creates the record, or fails validation).
+The **after create** code is called after the record is saved (and thus has an id in the case of the create action).
+Both should be wrapped in quotation marks when specified in the command line, and use semicolons to separate multiple lines of code.
+(Notice the funky indentation of the lines in the generated code. Adjust you input to get the indentation correct.)
+
+
+
 ## Special Features
 
 ### `--attachments`
@@ -1500,35 +1514,52 @@ For example, to display the field `my_story` on the object `Thing`, you'd genera
 bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 ```
 
+### Pickup Partial Includes for `_edit` and `_new` Screens
+
+If you have a partial already in the view folder called `_edit_within_form.html.erb`, it with get included within the edit form.
+If you have a partial already in the view folder called `_new_within_form.html.erb`, it with get included within the new form.
+For these, you can use any of the objects by local variable name or the special `f` local variable to access the form itself.
+
+These partials are good for including extra functionality in the form, like interactive widgets or hidden fields.
+If you have a partial already in the view folder called `_edit_after_form.html.erb`, it with get included **_after_** the edit form.
+If you have a partial already in the view folder called `_new_after_form.html.erb`, it with get included **_after_** the new form.
+You can use any of the objects by local variable name (but you cannot use the form object `f` because it is not in scope.)
+
+The `within` partials should do operations within the form (like hidden fields), and the `after` partials should do entirely unrelated operations, like a different form entirely.
+
+These automatic pickups for partials are detected at buildtime. This means that if you add these partials later, you must rebuild your scaffold.
+
+
+
+
+
 # VERSION HISTORY
 
-#### 2023-12-01 - TBR
+#### 2023-12-02 - v0.6.2
 
-• Fixess to typeahead when using Pundit
+• Fixes to typeahead when using Pundit.
 
-• New Code Before/After Create Hooks
+• New Code Hooks: Add Custom Code Before/After the Update or Create Actions
 
 `--code-before-create`
 `--code-after-create`
+`--code-before-update`
+`--code-after-update`
 
-Insert some code into the `create` action. 
 
-The before create code is called after authorization but before save (which creates the record, or fails validation). 
+Insert some code into the `create` action or `update` actions.
 
-The after create code is called after the record is saved (and thus has an id).
+The **before code** is called _after authorization_ but _before saving_ (which creates the record, or fails validation). 
+
+The **after create** code is called after the record is saved (and thus has an id in the case of the create action). 
 
 Both should be wrapped in quotation marks when specified in the command line, and use semicolons to separate multiple lines of code.
 (Notice the funky indentation of the lines in the generated code. Adjust you input to get the indentation correct.)
 
 • New Automatic Pickup Partial Includes for `_edit` and `_new` Screens
 
-If you have a partial already in the view folder called `_edit_within_form.html.erb`, it with get included within the edit form. You can use any of the objects by local variable name or the special `f` local variable to access the form itself.
-This partial is good for including extra functionality in the form, like interactive widgets or hidden fields.
-If you have a partial already in the view folder called `_edit_after_form.html.erb`, it with get included **_after_** the edit form. You can use any of the objects by local variable name. This partial should do operations outside of the form's update action, like a different form entirely.
+See "Pickup Partial Includes for `_edit` and `_new` Screens" above
 
-TODO: implement for _new Screens
-
-Remember, these operate as automatic pickups so the detection for your unique partials happens at buildtime. This means that if you add these partials later, you must rebuild. 
 
 
 #### 2023-11-21 - v0.6.1 - `--related-sets`
