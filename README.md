@@ -1064,6 +1064,26 @@ Both should be wrapped in quotation marks when specified in the command line, an
 (Notice the funky indentation of the lines in the generated code. Adjust you input to get the indentation correct.)
 
 
+## Searching
+
+### `--searchable` (options: simple, set, predicate, default: false)
+
+#### Simple
+If you specify `--searchable` to `simple`, you will get a search box on the list view. The search box will search all text fields by default.
+
+#### Set
+If you specify `--searchable` to `set`, you will get a whole bar accross the top of the list with search fields for each field. Within the set, the query is **_combinative_** ("and").
+
+After defining a set and performing a search on that set, you can optionally define another set, which will return results with an "or" operator against the other set -- making results from both sets returned.
+
+(More options: not set, XOR set) 
+
+#### Predicate
+The predicate search is the most powerful and requires the most nuanced understanding. For each predicate, you construct a condition and a **child**. The child is joins to its parent with either an AND, OR, or XOR.
+
+The root predicate has no parent, but all other child predicates have parents. 
+
+The root predicate starts the evaluation, and the evaluation proceeds down the tree based on and/or/xno execution rules you expect. 
 
 ## Special Features
 
