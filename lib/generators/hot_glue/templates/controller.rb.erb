@@ -81,7 +81,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <% end %>
   end
 
-  def index
+  def index <% if @search == "set" %>
+    @q = search_params[:q] || [{ search__aaa: ""}] <% end %>
     load_all_<%= plural %><% if @pundit %><% if @pundit %>
     authorize @<%= plural_name %><% end %>
   rescue Pundit::NotAuthorizedError
@@ -230,6 +231,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     params.require(:<%= testing_name %>).permit(<%= ((fields_filtered_for_strong_params - @update_show_only)  + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %>)
   end<% end %>
 
+  <% if @search %>
+  def search_params
+    params.permit(:q, :page)
+  end
+  <% end %>
   def namespace
     <% if @namespace %>'<%= @namespace %>/'<% else %><% end %>
   end

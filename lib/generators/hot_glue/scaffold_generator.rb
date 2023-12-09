@@ -95,6 +95,19 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :code_before_update, default: nil
   class_option :code_after_update, default: nil
 
+  class_option :search, default: nil # set or predicate
+
+  # FOR THE SET SEARCH
+  class_option :search_fields, default: nil # comma separated list of all fields to search
+
+  # for the single-entry search box, they will be removed from the list specified above.
+  class_option :search_query_fields, default: '' # comma separated list of fields to search by single-entry search term
+  class_option :search_position, default: 'vertical' # choices are vertical or horizontal
+
+  # FOR THE PREDICATE SEARCH
+  # TDB
+
+
   def initialize(*meta_args)
     super
 
@@ -490,11 +503,31 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
     end
 
+    # search
+    @search = options['search']
+    if @search == 'set'
+      @search_fields = options['search_fields'].split(',') || @columns
+      # within the set search we will take out any fields on the query list
+      # or the field
+      @search_query_fields = options['search_query_fields'].split(',') || []
+      @search_position = options['search_position'] || 'vertical'
+
+      @search_fields = @search_fields - @search_query_fields
+
+    elsif @search == 'predicate'
+
+    end
+
+    builder = HotGlue::Layout::Builder.new(generator: self,
+                                           include_setting: options['include'],
+                                           buttons_width: buttons_width)
+    @layout_object = builder.construct
 
 
     # create the template object
     if @markup == "erb"
       @template_builder = HotGlue::ErbTemplate.new(
+        layout_object: @layout_object,
         layout_strategy: @layout_strategy,
         magic_buttons: @magic_buttons,
         small_buttons: @small_buttons,
@@ -510,7 +543,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         attachments: @attachments,
         columns_map: @columns_map,
         pundit: @pundit,
-        related_sets: @related_sets
+        related_sets: @related_sets,
+        search: @search,
+        search_fields: @search_fields,
+        search_query_fields: @search_query_fields,
+        search_position: @search_position
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")
@@ -518,10 +555,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       raise(HotGlue::Error, "HAML IS NOT IMPLEMENTED")
     end
 
-    builder = HotGlue::Layout::Builder.new(generator: self,
-                                           include_setting: options['include'],
-                                           buttons_width: buttons_width)
-    @layout_object = builder.construct
 
     @menu_file_exists = true if @nested_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
@@ -826,7 +859,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def list_column_headings
     @template_builder.list_column_headings(
-      layout_object: @layout_object,
       col_identifier: @layout_strategy.column_classes_for_column_headings,
       column_width: @layout_strategy.column_width,
       singular: @singular
@@ -1252,8 +1284,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def form_fields_html
-    @template_builder.all_form_fields(layout_strategy: @layout_strategy,
-                                      layout_object: @layout_object)
+    @template_builder.all_form_fields(layout_strategy: @layout_strategy)
   end
 
   def list_label
@@ -1268,8 +1299,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @template_builder.all_line_fields(
       col_identifier: @layout_strategy.column_classes_for_line_fields,
       perc_width: @layout_strategy.each_col, # undefined method `each_col'
-      layout_strategy: @layout_strategy,
-      layout_object: @layout_object
+      layout_strategy: @layout_strategy
     )
   end
 

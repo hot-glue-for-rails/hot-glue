@@ -129,8 +129,8 @@ describe HotGlue::ErbTemplate do
       related_sets: [])
 
     @template_builder.all_line_fields( perc_width: 15,
-                                       layout_strategy: layout_strategy,
-                                       layout_object: layout_object)
+                                       layout_strategy: layout_strategy
+                                       )
 
   end
 
