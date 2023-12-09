@@ -47,4 +47,27 @@ class StringField < Field
       text_area_output( 65536)
     end
   end
+
+  def search_field_output
+    "<%= f.select 'q[0][#{name}_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is exactly'], ['starts with', 'starts with'], ['ends with', 'ends with']], @q[\'0\']['#{name}_match'] ), {} , { class: 'form-control' } %>"+
+    "<%= f.text_field 'q[0][#{name}_search]', value: @q[\'0\'][:#{name}_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>"
+  end
+
+
+  def where_query_statement
+    ".where('#{name} ILIKE ?', #{name}_query)"
+  end
+
+  def load_all_query_statement
+    "  case @q['0'][:#{field}_match]
+    when 'contains'
+      #{field}_query = \"%\#{@q['0'][:#{field}_search]}%\"
+    when 'starts_with'
+      #{field}_query = \"\#{@q['0'][:#{field}_search]}%\"
+    when 'ends_with'
+      #{field}_query= \"%\#{@q['0'][:#{field}_search]}\"
+    when 'is_exactly'
+      #{field}_query = \"\#{@q['0'][:#{field}_search]}\"
+  end"
+  end
 end

@@ -48,4 +48,12 @@ class DateTimeField < Field
   <% end %>"
     end
   end
+
+  def search_field_output
+    ""
+  end
+
+  def where_query_statement
+    ""
+  end
 end

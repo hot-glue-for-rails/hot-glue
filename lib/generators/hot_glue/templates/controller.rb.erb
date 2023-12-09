@@ -76,7 +76,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <%= load_all_code %>
   end
 
-  def index
+  def index <% if @search == "set" %>
+    @q = params[:q] ||  <%= {"0" => @search_fields.collect{|foo| {"#{foo}_match".to_sym => "", "#{foo}_search".to_sym => ""}}.reduce({}, :merge)  } %> <% end %>
     load_all_<%= plural %><% if @pundit %><% if @pundit %>
     authorize @<%= plural_name %><% end %>
   rescue Pundit::NotAuthorizedError
@@ -227,6 +228,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
   <% end %>
 
+  <% if @search %>
+  def search_params
+    params.permit(:q, :page)
+  end
+  <% end %>
   def namespace
     <% if @namespace %>'<%= @namespace %>/'<% else %><% end %>
   end

@@ -63,10 +63,14 @@ Instantly get a simple CRUD interface
 _If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/README2.md) and complete those steps FIRST._
 
 ## The Super-Quick Setup
+https://jasonfleetwoodboldt.com/courses/stepping-up-rails/jason-fleetwood-boldts-rails-cookbook/hot-glue-quick-install-mega-script/
+Copy & paste the whole code block into your terminal.
+Remember, there is a small "Copy" button at the top-right of the code block.
+Be sure to use your Node + Ruby version managers to switch into the Node & Ruby versions **before running the quick script**. 
 
+
+For more of a step-by-step, see the full cookbook at:
 https://jasonfleetwoodboldt.com/courses/stepping-up-rails/jason-fleetwood-boldts-rails-cookbook/
-
-Copy & paste the whole code block from each section into your terminal. Remember, there is a small "Copy" button at the top-right of each code block to help you copy & paste the script into your terminal. 
 
 These are the sections you need, you can ignore any others:
 

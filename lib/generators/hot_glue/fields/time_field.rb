@@ -30,5 +30,11 @@ class TimeField < Field
     # "expect(page).to have_content(#{singular}#{1}.#{name})"
   end
 
+  def search_field_output
+    ""
+  end
 
+  def where_query_statement
+    ""
+  end
 end
