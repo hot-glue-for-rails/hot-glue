@@ -178,7 +178,5 @@ class Field
 
   end
 
-  def search_field_output
-      "<%= f.text_field :#{name}, value: @q[0]['search__#{name}'], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>"
-  end
+
 end

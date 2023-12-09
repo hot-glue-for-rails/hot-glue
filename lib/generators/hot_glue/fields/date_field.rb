@@ -20,4 +20,8 @@ class DateField < Field
       <span class=''>MISSING</span>
     <% end %>"
   end
+
+  def search_field_output
+    ""
+  end
 end
