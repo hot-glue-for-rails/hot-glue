@@ -49,7 +49,7 @@ class StringField < Field
   end
 
   def search_field_output
-    "<%= f.select :search__#{name}, options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is exactly'], ['starts with', 'starts with'], ['ends with', 'ends with']], @q[0]['search__#{name}']), class: 'form-control' %>"
-    + "<%= f.text_field :#{name}, value: @q[0]['search__#{name}'], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>"
+    "<%= f.select 'q[0][#{name}_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is exactly'], ['starts with', 'starts with'], ['ends with', 'ends with']], @q[\'0\']['#{name}_match'] ), {} , { class: 'form-control' } %>"+
+    "<%= f.text_field 'q[0][#{name}_search]', value: @q[\'0\'][:#{name}_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>"
   end
 end

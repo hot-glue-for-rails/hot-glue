@@ -72,17 +72,19 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     params[:per] || 10
   end
 
-  <% end %>def load_all_<%= plural %><% if @pundit %>
-    @<%= plural_name %> = policy_scope(<%= object_scope %>).page(params[:page])<%= n_plus_one_includes %><%= ".per(per)" if @paginate_per_page_selector %>
-    <% else %> <% if !@self_auth %>
-    @<%= plural_name %> = <%= object_scope.gsub("@",'') %><%= n_plus_one_includes %>.page(params[:page])<%= ".per(per)" if @paginate_per_page_selector %><%= " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] %><% if @nested_set[0] &&  @nested_set[0][:optional] %>
-    @<%= plural_name %> = <%= class_name %>.all<% end %><% else %>
-    @<%= plural_name %> = <%= class_name %>.where(id: <%= auth_object.gsub("@",'') %>.id)<%= n_plus_one_includes %>.page(params[:page])<%= ".per(per)" if @paginate_per_page_selector %><% end %>
+  <% end %>def load_all_<%= plural %>
+    @<%= plural_name %> = <% if @pundit %>policy_scope(<%= object_scope %>)<% else %> <% if !@self_auth %><%= object_scope.gsub("@",'') %>.all<% else %><%= class_name %><% end %><% end %><%= n_plus_one_includes %><% if @nested_set[0] &&  @nested_set[0][:optional] %>
+                      .where(id: <%= auth_object.gsub("@",'') %>.id)<% end %>
+                      .page(params[:page])<%= ".per(per)" if @paginate_per_page_selector %><%= " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] %><% if @nested_set[0] && @nested_set[0][:optional] %>
+
+    <%#= " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] && @nested_set[0][:optional] %>
+
     <% end %>
+
   end
 
   def index <% if @search == "set" %>
-    @q = search_params[:q] || [{ search__aaa: ""}] <% end %>
+    @q = params[:q] ||  <%= {"0" => @search_fields.collect{|foo| {"#{foo}_match".to_sym => "", "#{foo}_search".to_sym => ""}}.reduce({}, :merge)  } %> <% end %>
     load_all_<%= plural %><% if @pundit %><% if @pundit %>
     authorize @<%= plural_name %><% end %>
   rescue Pundit::NotAuthorizedError

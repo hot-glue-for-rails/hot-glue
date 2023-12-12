@@ -86,8 +86,8 @@ module  HotGlue
       column_classes = layout_strategy.column_classes_for_form_fields
 
 
-      res =+ ' <\%= form_for :search, method: :get do |f| %>'
-      res << "<div class=\"#{@layout_strategy.row_classes} search--#{@layout_strategy.row_heading_classes}\">"
+      res =+ '<\%= form_with url: things_path, method: :get, html: {\'data-turbo-action\': \'advance\'} do |f| %>'
+      res << "<div class=\"#{@layout_strategy.row_classes} search--#{@plural}\">"
 
       res << columns.map{ |column|
         "  <div class='#{column_classes} search-cell--#{singular}--#{column.join("-")}' >" +
