@@ -484,6 +484,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @columns_map[col] = this_column_object.field
     end
 
+
     @columns_map.each do |key, field|
       if field.is_a?(AssociationField)
         if @modify_as && @modify_as[key] && @modify_as[key][:typeahead]
@@ -513,6 +514,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @search_position = options['search_position'] || 'vertical'
 
       @search_fields = @search_fields - @search_query_fields
+
+      @search_fields.each do |field|
+        if !@columns.include?(field.to_sym)
+          raise "You specified a search field for #{field} but that field is not in the list of columns"
+        end
+      end
 
     elsif @search == 'predicate'
 
@@ -720,6 +727,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     else
       @columns = @the_object.columns.map(&:name).map(&:to_sym).reject { |field| !@include_fields.include?(field) }
     end
+
 
     if @attachments.any?
       puts "Adding attachments-as-columns: #{@attachments}"

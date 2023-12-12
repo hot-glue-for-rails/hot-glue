@@ -52,4 +52,9 @@ class StringField < Field
     "<%= f.select 'q[0][#{name}_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is exactly'], ['starts with', 'starts with'], ['ends with', 'ends with']], @q[\'0\']['#{name}_match'] ), {} , { class: 'form-control' } %>"+
     "<%= f.text_field 'q[0][#{name}_search]', value: @q[\'0\'][:#{name}_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>"
   end
+
+
+  def where_query_statement
+    ".where('#{name} ILIKE ?', #{name}_query)"
+  end
 end
