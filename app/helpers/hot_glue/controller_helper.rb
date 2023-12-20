@@ -104,6 +104,23 @@ module HotGlue
       modified_params
     end
 
+    def string_search_match # depends on @q
+
+    end
+
+    def datetime_search_match
+
+    end
+
+    def date_search_match
+
+    end
+
+    def time_search_match
+
+    end
+
+
     private
 
     def server_timezone_offset # returns integer of hours to add/subtract from UTC

@@ -73,17 +73,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
   <% end %>def load_all_<%= plural %>
+
     <%= @search_fields.collect{ |field|
-"  case @q['0'][:#{field}_match]
-    when 'contains'
-      #{field}_query = \"%\#{@q['0'][:#{field}_search]}%\"
-    when 'starts_with'
-      #{field}_query = \"\#{@q['0'][:#{field}_search]}%\"
-    when 'ends_with'
-      #{field}_query= \"%\#{@q['0'][:#{field}_search]}\"
-    when 'is_exactly'
-      #{field}_query = \"\#{@q['0'][:#{field}_search]}\"
-  end"
+    @columns_map[field.to_sym].load_all_query_statement
   }.join("\n")
     %>
     @<%= plural_name %> = <% if @pundit %>policy_scope(<%= object_scope %>)<% else %> <% if !@self_auth %><%= object_scope.gsub("@",'') %>.all<% else %><%= class_name %><% end %><% end %><%= n_plus_one_includes %><% if @nested_set[0] &&  @nested_set[0][:optional] %>

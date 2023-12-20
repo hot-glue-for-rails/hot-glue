@@ -57,4 +57,17 @@ class StringField < Field
   def where_query_statement
     ".where('#{name} ILIKE ?', #{name}_query)"
   end
+
+  def load_all_query_statement
+    "  case @q['0'][:#{field}_match]
+    when 'contains'
+      #{field}_query = \"%\#{@q['0'][:#{field}_search]}%\"
+    when 'starts_with'
+      #{field}_query = \"\#{@q['0'][:#{field}_search]}%\"
+    when 'ends_with'
+      #{field}_query= \"%\#{@q['0'][:#{field}_search]}\"
+    when 'is_exactly'
+      #{field}_query = \"\#{@q['0'][:#{field}_search]}\"
+  end"
+  end
 end
