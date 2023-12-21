@@ -1387,6 +1387,25 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
   end
 
+
+  def load_all_code
+    res = +""
+    if pundit
+      res << "@#{ plural_name } = policy_scope(#{ object_scope }).page(params[:page])#{ n_plus_one_includes }#{ ".per(per)" if @paginate_per_page_selector }"
+    else
+
+      if !@self_auth
+        res << "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }#{ " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] }"
+      elsif @nested_set[0] && @nested_set[0][:optional]
+        res << "@#{ plural_name } = #{ class_name }.all"
+      else
+        res << "@#{ plural_name } = #{ class_name }.where(id: #{ auth_object.gsub("@",'') }.id)#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
+      end
+    end
+    res
+  end
+
+
   private # thor does something fancy like sending the class all of its own methods during some strange run sequence
   # does not like public methods
   def cc_filename_with_extensions(name, file_format = format)
