@@ -48,7 +48,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :no_edit, type: :boolean, default: false
   class_option :no_list, type: :boolean, default: false
   class_option :no_controller, type: :boolean, default: false
-  class_option :no_list, type: :boolean, default: false
   class_option :no_paginate, type: :boolean, default: false
   class_option :paginate_per_page_selector, type: :boolean, default: false
   class_option :big_edit, type: :boolean, default: false
@@ -295,6 +294,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @no_edit = options['no_edit'] || false
     @no_list = options['no_list'] || false
+
     @no_controller = options['no_controller'] || false
     @no_list = options['no_list'] || false
     @no_list_label = options['no_list_label'] || false
@@ -1386,6 +1386,25 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       ", \n    nested_for: \"" + @nested_set.collect { |a| "#{a[:singular]}-" + '#{' + instance_symbol + a[:singular] + ".id}" }.join("__") + "\""
     end
   end
+
+
+  def load_all_code
+    res = +""
+    if pundit
+      res << "@#{ plural_name } = policy_scope(#{ object_scope }).page(params[:page])#{ n_plus_one_includes }#{ ".per(per)" if @paginate_per_page_selector }"
+    else
+
+      if !@self_auth
+        res << "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }#{ " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] }"
+      elsif @nested_set[0] && @nested_set[0][:optional]
+        res << "@#{ plural_name } = #{ class_name }.all"
+      else
+        res << "@#{ plural_name } = #{ class_name }.where(id: #{ auth_object.gsub("@",'') }.id)#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
+      end
+    end
+    res
+  end
+
 
   private # thor does something fancy like sending the class all of its own methods during some strange run sequence
   # does not like public methods
