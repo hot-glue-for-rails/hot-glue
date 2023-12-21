@@ -59,15 +59,15 @@ class StringField < Field
   end
 
   def load_all_query_statement
-    "  case @q['0'][:#{field}_match]
+    "  case @q['0'][:#{name}_match]
     when 'contains'
-      #{field}_query = \"%\#{@q['0'][:#{field}_search]}%\"
+      #{name}_query = \"%\#{@q['0'][:#{name}_search]}%\"
     when 'starts_with'
-      #{field}_query = \"\#{@q['0'][:#{field}_search]}%\"
+      #{name}_query = \"\#{@q['0'][:#{name}_search]}%\"
     when 'ends_with'
-      #{field}_query= \"%\#{@q['0'][:#{field}_search]}\"
+      #{name}_query= \"%\#{@q['0'][:#{name}_search]}\"
     when 'is_exactly'
-      #{field}_query = \"\#{@q['0'][:#{field}_search]}\"
+      #{name}_query = \"\#{@q['0'][:#{name}_search]}\"
   end"
   end
 end

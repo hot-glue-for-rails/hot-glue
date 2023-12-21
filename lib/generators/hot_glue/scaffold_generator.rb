@@ -1433,13 +1433,17 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       res << "@#{ plural_name } = policy_scope(#{ object_scope }).page(params[:page])#{ n_plus_one_includes }#{ ".per(per)" if @paginate_per_page_selector }"
     else
       if !@self_auth
-        res << "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }#{ " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] }"
+        res << "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
+        res << @search_fields.collect{ |field|
+          "\n" + (singular.length + singular.length + 9).times.collect{" "}.join + @columns_map[field.to_sym].where_query_statement
+        }.join
+        # #{ " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] }"
       elsif @nested_set[0] && @nested_set[0][:optional]
         res << "@#{ plural_name } = #{ class_name }.all"
       else
         res << "@#{ plural_name } = #{ class_name }.where(id: #{ auth_object.gsub("@",'') }.id)#{ n_plus_one_includes }"
         res << @search_fields.collect{ |field|
-          @columns_map[field.to_sym].load_all_query_statement
+          @columns_map[field.to_sym].where_query_statement
         }.join("\n")
         res << ".page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
       end

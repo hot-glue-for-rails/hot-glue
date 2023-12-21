@@ -56,4 +56,8 @@ class DateTimeField < Field
   def where_query_statement
     ""
   end
+
+  def load_all_query_statement
+    ""
+  end
 end
