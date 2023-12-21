@@ -71,7 +71,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   <% if @paginate_per_page_selector %>def per
     params[:per] || 10
   end
-
+  <% unless @no_list %>
   <% end %>def load_all_<%= plural %><% if @pundit %>
     @<%= plural_name %> = policy_scope(<%= object_scope %>).page(params[:page])<%= n_plus_one_includes %><%= ".per(per)" if @paginate_per_page_selector %>
     <% else %> <% if !@self_auth %>
@@ -87,7 +87,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   rescue Pundit::NotAuthorizedError
     flash[:alert] = 'You are not authorized to perform this action.'
     render 'layouts/error'<% end %>
-  end
+  end<% end %>
 
 <% if create_action %>  def new<% if @object_owner_sym %>
     @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name %><% if @pundit %>)<% end %>.new<% if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>(<%= @object_owner_sym %>: <%= @object_owner_eval %>)<% end %><% elsif @object_owner_optional && any_nested? %>
@@ -226,9 +226,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     params.require(:<%= testing_name %>).permit(<%= ((fields_filtered_for_strong_params - @show_only ) + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %>)
   end<% if @update_show_only %>
 
+  <% unless @no_edit %>
   def update_<%=singular_name%>_params
     params.require(:<%= testing_name %>).permit(<%= ((fields_filtered_for_strong_params - @update_show_only)  + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %>)
   end<% end %>
+  <% end %>
 
   def namespace
     <% if @namespace %>'<%= @namespace %>/'<% else %><% end %>

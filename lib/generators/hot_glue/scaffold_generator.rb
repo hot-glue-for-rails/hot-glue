@@ -48,7 +48,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :no_edit, type: :boolean, default: false
   class_option :no_list, type: :boolean, default: false
   class_option :no_controller, type: :boolean, default: false
-  class_option :no_list, type: :boolean, default: false
   class_option :no_paginate, type: :boolean, default: false
   class_option :paginate_per_page_selector, type: :boolean, default: false
   class_option :big_edit, type: :boolean, default: false
@@ -295,6 +294,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @no_edit = options['no_edit'] || false
     @no_list = options['no_list'] || false
+
     @no_controller = options['no_controller'] || false
     @no_list = options['no_list'] || false
     @no_list_label = options['no_list_label'] || false
