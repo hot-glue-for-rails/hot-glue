@@ -1427,16 +1427,25 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
   def load_all_code
+    # the inner method definition of the load_all_* method
     res = +""
-    
+    res << @search_fields.collect{ |field|
+      if !@columns_map[field.to_sym].load_all_query_statement.empty?
+        (singular.length + singular.length + 9).times.collect{" "}.join + @columns_map[field.to_sym].load_all_query_statement + "\n"
+      end
+    }.compact.join
+
     if pundit
       res << "@#{ plural_name } = policy_scope(#{ object_scope }).page(params[:page])#{ n_plus_one_includes }#{ ".per(per)" if @paginate_per_page_selector }"
     else
       if !@self_auth
-        res << "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
+        res << spaces(4) + "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
         res << @search_fields.collect{ |field|
-          "\n" + (singular.length + singular.length + 9).times.collect{" "}.join + @columns_map[field.to_sym].where_query_statement
-        }.join
+          wqs = @columns_map[field.to_sym].where_query_statement
+          if !wqs.empty?
+            "\n" + spaces(4) +  "@#{ plural_name } = @#{ plural_name }#{ wqs } if #{field}_query"
+          end
+        }.compact.join
         # #{ " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] }"
       elsif @nested_set[0] && @nested_set[0][:optional]
         res << "@#{ plural_name } = #{ class_name }.all"
@@ -1454,6 +1463,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   private # thor does something fancy like sending the class all of its own methods during some strange run sequence
   # does not like public methods
+
+  def spaces(num)
+    " " * num
+  end
+
   def cc_filename_with_extensions(name, file_format = format)
     [name, file_format].compact.join(".")
   end

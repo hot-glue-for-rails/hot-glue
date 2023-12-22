@@ -49,7 +49,7 @@ class StringField < Field
   end
 
   def search_field_output
-    "<%= f.select 'q[0][#{name}_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is exactly'], ['starts with', 'starts with'], ['ends with', 'ends with']], @q[\'0\']['#{name}_match'] ), {} , { class: 'form-control' } %>"+
+    "<%= f.select 'q[0][#{name}_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is_exactly'], ['starts with', 'starts_with'], ['ends with', 'ends_with']], @q[\'0\']['#{name}_match'] ), {} , { class: 'form-control' } %>"+
     "<%= f.text_field 'q[0][#{name}_search]', value: @q[\'0\'][:#{name}_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>"
   end
 
@@ -59,7 +59,7 @@ class StringField < Field
   end
 
   def load_all_query_statement
-    "  case @q['0'][:#{name}_match]
+    "case @q['0'][:#{name}_match]
     when 'contains'
       #{name}_query = \"%\#{@q['0'][:#{name}_search]}%\"
     when 'starts_with'
