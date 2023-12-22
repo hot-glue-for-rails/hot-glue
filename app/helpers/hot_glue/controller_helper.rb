@@ -104,22 +104,24 @@ module HotGlue
       modified_params
     end
 
-    def string_search_match # depends on @q
-
+    def string_query_constructor(match, search)
+      if match.blank? || search.blank?
+        nil
+      else
+        case match
+        when 'contains'
+          "%#{search}%"
+        when 'is_exactly'
+          "#{search}"
+        when 'starts_with'
+          "#{search}%"
+        when 'ends_with'
+          "%#{search}"
+        else
+          nil
+        end
+      end
     end
-
-    def datetime_search_match
-
-    end
-
-    def date_search_match
-
-    end
-
-    def time_search_match
-
-    end
-
 
     private
 

@@ -1431,9 +1431,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     res = +""
     res << @search_fields.collect{ |field|
       if !@columns_map[field.to_sym].load_all_query_statement.empty?
-        (singular.length + singular.length + 9).times.collect{" "}.join + @columns_map[field.to_sym].load_all_query_statement + "\n"
+        @columns_map[field.to_sym].load_all_query_statement
       end
-    }.compact.join
+    }.compact.join("\n" + spaces(4))
+    if @search_fields.any?
+      res << "\n"
+    end
 
     if pundit
       res << "@#{ plural_name } = policy_scope(#{ object_scope }).page(params[:page])#{ n_plus_one_includes }#{ ".per(per)" if @paginate_per_page_selector }"
