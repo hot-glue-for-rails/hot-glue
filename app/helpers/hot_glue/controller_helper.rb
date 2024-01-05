@@ -5,18 +5,22 @@ module HotGlue
       (tz >= 0 ? "+" : "-") + sprintf('%02d',tz.abs) + ":00"
     end
 
-    def datetime_field_localized(form_object, field_name, value, label, nothing = nil )
+    def datetime_field_localized(form_object, field_name, value, *args )
       current_timezone
-      form_object.text_field(field_name, class: 'form-control',
+
+
+      form_object.text_field(field_name, args.merge({class: 'form-control',
                                     type: 'datetime-local',
-                                    value: date_to_current_timezone(value, current_timezone))  + timezonize(current_timezone)
+                                    value: date_to_current_timezone(value, current_timezone)
+                                                    }))  + timezonize(current_timezone)
     end
 
 
-    def date_field_localized(form_object, field_name, value, label, timezone = nil )
-      form_object.text_field(field_name, class: 'form-control',
-                                    type: 'date',
-                                    value: value )
+    def date_field_localized(form_object, field_name, value, **args)
+
+      form_object.text_field(field_name,  args.merge({class: 'form-control',
+                                                       type: 'date',
+                                                       value: value }))
     end
 
     def time_field_localized(form_object, field_name, value, label )
