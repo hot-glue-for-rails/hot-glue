@@ -1429,12 +1429,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def load_all_code
     # the inner method definition of the load_all_* method
     res = +""
-    res << @search_fields.collect{ |field|
-      if !@columns_map[field.to_sym].load_all_query_statement.empty?
-        @columns_map[field.to_sym].load_all_query_statement
-      end
-    }.compact.join("\n" + spaces(4))
-    if @search_fields.any?
+    if @search_fields
+      res << @search_fields.collect{ |field|
+        if !@columns_map[field.to_sym].load_all_query_statement.empty?
+          @columns_map[field.to_sym].load_all_query_statement
+        end
+      }.compact.join("\n" + spaces(4))
       res << "\n"
     end
 
@@ -1443,20 +1443,23 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     else
       if !@self_auth
         res << spaces(4) + "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
-        res << @search_fields.collect{ |field|
-          wqs = @columns_map[field.to_sym].where_query_statement
-          if !wqs.empty?
-            "\n" + spaces(4) +  "@#{ plural_name } = @#{ plural_name }#{ wqs } if #{field}_query"
-          end
-        }.compact.join
-        # #{ " if params.include?(:#{ @nested_set.last[:singular]}_id)" if @nested_set.any? && @nested_set[0] &&  @nested_set[0][:optional] }"
+        if @search_fields
+          res << @search_fields.collect{ |field|
+            wqs = @columns_map[field.to_sym].where_query_statement
+            if !wqs.empty?
+              "\n" + spaces(4) +  "@#{ plural_name } = @#{ plural_name }#{ wqs } if #{field}_query"
+            end
+          }.compact.join
+        end
       elsif @nested_set[0] && @nested_set[0][:optional]
         res << "@#{ plural_name } = #{ class_name }.all"
       else
         res << "@#{ plural_name } = #{ class_name }.where(id: #{ auth_object.gsub("@",'') }.id)#{ n_plus_one_includes }"
-        res << @search_fields.collect{ |field|
-          @columns_map[field.to_sym].where_query_statement
-        }.join("\n")
+        if @search_fields
+          res << @search_fields.collect{ |field|
+            @columns_map[field.to_sym].where_query_statement
+          }.join("\n")
+        end
         res << ".page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
       end
     end
