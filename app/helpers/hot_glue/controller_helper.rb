@@ -131,6 +131,30 @@ module HotGlue
       end
     end
 
+    def date_query_constructor(field, match, search_start, search_end)
+      if match.blank?
+        nil
+      elsif ['is_on', 'not_on'].include?(match) && search_start.blank?
+        nil
+      elsif
+      ['is_on_or_after', 'is_before_or_on', 'is_between'].include?(match) && (search_start.blank? || search_end.blank?)
+        nil
+      else
+        case match
+        when 'is_on'
+          ["#{field} = ?", search_start]
+        when 'is_on_or_after'
+          ["#{field} = ? OR #{field} > ?", search_start, search_start]
+        when "is_before_or_on"
+          ["#{field} = ? OR #{field} < ?", search_end, search_end]
+        when "is_between"
+          ["#{field} BETWEEN ? AND ?", search_start, search_end]
+        when "not_on"
+          ["#{field} != ?", search_start]
+        end
+      end
+    end
+
     private
 
     def server_timezone_offset # returns integer of hours to add/subtract from UTC
