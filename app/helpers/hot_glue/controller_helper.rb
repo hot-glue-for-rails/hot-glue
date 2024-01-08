@@ -166,13 +166,14 @@ module HotGlue
       else
         case match
         when 'is_at_exactly'
-          ["#{field} = ?", search_start]
-        when 'is_at_or_after'
-          ["#{field} = ? OR #{field} > ?", search_start, search_start]
-        when "is_before_or_at"
-          ["#{field} = ? OR #{field} < ?", search_end, search_end]
-        when "is_between"
-          ["#{field} BETWEEN ? AND ?", search_start, search_end]
+          ["EXTRACT(HOUR FROM #{field}) = ?
+          AND EXTRACT(MINUTE FROM #{field}) = ? ", search_start.split(":")[0], search_start.split(":")[1]]
+        # when 'is_at_or_after'
+        #   ["#{field} = ? OR #{field} > ?", search_start, search_start]
+        # when "is_before_or_at"
+        #   ["#{field} = ? OR #{field} < ?", search_end, search_end]
+        # when "is_between"
+        #   ["#{field} BETWEEN ? AND ?", search_start, search_end]
         end
       end
     end
