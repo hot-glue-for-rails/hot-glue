@@ -32,7 +32,7 @@ module HotGlue
 
       form_object.text_field(field_name,  args.merge({class: 'form-control',
                                                       type: 'time',
-                                                      value: value && value.strftime("%H:%M") }))
+                                                      value: value }))
 
     end
 
@@ -156,18 +156,16 @@ module HotGlue
       end
     end
 
-
     def time_query_constructor(field, match, search_start, search_end)
       if match.blank?
         nil
-      elsif ['is_on', 'not_on'].include?(match) && search_start.blank?
+      elsif ['is_at'].include?(match) && search_start.blank?
         nil
-      elsif
-      ['is_on_or_after', 'is_before_or_on', 'is_between'].include?(match) && (search_start.blank? || search_end.blank?)
+      elsif ['is_ar_or_after', 'is_before_or_at', 'is_between'].include?(match) && (search_start.blank? || search_end.blank?)
         nil
       else
         case match
-        when 'is_at'
+        when 'is_at_exactly'
           ["#{field} = ?", search_start]
         when 'is_at_or_after'
           ["#{field} = ? OR #{field} > ?", search_start, search_start]
@@ -178,7 +176,6 @@ module HotGlue
         end
       end
     end
-
 
     private
 
