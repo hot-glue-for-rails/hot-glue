@@ -27,11 +27,12 @@ module HotGlue
                                                        value: value }))
     end
 
-    def time_field_localized(form_object, field_name, value, label )
+    def time_field_localized(form_object, field_name, value, **args )
       current_timezone
-      form_object.text_field(field_name, class: 'form-control',
-                                    type: 'time',
-                                    value: value && value.strftime("%H:%M"))
+
+      form_object.text_field(field_name,  args.merge({class: 'form-control',
+                                                      type: 'time',
+                                                      value: value && value.strftime("%H:%M") }))
 
     end
 
@@ -154,6 +155,30 @@ module HotGlue
         end
       end
     end
+
+
+    def time_query_constructor(field, match, search_start, search_end)
+      if match.blank?
+        nil
+      elsif ['is_on', 'not_on'].include?(match) && search_start.blank?
+        nil
+      elsif
+      ['is_on_or_after', 'is_before_or_on', 'is_between'].include?(match) && (search_start.blank? || search_end.blank?)
+        nil
+      else
+        case match
+        when 'is_at'
+          ["#{field} = ?", search_start]
+        when 'is_at_or_after'
+          ["#{field} = ? OR #{field} > ?", search_start, search_start]
+        when "is_before_or_at"
+          ["#{field} = ? OR #{field} < ?", search_end, search_end]
+        when "is_between"
+          ["#{field} BETWEEN ? AND ?", search_start, search_end]
+        end
+      end
+    end
+
 
     private
 
