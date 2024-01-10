@@ -137,8 +137,11 @@ module HotGlue
         nil
       elsif ['is_on', 'not_on'].include?(match) && search_start.blank?
         nil
-      elsif
-      ['is_on_or_after', 'is_before_or_on', 'is_between'].include?(match) && (search_start.blank? || search_end.blank?)
+      elsif ['is_on_or_after','is_between'].include?(match) && (search_start.blank? )
+        nil
+      elsif ['is_before_or_on'].include?(match) && (search_end.blank? )
+        nil
+      elsif ['is_between'].include?(match) && (search_start.blank? || search_end.blank? )
         nil
       else
         case match

@@ -55,8 +55,8 @@ class DateTimeField < Field
       "\n         ['is between', 'is_between'], ['is on or after', 'is_on_or_after'], " +
       "\n         ['is before or on', 'is_before_or_on'], ['not on', 'not_on']], @q[\'0\']['#{name}_match'] ), {} ," +
       "\n         { class: 'form-control match', 'data-action': 'change->date-range-picker#matchSelection' } %>"+
-      "\n        <%= datetime_local_field 'q[0][#{name}_search_start]',  @q[\'0\'][:#{name}_search_start], { autocomplete: 'off', size: 40, class: 'form-control', placeholder: 'start', 'data-date-range-picker-target': 'start' } %>" +
-      "\n        <%= datetime_local_field 'q[0][#{name}_search_end]',  @q[\'0\'][:#{name}_search_end], { autocomplete: 'off', size: 40, class: 'form-control', placeholder: 'end' , 'data-date-range-picker-target': 'end' } %>" +
+      "\n        <%= datetime_local_field 'q[0]', '#{name}_search_start', {value: @q[\'0\'][:#{name}_search_start], autocomplete: 'off', size: 40, class: 'form-control', placeholder: 'start', 'data-date-range-picker-target': 'start' } %>" +
+      "\n        <%= datetime_local_field 'q[0]', '#{name}_search_end', {value: @q[\'0\'][:#{name}_search_end], autocomplete: 'off', size: 40, class: 'form-control', placeholder: 'end' , 'data-date-range-picker-target': 'end' } %>" +
       "\n      </div>"
   end
 
