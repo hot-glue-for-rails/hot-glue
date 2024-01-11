@@ -181,6 +181,14 @@ module HotGlue
       end
     end
 
+    def association_constructor(field, search)
+      unless search.blank?
+        ["#{field} = ?", search]
+      else
+        nil
+      end
+    end
+
     private
 
     def server_timezone_offset # returns integer of hours to add/subtract from UTC

@@ -532,6 +532,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
     # create the template object
+
+
     if @markup == "erb"
       @template_builder = HotGlue::ErbTemplate.new(
         layout_object: @layout_object,
@@ -554,7 +556,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         search: @search,
         search_fields: @search_fields,
         search_query_fields: @search_query_fields,
-        search_position: @search_position
+        search_position: @search_position,
+        form_path: form_path_new_helper
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")

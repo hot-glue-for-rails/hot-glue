@@ -9,7 +9,8 @@ module  HotGlue
                   :columns,  :col_identifier, :singular,
                   :form_placeholder_labels, :hawk_keys, :update_show_only,
                   :attachments, :show_only, :columns_map, :pundit, :related_sets,
-                  :search, :search_fields, :search_query_fields, :search_position, :layout_object
+                  :search, :search_fields, :search_query_fields, :search_position,
+                  :form_path, :layout_object
 
 
     def initialize(singular:, singular_class: ,
@@ -19,8 +20,11 @@ module  HotGlue
                  inline_list_labels: ,
                  form_placeholder_labels:, hawk_keys: ,
                  update_show_only:, attachments: , columns_map:, pundit:, related_sets:,
-                 search:, search_fields:, search_query_fields: , search_position:, layout_object:)
+                 search:, search_fields:, search_query_fields: , search_position:, layout_object:,
+                 form_path: )
 
+
+      @form_path = form_path
       @search = search
       @search_fields = search_fields
       @search_by_query = search_query_fields
@@ -86,7 +90,7 @@ module  HotGlue
       column_classes = layout_strategy.column_classes_for_form_fields
 
 
-      res =+ '<\%= form_with url: things_path, method: :get, html: {\'data-turbo-action\': \'advance\'} do |f| %>'
+      res =+ "<\%= form_with url: #{form_path}, method: :get, html: {'data-turbo-action': 'advance'} do |f| %>"
       res << "<div class=\"#{@layout_strategy.row_classes} search--#{@plural}\">"
 
       res << columns.map{ |column|
