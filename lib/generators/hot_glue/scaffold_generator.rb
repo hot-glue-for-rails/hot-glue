@@ -732,6 +732,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
 
+    @columns = @columns -@nested_set.collect { |set| (set[:singular] + "_id").to_sym  }
+
     if @attachments.any?
       puts "Adding attachments-as-columns: #{@attachments}"
       @attachments.keys.each do |attachment|
