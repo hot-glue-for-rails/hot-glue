@@ -188,7 +188,7 @@ class AssociationField < Field
       end
 
       (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
-        "  <%= f.collection_select(\"q[0][#{name}_search]\", #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: @q['0']['#{name}_search'] }, class: 'form-control') %>\n" +
+        "  <%= f.collection_select(\"q[0][#{name}_search]\", #{hawked_association}, :id, :#{display_column}, {include_blank: true, selected: @q['0']['#{name}_search'] }, class: 'form-control') %>\n" +
         (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
         (is_owner ? "\n<% end %>" : "")
     end
