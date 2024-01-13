@@ -1509,8 +1509,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def turbo_parental_updates
     @nested_set.collect { |data|
-      "<%= turbo_stream.replace \"#{@namespace + '__' if @namespace}\#{dom_id(@#{data[:singular]})}\" do %>
-    <%= render partial: \"#{@namespace}/#{data[:plural]}/edit\", locals: {#{data[:singular]}: @#{singular}.#{data[:singular]}.reload} %>
+      "<%= turbo_stream.replace \"__#{@namespace if @namespace}\#{dom_id(@#{data[:singular]})}\" do %>
+    <%= render partial: \"#{@namespace}/#{data[:plural]}/line\", locals: {#{data[:singular]}: @#{singular}.#{data[:singular]}.reload} %>
   <% end %>"
     }.join("\n")
   end
