@@ -68,8 +68,8 @@ describe HotGlue::ControllerHelper do
   describe "#time_field_localized" do
     it "should render a time field output" do
       expect(fake_controller.time_field_localized(
-        form_builder, :when_at, nil, "When at"
-      )).to eq("<input class=\"form-control\" type=\"time\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
+        form_builder, :when_at, nil, options: {label: "When at"}
+      )).to eq("<input label=\"When at\" class=\"form-control\" type=\"time\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
 
     end
   end

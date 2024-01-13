@@ -30,7 +30,7 @@ module HotGlue
     def time_field_localized(form_object, field_name, value, **args )
       current_timezone
 
-      form_object.text_field(field_name,  args.merge({class: 'form-control',
+      form_object.text_field(field_name,  args[:options].merge({class: 'form-control',
                                                       type: 'time',
                                                       value: value }))
 

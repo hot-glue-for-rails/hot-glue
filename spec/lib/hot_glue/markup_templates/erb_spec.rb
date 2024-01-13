@@ -68,7 +68,8 @@ describe HotGlue::ErbTemplate do
       search_fields: nil,
       search_query_fields: nil,
       search_position: nil ,
-      layout_object: layout_object)
+      layout_object: layout_object,
+      form_path: "/jkls")
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy)
 
@@ -135,7 +136,9 @@ describe HotGlue::ErbTemplate do
       search_fields: nil,
       search_query_fields: nil,
       search_position: nil ,
-      layout_object: layout_object)
+      layout_object: layout_object,
+      form_path: "/jkls"
+      )
 
     @template_builder.all_line_fields( perc_width: 15,
                                        layout_strategy: layout_strategy
@@ -171,7 +174,7 @@ describe HotGlue::ErbTemplate do
 
     it "should make a datetime column" do
       res = factory_all_form_fields({columns: [:approved_at]})
-      expect(res).to include("<%= datetime_field_localized(f, :approved_at, jkl.approved_at, 'Approved at') %>")
+      expect(res).to include("<%= datetime_field_localized(f, :approved_at, jkl.approved_at, options: {label: 'Approved at'} ) %>")
     end
 
     it "should make a date column " do
