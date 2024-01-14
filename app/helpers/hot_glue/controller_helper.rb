@@ -36,6 +36,9 @@ module HotGlue
 
     end
 
+
+
+
     def current_timezone
       # returns a TimeZone (https://apidock.com/rails/TimeZone) object
       if defined?(current_user)
@@ -131,6 +134,12 @@ module HotGlue
         end
       end
     end
+
+    def enum_constructor(field_name, value, **args)
+      return nil if value.blank?
+      ["#{field_name} = ?", value]
+    end
+
 
     def date_query_constructor(field, match, search_start, search_end)
       if match.blank?
