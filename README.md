@@ -1089,6 +1089,23 @@ use `--search-query-fields` to specify a list of strings only which will be take
 use `--search-position` to specify vertical or horizontal
 
 
+examples:
+
+```
+bin/rails generate Thing --include=name,description --search=set --search-fields=name,description
+```
+
+
+Here's how you would add a search interface to Example #1 in the [Hot Glue Tutorial](https://school.jfbcodes.com/8188) 
+
+```
+bin/rails generate Book --include=name,author_id --search=set --search-fields=name,author_id
+```
+
+
+
+
+
 #### Predicate
 NOT IMPLEMENTED YET
 TODO: implement me
