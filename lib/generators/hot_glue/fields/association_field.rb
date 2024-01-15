@@ -157,18 +157,21 @@ class AssociationField < Field
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
     if modify_as && modify_as[:typeahead]
       search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
-      "<div class='typeahead typeahead--#{assoc.name}_id'
+
+      # \"q[0][#{name}_search]\"
+      # @q['0']['#{name}_search']
+      "<div class='typeahead typeahead--q_0_#{name}_search'
       data-controller='typeahead'
       data-typeahead-url-value='<%= #{search_url} %>'
       data-typeahead-typeahead-results-outlet='#search-results'>
-      <%= text_field_tag :#{assoc.plural_name}_query, '', placeholder: 'Search #{assoc.plural_name}', class: 'search__input',
+      <%= text_field_tag \'q[0][#{name}_search]_query\', '', placeholder: 'Search #{assoc.plural_name}', class: 'search__input',
                      data: { action: 'keyup->typeahead#fetchResults keydown->typeahead#navigateResults', typeahead_target: 'query' },
                      autofocus: true,
                      autocomplete: 'off',
-                     value: #{singular}.try(:#{assoc.name}).try(:name) %>
-      <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.try(:#{assoc.name}).try(:id), 'data-typeahead-target': 'hiddenFormValue' %>
+                     value: @q['0']['#{name}'] ? #{assoc.class_name}.find(@q['0']['#{name}']).try(:name) : \"\"  %>
+      <%= f.hidden_field \'q[0][#{name}]\', value: @q['0']['#{name}_search'].try(:id), 'data-typeahead-target': 'hiddenFormValue' %>
       <div data-typeahead-target='results'></div>
-      <div data-typeahead-target='classIdentifier' data-id=\"typeahead--#{assoc_name}_id\"></div>
+      <div data-typeahead-target='classIdentifier' data-id=\"typeahead--q_0_#{name}_search\"></div>
       </div>"
     else
       if assoc.nil?
@@ -210,7 +213,11 @@ class AssociationField < Field
   end
 
   def load_all_query_statement
-    "#{name}_query = association_constructor(:#{name}, @q['0'][:#{name}_search])"
+    if modify_as && modify_as[:typeahead]
+      "#{name}_query = association_constructor(:#{name}, @q['0'][:#{name}])"
+    else
+      "#{name}_query = association_constructor(:#{name}, @q['0'][:#{name}_search])"
+    end
   end
 
 
