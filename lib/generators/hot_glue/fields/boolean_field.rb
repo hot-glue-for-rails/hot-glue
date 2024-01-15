@@ -78,4 +78,34 @@ class BooleanField < Field
   def label_class
     super + " form-check-label"
   end
+
+
+
+  def search_field_output
+    "  <%= f.radio_button('q[0][#{name}_match]', '-1', checked: @q[\'0\']['#{name}_match']==-1  ? '' : 'checked', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.label('q[0][#{name}_match]', value: '-1', for: 'q[0][#{name}_match]_-1'  ) %>\n" +
+
+      "  <%= f.radio_button('q[0][#{name}_match]', '0', checked: @q[\'0\']['#{name}_match']==0 ? '' : 'checked', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.label('q[0][#{name}_match]_0', value: '#{modify_binary? && modify_as[:binary][:falsy] || 'No'}', for: 'q[0][#{name}_match]_0') %>\n" +
+      " <br /> <%= f.radio_button('q[0][#{name}_match]', '1',  checked: @q[\'0\']['#{name}_match']==1  ? 'checked' : '' , class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.label('q[0][#{name}_match]_1', value: '#{modify_binary? && modify_as[:binary][:truthy] || 'Yes'}', for: 'q[0][#{name}_match]_1') %>\n"
+
+
+    # "<%= f.select 'q[0][#{name}_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is_exactly'], ['starts with', 'starts_with'], ['ends with', 'ends_with']], @q[\'0\']['#{name}_match'] ), {} , { class: 'form-control match' } %>"+
+    #   "<%= f.text_field 'q[0][#{name}_search]', value: @q[\'0\'][:#{name}_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>"
+  end
+
+
+  def where_query_statement
+    ".where('#{name} ILIKE ?', #{name}_query)"
+  end
+
+  def load_all_query_statement
+    "#{name}_query = boolean_query_constructor(@q['0'][:#{name}_match], @q['0'][:#{name}_search])"
+  end
+
+  # def code_to_reset_match_if_search_is_blank
+  #   "    @q['0'][:#{name}_match] = '' if @q['0'][:#{name}_search] == ''"
+  # end
+
 end

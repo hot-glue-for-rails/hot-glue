@@ -19,4 +19,16 @@ class FloatField < Field
   #
   #   "<%= #{singular}.#{name} %>"
   # end
+
+  def search_field_output
+    ""
+  end
+
+
+  def where_query_statement
+  end
+
+  def load_all_query_statement
+
+   end
 end

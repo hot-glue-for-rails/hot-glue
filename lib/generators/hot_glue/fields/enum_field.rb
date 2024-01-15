@@ -38,7 +38,7 @@ class EnumField < Field
       enum_definer = "#{class_name}.defined_enums['#{name}']"
     end
 
-    res = "<%= f.collection_select(:#{name},  enum_to_collection_select(#{enum_definer}), :key, :value, {selected: #{singular}.#{name} }, class: 'form-control') %>"
+    res = "<%= f.collection_select(:#{name},  enum_to_collection_select(#{enum_definer}), :key, :value, {include_blank: true, selected: #{singular}.#{name} }, class: 'form-control') %>"
 
 
     if modify_as && modify_as[:enum] == :partials
@@ -89,7 +89,7 @@ class EnumField < Field
       enum_definer = "#{class_name}.defined_enums['#{name}']"
     end
 
-    "<%= f.collection_select(\'q[0][#{name}_search]\', enum_to_collection_select(#{enum_definer}), :key, :value, {selected: @q['0']['#{name}_search'] }, class: 'form-control') %>"
+    "<%= f.collection_select(\'q[0][#{name}_search]\', enum_to_collection_select(#{enum_definer}), :key, :value, {include_blank: true, selected: @q['0']['#{name}_search'] }, class: 'form-control') %>"
   end
 
 
