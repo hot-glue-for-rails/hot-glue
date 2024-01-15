@@ -51,7 +51,7 @@ describe HotGlue::ControllerHelper do
 
       the_time = time.to_datetime
       expect(fake_controller.datetime_field_localized(
-        form_builder, :when_at, nil, options: {'data-date-picker-target': 'start'}
+        form_builder, :when_at, nil, 'data-date-picker-target': 'start'
       )).to eq("<input data-date-picker-target=\"start\" class=\"form-control\" type=\"datetime-local\" value=\"#{time.strftime("%Y-%m-%d %H:%M:%S %z")}\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
     end
   end
