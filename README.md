@@ -1073,7 +1073,7 @@ Both should be wrapped in quotation marks when specified in the command line, an
 ### `--search` (options: simple, set, false predicate, default: false)
 
 
-#### Set
+#### Set Search
 If you specify `--search` to `set`, you will get a whole bar across the top of the list with search fields for each field.
 Within the set, the search query is **_combinative_** ("and"), so records matching all criteria are shown as the **result set.**
 For date pickers and time pickers, you need the additional Stimulus.
@@ -1082,22 +1082,41 @@ Install this with :
 ```
 bin/rails generate hot_glue:set_search_interface_install
 ```
-use `--search-fields` to specify which fields you want to be searchable.
 
-use `--search-query-fields` to specify a list of strings only which will be taken out of the search set and presented in a singular query box (allowing search across multiple string fields)
+_Additional search option for Set Search_
+##### `--search-fields=aaa,bbb,ccc,ddd,eee` 
+to specify which fields you want to be searchable.
 
-use `--search-position` to specify vertical or horizontal
 
+##### `--search-query-fields=aaa,ddd` 
+to specify a list of strings only which will be taken out of the search set and presented in a singular query box (allowing search across multiple string fields)
+
+##### `--search-position=vertical` 
+to specify vertical or horizontal (default: horizontal)
+
+##### `--search-clear-button` (no option) 
+to specify whether to show a clear button to clear the whole search form at once (default: false)
+
+##### `--search-autosearch` (no option) 
+to specify whether to automatically search when the user exit or changes any field (default: false)
 
 examples:
-
 ```
 bin/rails generate Thing --include=name,description --search=set --search-fields=name,description
 ```
 
+_Make a searchable table with two foreign keys (author_id and category_id) and a query field for title, including a clear button._
+```
+bin/rails generate Articles --inclue=title,author_id,category_id --search=set --search-fields=title,author_id,category_id --search-query-fields=title --search-clear-button
+```
 
-Here's how you would add a search interface to Example #1 in the [Hot Glue Tutorial](https://school.jfbcodes.com/8188) 
+_Make a searchable table with vertical position and autosearch on._
+```
+bin/rails generate Inications --inclue=patient_id,drug_id,quantity --search=set --search-fields=patient_id,drug_id --search-position=vertical --search-autosearch
+```
 
+
+Here's how you would add a search interface to Example #1 in the [Hot Glue Tutorial](https://school.jfbcodes.com/8188)
 ```
 bin/rails generate Book --include=name,author_id --search=set --search-fields=name,author_id
 ```
