@@ -1082,12 +1082,26 @@ After defining a set and performing a search on that set, you can optionally def
 
 (More options: not set, XOR set) 
 
+To use for some fields, you need the additional Stimulus javascript. Install this with :
+
+```
+bin/rails generate hot_glue:set_search_interface_install
+```
+
+
+
+
 #### Predicate
 The predicate search is the most powerful and requires the most nuanced understanding. For each predicate, you construct a condition and a **child**. The child is joins to its parent with either an AND, OR, or XOR.
 
 The root predicate has no parent, but all other child predicates have parents. 
 
 The root predicate starts the evaluation, and the evaluation proceeds down the tree based on and/or/xno execution rules you expect. 
+
+
+
+
+
 
 ## Special Features
 
