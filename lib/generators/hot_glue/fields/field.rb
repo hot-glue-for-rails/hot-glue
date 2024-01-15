@@ -177,4 +177,8 @@ class Field
   def label_for
 
   end
+
+  def code_to_reset_match_if_search_is_blank
+    nil
+  end
 end

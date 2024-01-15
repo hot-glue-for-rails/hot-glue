@@ -63,10 +63,14 @@ Instantly get a simple CRUD interface
 _If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/README2.md) and complete those steps FIRST._
 
 ## The Super-Quick Setup
+https://jasonfleetwoodboldt.com/courses/stepping-up-rails/jason-fleetwood-boldts-rails-cookbook/hot-glue-quick-install-mega-script/
+Copy & paste the whole code block into your terminal.
+Remember, there is a small "Copy" button at the top-right of the code block.
+Be sure to use your Node + Ruby version managers to switch into the Node & Ruby versions **before running the quick script**. 
 
+
+For more of a step-by-step, see the full cookbook at:
 https://jasonfleetwoodboldt.com/courses/stepping-up-rails/jason-fleetwood-boldts-rails-cookbook/
-
-Copy & paste the whole code block from each section into your terminal. Remember, there is a small "Copy" button at the top-right of each code block to help you copy & paste the script into your terminal. 
 
 These are the sections you need, you can ignore any others:
 
@@ -1066,24 +1070,52 @@ Both should be wrapped in quotation marks when specified in the command line, an
 
 ## Searching
 
-### `--searchable` (options: simple, set, predicate, default: false)
+### `--search` (options: simple, set, false predicate, default: false)
 
-#### Simple
-If you specify `--searchable` to `simple`, you will get a search box on the list view. The search box will search all text fields by default.
 
 #### Set
-If you specify `--searchable` to `set`, you will get a whole bar accross the top of the list with search fields for each field. Within the set, the query is **_combinative_** ("and").
+If you specify `--search` to `set`, you will get a whole bar across the top of the list with search fields for each field.
+Within the set, the search query is **_combinative_** ("and"), so records matching all criteria are shown as the **result set.**
+For date pickers and time pickers, you need the additional Stimulus.
+Install this with :
 
-After defining a set and performing a search on that set, you can optionally define another set, which will return results with an "or" operator against the other set -- making results from both sets returned.
+```
+bin/rails generate hot_glue:set_search_interface_install
+```
+use `--search-fields` to specify which fields you want to be searchable.
 
-(More options: not set, XOR set) 
+use `--search-query-fields` to specify a list of strings only which will be taken out of the search set and presented in a singular query box (allowing search across multiple string fields)
+
+use `--search-position` to specify vertical or horizontal
+
+
+examples:
+
+```
+bin/rails generate Thing --include=name,description --search=set --search-fields=name,description
+```
+
+
+Here's how you would add a search interface to Example #1 in the [Hot Glue Tutorial](https://school.jfbcodes.com/8188) 
+
+```
+bin/rails generate Book --include=name,author_id --search=set --search-fields=name,author_id
+```
+
+
+
+
 
 #### Predicate
-The predicate search is the most powerful and requires the most nuanced understanding. For each predicate, you construct a condition and a **child**. The child is joins to its parent with either an AND, OR, or XOR.
+NOT IMPLEMENTED YET
+TODO: implement me
 
-The root predicate has no parent, but all other child predicates have parents. 
 
-The root predicate starts the evaluation, and the evaluation proceeds down the tree based on and/or/xno execution rules you expect. 
+
+
+
+
+
 
 ## Special Features
 

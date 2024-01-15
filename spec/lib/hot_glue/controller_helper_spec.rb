@@ -28,12 +28,14 @@ describe HotGlue::ControllerHelper do
   let(:lookup_context) {OpenStruct.new}
   let(:assigns) {OpenStruct.new}
   let(:object_name) {"Xyz"}
-  let(:object) { Xyz.new }
+  let(:object) { OpenStruct.new(when_at: time) }
   let(:template) {ActionView::Base.new(lookup_context, assigns, fake_controller)}
   let(:options) { {} }
 
   let(:form_builder) {ActionView::Helpers::FormBuilder.new(object_name, object, template, options)}
 
+
+  let(:time) {Time.now}
 
   describe "#timezonize" do
     it "should return +00:00 for nil " do
@@ -46,18 +48,19 @@ describe HotGlue::ControllerHelper do
 
   describe "#datetime_field_localized" do
     it "should render a datetime field output" do
-      expect(fake_controller.datetime_field_localized(
-        form_builder, :when_at, nil, "When at"
-      )).to eq("<input class=\"form-control\" type=\"datetime-local\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />+00:00")
 
+      the_time = time.to_datetime
+      expect(fake_controller.datetime_field_localized(
+        form_builder, :when_at, nil, options: {'data-date-picker-target': 'start'}
+      )).to eq("<input data-date-picker-target=\"start\" class=\"form-control\" type=\"datetime-local\" value=\"#{time.strftime("%Y-%m-%d %H:%M:%S %z")}\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
     end
   end
 
   describe "#date_field_localized" do
     it "should render a datetime field output" do
       expect(fake_controller.date_field_localized(
-        form_builder, :when_at, nil, "When at"
-      )).to eq("<input class=\"form-control\" type=\"date\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
+        form_builder, :when_at, nil, label: "When at"
+      )).to eq("<input label=\"When at\" class=\"form-control\" type=\"date\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
 
     end
   end
@@ -65,8 +68,8 @@ describe HotGlue::ControllerHelper do
   describe "#time_field_localized" do
     it "should render a time field output" do
       expect(fake_controller.time_field_localized(
-        form_builder, :when_at, nil, "When at"
-      )).to eq("<input class=\"form-control\" type=\"time\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
+        form_builder, :when_at, nil, options: {label: "When at"}
+      )).to eq("<input label=\"When at\" class=\"form-control\" type=\"time\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
 
     end
   end

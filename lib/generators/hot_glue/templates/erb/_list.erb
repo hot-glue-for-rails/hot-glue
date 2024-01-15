@@ -1,4 +1,5 @@
 <\%= turbo_frame_tag "<%= @namespace %>__<%= plural %>-list" <%= nested_for_turbo_id_list_constructor %>  do %>
+
   <div class="<%= @container_name %> <%= @layout_strategy.list_classes %>">
     <% unless @no_list  || @no_list_label || (@nested_set.any? && !@nested_set.collect{|x| x[:optional]}.any?)  %>
       <% unless list_label.nil? %><h4>
@@ -38,6 +39,10 @@
           <div class=' scaffold-col-heading scaffold-col-heading-buttons <%= @layout_strategy.column_classes_for_column_headings %>' <%= @layout_strategy.button_column_style %>>
           </div>
         </div>
+      <% end %>
+
+      <% if @search %>
+        <%= @template_builder.search_input_area %>
       <% end %>
 
       <\% if <%= plural %>.empty? %>

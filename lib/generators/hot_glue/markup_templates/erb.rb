@@ -8,16 +8,28 @@ module  HotGlue
                   :inline_list_labels, :layout_object,
                   :columns,  :col_identifier, :singular,
                   :form_placeholder_labels, :hawk_keys, :update_show_only,
-                  :attachments, :show_only, :columns_map, :pundit, :related_sets
+                  :attachments, :show_only, :columns_map, :pundit, :related_sets,
+                  :search, :search_fields, :search_query_fields, :search_position,
+                  :form_path, :layout_object
 
 
-      def initialize(singular:, singular_class: ,
-                   layout_strategy: , magic_buttons: ,
-                   small_buttons: , show_only: ,
-                   ownership_field: , form_labels_position: ,
-                   inline_list_labels: ,
-                   form_placeholder_labels:, hawk_keys: ,
-                   update_show_only:, attachments: , columns_map:, pundit:, related_sets:  )
+    def initialize(singular:, singular_class: ,
+                 layout_strategy: , magic_buttons: ,
+                 small_buttons: , show_only: ,
+                 ownership_field: , form_labels_position: ,
+                 inline_list_labels: ,
+                 form_placeholder_labels:, hawk_keys: ,
+                 update_show_only:, attachments: , columns_map:, pundit:, related_sets:,
+                 search:, search_fields:, search_query_fields: , search_position:, layout_object:,
+                 form_path: )
+
+
+      @form_path = form_path
+      @search = search
+      @search_fields = search_fields
+      @search_by_query = search_query_fields
+      @search_position = search_position
+      @layout_object = layout_object
 
       @singular = singular
       @singular_class = singular_class
@@ -56,8 +68,7 @@ module  HotGlue
       }.join("\n")
     end
 
-    def list_column_headings(layout_object: ,
-                             col_identifier: ,
+    def list_column_headings(col_identifier: ,
                              column_width:, singular: )
       col_style = @layout_strategy.column_headings_col_style
 
@@ -74,8 +85,38 @@ module  HotGlue
     # THE FORM
     ################################################################
 
+    def search_input_area
+      columns = layout_object[:columns][:container]
+      column_classes = layout_strategy.column_classes_for_form_fields
 
-    def all_form_fields(layout_strategy:, layout_object: )
+
+      res =+ "<\%= form_with url: #{form_path}, method: :get, html: {'data-turbo-action': 'advance'} do |f| %>"
+      res << "<div class=\"#{@layout_strategy.row_classes} search--#{@plural}\">"
+
+      res << columns.map{ |column|
+        "  <div class='#{column_classes} search-cell--#{singular}--#{column.join("-")}' >" +
+
+          column.map { |col|
+            label_class = columns_map[col].label_class
+            label_for = columns_map[col].label_for
+            the_label = "\n<label class='#{label_class}' for='search-#{label_for}'>#{col.to_s.humanize}</label>"
+            search_field_result =  columns_map[col].search_field_output
+
+            add_spaces_each_line( "\n  <span class='' >\n" +
+             add_spaces_each_line( (form_labels_position == 'before' ? the_label || "" : "") +
+                                     +  " <br />\n" + search_field_result +
+                                     (form_labels_position == 'after' ? the_label : "")   , 4) +
+             "\n  </span>\n  <br /></div>", 2)
+          }.join("\n")
+      }.join("\n")
+      res << "<div class='#{column_classes}'>
+<\%= submit_tag \"Search\", name: nil, class: 'btn btn-sm btn-primary' %>
+  </div><\% end %>"
+      res
+    end
+
+
+    def all_form_fields(layout_strategy:)
       column_classes = layout_strategy.column_classes_for_form_fields
       columns = layout_object[:columns][:container]
 
@@ -105,7 +146,7 @@ module  HotGlue
             else
               columns_map[col].form_field_output
             end
-            # byebug
+
             @tinymce_stimulus_controller = (columns_map[col].modify_as == {tinymce: 1} ?  "data-controller='tiny-mce' " : "")
 
             add_spaces_each_line( "\n  <span #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
@@ -133,7 +174,6 @@ module  HotGlue
     ################################################################
 
     def all_line_fields(layout_strategy:,
-                        layout_object: ,
                         perc_width:,
                         col_identifier: nil)
 

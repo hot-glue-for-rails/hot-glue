@@ -76,7 +76,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <%= load_all_code %>
   end
 
-  def index
+  def index <% if @search == "set" %>
+    @q = params[:q] ||  <%= {"0" => @search_fields.collect{|foo| {"#{foo}_match".to_sym => "", "#{foo}_search".to_sym => ""}}.reduce({}, :merge)  } %> <% end %><% if @search_fields %>
+<%= @search_fields.collect{|field_name| @columns_map[field_name.to_sym].code_to_reset_match_if_search_is_blank}.compact.join("     \n") %><% end %>
     load_all_<%= plural %><% if @pundit %><% if @pundit %>
     authorize @<%= plural_name %><% end %>
   rescue Pundit::NotAuthorizedError
@@ -101,8 +103,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     flash[:notice] = +''
     modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup, <%= current_user_object %>, <%= datetime_fields_list %>)<% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
     modified_params = modified_params.merge(<%= @object_owner_sym %>: <%= @object_owner_eval %>) <% elsif @object_owner_optional && any_nested? %>
-    modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% elsif !@object_owner_eval.empty? && !@god %>
-    modified_params = modified_params.merge(<%= @object_owner_eval %>) <% end %>
+    modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% end %>
 
       <% if @hawk_keys.any? %>
     modified_params = hawk_params({<%= hawk_to_ruby %>}, modified_params)<% end %>
@@ -160,8 +161,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
     modified_params = modify_date_inputs_on_params(<% if @update_show_only %>update_<% end %><%= singular_name %>_params.dup<%= controller_update_params_tap_away_magic_buttons  %>, <%= current_user_object %>, <%= datetime_fields_list %>) <% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
     modified_params = modified_params.merge(<%= @object_owner_sym %>: <%= @object_owner_eval %>) <% elsif @object_owner_optional && any_nested? %>
-    modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% elsif ! @object_owner_eval.empty?  && !@self_auth && ! @god%>
-    modified_params = modified_params.merge(<%= @object_owner_eval %>) <% end %>
+    modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% end %>
     <% if @pundit %><% @related_sets.each do |key, related_set| %>
     check_<%= related_set[:association_ids_method].to_s %>_permissions(modified_params, :update)<% end %><% end %>
 
@@ -227,6 +227,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
   <% end %>
 
+  <% if @search %>
+  def search_params
+    params.permit(:q, :page)
+  end
+  <% end %>
   def namespace
     <% if @namespace %>'<%= @namespace %>/'<% else %><% end %>
   end

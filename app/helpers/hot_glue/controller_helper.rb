@@ -5,27 +5,39 @@ module HotGlue
       (tz >= 0 ? "+" : "-") + sprintf('%02d',tz.abs) + ":00"
     end
 
-    def datetime_field_localized(form_object, field_name, value, label, nothing = nil )
+    def datetime_field_localized(form_object, field_name, value, **args )
       current_timezone
-      form_object.text_field(field_name, class: 'form-control',
-                                    type: 'datetime-local',
-                                    value: date_to_current_timezone(value, current_timezone))  + timezonize(current_timezone)
+
+      args = args[:options].merge({class: 'form-control',
+                                  type: 'datetime-local' })
+
+      if !value.nil?
+        args[:value] = date_to_current_timezone(value, current_timezone) + timezonize(current_timezone)
+      end
+
+      form_object.text_field(field_name, args)
+
     end
 
 
-    def date_field_localized(form_object, field_name, value, label, timezone = nil )
-      form_object.text_field(field_name, class: 'form-control',
-                                    type: 'date',
-                                    value: value )
+    def date_field_localized(form_object, field_name, value, **args)
+
+      form_object.text_field(field_name,  args.merge({class: 'form-control',
+                                                       type: 'date',
+                                                       value: value }))
     end
 
-    def time_field_localized(form_object, field_name, value, label )
+    def time_field_localized(form_object, field_name, value, **args )
       current_timezone
-      form_object.text_field(field_name, class: 'form-control',
-                                    type: 'time',
-                                    value: value && value.strftime("%H:%M"))
+
+      form_object.text_field(field_name,  args[:options].merge({class: 'form-control',
+                                                      type: 'time',
+                                                      value: value }))
 
     end
+
+
+
 
     def current_timezone
       # returns a TimeZone (https://apidock.com/rails/TimeZone) object
@@ -102,6 +114,88 @@ module HotGlue
         end
       end
       modified_params
+    end
+
+    def string_query_constructor(match, search)
+      if match.blank? || search.blank?
+        nil
+      else
+        case match
+        when 'contains'
+          "%#{search}%"
+        when 'is_exactly'
+          "#{search}"
+        when 'starts_with'
+          "#{search}%"
+        when 'ends_with'
+          "%#{search}"
+        else
+          nil
+        end
+      end
+    end
+
+    def enum_constructor(field_name, value, **args)
+      return nil if value.blank?
+      ["#{field_name} = ?", value]
+    end
+
+
+    def date_query_constructor(field, match, search_start, search_end)
+      if match.blank?
+        nil
+      elsif ['is_on', 'not_on'].include?(match) && search_start.blank?
+        nil
+      elsif ['is_on_or_after','is_between'].include?(match) && (search_start.blank? )
+        nil
+      elsif ['is_before_or_on'].include?(match) && (search_end.blank? )
+        nil
+      elsif ['is_between'].include?(match) && (search_start.blank? || search_end.blank? )
+        nil
+      else
+        case match
+        when 'is_on'
+          ["#{field} = ?", search_start]
+        when 'is_on_or_after'
+          ["#{field} = ? OR #{field} > ?", search_start, search_start]
+        when "is_before_or_on"
+          ["#{field} = ? OR #{field} < ?", search_end, search_end]
+        when "is_between"
+          ["#{field} BETWEEN ? AND ?", search_start, search_end]
+        when "not_on"
+          ["#{field} != ?", search_start]
+        end
+      end
+    end
+
+    def time_query_constructor(field, match, search_start, search_end)
+      if match.blank?
+        nil
+      elsif ['is_at'].include?(match) && search_start.blank?
+        nil
+      elsif ['is_ar_or_after', 'is_before_or_at', 'is_between'].include?(match) && (search_start.blank? || search_end.blank?)
+        nil
+      else
+        case match
+        when 'is_at_exactly'
+          ["EXTRACT(HOUR FROM #{field}) = ?
+          AND EXTRACT(MINUTE FROM #{field}) = ? ", search_start.split(":")[0], search_start.split(":")[1]]
+        # when 'is_at_or_after'
+        #   ["#{field} = ? OR #{field} > ?", search_start, search_start]
+        # when "is_before_or_at"
+        #   ["#{field} = ? OR #{field} < ?", search_end, search_end]
+        # when "is_between"
+        #   ["#{field} BETWEEN ? AND ?", search_start, search_end]
+        end
+      end
+    end
+
+    def association_constructor(field, search)
+      unless search.blank?
+        ["#{field} = ?", search]
+      else
+        nil
+      end
     end
 
     private

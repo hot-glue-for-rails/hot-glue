@@ -79,4 +79,25 @@ class EnumField < Field
   def form_show_only_output
     viewable_output
   end
+
+
+  def search_field_output
+    enum_type = eval("#{class_name}.columns.select{|x| x.name == '#{name}'}[0].sql_type")
+    if eval("defined? #{class_name}.#{enum_type}_labels") == "method"
+      enum_definer = "#{class_name}.#{enum_type}_labels"
+    else
+      enum_definer = "#{class_name}.defined_enums['#{name}']"
+    end
+
+    "<%= f.collection_select(\'q[0][#{name}_search]\', enum_to_collection_select(#{enum_definer}), :key, :value, {selected: @q['0']['#{name}_search'] }, class: 'form-control') %>"
+  end
+
+
+  def where_query_statement
+    ".where(*#{name}_query)"
+  end
+
+  def load_all_query_statement
+    "#{name}_query = enum_constructor(:#{name}, @q['0'][:#{name}_search])"
+  end
 end
