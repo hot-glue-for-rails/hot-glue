@@ -68,6 +68,8 @@ describe HotGlue::ErbTemplate do
       search_fields: nil,
       search_query_fields: nil,
       search_position: nil ,
+      search_clear_button: nil,
+      search_autosearch: nil,
       layout_object: layout_object,
       form_path: "/jkls")
 
@@ -136,6 +138,8 @@ describe HotGlue::ErbTemplate do
       search_fields: nil,
       search_query_fields: nil,
       search_position: nil ,
+      search_clear_button: nil,
+      search_autosearch: nil,
       layout_object: layout_object,
       form_path: "/jkls"
       )
@@ -174,17 +178,17 @@ describe HotGlue::ErbTemplate do
 
     it "should make a datetime column" do
       res = factory_all_form_fields({columns: [:approved_at]})
-      expect(res).to include("<%= datetime_field_localized(f, :approved_at, jkl.approved_at, options: {label: 'Approved at'} ) %>")
+      expect(res).to include("<%= datetime_field_localized(f, :approved_at, jkl.approved_at, label: 'Approved at' ) %>")
     end
 
     it "should make a date column " do
       res = factory_all_form_fields({columns: [:release_on]})
-      expect(res).to include("<%= date_field_localized(f, :release_on, jkl.release_on, 'Release on') %>")
+      expect(res).to include("<%= date_field_localized(f, :release_on, jkl.release_on, label:  'Release on') %>")
     end
 
     it "should make a time column " do
       res = factory_all_form_fields({columns: [:time_of_day]})
-      expect(res).to include("<%= time_field_localized(f, :time_of_day, jkl.time_of_day,  'Time of day') %>")
+      expect(res).to include("<%= time_field_localized(f, :time_of_day, jkl.time_of_day, label: 'Time of day') %>")
     end
 
     it "should make a boolean column" do
@@ -200,7 +204,7 @@ describe HotGlue::ErbTemplate do
       expect(res).to include('<div class=\'scaffold-cell cell--jkl--genre\' >')
       expect(res).to include('<span class=\'<%= "alert alert-danger" if jkl.errors.details.keys.include?(:genre) %>')
 
-      expect(res).to include("<%= f.collection_select(:genre,  enum_to_collection_select(Jkl.defined_enums['genre']), :key, :value, {selected: jkl.genre }, class: 'form-control') %>")
+      expect(res).to include("<%= f.collection_select(:genre,  enum_to_collection_select(Jkl.defined_enums['genre']), :key, :value, {include_blank: true, selected: jkl.genre }, class: 'form-control') %>")
     end
   end
 

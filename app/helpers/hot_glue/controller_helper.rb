@@ -8,7 +8,7 @@ module HotGlue
     def datetime_field_localized(form_object, field_name, value, **args )
       current_timezone
 
-      args = args[:options].merge({class: 'form-control',
+      args = args.merge({class: 'form-control',
                                   type: 'datetime-local' })
 
       if !value.nil?
