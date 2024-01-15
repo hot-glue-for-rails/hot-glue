@@ -61,4 +61,8 @@ class StringField < Field
   def load_all_query_statement
     "#{name}_query = string_query_constructor(@q['0'][:#{name}_match], @q['0'][:#{name}_search])"
   end
+
+  def code_to_reset_match_if_search_is_blank
+    "    @q['0'][:#{name}_match] = '' if @q['0'][:#{name}_search] == ''"
+  end
 end
