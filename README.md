@@ -1606,6 +1606,45 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 # VERSION HISTORY
 
+#### D2024-01-15 - v0.6.3
+
+## Set Searching
+
+### `--search` (options: set, false default: false)
+
+(Future options include simple, predicate)
+
+A set search is a search form that allows you to search across multiple fields at once. It is a set of search fields, each of which is a search field for a single field.
+
+
+#### Set Search
+If you specify `--search` to `set`, you will get a whole bar across the top of the list with search fields for each field.
+Within the set, the search query is **_combinative_** ("and"), so records matching all criteria are shown as the **result set.**
+For date pickers, time pickers, and the clear form interaction, you need the additional Stimulus JS. 
+Install this with :
+
+```
+bin/rails generate hot_glue:set_search_interface_install
+```
+
+_Additional search option for Set Search_
+##### `--search-fields=aaa,bbb,ccc,ddd,eee`
+to specify which fields you want to be searchable.
+
+##### `--search-query-fields=aaa,ddd`
+to specify a list of strings only which will be taken out of the search set and presented in a singular query box (allowing search across multiple string fields)
+
+##### `--search-position=vertical`
+to specify vertical or horizontal (default: horizontal)
+
+##### `--search-clear-button` (no option)
+to specify whether to show a clear button to clear the whole search form at once (default: false)
+
+
+
+
+
+
 #### 2023-12-02 - v0.6.2
 
 • Fixes to typeahead when using Pundit.
