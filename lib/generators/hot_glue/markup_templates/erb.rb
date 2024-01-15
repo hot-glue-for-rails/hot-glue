@@ -10,7 +10,7 @@ module  HotGlue
                   :form_placeholder_labels, :hawk_keys, :update_show_only,
                   :attachments, :show_only, :columns_map, :pundit, :related_sets,
                   :search, :search_fields, :search_query_fields, :search_position,
-                  :form_path, :layout_object
+                  :form_path, :layout_object, :search_clear_button, :search_autosearch
 
 
     def initialize(singular:, singular_class: ,
@@ -20,7 +20,8 @@ module  HotGlue
                  inline_list_labels: ,
                  form_placeholder_labels:, hawk_keys: ,
                  update_show_only:, attachments: , columns_map:, pundit:, related_sets:,
-                 search:, search_fields:, search_query_fields: , search_position:, layout_object:,
+                 search:, search_fields:, search_query_fields: , search_position:,
+                 search_clear_button:, search_autosearch:, layout_object:,
                  form_path: )
 
 
@@ -33,6 +34,8 @@ module  HotGlue
 
       @singular = singular
       @singular_class = singular_class
+      @search_clear_button = search_clear_button
+      @search_autosearch = search_autosearch
 
       @columns_map = columns_map
 
@@ -90,7 +93,7 @@ module  HotGlue
       column_classes = layout_strategy.column_classes_for_form_fields
 
 
-      res =+ "<\%= form_with url: #{form_path}, method: :get, html: {'data-turbo-action': 'advance'} do |f| %>"
+      res =+ "<\%= form_with url: #{form_path}, method: :get, html: {'data-turbo-action': 'advance', 'data-controller': 'search-form'} do |f| %>"
       res << "<div class=\"#{@layout_strategy.row_classes} search--#{@plural}\">"
 
       res << columns.map{ |column|
@@ -109,9 +112,12 @@ module  HotGlue
              "\n  </span>\n  <br /></div>", 2)
           }.join("\n")
       }.join("\n")
-      res << "<div class='#{column_classes}'>
-<\%= submit_tag \"Search\", name: nil, class: 'btn btn-sm btn-primary' %>
-  </div><\% end %>"
+      res << "<div class='#{column_classes}'>"
+      if @search_clear_button
+        res << "<\%= f.button \"Clear\", name: nil, 'data-search-form-target': 'clearButton', class: 'btn btn-sm btn-secondary' %>"
+      end
+      res << "<\%= submit_tag \"Search\", name: nil, class: 'btn btn-sm btn-primary' %>"
+      res << "</div><\% end %>"
       res
     end
 
