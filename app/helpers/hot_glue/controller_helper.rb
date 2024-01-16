@@ -8,7 +8,7 @@ module HotGlue
     def datetime_field_localized(form_object, field_name, value, **args )
       current_timezone
 
-      args = args[:options].merge({class: 'form-control',
+      args = args.merge({class: 'form-control',
                                   type: 'datetime-local' })
 
       if !value.nil?
@@ -30,11 +30,13 @@ module HotGlue
     def time_field_localized(form_object, field_name, value, **args )
       current_timezone
 
-      form_object.text_field(field_name,  args[:options].merge({class: 'form-control',
+      form_object.text_field(field_name,  args.merge({class: 'form-control',
                                                       type: 'time',
                                                       value: value }))
 
     end
+
+
 
 
 
@@ -191,6 +193,14 @@ module HotGlue
     end
 
     def association_constructor(field, search)
+      unless search.blank?
+        ["#{field} = ?", search]
+      else
+        nil
+      end
+    end
+
+    def boolean_query_constructor(field, search)
       unless search.blank?
         ["#{field} = ?", search]
       else

@@ -34,7 +34,7 @@ class DateTimeField < Field
   end
 
   def form_field_output
-    "<%= datetime_field_localized(f, :#{name}, #{singular}.#{name}, options: {label: '#{ name.to_s.humanize }'} ) %>"
+    "<%= datetime_field_localized(f, :#{name}, #{singular}.#{name}, label: '#{ name.to_s.humanize }' ) %>"
   end
 
   def viewable_output

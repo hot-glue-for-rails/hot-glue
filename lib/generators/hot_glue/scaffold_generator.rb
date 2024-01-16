@@ -23,7 +23,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting, :update_show_only, :ownership_field,
                 :layout_strategy, :form_placeholder_labels, :form_labels_position, :pundit,
-                :self_auth, :namespace_value, :related_sets
+                :self_auth, :namespace_value, :related_sets, :search_clear_button, :search_autosearch
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -102,6 +102,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   # for the single-entry search box, they will be removed from the list specified above.
   class_option :search_query_fields, default: '' # comma separated list of fields to search by single-entry search term
   class_option :search_position, default: 'vertical' # choices are vertical or horizontal
+
+
+  class_option :search_clear_button, default: false
+  class_option :saerch_autosearch, default: false
+
 
   # FOR THE PREDICATE SEARCH
   # TDB
@@ -521,6 +526,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         end
       end
 
+      @search_clear_button = !!options['search_clear_button']
+      @search_autosearch = !!options['search_autosearch']
+
     elsif @search == 'predicate'
 
     end
@@ -557,6 +565,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         search_fields: @search_fields,
         search_query_fields: @search_query_fields,
         search_position: @search_position,
+        search_clear_button: @search_clear_button,
+        search_autosearch: @search_autosearch,
         form_path: form_path_new_helper
       )
     elsif @markup == "slim"

@@ -51,7 +51,7 @@ describe HotGlue::ControllerHelper do
 
       the_time = time.to_datetime
       expect(fake_controller.datetime_field_localized(
-        form_builder, :when_at, nil, options: {'data-date-picker-target': 'start'}
+        form_builder, :when_at, nil, 'data-date-picker-target': 'start'
       )).to eq("<input data-date-picker-target=\"start\" class=\"form-control\" type=\"datetime-local\" value=\"#{time.strftime("%Y-%m-%d %H:%M:%S %z")}\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
     end
   end
@@ -68,7 +68,7 @@ describe HotGlue::ControllerHelper do
   describe "#time_field_localized" do
     it "should render a time field output" do
       expect(fake_controller.time_field_localized(
-        form_builder, :when_at, nil, options: {label: "When at"}
+        form_builder, :when_at, nil, label: "When at"
       )).to eq("<input label=\"When at\" class=\"form-control\" type=\"time\" name=\"Xyz[when_at]\" id=\"Xyz_when_at\" />")
 
     end
