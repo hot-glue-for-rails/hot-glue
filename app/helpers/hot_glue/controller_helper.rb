@@ -201,8 +201,8 @@ module HotGlue
     end
 
     def boolean_query_constructor(field, search)
-      unless search.blank?
-        ["#{field} = ?", search]
+      unless search == "-1"
+        ["#{field} IS #{search ? 'TRUE' : 'FALSE'}"]
       else
         nil
       end

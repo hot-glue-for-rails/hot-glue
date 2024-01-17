@@ -61,11 +61,11 @@ class DateTimeField < Field
       "\n        <%= datetime_local_field 'q[0]', '#{name}_search_end', {value: @q[\'0\'][:#{name}_search_end], autocomplete: 'off', size: 40, class: 'form-control', placeholder: 'end' , 'data-date-range-picker-target': 'end' } %>" +
       "\n      </div>"
     else
-      "  <%= f.radio_button('q[0][#{name}_match]', '-1', checked: @q[\'0\']['#{name}_match']=='-1'  ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.radio_button('q[0][#{name}_match]', '-1', checked: @q[\'0\'][:#{name}_match]=='-1' ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
       "  <%= f.label('All', value: '-1', for: 'q[0][#{name}_match]_-1'  ) %>\n" +
-      "  <br /><%= f.radio_button('q[0][#{name}_match]', '0', checked: @q[\'0\']['#{name}_match']=='0' ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <br /><%= f.radio_button('q[0][#{name}_match]', '0', checked: @q[\'0\'][:#{name}_match]=='0' ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
       "  <%= f.label('#{modify_as[:binary][:falsy]}', value: '0', for: 'q[0][#{name}_match]_0') %>\n" +
-      "  <br /><%= f.radio_button('q[0][#{name}_match]', '1',  checked: @q[\'0\']['#{name}_match']=='1'  ? 'checked' : '' , class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <br /><%= f.radio_button('q[0][#{name}_match]', '1',  checked: @q[\'0\'][:#{name}_match]=='1' ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
       "  <%= f.label('#{modify_as[:binary][:truthy]}', value: '1', for: 'q[0][#{name}_match]_1') %>\n" +
         "<br />"
     end

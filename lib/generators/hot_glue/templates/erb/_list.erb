@@ -42,7 +42,11 @@
       <% end %>
 
       <% if @search %>
+        <div class="card">
+          <div class="card-body">
         <%= @template_builder.search_input_area %>
+          </div>
+        </div>
       <% end %>
 
       <\% if <%= plural %>.empty? %>

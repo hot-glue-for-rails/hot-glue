@@ -75,6 +75,14 @@ class BooleanField < Field
     end
   end
 
+  def truthy_value
+    modify_as[:binary][:truthy] || 'Yes'
+  end
+
+  def falsy_value
+    modify_as[:binary][:falsy] || 'No'
+  end
+
   def label_class
     super + " form-check-label"
   end
@@ -82,22 +90,21 @@ class BooleanField < Field
 
 
   def search_field_output
-    "  <%= f.radio_button('q[0][#{name}_match]', '-1', checked: @q[\'0\']['#{name}_match']==-1  ? '' : 'checked', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+    "  <%= f.radio_button('q[0][#{name}_match]', '-1', checked: @q[\'0\'][:#{name}_match]=='-1'  ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
       "  <%= f.label('All', value: '-1', for: 'q[0][#{name}_match]_-1'  ) %>\n" +
-      "  <%= f.radio_button('q[0][#{name}_match]', '0', checked: @q[\'0\']['#{name}_match']==0 ? '' : 'checked', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
-      "  <%= f.label('No', value: '0'}', for: 'q[0][#{name}_match]_0') %>\n" +
-      " <br /> <%= f.radio_button('q[0][#{name}_match]', '1',  checked: @q[\'0\']['#{name}_match']==1  ? 'checked' : '' , class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
-      "  <%= f.label('Yes', value: '1'}', for: 'q[0][#{name}_match]_1') %>\n"
-
+      "  <%= f.radio_button('q[0][#{name}_match]', '0', checked: @q[\'0\'][:#{name}_match]=='0' ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.label('#{falsy_value}', value: '0', for: 'q[0][#{name}_match]_0') %>\n" +
+      " <br /> <%= f.radio_button('q[0][#{name}_match]', '1',  checked: @q[\'0\'][:#{name}_match]=='1'  ? 'checked' : '' , class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.label('#{truthy_value}', value: '1', for: 'q[0][#{name}_match]_1') %>\n"
   end
 
 
   def where_query_statement
-    ".where('#{name} ILIKE ?', #{name}_query)"
+    ".where(#{name}_query)"
   end
 
   def load_all_query_statement
-    "#{name}_query = boolean_query_constructor(@q['0'][:#{name}_match], @q['0'][:#{name}_search])"
+    "#{name}_query = boolean_query_constructor(:#{name}, @q['0'][:#{name}_match])"
   end
 
   # def code_to_reset_match_if_search_is_blank

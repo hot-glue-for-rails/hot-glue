@@ -96,25 +96,26 @@ module  HotGlue
       res << "<div class=\"#{@layout_strategy.row_classes} search--#{@plural}\">"
 
       res << columns.map{ |column|
-        if (column & @search_fields.collect(&:to_sym )).size > 0
-          "  <div class='#{column_classes} search-cell--#{singular}--#{column.join("-")}' >" +
-          column.map { |col|
-            if @search_fields.collect(&:to_sym).include?(col)
-              label_class = columns_map[col].label_class
-              label_for = columns_map[col].label_for
-              the_label = "\n<label class='#{label_class}' for='search-#{label_for}'>#{col.to_s.humanize}</label>"
-              search_field_result =  columns_map[col].search_field_output
+        cols_result = column.map { |col|
+          if @search_fields.collect(&:to_sym).include?(col)
+            label_class = columns_map[col].label_class
+            label_for = columns_map[col].label_for
+            the_label = "\n<label class='#{label_class}' for='search-#{label_for}'>#{col.to_s.humanize}</label>"
+            search_field_result =  columns_map[col].search_field_output
 
-              add_spaces_each_line( "\n  <span class='' >\n" +
-                                      add_spaces_each_line( (form_labels_position == 'before' ? the_label || "" : "") +
-                                                              +  " <br />\n" + search_field_result +
-                                                              (form_labels_position == 'after' ? the_label : "")   , 4) +
-                                      "\n  </span>\n  <br /></div>", 2)
-            end
+            add_spaces_each_line( "\n  <span class='' >\n" +
+                                    add_spaces_each_line( (form_labels_position == 'before' ? the_label || "" : "") +
+                                                            +  " <br />\n" + search_field_result +
+                                                            (form_labels_position == 'after' ? the_label : "")   , 4) +
+                                    "\n  </span>\n  <br />", 2)
+          end
+        }.compact.join("\n")
 
-          }.join("\n")
-        end
+        "  <div class='#{column_classes} search-cell--#{singular}--#{column.join("-")}' >" +
+          cols_result + "</div>"
+
       }.join("\n")
+      res << "</div>"
       res << "<div class='#{column_classes}'>"
       if @search_clear_button
         res << "<\%= f.button \"Clear\", name: nil, 'data-search-form-target': 'clearButton', class: 'btn btn-sm btn-secondary' %>"
