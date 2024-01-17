@@ -513,6 +513,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @search = options['search']
     if @search == 'set'
       @search_fields = options['search_fields'].split(',') || @columns
+
       # within the set search we will take out any fields on the query list
       # or the field
       @search_query_fields = options['search_query_fields'].split(',') || []
