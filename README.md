@@ -1606,6 +1606,10 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 # VERSION HISTORY
 
+#### 2024-01-16 - v0.6.3.1
+Adds support for boolean modified datetime search; now, when using a modify= to turn a datetime into a boolean, the search box behaves appropriately and shows a 3-way radio picker: all, falsy, truthy.
+(Only implemented for datetime)
+
 #### 2024-01-15 - v0.6.3
 
 ## Set Searching
