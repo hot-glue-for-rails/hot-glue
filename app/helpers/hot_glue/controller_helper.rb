@@ -208,6 +208,14 @@ module HotGlue
       end
     end
 
+    def boolean_modified_datetime_constructor(field,search)
+      unless search == '-1'
+        ["#{field} #{search == '0' ? 'IS NULL' : 'IS NOT NULL'}"]
+      else
+        nil
+      end
+    end
+
     private
 
     def server_timezone_offset # returns integer of hours to add/subtract from UTC

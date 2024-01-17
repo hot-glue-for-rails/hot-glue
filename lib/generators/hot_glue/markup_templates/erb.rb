@@ -92,25 +92,28 @@ module  HotGlue
       columns = layout_object[:columns][:container]
       column_classes = layout_strategy.column_classes_for_form_fields
 
-
       res =+ "<\%= form_with url: #{form_path}, method: :get, html: {'data-turbo-action': 'advance', 'data-controller': 'search-form'} do |f| %>"
       res << "<div class=\"#{@layout_strategy.row_classes} search--#{@plural}\">"
 
       res << columns.map{ |column|
-        "  <div class='#{column_classes} search-cell--#{singular}--#{column.join("-")}' >" +
-
+        if (column & @search_fields.collect(&:to_sym )).size > 0
+          "  <div class='#{column_classes} search-cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
-            label_class = columns_map[col].label_class
-            label_for = columns_map[col].label_for
-            the_label = "\n<label class='#{label_class}' for='search-#{label_for}'>#{col.to_s.humanize}</label>"
-            search_field_result =  columns_map[col].search_field_output
+            if @search_fields.collect(&:to_sym).include?(col)
+              label_class = columns_map[col].label_class
+              label_for = columns_map[col].label_for
+              the_label = "\n<label class='#{label_class}' for='search-#{label_for}'>#{col.to_s.humanize}</label>"
+              search_field_result =  columns_map[col].search_field_output
 
-            add_spaces_each_line( "\n  <span class='' >\n" +
-             add_spaces_each_line( (form_labels_position == 'before' ? the_label || "" : "") +
-                                     +  " <br />\n" + search_field_result +
-                                     (form_labels_position == 'after' ? the_label : "")   , 4) +
-             "\n  </span>\n  <br /></div>", 2)
+              add_spaces_each_line( "\n  <span class='' >\n" +
+                                      add_spaces_each_line( (form_labels_position == 'before' ? the_label || "" : "") +
+                                                              +  " <br />\n" + search_field_result +
+                                                              (form_labels_position == 'after' ? the_label : "")   , 4) +
+                                      "\n  </span>\n  <br /></div>", 2)
+            end
+
           }.join("\n")
+        end
       }.join("\n")
       res << "<div class='#{column_classes}'>"
       if @search_clear_button

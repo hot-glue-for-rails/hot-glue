@@ -1606,7 +1606,7 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 # VERSION HISTORY
 
-#### D2024-01-15 - v0.6.3
+#### 2024-01-15 - v0.6.3
 
 ## Set Searching
 

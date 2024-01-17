@@ -50,7 +50,9 @@ class DateTimeField < Field
   end
 
   def search_field_output
-    "      <div data-controller='date-range-picker' >"+
+    if !modify_binary?
+
+      "      <div data-controller='date-range-picker' >"+
       "\n        <%= f.select 'q[0][#{name}_match]', options_for_select([['', ''], ['is on', 'is_on'], " +
       "\n         ['is between', 'is_between'], ['is on or after', 'is_on_or_after'], " +
       "\n         ['is before or on', 'is_before_or_on'], ['not on', 'not_on']], @q[\'0\']['#{name}_match'] ), {} ," +
@@ -58,14 +60,27 @@ class DateTimeField < Field
       "\n        <%= datetime_local_field 'q[0]', '#{name}_search_start', {value: @q[\'0\'][:#{name}_search_start], autocomplete: 'off', size: 40, class: 'form-control', placeholder: 'start', 'data-date-range-picker-target': 'start' } %>" +
       "\n        <%= datetime_local_field 'q[0]', '#{name}_search_end', {value: @q[\'0\'][:#{name}_search_end], autocomplete: 'off', size: 40, class: 'form-control', placeholder: 'end' , 'data-date-range-picker-target': 'end' } %>" +
       "\n      </div>"
+    else
+      "  <%= f.radio_button('q[0][#{name}_match]', '-1', checked: @q[\'0\']['#{name}_match']=='-1'  ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.label('All', value: '-1', for: 'q[0][#{name}_match]_-1'  ) %>\n" +
+      "  <%= f.radio_button('q[0][#{name}_match]', '0', checked: @q[\'0\']['#{name}_match']=='0' ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.label('No', value: '0', for: 'q[0][#{name}_match]_0') %>\n" +
+      "  <%= f.radio_button('q[0][#{name}_match]', '1',  checked: @q[\'0\']['#{name}_match']=='1'  ? 'checked' : '' , class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.label('Yes', value: '1', for: 'q[0][#{name}_match]_1') %>\n" +
+        "<br />"
+    end
   end
 
 
   def where_query_statement
-    ".where(*#{name}_query)"
+    ".where(#{name}_query)"
   end
 
   def load_all_query_statement
-    "#{name}_query = date_query_constructor(:#{name}, @q['0'][:#{name}_match], @q['0'][:#{name}_search_start], @q['0'][:#{name}_search_end])"
+    if !modify_binary?
+      "#{name}_query = date_query_constructor(:#{name}, @q['0'][:#{name}_match], @q['0'][:#{name}_search_start], @q['0'][:#{name}_search_end])"
+    else
+      "#{name}_query = boolean_modified_datetime_constructor(:#{name}, @q['0'][:#{name}_match])"
+    end
   end
 end
