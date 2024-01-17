@@ -63,10 +63,10 @@ class DateTimeField < Field
     else
       "  <%= f.radio_button('q[0][#{name}_match]', '-1', checked: @q[\'0\']['#{name}_match']=='-1'  ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
       "  <%= f.label('All', value: '-1', for: 'q[0][#{name}_match]_-1'  ) %>\n" +
-      "  <%= f.radio_button('q[0][#{name}_match]', '0', checked: @q[\'0\']['#{name}_match']=='0' ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
-      "  <%= f.label('No', value: '0', for: 'q[0][#{name}_match]_0') %>\n" +
-      "  <%= f.radio_button('q[0][#{name}_match]', '1',  checked: @q[\'0\']['#{name}_match']=='1'  ? 'checked' : '' , class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
-      "  <%= f.label('Yes', value: '1', for: 'q[0][#{name}_match]_1') %>\n" +
+      "  <br /><%= f.radio_button('q[0][#{name}_match]', '0', checked: @q[\'0\']['#{name}_match']=='0' ? 'checked' : '', class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.label('#{modify_as[:binary][:falsy]}', value: '0', for: 'q[0][#{name}_match]_0') %>\n" +
+      "  <br /><%= f.radio_button('q[0][#{name}_match]', '1',  checked: @q[\'0\']['#{name}_match']=='1'  ? 'checked' : '' , class: '#{@layout_strategy.form_checkbox_input_class}') %>\n" +
+      "  <%= f.label('#{modify_as[:binary][:truthy]}', value: '1', for: 'q[0][#{name}_match]_1') %>\n" +
         "<br />"
     end
   end
