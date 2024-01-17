@@ -1455,7 +1455,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     if pundit
-      res << "@#{ plural_name } = policy_scope(#{ object_scope }).page(params[:page])#{ n_plus_one_includes }#{ ".per(per)" if @paginate_per_page_selector }"
+      res << "    @#{ plural_name } = policy_scope(#{ object_scope }).page(params[:page])#{ n_plus_one_includes }#{ ".per(per)" if @paginate_per_page_selector }"
     else
       if !@self_auth
         res << spaces(4) + "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
@@ -1471,13 +1471,15 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         res << "@#{ plural_name } = #{ class_name }.all"
       else
         res << "@#{ plural_name } = #{ class_name }.where(id: #{ auth_object.gsub("@",'') }.id)#{ n_plus_one_includes }"
-        if @search_fields
-          res << @search_fields.collect{ |field|
-            @columns_map[field.to_sym].where_query_statement
-          }.join("\n")
-        end
+
         res << ".page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
       end
+    end
+    res << "\n"
+    if @search_fields
+      res << @search_fields.collect{ |field|
+        spaces(4) + "@#{plural_name} = @#{plural_name}" + @columns_map[field.to_sym].where_query_statement + " if #{field}_query"
+      }.join("\n")
     end
     res
   end
