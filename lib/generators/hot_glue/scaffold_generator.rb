@@ -512,7 +512,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # search
     @search = options['search']
     if @search == 'set'
-      @search_fields = options['search_fields'].split(',') || @columns
+      if options['search_fields'].nil?
+        @search_fields = @columns
+      else
+        @search_fields = options['search_fields'].split(',')
+      end
 
       # within the set search we will take out any fields on the query list
       # or the field
@@ -793,8 +797,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       res = +"begin
       #{@factory_creation}
       "
-      res << "\n" + "@#{singular} = factory.#{singular}" unless res.include?("@#{singular} = factory.#{singular}")
-      res << "flash[:notice] = \"Successfully created \#{@#{singular}.name}\" unless @#{singular}.new_record?
+      res << "\n      " + "@#{singular} = factory.#{singular}" unless res.include?("@#{singular} = factory.#{singular}")
+      res << "\n      flash[:notice] = \"Successfully created \#{@#{singular}.name}\" unless @#{singular}.new_record?
     rescue ActiveRecord::RecordInvalid
       @#{singular} = factory.#{singular}
       flash[:alert] = \"Oops, your #{singular} could not be created. #{@hawk_alarm}\"
