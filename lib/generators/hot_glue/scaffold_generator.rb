@@ -1517,6 +1517,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         parent = data[:singular]
         "@#{singular}.#{parent}.reload"
       }
+    else
+      []
     end
   end
 
