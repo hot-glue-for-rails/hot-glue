@@ -978,10 +978,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
   end
 
-  def path_helper_plural
+  def path_helper_plural(top_level = false)
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @controller_build_folder,
-                                 nested_set: @nested_set)
+                                 nested_set: @nested_set,
+                                 top_level: top_level)
   end
 
   def datetime_fields_list
