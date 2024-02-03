@@ -2,7 +2,7 @@
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <\%= link_to "<% if @button_icons == 'font-awesome' %><i class='fa fa-arrow-circle-left  2x'></i><% end %> Back to list".html_safe, <%= path_helper_plural %> %>
+      <\%= link_to "<% if @button_icons == 'font-awesome' %><i class='fa fa-arrow-circle-left  2x'></i><% end %> Back to list".html_safe, <%= path_helper_plural(true) %> %>
 <% end %>
 <\%= render partial: "edit", locals: {<%= singular %>: @<%= singular %><%= @nested_set.collect{|arg| ", #{arg[:singular]}: @#{arg[:singular]}" }.join(", ") %>}  %>
 <% if @big_edit %>
