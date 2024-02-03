@@ -54,7 +54,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       this_scope =  "#{nest_chain.last}.#{arg[:plural]}"
       nest_chain << arg[:singular] %>
   def <%= arg[:singular] %>
-    @<%=  arg[:singular] %> ||= (<%= this_scope;  %>.find(params[:<%=  arg[:singular] %>_id]) <%= " if params.include?(:#{last_arg[:singular]}_id)" if last_arg && @god && last_arg[:optional] %>)
+    @<%=  arg[:singular] %> ||= (<%= this_scope; %>.find(params[:<%=  arg[:singular] %>_id]) <%= " if params.include?(:#{last_arg[:singular]}_id)" if last_arg && @god && last_arg[:optional] %>)
       <% if @god && last_arg && (last_arg[:optional] ) %>@<%= arg[:singular] %> ||=  (<%=  collect_objects[index-1] %>.find(params[:<%= arg[:singular] %>_id]) if params.include?(:<%= arg[:singular] %>_id) )   <% end %>
   end<% end %><% end %>
   <% if !@self_auth %>
@@ -100,7 +100,6 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
   def create
-    flash[:alert] = +''
     flash[:notice] = +''
     modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup, <%= current_user_object %>, <%= datetime_fields_list %>)<% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
     modified_params = modified_params.merge(<%= @object_owner_sym %>: <%= @object_owner_eval %>) <% elsif @object_owner_optional && any_nested? %>
@@ -116,7 +115,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <%= @code_before_create ? "\n    " + @code_before_create.gsub(";", "\n") : "" %>
     if @<%= singular_name %>.save<%= @code_after_create ? ("\n      " + @code_after_create.gsub(";", "\n"))  : ""%>
       flash[:notice] = "Successfully created #{@<%= singular %>.<%= display_class %>}"
-      <%= post_action_parental_updates %>
+      <%= post_action_parental_updates.join("\n      ") %>
       load_all_<%= plural %>
       render :create
     else
@@ -146,7 +145,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @action = 'edit'
     render :edit<% if @pundit %>
   rescue Pundit::NotAuthorizedError
-    flash[:alert] = "Editing #{@<%= singular %>.<%= display_class %>} not authorized."
+    flash[:notice] = "Editing #{@<%= singular %>.<%= display_class %>} not authorized."
     render :index <% end %>
   end
 
@@ -199,7 +198,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       flash[:notice] = '<%= singular_name.titlecase %> successfully deleted'
     rescue StandardError => e
       flash[:alert] = '<%= singular_name.titlecase %> could not be deleted'
-    end <%= post_action_parental_updates %>
+    end
+    <%= post_action_parental_updates.join("\n    ") %>
     load_all_<%= plural %><% if @pundit %>
   rescue Pundit::NotAuthorizedError
     flash[:alert] = "Deleting #{@<%= singular_name %>.<%= display_class %>} not authorized. "
