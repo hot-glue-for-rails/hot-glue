@@ -59,6 +59,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :magic_buttons, type: :string, default: nil
   class_option :small_buttons, type: :boolean, default: nil
   class_option :display_list_after_update, type: :boolean, default: false
+  class_option :display_edit_after_create, type: :boolean, default: false
+  class_option :new_in_modal, type: :boolean, default: false
   class_option :smart_layout, type: :boolean, default: false
   class_option :markup, type: :string, default: nil # deprecated -- use in app config instead
   class_option :layout, type: :string, default: nil # if used here it will override what is in the config
@@ -320,6 +322,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @stacked_downnesting = options['stacked_downnesting']
 
     @display_list_after_update = options['display_list_after_update'] || false
+    @display_edit_after_create = options['display_edit_after_create'] || false
+    @new_in_modal = options['new_in_modal'] || false
+
     @smart_layout = options['smart_layout']
 
     @pundit = options['pundit']
