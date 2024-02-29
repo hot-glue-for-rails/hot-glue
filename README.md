@@ -1605,6 +1605,12 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 
 # VERSION HISTORY
+#### 2024-01-28 - v0.6.3.2
+- corrects variables to be top-level in for nested merge in edit.erb; also adds new flag --display-edit-after-create used to direct to the edit page after the create action (#157)
+- code spacing tweeks
+- picks up all columns if no search fields specified
+- fixes top_level setting on edit.erb
+
 
 #### 2024-01-16 - v0.6.3.1
 Adds support for boolean modified datetime search; now, when using a modify= to turn a datetime into a boolean, the search box behaves appropriately and shows a 3-way radio picker: all, falsy, truthy.
