@@ -13,7 +13,9 @@ It will read your relationships and field types to generate your code for you, l
 
 By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields. (Handily, Hot Glue leaves the command you used in a comment at the top of your generated controller so you can regenerate it again in the future.)
 
-Hot Glue generates functionality that is quick and dirty. It lets you be crafty. As with a real glue gun, use it with caution.
+Alternatively, refinements allow you to scope records using custom access control or Pundit. Hot Glue scaffold come with pagination by default and now have an optional search to add to scaffolds. 
+
+Hot Glue generates quick and dirty functionality. It lets you be crafty. However, like with a real glue gun, please be sure to use it with caution.
 
 * Build plug-and-play scaffolding mixing generated ERB with the power of Hotwire and Turbo-Rails
 * Everything edits-in-place (unless you use `--big-edit`)
