@@ -13,7 +13,7 @@ It will read your relationships and field types to generate your code for you, l
 
 By default, it generates code that gives users full control over objects they 'own' and by default it spits out functionality giving access to all fields. (Handily, Hot Glue leaves the command you used in a comment at the top of your generated controller so you can regenerate it again in the future.)
 
-Alternatively, refinements allow you to scope records using custom access control or Pundit. Hot Glue scaffold come with pagination by default and now have an optional search to add to scaffolds. 
+Alternatively, refinements allow you to scope records using custom access control or Pundit. Hot Glue scaffold comes with pagination by default and now has an option to add searching too.
 
 Hot Glue generates quick and dirty functionality. It lets you be crafty. However, like with a real glue gun, please be sure to use it with caution.
 
