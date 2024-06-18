@@ -10,8 +10,18 @@
     <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  @controller_build_folder + '/new_button", locals: {}' + @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join()  + ' %\>'.gsub('\\',"")  %><br /><% end %>
 
     <% unless @no_list %>
+
+      <% if @search %>
+        <div class="card search-interface">
+          <strong>SEARCH <%= list_label %></strong>
+          <div class="card-body">
+            <%= @template_builder.search_input_area %>
+          </div>
+        </div>
+      <% end %>
+
       <% unless @no_list_heading %>
-        <div class="<%= @layout_strategy.row_classes %> <%= @layout_strategy.row_heading_classes %>">
+        <div class="<%= @layout_strategy.row_classes %> list-result-heading <%= @layout_strategy.row_heading_classes %>">
           <%= list_column_headings %>
 
           <% if @downnest_object.any? && !@big_edit %>
@@ -41,32 +51,29 @@
         </div>
       <% end %>
 
-      <% if @search %>
-        <div class="card">
-          <div class="card-body">
-        <%= @template_builder.search_input_area %>
-          </div>
-        </div>
-      <% end %>
 
       <\% if <%= plural %>.empty? %>
-    <div>
-        None
-    </div>
+
+      <div>
+          None
+      </div>
       <\% end %>
-      <\% <%= plural %>.each do |<%= singular %>| %>
-        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %>}
-            .merge(defined?(nested_for) ? {nested_for: nested_for} : {})
-      <%= @nested_set.collect{|arg| "      .merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join("\n") %>
-        %>
-      <\% end %>
-      <% if @paginate_per_page_selector %>
-        <\%= form_with url: things_path, method: :get do |f| %>
-           Show per page
-        <\%= f.collection_select  "per", [10, 25, 100], :to_s, :to_s, {prompt: true, selected: params[:per]}, {onChange: "this.form.submit();"} %>
+      <div class="result-set">
+        <\% <%= plural %>.each do |<%= singular %>| %>
+          <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %>}
+              .merge(defined?(nested_for) ? {nested_for: nested_for} : {})
+        <%= @nested_set.collect{|arg| "      .merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join("\n") %>
+          %>
         <\% end %>
-      <% end %>
-    <%=  @no_paginate ? "" : paginate %>
+        <% if @paginate_per_page_selector %>
+          <\%= form_with url: things_path, method: :get do |f| %>
+             Show per page
+          <\%= f.collection_select  "per", [10, 25, 100], :to_s, :to_s, {prompt: true, selected: params[:per]}, {onChange: "this.form.submit();"} %>
+          <\% end %>
+        <% end %>
+      </div>
+
+      <%=  @no_paginate ? "" : paginate %>
   <% end  %>
   </div>
 <\% end %>

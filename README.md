@@ -1607,7 +1607,7 @@ These automatic pickups for partials are detected at buildtime. This means that 
 # VERSION HISTORY
 #### 2024-01-28 - v0.6.3.2
 - corrects variables to be top-level in for nested merge in edit.erb; also adds new flag --display-edit-after-create used to direct to the edit page after the create action (#157)
-- code spacing tweeks
+- code spacing tweaks
 - picks up all columns if no search fields specified
 - fixes top_level setting on edit.erb
 
