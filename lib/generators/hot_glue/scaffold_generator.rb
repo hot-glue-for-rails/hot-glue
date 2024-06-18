@@ -458,8 +458,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @code_before_update = options['code_before_update']
     @code_after_update = options['code_after_update']
 
-    buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
+    # buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
+    buttons_width = 2
 
 
 
@@ -516,6 +517,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     # search
     @search = options['search']
+    @search_fields = []
     if @search == 'set'
       if options['search_fields'].nil?
         @search_fields = @columns
@@ -724,8 +726,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       else
         if eval(singular_class + ".reflect_on_association(:#{@object_owner_sym.to_s})").nil? && !eval(singular_class + ".reflect_on_association(:#{@object_owner_sym.to_s.singularize})").nil?
           exit_message = "*** Oops: you tried to nest #{singular_class} within a route for `#{@object_owner_sym}` but I can't find an association for this relationship. Did you mean `#{@object_owner_sym.to_s.singularize}` (singular) instead?"
-          # else  # NOTE: not reachable
-          #   exit_message = "*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god."
+        elsif eval(singular_class + ".reflect_on_association(:#{@object_owner_sym.to_s.singularize})").nil?
+
+          exit_message = "The #{singular_class} model does not have an association for #{@object_owner_sym} or #{@object_owner_sym} does not have an association for `#{@object_owner_sym.to_s.singularize}`"
         end
 
         raise(HotGlue::Error, exit_message)

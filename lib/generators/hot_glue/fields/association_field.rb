@@ -21,7 +21,9 @@ class AssociationField < Field
       raise(HotGlue::Error, exit_message)
     end
 
-    @assoc_class = eval(assoc_model.try(:class_name))
+    unless  eval("#{class_name}.reflect_on_association(:#{assoc})").polymorphic?
+      @assoc_class = eval(assoc_model.try(:class_name))
+    end
 
     name_list = [:name, :to_label, :full_name, :display_name, :email]
 
