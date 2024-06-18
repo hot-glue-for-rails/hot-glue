@@ -73,7 +73,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
   <% unless @no_list %>
   def load_all_<%= plural %>
-    <%= load_all_code %>
+<%= load_all_code %>
   end
 
   def index <% if @search == "set" %>

@@ -1461,7 +1461,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           @columns_map[field.to_sym].load_all_query_statement
         end
       }.compact.join("\n" + spaces(4))
-      res << "\n"
     end
 
     if pundit
@@ -1485,8 +1484,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         res << ".page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
       end
     end
-    res << "\n"
     if @search_fields
+      res << "\n"
       res << @search_fields.collect{ |field|
         spaces(4) + "@#{plural_name} = @#{plural_name}" + @columns_map[field.to_sym].where_query_statement + " if #{field}_query"
       }.join("\n")
