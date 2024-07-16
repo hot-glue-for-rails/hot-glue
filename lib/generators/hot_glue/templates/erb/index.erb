@@ -1,11 +1,11 @@
 <% if @menu_file_exists %><\%= render partial: "<%= namespace_with_trailing_dash %>menu", locals: {active: '<%= plural %>'} %><% end %>
 
 <div class="<%= @container_name %>">
-  <%= @layout_strategy.page_begin %>
-  <% if include_nav_template %><\%= render partial: "<%= nav_template %>", locals: {nav: "<%= @plural %>"} %><% end %>
+  <% if include_nav_template %><%= @layout_strategy.page_begin %><\%= render partial: "<%= nav_template %>", locals: {nav: "<%= @plural %>"} %><%= @layout_strategy.page_end %><% end %>
+  <% if @index_before_list_partial %><\%= render partial: "index_before_list" %><% end %>
 
+  <%= @layout_strategy.page_begin %>
   <\%= render partial: '<%= list_path_partial %>',
     locals: {<%= plural %>: @<%= plural %>}<%= @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {nested_for: \"" + arg[:singular] + "-\#{@" + arg[:singular] + ".id}\"" + ", " + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> \%>
-
   <%= @layout_strategy.page_end %>
 </div>

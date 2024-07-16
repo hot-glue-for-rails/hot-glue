@@ -130,15 +130,26 @@ class Field
   end
 
   def modified_display_output
+    res = +''
     if modify_as[:cast] && modify_as[:cast] == "$"
-      "<%= number_to_currency(#{singular}.#{name}) %>"
+      res += "<%= number_to_currency(#{singular}.#{name}) %>"
     elsif modify_as[:binary]
-      "<%= #{singular}.#{name} ? '#{modify_as[:binary][:truthy]}' : '#{modify_as[:binary][:falsy]}' %>"
+      res += "<%= #{singular}.#{name} ? '#{modify_as[:binary][:truthy]}' : '#{modify_as[:binary][:falsy]}' %>"
     elsif modify_as[:tinymce]
 
     elsif modify_as[:enum]
-      "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
+      res += "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
     end
+
+    if modify_as[:badges]
+      badge_code = if modify_as[:binary]
+                     "#{singular}.#{name} ? '#{modify_as[:badges].split("|")[0]}' : '#{modify_as[:badges].split("|")[1]}'"
+                   else
+                     modify_as[:badges].split("|").to_s + "[#{singular}.#{name}]"
+                   end
+      res = "<span class='badge <%= #{badge_code} %>'>" + res + "</span>"
+    end
+
   end
 
   def field_output(type = nil, width )
