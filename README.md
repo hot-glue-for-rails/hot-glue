@@ -1587,7 +1587,7 @@ For example, to display the field `my_story` on the object `Thing`, you'd genera
 bin/rails generate Thing --include=my_story --modify='my_story{tinymce}'
 ```
 
-### Pickup Partial Includes for `_edit` and `_new` Screens
+### Pickup Partials
 
 If you have a partial already in the view folder called `_edit_within_form.html.erb`, it with get included within the edit form.
 If you have a partial already in the view folder called `_new_within_form.html.erb`, it with get included within the new form.
@@ -1597,6 +1597,7 @@ These partials are good for including extra functionality in the form, like inte
 If you have a partial already in the view folder called `_edit_after_form.html.erb`, it with get included **_after_** the edit form.
 If you have a partial already in the view folder called `_new_after_form.html.erb`, it with get included **_after_** the new form.
 You can use any of the objects by local variable name (but you cannot use the form object `f` because it is not in scope.)
+If you have  a partial already in your view folder called `_index_before_list`, it will be included before the list of records in the index view.
 
 The `within` partials should do operations within the form (like hidden fields), and the `after` partials should do entirely unrelated operations, like a different form entirely.
 

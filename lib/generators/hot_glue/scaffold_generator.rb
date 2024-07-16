@@ -1175,7 +1175,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @edit_after_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_edit_within_form.html.#{@markup}")
     @new_within_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_new_within_form.html.#{@markup}")
     @new_after_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_new_within_form.html.#{@markup}")
-
+    @index_before_list_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_index_before_list.html.#{@markup}")
     if @no_controller
       File.write("#{Rails.root}/app/views/#{namespace_with_trailing_dash}/#{plural}/REGENERATE.md", regenerate_me_code)
     end
