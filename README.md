@@ -1597,7 +1597,10 @@ These partials are good for including extra functionality in the form, like inte
 If you have a partial already in the view folder called `_edit_after_form.html.erb`, it with get included **_after_** the edit form.
 If you have a partial already in the view folder called `_new_after_form.html.erb`, it with get included **_after_** the new form.
 You can use any of the objects by local variable name (but you cannot use the form object `f` because it is not in scope.)
-If you have  a partial already in your view folder called `_index_before_list`, it will be included before the list of records in the index view.
+If you have  a partial already in your view folder called `_index_before_list`, it will be included above the list of records in the index view.
+
+If you have a partial in your view folder called `_list_after_each_row`, it will be added after each row (be sure to include column divs)
+If you have a partial in your view folder called `_list_after_each_row_heading`, it will be added after the heading row above the list_after_each_row content (be sure to include column divs)
 
 The `within` partials should do operations within the form (like hidden fields), and the `after` partials should do entirely unrelated operations, like a different form entirely.
 
