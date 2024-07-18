@@ -73,8 +73,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
   <% unless @no_list %>
   def load_all_<%= plural %>
-    <%= load_all_code %>
-  end
+<%= load_all_code %>  end
 
   def index<% if @search == "set" %>
     @q = params[:q] ||  <%= {"0" => @search_fields.collect{|foo|

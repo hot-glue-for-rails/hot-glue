@@ -36,6 +36,8 @@
             <% end %>
           <% end %>
 
+          <% if @list_after_each_row_heading_partial %><\%= render partial: "list_after_each_row_heading" %><% end %>
+
           <div class=' scaffold-col-heading scaffold-col-heading-buttons <%= @layout_strategy.column_classes_for_column_headings %>' <%= @layout_strategy.button_column_style %>>
           </div>
         </div>

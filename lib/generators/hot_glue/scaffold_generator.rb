@@ -236,25 +236,28 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @modify_as = {}
     if !options['modify'].empty?
-
       modify_input = options['modify'].split(",")
       modify_input.each do |setting|
-        setting =~ /(.*){(.*)}/
-        key, lookup_as = $1, $2
-
+        if setting.include?("[")
+          setting =~ /(.*){(.*)}\[(.*)\]/
+          key, lookup_as = $1, $2, $3
+        else
+          setting =~ /(.*){(.*)}/
+          key, lookup_as = $1, $2
+        end
         if ["$"].include?($2)
-          @modify_as[key.to_sym] =  {cast: $2}
+          @modify_as[key.to_sym] =  {cast: $2, badges: $3}
         elsif $2.include?("|")
           binary = $2.split("|")
-          @modify_as[key.to_sym] =  {binary: {truthy: binary[0], falsy: binary[1]}}
+          @modify_as[key.to_sym] =  {binary: {truthy: binary[0],
+                                              falsy: binary[1]},
+                                              badges: $3}
         elsif $2 == "partial"
-          @modify_as[key.to_sym] =  {enum: :partials}
+          @modify_as[key.to_sym] =  {enum: :partials, badges: $3 }
         elsif $2 == "tinymce"
-          @modify_as[key.to_sym] =  {tinymce: 1}
+          @modify_as[key.to_sym] =  {tinymce: 1, badges: $3}
         elsif $2 == "typeahead"
-          @modify_as[key.to_sym] =  {typeahead: 1}
-
-
+          @modify_as[key.to_sym] =  {typeahead: 1, badges: $3}
         else
           raise "unknown modification direction #{$2}"
         end
@@ -1176,6 +1179,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @new_within_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_new_within_form.html.#{@markup}")
     @new_after_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_new_within_form.html.#{@markup}")
     @index_before_list_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_index_before_list.html.#{@markup}")
+    @list_after_each_row_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_list_after_each_row.html.#{@markup}")
+    @list_after_each_row_heading_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_list_after_each_row_heading.html.#{@markup}")
     if @no_controller
       File.write("#{Rails.root}/app/views/#{namespace_with_trailing_dash}/#{plural}/REGENERATE.md", regenerate_me_code)
     end

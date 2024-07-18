@@ -24,6 +24,9 @@
   <% if @stacked_downnesting %></div><% end %>
 <% end %>
 
+
+<% if @list_after_each_row_partial %><\%= render partial: "list_after_each_row", locals: {<%= @singular %>: <%= @singular %>} %> <% end %>
+
 <%= @layout_strategy.button_style %>
 <div class=" scaffold-line-buttons <%= @layout_strategy.column_classes_for_button_column %>" <%= @layout_strategy.button_style %>>
   <%= magic_button_output %>
