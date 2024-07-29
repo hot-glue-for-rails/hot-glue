@@ -29,6 +29,6 @@ class FloatField < Field
   end
 
   def load_all_query_statement
-
-   end
+    raise "Float field search not implemented"
+  end
 end
