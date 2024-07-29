@@ -68,4 +68,12 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   def form_checkbox_label_class
     "form-check-label"
   end
+
+  def search_opening
+    '<div class="row"><div class="col-md-12 card"><div class="card-body">'
+  end
+
+  def search_closing
+    "</div></div></div>"
+  end
 end

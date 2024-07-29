@@ -33,5 +33,13 @@ module LayoutStrategy
     def form_checkbox_input_class; ""; end
     def form_checkbox_label_class; ""; end
     def form_checkbox_wrapper_class; ""; end
+
+    def search_opening
+      ""
+    end
+
+    def search_closing
+      ""
+    end
   end
 end
