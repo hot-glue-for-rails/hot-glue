@@ -22,7 +22,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
      nest_chain << arg %>
   before_action :<%= arg[:singular] %><%= ", if: -> { params.include?(:#{arg[:singular]}_id) }" if arg[:optional] %><% } %><% end %>
-  before_action :load_<%= singular_name %>, only: %i[show edit update destroy]
+  before_action :load_<%= singular_name %>, only: %i[<%= "show edit update" unless @no_edit %> <%= "destroy" unless @no_delete %>]
   after_action -> { flash.discard }, if: -> { request.format.symbol == :turbo_stream }<% if @nested_set.any? %>
     def <%= @nested_set[0][:singular] %><% if @god
        next_object = nil
