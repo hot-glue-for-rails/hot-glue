@@ -1,8 +1,14 @@
 require 'rails_helper'
 
+describe "HotGlue::ScaffoldGenerator" do
+  before(:all) do
+    $INTERNAL_SPECS = true
+  end
 
+  after(:all) do
+    $INTERNAL_SPECS = nil
+  end
 
-describe HotGlue::ScaffoldGenerator do
   before(:each) do
     remove_everything
   end
@@ -1280,7 +1286,7 @@ describe HotGlue::ScaffoldGenerator do
 
       end
 
-      it "should generate automatic thumbnail if there is a mathcing 'thumb' variant" do
+      it "should generate automatic thumbnail if there is a matching 'thumb' variant" do
         response = Rails::Generators.invoke("hot_glue:scaffold",
                                             ["Abc","--gd", "--attachments=aaa"])
 
@@ -1357,6 +1363,30 @@ describe HotGlue::ScaffoldGenerator do
           }.to raise_exception(HotGlue::Error, /received 4th parameter in attachme long form specification that was not 'dropzone'/)
         end
       end
+    end
+  end
+
+  describe "search syntax" do
+    it "should include search fields" do
+      response = Rails::Generators.invoke("hot_glue:scaffold",
+                                          ["Jkls", "--gd", "--search=set",
+                                           "--search-fields=blurb,long_description,approved_at"])
+
+
+      # NOT IMPLEMENTED: float field, integer field
+      _list = File.read("spec/dummy/app/views/jkls/_list.erb")
+      expect(_list).to include("%= f.select 'q[0][blurb_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is_exactly'], ['starts with', 'starts_with'], ['ends with', 'ends_with']], @q['0']['blurb_match'] ), {} , { class: 'form-control match' } %><%= f.text_field 'q[0][blurb_search]', value: @q['0'][:blurb_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>")
+      expect(_list).to include("<%= f.select 'q[0][long_description_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is_exactly'], ['starts with', 'starts_with'], ['ends with', 'ends_with']], @q['0']['long_description_match'] ), {} , { class: 'form-control match' } %><%= f.text_field 'q[0][long_description_search]', value: @q['0'][:long_description_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>")
+      expect(_list).to include("<div data-controller='date-range-picker' >")
+
+      expect(_list).to include("<%= f.select 'q[0][approved_at_match]', options_for_select([['', ''], ['is on', 'is_on'],")
+      expect(_list).to include("['is between', 'is_between'], ['is on or after', 'is_on_or_after'],")
+      expect(_list).to include("['is before or on', 'is_before_or_on'], ['not on', 'not_on']], @q['0']['approved_at_match'] ), {} ,")
+      expect(_list).to include("{ class: 'form-control match', 'data-action': 'change->date-range-picker#matchSelection' } %>")
+      expect(_list).to include("<%= datetime_local_field 'q[0]', 'approved_at_search_start', {value: @q['0'][:approved_at_search_start], autocomplete: 'off', size: 40, class: 'form-control', placeholder: 'start', 'data-date-range-picker-target': 'start' } %>")
+      expect(_list).to include("<%= datetime_local_field 'q[0]', 'approved_at_search_end', {value: @q['0'][:approved_at_search_end], autocomplete: 'off', size: 40, class: 'form-control', placeholder: 'end' , 'data-date-range-picker-target': 'end' } %>")
+      expect(_list).to include("</div>")
+
     end
   end
 end

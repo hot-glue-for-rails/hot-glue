@@ -1189,7 +1189,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       formats.each do |format|
         source_filename = cc_filename_with_extensions("#{@markup}/#{view}", "#{@markup}")
         dest_filename = cc_filename_with_extensions("#{view}", "#{@markup}")
-
+        # byebug
         dest_filepath = File.join("#{filepath_prefix}app/views#{namespace_with_dash}",
                                   @controller_build_folder, dest_filename)
 
