@@ -1611,6 +1611,21 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 
 # VERSION HISTORY
+
+#### 2024-07-29 - v0.6.3.3
+
+• Adds pickup partials for
+`_index_before_list`
+`_list_after_each_row`
+`_list_after_each_row_heading`
+
+Remember, to use pickup partials these partials must exist in the build folder at the time you are building scaffolding.
+
+• Fixes issue with Rails 7.1 when using `--no-edit` or `--no-delete` flags
+(Rails 7.1 enforces the presence of action names flagged with `only` on the before hook, which caused `The show action could not be found for the :load_charge callback...`)
+
+
+
 #### 2024-01-28 - v0.6.3.2
 - corrects variables to be top-level in for nested merge in edit.erb; also adds new flag --display-edit-after-create used to direct to the edit page after the create action (#157)
 - code spacing tweeks
