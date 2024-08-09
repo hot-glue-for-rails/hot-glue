@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hot-glue (0.6.3.2)
+    hot-glue (0.6.4)
       ffaker (~> 2.16)
       kaminari (~> 1.2)
       rails (> 5.1)
@@ -133,20 +133,20 @@ GEM
       net-imap
       net-pop
       net-smtp
-    marcel (1.0.2)
+    marcel (1.0.4)
     matrix (0.4.2)
     method_source (1.0.0)
     mini_mime (1.1.2)
     mini_portile2 (2.8.4)
     minitest (5.16.3)
-    net-imap (0.4.9.1)
+    net-imap (0.4.14)
       date
       net-protocol
     net-pop (0.1.2)
       net-protocol
     net-protocol (0.2.2)
       timeout
-    net-smtp (0.4.0.1)
+    net-smtp (0.5.0)
       net-protocol
     nio4r (2.5.8)
     nokogiri (1.13.9)
