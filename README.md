@@ -682,13 +682,15 @@ You will need to separately specify them as show-only if you want them to be non
 
 Notice that each modifiers can be used with specific field types. 
 
-| user modifier                 | what it does                                                                                                                                                     | Field types                       |   |   |
-|-------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|---|---|
-| $                             | wraps output in `number_to_currency()`                                                                                                                           | floats and integers               |   |   |
+| user modifier                 | what it does                                                                                                                                                         | Field types                       |   |   |
+|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|---|---|
+| $                             | wraps output in `number_to_currency()`                                                                                                                               | floats and integers               |   |   |
 | (truthy label)\|(falsy label) | specify a binary switch with a pipe (\|) character if the value is truthy, it will display as "truthy label" if the value is falsy, it will display as "falsy label" | booleans, datetimes, dates, times |   |    |
-| partials                      | applies to enums only, you must have a partial whose name matches each enum type                                                                                 | enums only                        |   |   |
-| tinymce                       | applies to text fields only, be sure to setup TineMCE globally                                                                                                   | text fields only                  |    |   |
-| typeahead                     | turns a foreign key (only) into a searchable typeahead field                                                                                                     | foreign keys only                 |   |   |
+| partials                      | applies to enums only, you must have a partial whose name matches each enum type                                                                                     | enums only                        |   |   |
+| tinymce                       | applies to text fields only, be sure to setup TineMCE globally                                                                                                       | text fields only                  |    |   |
+| typeahead                     | turns a foreign key (only) into a searchable typeahead field                                                                                                         | foreign keys only                 |   |   |
+| timezone                      | turns a string (varchar) into a drop down of timezones                                                                                                               | foreign keys only                 |   |   |
+
 
 Except for "(truthy label)" and "(falsy label)" which use the special syntax, use the modifier _exactly_ as it is named.
 
