@@ -2310,3 +2310,9 @@ To run only the internal specs, use
 
 Internal Test coverage as of 2023-10-15 (v0.5.24)
 All Files ( 86.29% covered at 75.64 hits/line )
+
+
+### Reference
+
+https://stackoverflow.com/questions/78313570/unable-to-bundle-install-nio4r-on-a-new-mac-m3
+

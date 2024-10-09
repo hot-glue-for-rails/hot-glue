@@ -8,6 +8,6 @@
     <\%=  render partial: "<%= namespace_with_trailing_dash + @controller_build_folder + "/" %>form", locals: {:<%=  singular  %> => <%= singular %>, f: f}<%= @nested_set.collect{|arg| ".merge(#{arg[:singular]} ? {#{arg[:singular]}: #{arg[:singular]}} : {})" }.join %> \%>
   <% if @edit_within_form_partial %><\%= render partial: "edit_within_form", locals: {f: f, <%=  singular  %>: <%= singular %>}<%= @nested_set.collect{|arg| ".merge(#{arg[:singular]} ? {#{arg[:singular]}: #{arg[:singular]}} : {})" }.join %> %><% end %>
   <\% end %>
-  <% if @edit_within_form_partial %><\%= render partial: "edit_after_form", locals: {<%=  singular  %>: <%= singular %>}<%= @nested_set.collect{|arg| ".merge(#{arg[:singular]} ? {#{arg[:singular]}: #{arg[:singular]}} : {})" }.join %> %><% end %>
+  <% if @edit_after_form_partial %><\%= render partial: "edit_after_form", locals: {<%=  singular  %>: <%= singular %>}<%= @nested_set.collect{|arg| ".merge(#{arg[:singular]} ? {#{arg[:singular]}: #{arg[:singular]}} : {})" }.join %> %><% end %>
 </div>
 <\% end %>
