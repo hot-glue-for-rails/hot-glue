@@ -136,8 +136,9 @@ class Field
     elsif modify_as[:binary]
       res += "<%= #{singular}.#{name} ? '#{modify_as[:binary][:truthy]}' : '#{modify_as[:binary][:falsy]}' %>"
     elsif modify_as[:tinymce]
+
     elsif modify_as[:timezone]
-          res += "<%= f.timezone_select :#{name}, class: 'form-control' %>"
+      res += "<%= #{singular}.#{name} %>"
     elsif modify_as[:enum]
       res += "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
     end
@@ -154,7 +155,11 @@ class Field
   end
 
   def field_output(type = nil, width )
-    "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  +  " %>\n " + "\n"
+    if modify_as && modify_as[:timezone]
+      "<%= f.time_zone_select :#{name}, ActiveSupport::TimeZone.all, {}, {class: 'form-control'} %>"
+    else
+      "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  +  " %>\n " + "\n"
+    end
   end
 
   def text_area_output(field_length, extra_classes: "")
