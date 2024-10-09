@@ -136,7 +136,8 @@ class Field
     elsif modify_as[:binary]
       res += "<%= #{singular}.#{name} ? '#{modify_as[:binary][:truthy]}' : '#{modify_as[:binary][:falsy]}' %>"
     elsif modify_as[:tinymce]
-
+    elsif modify_as[:timezone]
+          res += "<%= f.timezone_select :#{name}, class: 'form-control' %>"
     elsif modify_as[:enum]
       res += "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
     end

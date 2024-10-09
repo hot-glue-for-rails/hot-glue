@@ -258,6 +258,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           @modify_as[key.to_sym] =  {tinymce: 1, badges: $3}
         elsif $2 == "typeahead"
           @modify_as[key.to_sym] =  {typeahead: 1, badges: $3}
+        elsif $2 == "timezone"
+          @modify_as[key.to_sym] =  {timezone: 1, badges: $3}
         else
           raise "unknown modification direction #{$2}"
         end
@@ -1175,7 +1177,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def copy_view_files
     return if @specs_only
     @edit_within_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_edit_within_form.html.#{@markup}")
-    @edit_after_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_edit_within_form.html.#{@markup}")
+    @edit_after_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_edit_after_form.html.#{@markup}")
     @new_within_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_new_within_form.html.#{@markup}")
     @new_after_form_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_new_within_form.html.#{@markup}")
     @index_before_list_partial = File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/#{@controller_build_folder}/_index_before_list.html.#{@markup}")
