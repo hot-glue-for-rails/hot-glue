@@ -155,7 +155,7 @@ class Field
   end
 
   def field_output(type = nil, width )
-    if modify_as[:timezone]
+    if modify_as && modify_as[:timezone]
       "<%= f.time_zone_select :#{name}, ActiveSupport::TimeZone.all, {}, {class: 'form-control'} %>"
     else
       "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  +  " %>\n " + "\n"
