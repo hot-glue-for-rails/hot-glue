@@ -62,7 +62,8 @@ Instantly get a simple CRUD interface
 # Getting Started Video
 [Hot Glue Getting Started (JSBundling)](https://www.youtube.com/watch?v=bzpXOhBkiDk)
 
-_If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/README2.md) and complete those steps FIRST._
+_If you are on Rails 6, see [LEGACY SETUP FOR RAILS 6](https://github.com/hot-glue-for-rails/hot-glue/blob/main/README2.md) and complete those steps FIRST._
+
 
 ## The Super-Quick Setup
 https://jasonfleetwoodboldt.com/courses/stepping-up-rails/jason-fleetwood-boldts-rails-cookbook/hot-glue-quick-install-mega-script/
@@ -113,7 +114,7 @@ To run Turbo (which Hot Glue requires), you must either (1) be running an Import
 
 (For the old method of installing Bootstrap [see this post](https://jasonfleetwoodboldt.com/courses/stepping-up-rails/rails-7-bootstrap/))
 
-(Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github.com/jasonfb/hot-glue/blob/main/README2.md) before continuing.)
+(Remember, for Rails 6 you must go through the [LEGACY SETUP FOR RAILS 6](https://github.com/hot-glue-for-rails/hot-glue/blob/main/README2.md) before continuing.)
 
 
 ### 2. ADD RSPEC, FACTORY-BOT, AND FFAKER
