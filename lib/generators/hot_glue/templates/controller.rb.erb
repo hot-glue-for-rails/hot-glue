@@ -73,7 +73,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
   <% unless @no_list %>
   def load_all_<%= plural %>
-<%= load_all_code %>  end
+    <%= load_all_code %>
+  end
 
   def index<% if @search == "set" %>
     @q = params[:q] ||  <%= {"0" => @search_fields.collect{|foo|
@@ -185,15 +186,16 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
       flash[:notice] << "Saved #{@<%= singular %>.<%= display_class %>}"
       flash[:alert] = @hawk_alarm if @hawk_alarm
-      render :update
+      <% unless @big_edit %>render :update, status: :unprocessable_entity<% else  %>redirect_to <%= @namespace %>_<%= @plural %>_path<% end %>
     else
       flash[:alert] = "<%= singular_name.titlecase %> could not be saved. #{@hawk_alarm}"
       @action = 'edit'
-      render :update, status: :unprocessable_entity
+      <% unless @big_edit %>render :update<% else %>render :edit<% end %>, status: :unprocessable_entity
     end<% if @pundit %>
   rescue Pundit::NotAuthorizedError
     flash[:alert] = "Updating #{@<%= singular_name %>.<%= display_class %>} not authorized. "
-    render :update<% end %>
+      <% unless @big_edit %>render :update<% else %>render :edit<% end %>, status: :unprocessable_entity
+        <% end %>
   end
 
 <% end %><% if destroy_action %>  def destroy
