@@ -1616,6 +1616,18 @@ These automatic pickups for partials are detected at buildtime. This means that 
 # VERSION HISTORY
 
 
+#### 2024-10-09 - v0.6.5
+• Adds timezone support as a modify option
+
+`--modify='time_zone{timezone}'`
+
+Note that this is a string field that will be displayed as a dropdown list of timezones using the rails `time_zone_select` helper.
+
+Unlike the previous implementation which used `timezone`, this one uses the Rails locale names as provided by the `name` method returned from the `ActiveSupport::TimeZone` object.
+
+• Fixes redisplay issue on big edit
+
+
 #### 2024-08-08 - v0.6.4 (renumbered v 6.0.3.3)
 
 • Adds pickup partials for
