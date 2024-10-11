@@ -70,7 +70,6 @@ module HotGlue
 
     def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = nil)
       use_offset = (current_user_object.try(:timezone)) || server_timezone_offset
-
       modified_params = modified_params.tap do |params|
         params.keys.each{|k|
 
@@ -81,18 +80,14 @@ module HotGlue
           end
           if include_me
             if use_offset != 0
-              puts "changing #{params[k]}"
+              zone = DateTime.now.in_time_zone(use_offset).zone
 
               if use_offset.is_a? String
-                puts "parsing #{use_offset}"
-                zone = DateTime.now.in_time_zone(use_offset).zone
                 params[k] = DateTime.parse(params[k].gsub("T", " ") + " #{zone}")
               else
-                puts "parsing #{use_offset}"
-                params[k] = DateTime.strptime("#{params[k]} #{use_offset}", '%Y-%m-%dT%H:%M %z').new_offset(0)
+                parse_date = "#{params[k].gsub("T", " ")} #{zone}"
+                params[k] = Time.strptime(parse_date, "%Y-%m-%d %H:%M:%S %Z")
               end
-              puts "changed #{params[k]}"
-
             end
           end
         }
