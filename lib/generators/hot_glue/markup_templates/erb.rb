@@ -158,7 +158,6 @@ module  HotGlue
             end
 
             @tinymce_stimulus_controller = (columns_map[col].modify_as == {tinymce: 1} ?  "data-controller='tiny-mce' " : "")
-
             add_spaces_each_line( "\n  <span #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
                                     add_spaces_each_line( (form_labels_position == 'before' ? the_label || "" : "") +
                                                         +  " <br />\n" + field_result +

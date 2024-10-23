@@ -3,6 +3,12 @@ class DateTimeField < Field
     Time.now + rand(1..5).days
   end
 
+
+  def form_show_only_output
+    viewable_output
+  end
+
+
   def spec_setup_and_change_act(which_partial = nil)
     "      " + "new_#{name} = DateTime.current + 1.year \n" +
     '      ' + "find(\"[name='#{testing_name}[#{ name.to_s }]']\").fill_in(with: new_#{name.to_s})"
@@ -48,6 +54,9 @@ class DateTimeField < Field
   <% end %>"
     end
   end
+
+
+
 
   def search_field_output
     if !modify_binary?

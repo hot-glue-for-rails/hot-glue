@@ -756,7 +756,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @columns = @the_object.columns.map(&:name).map(&:to_sym).reject { |field| !@include_fields.include?(field) }
     end
 
-
     @columns = @columns -@nested_set.collect { |set| (set[:singular] + "_id").to_sym  }
 
     if @attachments.any?
