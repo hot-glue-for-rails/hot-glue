@@ -69,7 +69,7 @@ module HotGlue
     end
 
     def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = nil)
-      use_offset = (current_user_object.try(:timezone)) || server_timezone_offset
+      use_timezone = (current_user.try(:timezone)) || Time.zone
       modified_params = modified_params.tap do |params|
         params.keys.each{|k|
 
@@ -78,16 +78,11 @@ module HotGlue
           else
             include_me = field_list.include?(k.to_sym)
           end
-          if include_me
-            if use_offset != 0
-              zone = DateTime.now.in_time_zone(use_offset).zone
-
-              if use_offset.is_a? String
-                params[k] = DateTime.parse(params[k].gsub("T", " ") + " #{zone}")
-              else
-                parse_date = "#{params[k].gsub("T", " ")} #{zone}"
-                params[k] = Time.strptime(parse_date, "%Y-%m-%d %H:%M:%S %Z")
-              end
+          if include_me && params[k].present?
+            if use_timezone
+              zone = DateTime.now.in_time_zone(use_timezone).zone
+              parse_date = "#{params[k].gsub("T", " ")} #{zone}"
+              params[k] = Time.strptime(parse_date, "%Y-%m-%d %H:%M %Z")
             end
           end
         }
@@ -213,8 +208,8 @@ module HotGlue
 
     private
 
-    def server_timezone_offset # returns integer of hours to add/subtract from UTC
-      Time.now.in_time_zone(Rails.application.config.time_zone).strftime("%z").to_i/100
-    end
+    # def server_timezone_offset # returns integer of hours to add/subtract from UTC
+    #   Time.now.in_time_zone(Rails.application.config.time_zone).strftime("%z").to_i/100
+    # end
   end
 end

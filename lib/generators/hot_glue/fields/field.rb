@@ -131,6 +131,7 @@ class Field
 
   def modified_display_output
     res = +''
+
     if modify_as[:cast] && modify_as[:cast] == "$"
       res += "<%= number_to_currency(#{singular}.#{name}) %>"
     elsif modify_as[:binary]
@@ -151,7 +152,9 @@ class Field
                    end
       res = "<span class='badge <%= #{badge_code} %>'>" + res + "</span>"
     end
+    # byebug
 
+    res
   end
 
   def field_output(type = nil, width )
