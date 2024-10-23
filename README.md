@@ -1615,6 +1615,31 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 # VERSION HISTORY
 
+#### 2024-10-23 - v0.6.6
+
+• Major refactor of contextual timezone support
+
+NEW INSTALL:
+your current_user object should have
+
+(1) a field on the database `time_zone` (notice underscore) this is a string field storing the name of the Rails timezone, 
+
+(2) a method like 
+
+def timezone
+  ActiveSupport::TimeZone[time_zone]
+end 
+
+(notice no underscore in method name)
+This method returns a TimeZone object
+
+UPGRADING: you will need to convert your existing `timezone` fields which were previously offset integers
+into strings using a new string field on your user object `time_zone` (notice underscores)
+
+
+
+
+
 #### 2024-10-11 - v0.6.5
 • Adds timezone support as a modify option
 
