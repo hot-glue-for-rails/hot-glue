@@ -28,7 +28,7 @@ Hot Glue generates quick and dirty functionality. It lets you be crafty. However
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
 How is it different than Rails scaffolding?
-
+77
 Although inspired by the Rails scaffold generators (built-in to Rails), Hot Glue does something similiar but has made opinionated decisions that deviate from the normal Rails scaffold: 
 
 1. The Hot Glue scaffolds are complete packages and are pre-optimized for 'edit-in-place' so that new and edit operations happen in-page smoothly. 
@@ -1610,10 +1610,33 @@ The `within` partials should do operations within the form (like hidden fields),
 These automatic pickups for partials are detected at buildtime. This means that if you add these partials later, you must rebuild your scaffold.
 
 
-
-
-
 # VERSION HISTORY
+
+#### 2024-11-18 - v0.6.6.1
+
+- Adds hg- classes to the form fields for easier styling
+  (add this css to your app)
+```
+
+div.hg-heading-row {
+background-color: #aab7d1;
+font-weight: bold;
+}
+
+div.hg-row {
+border: solid 1px grey;
+}
+
+
+.hg-col {
+border: solid 1px grey;
+overflow: hidden;
+}
+```
+- Fixes in `modify_date_inputs_on_params`
+- Fixes in named_variants for Rails 7.1 (applies to attachments)
+
+
 
 #### 2024-10-23 - v0.6.6
 
