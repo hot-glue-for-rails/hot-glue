@@ -50,7 +50,7 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   end
 
   def row_classes
-    "row"
+    "row hg-row"
   end
 
   def page_end
