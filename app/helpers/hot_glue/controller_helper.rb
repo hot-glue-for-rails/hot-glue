@@ -80,9 +80,8 @@ module HotGlue
           end
           if include_me && params[k].present?
             if use_timezone
-              zone = DateTime.now.in_time_zone(use_timezone).zone
-              parse_date = "#{params[k].gsub("T", " ")} #{zone}"
-              params[k] = Time.strptime(parse_date, "%Y-%m-%d %H:%M %Z")
+              parse_date = "#{params[k].gsub("T", " ")} #{use_timezone.formatted_offset}"
+              params[k] = Time.strptime(parse_date, "%Y-%m-%d %H:%M:%S %Z")
             end
           end
         }

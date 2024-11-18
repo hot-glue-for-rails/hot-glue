@@ -77,7 +77,7 @@ module  HotGlue
 
       columns = layout_object[:columns][:container]
       result = columns.map{ |column|
-        "<div class='#{col_identifier} heading--#{singular}--#{column.join("-")}' " + col_style + ">" +
+        "<div class='#{col_identifier} hg-heading-row heading--#{singular}--#{column.join("-")}' " + col_style + ">" +
           column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
       }.join("\n")
       return result
@@ -198,7 +198,7 @@ module  HotGlue
 
       result = columns.map{ |column|
 
-        "<div class='#{col_identifier} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
+        "<div class='hg-col #{col_identifier} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
         column.map { |col|
           if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
