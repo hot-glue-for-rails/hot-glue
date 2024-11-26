@@ -81,7 +81,14 @@ module HotGlue
           if include_me && params[k].present?
             if use_timezone
               parse_date = "#{params[k].gsub("T", " ")} #{use_timezone.formatted_offset}"
-              params[k] = Time.strptime(parse_date, "%Y-%m-%d %H:%M:%S %Z")
+              # note: as according to https://stackoverflow.com/questions/20111413/html5-datetime-local-control-how-to-hide-seconds
+              # there is no way to set the seconds to 00 in the datetime-local input field
+              # as I have implemented a "seconds don't matter" solution,
+              # the only solution is to avoid setting any non-00 datetime values into the database
+              # if they already exist in your database, you should zero them out
+              # or apply .change(sec: 0) when displaying them as output in the form
+              # this will prevent seconds from being added by the browser
+              params[k] = Time.strptime(parse_date, "%Y-%m-%d %H:%M %Z")
             end
           end
         }

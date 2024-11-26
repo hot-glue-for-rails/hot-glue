@@ -1612,6 +1612,23 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 # VERSION HISTORY
 
+#### 2024-11-26 - v0.6.7
+
+Patch for my non-:00 seconds problem. I have discovered that the root of my issues was a quirk in how browsers display datetime-local fields.
+
+This implementation favors a no-seconds approach, which is a good idea for most applications. If you need seconds, you should use a different approach.
+
+here is a note about the problem:
+              # note: as according to https://stackoverflow.com/questions/20111413/html5-datetime-local-control-how-to-hide-seconds
+              # there is no way to set the seconds to 00 in the datetime-local input field
+              # as I have implemented a "seconds don't matter" solution,
+              # the only solution is to avoid setting any non-00 datetime values into the database
+              # if they already exist in your database, you should zero them out
+              # or apply .change(sec: 0) when displaying them as output in the form
+              # this will prevent seconds from being added by the browser
+
+
+
 #### 2024-11-18 - v0.6.6.1
 
 - Adds hg- classes to the form fields for easier styling
