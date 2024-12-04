@@ -24,6 +24,7 @@ describe HotGlue::ErbTemplate do
                     columns: nil,
                     smart_layout: false,
                     attachments: {},
+                    alt_lookups: {},
                     bootstrap_column_width: 2,
                     singular_class: "Jkl",
                     layout_strategy: layout_strategy,
@@ -88,6 +89,7 @@ describe HotGlue::ErbTemplate do
       selected: FieldFactory.new(type: :boolean, name: "selected", generator: generator).field,
       name: FieldFactory.new(type: :string, name: "name", generator: generator).field,
       hgi_id: AssociationField.new(
+              alt_lookup: nil,
               self_auth: false,
               default_boolean_display: "radio" , display_as: {},
               namespace: nil,

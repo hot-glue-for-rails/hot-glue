@@ -262,6 +262,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           @modify_as[key.to_sym] =  {typeahead: 1, badges: $3}
         elsif $2 == "timezone"
           @modify_as[key.to_sym] =  {timezone: 1, badges: $3}
+        elsif $2 == "none"
+          @modify_as[key.to_sym] =  {none: 1, badges: $3}
         else
           raise "unknown modification direction #{$2}"
         end

@@ -124,13 +124,22 @@ class Field
 
   def viewable_output
     if modify_as
-      modified_display_output
+      modified_display_output(show_only: true)
+    else
+      field_view_output
+    end
+  end
+
+  def field_view_output
+    if modify_as && modify_as[:none]
+      "<span class='badge #{modify_as[:badges]}'>" + field_view_output + "</span>"
     else
       "<%= #{singular}.#{name} %>"
     end
   end
 
-  def modified_display_output
+
+  def modified_display_output(show_only: false)
     res = +''
 
     if modify_as[:cast] && modify_as[:cast] == "$"
@@ -142,19 +151,21 @@ class Field
     elsif modify_as[:timezone]
       res += "<%= #{singular}.#{name} %>"
     elsif modify_as[:enum]
-      res += "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
+    elsif modify_as[:none]
+        field_view_output
+      # res += "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
     end
 
-    if modify_as[:badges]
-      badge_code = if modify_as[:binary]
-                     "#{singular}.#{name} ? '#{modify_as[:badges].split("|")[0]}' : '#{modify_as[:badges].split("|")[1]}'"
-                   else
-                     modify_as[:badges].split("|").to_s + "[#{singular}.#{name}]"
-                   end
-      res = "<span class='badge <%= #{badge_code} %>'>" + res + "</span>"
-    end
+
+    # if modify_as[:badges]
+    #   badge_code = if modify_as[:binary]
+    #                  "#{singular}.#{name} ? '#{modify_as[:badges].split("|")[0]}' : '#{modify_as[:badges].split("|")[1]}'"
+    #                else
+    #                  modify_as[:badges].split("|").to_s + "[#{singular}.#{name}]"
+    #                end
+    #   res = "<span class='badge <%= #{badge_code} %>'>" + res + "</span>"
+    # end
     # byebug
-
     res
   end
 
