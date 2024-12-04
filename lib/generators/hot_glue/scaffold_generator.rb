@@ -16,7 +16,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   hook_for :form_builder, :as => :scaffold
 
   source_root File.expand_path('templates', __dir__)
-  attr_accessor :attachments, :auth, :big_edit, :button_icons, :bootstrap_column_width, :columns,
+  attr_accessor :alt_lookups, :attachments, :auth,
+                :big_edit, :button_icons, :bootstrap_column_width,
+                :columns,
                 :default_boolean_display,
                 :display_as, :downnest_children, :downnest_object, :hawk_keys, :layout_object,
                 :modify_as,
@@ -466,6 +468,30 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
 
+    # alt_lookups_entry =
+
+
+    @alt_lookups = {}
+
+    options['alt_foreign_key_lookup'].split(",").each do |setting|
+      setting =~ /(.*){(.*)}/
+      key, lookup_as = $1, $2
+
+      assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
+
+      data = {lookup_as: lookup_as.gsub("+",""),
+              assoc: assoc,
+              with_create: lookup_as.include?("+")}
+      @alt_lookups[key] = data
+    end
+
+    puts "------ ALT LOOKUPS for #{@alt_lookups}"
+
+    # @update_alt_lookups = @alt_lookups.collect{|key, value|
+    #   @update_show_only.include?(key) ?
+    #     {  key: value }
+    #     : nil}.compact
+
 
 
     # build a new polymorphic object
@@ -552,6 +578,15 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                            include_setting: options['include'],
                                            buttons_width: buttons_width)
     @layout_object = builder.construct
+
+
+
+    # syntax should be xyz_id{xyz_email},abc_id{abc_email}
+    # instead of a drop-down for the foreign entity, a text field will be presented
+    # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
+
+
+
 
 
     # create the template object

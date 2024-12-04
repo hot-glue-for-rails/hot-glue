@@ -1,5 +1,5 @@
 class Field
-  attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :auth,
+  attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookup, :auth,
                 :assoc_label,  :class_name, :default_boolean_display, :display_as, :form_placeholder_labels,
                 :form_labels_position,
                 :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :object, :sample_file_path,
@@ -11,6 +11,7 @@ class Field
     auth: ,
     attachment_data: nil,
     class_name: ,
+    alt_lookup: ,
     default_boolean_display: ,
     display_as: ,
     form_labels_position:,
@@ -29,7 +30,7 @@ class Field
   )
     @name = name
     @layout_strategy = layout_strategy
-    @alt_lookups = alt_lookups
+    @alt_lookup = alt_lookup
     @singular = singular
     @class_name = class_name
     @update_show_only = update_show_only
