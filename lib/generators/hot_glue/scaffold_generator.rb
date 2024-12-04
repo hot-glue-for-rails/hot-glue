@@ -612,6 +612,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         end
 
         hawk_scope = key.gsub("_id", "").pluralize
+        if eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})").nil?
+          raise "Could not find `#{key.gsub('_id', '')}` association; add this to the #{singular_class} class: \nbelongs_to :#{key.gsub('_id', '')} "
+        end
+
         optional = eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})").options[:optional]
 
         @hawk_keys[key.to_sym] = { bind_to: [hawk_to], optional: optional }
@@ -1253,9 +1257,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def insert_into_nav_template
     # how does this get called(?)
     nav_file = "#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}"
-    if include_nav_template && @nested_set.none?
+
+    if include_nav_template
       append_text = "  <li class='nav-item'>
-    <%= link_to '#{@list_label_heading}', #{path_helper_plural}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
+    <%= link_to '#{@list_label_heading.humanize}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
   </li>"
 
       text = File.read(nav_file)
