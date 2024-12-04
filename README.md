@@ -1665,7 +1665,13 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 #### 2024-12-05 - v0.6.8
 • fixes in modify_date_inputs_on_params for current_user_object
+
 • adds back alt_lookup feature from version 0.5.7; use with --alt-foreign-key-lookup
+
+• badges can be added to modified fields using `[` and `]` which come after the modification flag inside `{...}`. 
+for booleans separate with pipes `|`
+
+• you can add badges to fields that have no other modification using the `none` modifier
 
 
 #### 2024-11-26 - v0.6.7
