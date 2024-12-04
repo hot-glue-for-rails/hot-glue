@@ -1,9 +1,24 @@
 class AttachmentField < Field
   attr_accessor :attachment_data
-  def initialize(name:, class_name:, default_boolean_display: ,
-                 display_as:, singular:, update_show_only:, hawk_keys:, auth:,
-                 sample_file_path: nil, attachment_data:, ownership_field:, layout_strategy: ,
-                 form_placeholder_labels: , form_labels_position:, modify_as:, self_auth: , namespace:, pundit:   )
+  def initialize(alt_lookup:,
+                 attachment_data:,
+                 auth:,
+                 class_name:,
+                 display_as:, singular:,
+                 default_boolean_display: ,
+                 form_placeholder_labels: ,
+                 form_labels_position:,
+                 hawk_keys:,
+                 layout_strategy: ,
+                 name:,
+                 namespace:,
+                 modify_as:,
+                 ownership_field:,
+                 pundit: ,
+                 sample_file_path: nil,
+                 self_auth:,
+                 update_show_only:
+  )
     super
 
     @attachment_data = attachment_data

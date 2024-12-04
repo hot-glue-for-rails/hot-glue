@@ -3,15 +3,16 @@ require_relative './field.rb'
 
 class AssociationField < Field
 
-  attr_accessor :assoc_name, :assoc_class, :assoc
+  attr_accessor :assoc_name, :assoc_class, :assoc, :alt_lookup
 
-  def initialize( class_name: , default_boolean_display:, display_as: ,
+  def initialize( alt_lookup: , class_name: , default_boolean_display:, display_as: ,
                  name: , singular: ,
                  update_show_only: ,
                  hawk_keys: , auth: , sample_file_path:,  ownership_field: ,
                  attachment_data: nil , layout_strategy: , form_placeholder_labels: nil,
                  form_labels_position:, modify_as: , self_auth: , namespace:, pundit:  )
     super
+
 
     @assoc_model = eval("#{class_name}.reflect_on_association(:#{assoc})")
 
@@ -47,7 +48,7 @@ class AssociationField < Field
   end
 
   def spec_setup_and_change_act(which_partial)
-    if which_partial == :update && update_show_only.include?(name)
+    if which_partial == :update_show_only && update_show_only.include?(name)
 
     else
       "      #{name}_selector = find(\"[name='#{singular}[#{name}]']\").click \n" +
@@ -75,10 +76,38 @@ class AssociationField < Field
     "  let!(:#{assoc}1) {create(:#{the_foreign_class}" +  hawk_keys_on_lets + ")}"
   end
 
+  def raw_view_field
+    assoc_name = name.to_s.gsub("_id","")
+    assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
+    if assoc.nil?
+      exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+      exit
+    end
+    is_owner = name == ownership_field
+    assoc_class_name = assoc.class_name.to_s
+    display_column = HotGlue.derrive_reference_name(assoc_class_name)
+
+
+    "<%= #{singular}.#{assoc_name}.#{display_column} %>"
+  end
+
   def form_field_output
     assoc_name = name.to_s.gsub("_id","")
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
-    if modify_as && modify_as[:typeahead]
+
+    if alt_lookup
+      alt = alt_lookup[:lookup_as]
+      assoc_name = name.to_s.gsub("_id","")
+      assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
+
+      alt = alt_lookup[:lookup_as]
+      "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" %>"
+
+      # if modify_as
+      #   modified_display_output
+      # else
+      # end
+    elsif modify_as && modify_as[:typeahead]
       search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
       "<div class='typeahead typeahead--#{assoc.name}_id'
       data-controller='typeahead'
@@ -122,25 +151,19 @@ class AssociationField < Field
   end
 
   def form_show_only_output
-    assoc_name = name.to_s.gsub("_id","")
-    assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
-    if assoc.nil?
-      exit_message = "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
-      exit
-    end
 
-    is_owner = name == ownership_field
-    assoc_class_name = assoc.class_name.to_s
-    display_column = HotGlue.derrive_reference_name(assoc_class_name)
 
-    if hawk_keys[assoc.foreign_key.to_sym]
-      hawk_definition = hawk_keys[assoc.foreign_key.to_sym]
-      hawked_association = hawk_definition.join(".")
+    # if hawk_keys[assoc.foreign_key.to_sym]
+    #   hawk_definition = hawk_keys[assoc.foreign_key.to_sym]
+    #   hawked_association = hawk_definition.join(".")
+    # else
+    #   hawked_association = "#{assoc.class_name}.all"
+    # end
+    if modify_as && modify_as[:none]
+      "<span class='badge #{modify_as[:badges]}'>" + raw_view_field + "</span>"
     else
-      hawked_association = "#{assoc.class_name}.all"
+      raw_view_field
     end
-    "<%= #{singular}.#{assoc_name}.#{display_column} %>"
-
   end
 
   def line_field_output

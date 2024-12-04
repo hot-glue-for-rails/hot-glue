@@ -226,7 +226,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %><% end %>
 
   def <%=singular_name%>_params
-    params.require(:<%= testing_name %>).permit(<%= ((fields_filtered_for_strong_params - @show_only ) + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %>)
+    params.require(:<%= testing_name %>).permit(<%= ((fields_filtered_for_strong_params - @show_only ) + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %><%= ", " +  @alt_lookups.collect{|k,v|  ":__lookup_#{v[:lookup_as]}"  }.join(", ") if @alt_lookups.any? %>)
   end<% if @update_show_only %>
 
   <% unless @no_edit %>

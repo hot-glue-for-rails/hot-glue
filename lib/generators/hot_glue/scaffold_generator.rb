@@ -16,7 +16,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   hook_for :form_builder, :as => :scaffold
 
   source_root File.expand_path('templates', __dir__)
-  attr_accessor :attachments, :auth, :big_edit, :button_icons, :bootstrap_column_width, :columns,
+  attr_accessor :alt_lookups, :attachments, :auth,
+                :big_edit, :button_icons, :bootstrap_column_width,
+                :columns,
                 :default_boolean_display,
                 :display_as, :downnest_children, :downnest_object, :hawk_keys, :layout_object,
                 :modify_as,
@@ -260,6 +262,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           @modify_as[key.to_sym] =  {typeahead: 1, badges: $3}
         elsif $2 == "timezone"
           @modify_as[key.to_sym] =  {timezone: 1, badges: $3}
+        elsif $2 == "none"
+          @modify_as[key.to_sym] =  {none: 1, badges: $3}
         else
           raise "unknown modification direction #{$2}"
         end
@@ -466,6 +470,30 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
 
+    # alt_lookups_entry =
+
+
+    @alt_lookups = {}
+
+    options['alt_foreign_key_lookup'].split(",").each do |setting|
+      setting =~ /(.*){(.*)}/
+      key, lookup_as = $1, $2
+
+      assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
+
+      data = {lookup_as: lookup_as.gsub("+",""),
+              assoc: assoc,
+              with_create: lookup_as.include?("+")}
+      @alt_lookups[key] = data
+    end
+
+    puts "------ ALT LOOKUPS for #{@alt_lookups}"
+
+    # @update_alt_lookups = @alt_lookups.collect{|key, value|
+    #   @update_show_only.include?(key) ?
+    #     {  key: value }
+    #     : nil}.compact
+
 
 
     # build a new polymorphic object
@@ -554,6 +582,15 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @layout_object = builder.construct
 
 
+
+    # syntax should be xyz_id{xyz_email},abc_id{abc_email}
+    # instead of a drop-down for the foreign entity, a text field will be presented
+    # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
+
+
+
+
+
     # create the template object
 
 
@@ -612,6 +649,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         end
 
         hawk_scope = key.gsub("_id", "").pluralize
+        if eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})").nil?
+          raise "Could not find `#{key.gsub('_id', '')}` association; add this to the #{singular_class} class: \nbelongs_to :#{key.gsub('_id', '')} "
+        end
+
         optional = eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})").options[:optional]
 
         @hawk_keys[key.to_sym] = { bind_to: [hawk_to], optional: optional }
@@ -1253,9 +1294,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def insert_into_nav_template
     # how does this get called(?)
     nav_file = "#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}"
-    if include_nav_template && @nested_set.none?
+
+    if include_nav_template
       append_text = "  <li class='nav-item'>
-    <%= link_to '#{@list_label_heading}', #{path_helper_plural}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
+    <%= link_to '#{@list_label_heading.humanize}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
   </li>"
 
       text = File.read(nav_file)

@@ -49,6 +49,7 @@ class FieldFactory
             end
     @class_name = class_name
 
+
     @field = field_class.new(name: name,
                              layout_strategy: generator.layout_strategy,
                              form_placeholder_labels: generator.form_placeholder_labels,
@@ -57,6 +58,7 @@ class FieldFactory
                              hawk_keys: generator.hawk_keys,
                              auth: generator.auth,
                              class_name: generator.singular_class,
+                             alt_lookup: generator.alt_lookups[name] || nil,
                              singular: generator.singular,
                              self_auth: generator.self_auth,
                              update_show_only: generator.update_show_only,

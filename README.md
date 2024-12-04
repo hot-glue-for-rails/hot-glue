@@ -690,9 +690,59 @@ Notice that each modifiers can be used with specific field types.
 | tinymce                       | applies to text fields only, be sure to setup TineMCE globally                                                                                                       | text fields only                  |    |   |
 | typeahead                     | turns a foreign key (only) into a searchable typeahead field                                                                                                         | foreign keys only                 |   |   |
 | timezone                      | turns a string (varchar) into a drop down of timezones                                                                                                               | foreign keys only                 |   |   |
-
+| none                          | special modifier for using badges |
 
 Except for "(truthy label)" and "(falsy label)" which use the special syntax, use the modifier _exactly_ as it is named.
+
+apply badge behavior using `[` and `]` markers after the modification marker. 
+
+`--modify=opened_at{opened|closed}[bg-primary|bg-secondary]`
+Applies a badge `bg-primary` to rows with opened_at truthy and `bg-secondary` to rows with opened_at falsy.
+
+to display a badge on everything, use the `none` modifier with the
+`--modify=opened_at{none}[bg-dark]`
+
+
+
+### `--alt-foreign-key-lookup=`
+
+Use for a join table to specify that a field should be looked up by a different field
+
+
+`./bin/rails generate hot_glue:scaffold AccountUser --alt-foreign-key-lookup=user_id{email}`
+
+Here we are specifying that the `user_id` field should be looked up by the `email` field on the User table. 
+If no existing user exists, we create one because we are using the `find_or_create_by!` method.
+
+Use with a factory pattern like this one:
+``` 
+class AccountUserFactory
+  attr_accessor :account_user
+
+  def initialize(params: {}, account: nil)
+    begin
+      user = User.find_or_create_by!( email: params[:__lookup_email])
+    rescue ActiveRecord::RecordInvalid => e
+      @account_user = AccountUser.new({account: account})
+
+      @account_user.errors.add(:user, e.message)
+    end
+
+    @account_user = AccountUser.new(params.tap{|x| x.delete(:__lookup_email)}
+                                          .merge({user: user,
+                                                  account: account}))
+  end
+end
+```
+
+this works with a factory creation syntax like so:
+
+```
+--factory-creation='factory = AccountUserFactory.new(params: account_user_params, account: account)
+```
+*See the `--factory-creation` section. 
+
+
 
 ### `--pundit`
 If you enable Pundit, your controllers will look for a Policy that matches the name of the thing being built.
@@ -1612,6 +1662,18 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 # VERSION HISTORY
 
+
+#### 2024-12-05 - v0.6.8
+• fixes in modify_date_inputs_on_params for current_user_object
+
+• adds back alt_lookup feature from version 0.5.7; use with --alt-foreign-key-lookup
+
+• badges can be added to modified fields using `[` and `]` which come after the modification flag inside `{...}`. 
+for booleans separate with pipes `|`
+
+• you can add badges to fields that have no other modification using the `none` modifier
+
+
 #### 2024-11-26 - v0.6.7
 
 Patch for my non-:00 seconds problem. I have discovered that the root of my issues was a quirk in how browsers display datetime-local fields.
@@ -2154,7 +2216,7 @@ div[class$="--phone_number"] {
 #### 2023-02-13 - v0.5.7 - factory-creation, alt lookups, update show only, fixes to Enums, support for Ruby 3.2
 • See `--factory-creation` section.
 
-• `--alt-lookup-foreign-keys`
+• `--alt-foreign-key-lookup`
 Allows you to specify that a foreign key should act as a search field, allowing the user to input a unique value (like an email) to search for a related record.
 
 • `--update-show-only`

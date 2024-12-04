@@ -69,7 +69,7 @@ module HotGlue
     end
 
     def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = nil)
-      use_timezone = (current_user.try(:timezone)) || Time.zone
+      use_timezone = (current_user_object.try(:timezone)) || Time.zone
       modified_params = modified_params.tap do |params|
         params.keys.each{|k|
 

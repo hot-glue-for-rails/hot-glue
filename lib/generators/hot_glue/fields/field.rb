@@ -1,5 +1,5 @@
 class Field
-  attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookups, :auth,
+  attr_accessor :assoc_model, :assoc_name, :assoc_class, :associations, :alt_lookup, :auth,
                 :assoc_label,  :class_name, :default_boolean_display, :display_as, :form_placeholder_labels,
                 :form_labels_position,
                 :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :object, :sample_file_path,
@@ -11,6 +11,7 @@ class Field
     auth: ,
     attachment_data: nil,
     class_name: ,
+    alt_lookup: ,
     default_boolean_display: ,
     display_as: ,
     form_labels_position:,
@@ -29,7 +30,7 @@ class Field
   )
     @name = name
     @layout_strategy = layout_strategy
-    @alt_lookups = alt_lookups
+    @alt_lookup = alt_lookup
     @singular = singular
     @class_name = class_name
     @update_show_only = update_show_only
@@ -123,13 +124,22 @@ class Field
 
   def viewable_output
     if modify_as
-      modified_display_output
+      modified_display_output(show_only: true)
+    else
+      field_view_output
+    end
+  end
+
+  def field_view_output
+    if modify_as && modify_as[:none]
+      "<span class='badge #{modify_as[:badges]}'>" + field_view_output + "</span>"
     else
       "<%= #{singular}.#{name} %>"
     end
   end
 
-  def modified_display_output
+
+  def modified_display_output(show_only: false)
     res = +''
 
     if modify_as[:cast] && modify_as[:cast] == "$"
@@ -141,19 +151,21 @@ class Field
     elsif modify_as[:timezone]
       res += "<%= #{singular}.#{name} %>"
     elsif modify_as[:enum]
-      res += "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
+    elsif modify_as[:none]
+        field_view_output
+      # res += "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
     end
 
-    if modify_as[:badges]
-      badge_code = if modify_as[:binary]
-                     "#{singular}.#{name} ? '#{modify_as[:badges].split("|")[0]}' : '#{modify_as[:badges].split("|")[1]}'"
-                   else
-                     modify_as[:badges].split("|").to_s + "[#{singular}.#{name}]"
-                   end
-      res = "<span class='badge <%= #{badge_code} %>'>" + res + "</span>"
-    end
+
+    # if modify_as[:badges]
+    #   badge_code = if modify_as[:binary]
+    #                  "#{singular}.#{name} ? '#{modify_as[:badges].split("|")[0]}' : '#{modify_as[:badges].split("|")[1]}'"
+    #                else
+    #                  modify_as[:badges].split("|").to_s + "[#{singular}.#{name}]"
+    #                end
+    #   res = "<span class='badge <%= #{badge_code} %>'>" + res + "</span>"
+    # end
     # byebug
-
     res
   end
 
