@@ -914,7 +914,7 @@ This means you can be a somewhat lazy about your bang methods, but keep in mind 
 
 Finally, you can raise an ActiveRecord error which will also get passed to the user in the flash alert area.
 
-For more information see [Example 5 in the Tutorial](https://school.jfbcodes.com/8188)
+For more information see [Example 6 in the Tutorial](https://school.jfbcodes.com/8188)
 
 
 ### `--downnest`
