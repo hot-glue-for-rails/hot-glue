@@ -123,6 +123,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
                                  nested_set: @nested_set,
                                  modifier: 'edit_',
                                  with_params: true,
+                                 instance_last_item: true,
                                  put_form: true).gsub("(#{singular}", "(@#{singular}") %><% end %>
     else
       flash[:alert] = "Oops, your <%= singular_name %> could not be created. #{@hawk_alarm}"
@@ -138,11 +139,13 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 <% unless @no_edit %>
   def show<% if @pundit %>
     authorize @<%= singular %><% end %>
-    redirect_to <%=   HotGlue.optionalized_ternary(namespace: @namespace,
+    redirect_to <%=  HotGlue.optionalized_ternary(namespace: @namespace,
                                  target:  @singular,
+                                 top_level: false,
                                  nested_set: @nested_set,
                                  modifier: 'edit_',
                                  with_params: true,
+                                 instance_last_item: true,
                                  put_form: true).gsub("(#{singular}", "(@#{singular}") %>
   end
 
@@ -186,7 +189,18 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
       flash[:notice] << "Saved #{@<%= singular %>.<%= display_class %>}"
       flash[:alert] = @hawk_alarm if @hawk_alarm
-      <% unless @big_edit %>render :update, status: :unprocessable_entity<% else  %>redirect_to <%= @namespace %>_<%= @plural %>_path<% end %>
+      <% unless @big_edit %>render :update, status: :unprocessable_entity<% else  %>
+        redirect_to <%=
+      HotGlue.optionalized_ternary(namespace: @namespace,
+                                 target:  @singular,
+                                 top_level: false,
+                                 nested_set: @nested_set,
+                                 modifier: 'edit_',
+                                 with_params: true,
+                                 instance_last_item: true,
+                                 put_form: true).gsub("(#{singular}", "(@#{singular}") %>
+
+     <% end %>
     else
       flash[:alert] = "<%= singular_name.titlecase %> could not be saved. #{@hawk_alarm}"
       @action = 'edit'
