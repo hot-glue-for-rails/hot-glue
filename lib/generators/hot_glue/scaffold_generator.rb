@@ -23,9 +23,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :display_as, :downnest_children, :downnest_object, :hawk_keys, :layout_object,
                 :modify_as,
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
-                :singular_class, :smart_layout, :stacked_downnesting, :update_show_only, :ownership_field,
-                :layout_strategy, :form_placeholder_labels, :form_labels_position, :pundit,
-                :self_auth, :namespace_value, :related_sets, :search_clear_button, :search_autosearch
+                :singular_class, :smart_layout, :stacked_downnesting,
+                :update_show_only, :ownership_field,
+                :layout_strategy, :form_placeholder_labels,
+                :form_labels_position, :pundit,
+                :self_auth, :namespace_value, :record_scope, :related_sets,
+                :search_clear_button, :search_autosearch
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -97,6 +100,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :code_after_create, default: nil
   class_option :code_before_update, default: nil
   class_option :code_after_update, default: nil
+  class_option :record_scope, default: nil
+
 
   class_option :search, default: nil # set or predicate
 
@@ -335,6 +340,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @new_in_modal = options['new_in_modal'] || false
 
     @smart_layout = options['smart_layout']
+    @record_scope = options['record_scope']
 
     @pundit = options['pundit']
     if @pundit.nil?
@@ -1527,10 +1533,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     if pundit
-      res << "    @#{ plural_name } = policy_scope(#{ object_scope }).page(params[:page])#{ n_plus_one_includes }#{ ".per(per)" if @paginate_per_page_selector }"
+      res << "    @#{ plural_name } = policy_scope(#{ object_scope })#{record_scope}.page(params[:page])#{ n_plus_one_includes }#{ ".per(per)" if @paginate_per_page_selector }"
     else
       if !@self_auth
-        res << spaces(4) + "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
+
+        res << spaces(4) + "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }#{record_scope}"
+
         if @search_fields
           res << @search_fields.collect{ |field|
             wqs = @columns_map[field.to_sym].where_query_statement
@@ -1539,12 +1547,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
             end
           }.compact.join
         end
-      elsif @nested_set[0] && @nested_set[0][:optional]
-        res << "@#{ plural_name } = #{ class_name }.all"
-      else
-        res << "@#{ plural_name } = #{ class_name }.where(id: #{ auth_object.gsub("@",'') }.id)#{ n_plus_one_includes }"
+        res << ".page(params[:page])#{ '.per(per)' if @paginate_per_page_selector }"
 
-        res << ".page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
+      elsif @nested_set[0] && @nested_set[0][:optional]
+        res << "@#{ plural_name } = #{ class_name }.#{record_scope}.all"
+      else
+        res << "@#{ plural_name } = #{ class_name }.#{record_scope}.where(id: #{ auth_object.gsub("@",'') }.id)#{ n_plus_one_includes }"
+
+        res << "#{record_scope}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
       end
     end
     res << "\n"

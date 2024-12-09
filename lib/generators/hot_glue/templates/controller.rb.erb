@@ -60,20 +60,20 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   <% if !@self_auth %>
   def load_<%= singular_name %>
     <% if @nested_set[0] && @nested_set[0][:optional] %>if params.include?(:<%= @nested_set.last[:singular] %>_id)
-      @<%= singular_name %> = <%= object_scope.gsub("@",'') %>.find(params[:id])
-    else <% end %>@<%= singular_name %> = <%= object_scope %>.find(params[:id])<% if @nested_set[0] && @nested_set[0][:optional]  %>
+      @<%= singular_name %> = <%= object_scope.gsub("@",'') %><%= @record_scope %>.find(params[:id])
+    else <% end %>@<%= singular_name %> = <%= object_scope %><%= @record_scope %>.find(params[:id])<% if @nested_set[0] && @nested_set[0][:optional]  %>
     end<% end %>
   end
   <% else %>
   def load_<%= singular_name %>
-    @<%= singular_name %> = (<%= auth_object.gsub("@",'') %><%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set.any? && @nested_set[0][:optional] %>)<% if @nested_set.any? && @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %>
+    @<%= singular_name %> = (<%= auth_object.gsub("@",'') %><%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set.any? && @nested_set[0][:optional] %>)<% if @nested_set.any? && @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %><%= @record_scope %>
   end<% end %>
   <% if @paginate_per_page_selector %>def per
     params[:per] || 10
   end<% end %>
   <% unless @no_list %>
   def load_all_<%= plural %>
-    <%= load_all_code %>
+  <%= load_all_code %>
   end
 
   def index<% if @search == "set" %>

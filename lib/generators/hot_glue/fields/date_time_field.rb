@@ -40,7 +40,7 @@ class DateTimeField < Field
   end
 
   def form_field_output
-    "<%= datetime_field_localized(f, :#{name}, #{singular}.#{name}, label: '#{ name.to_s.humanize }' ) %>"
+    "<%= f.datetime_field( :#{name}, value: #{singular}.#{name}, class: '#{@layout_strategy.form_input_class}'  ) %>"
   end
 
   def viewable_output
