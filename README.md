@@ -934,6 +934,23 @@ The 'Abcs' portal will display as 5 bootstrap columns instead of the typical 4. 
 This puts the downnested portals on top of one another (stacked top to bottom) instead of side-by-side (left to right). This is useful if you have a lot of downnested portals and you want to keep the page from getting too wide.
 
 
+
+### `--record-scope=`
+
+Record scope allows you to apply a model based scope for the controller being generated.
+This is applied on top of all other scopes, searches, and modifiers applied to the 
+
+`bin/rails :generate hot_glue:scaffold Order --record-scope='.is_open'`
+
+Be sure to use single quotes (') and don't forget the dot (`.`) before your scope(s).
+
+Make sure your Order model has a scope `is_open`
+```
+scope :is_open, -> {where(state == 'open')}
+```
+
+Now all records displayed through the generated controller 
+
 ## FLAGS (Options with no values)
 These options (flags) also uses `--` syntax but do not take any values. Everything is assumed (default) to be false unless specified.
 

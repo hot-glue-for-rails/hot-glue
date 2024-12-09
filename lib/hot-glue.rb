@@ -25,19 +25,22 @@ module HotGlue
                                 modifier: "",
                                 with_params: false,
                                 top_level: false,
-                                put_form: false)
+                                put_form: false,
+                                instance_last_item: false )
     instance_sym = top_level ? "@" : ""
+
 
     if nested_set.nil? || nested_set.empty?
       return modifier + "#{(namespace + '_') if namespace}#{target}_path" + (("(#{instance_sym}#{target})" if put_form) || "")
     elsif nested_set[0][:optional] == false
 
-      return modifier + ((namespace + "_" if namespace) || "") + nested_set.collect{|x|
+      res = modifier + ((namespace + "_" if namespace) || "") + nested_set.collect{|x|
         x[:singular] + "_"
       }.join() + target + "_path" + (("(#{nested_set.collect{
         |x| instance_sym + x[:singular] }.join(",")
-      }#{ put_form ? ',' + instance_sym + target : '' })") || "")
+      }#{ put_form ? ',' + (instance_last_item ? "@" : instance_sym) + target : '' })") || "")
 
+      res
 
     else
       # copy the first item, make a ternery in this cycle, and recursively move to both the

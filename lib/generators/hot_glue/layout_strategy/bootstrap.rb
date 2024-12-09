@@ -69,6 +69,10 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
     "form-check-label"
   end
 
+  def form_input_class
+    "form-control"
+  end
+
   def search_opening
     '<div class="row"><div class="col-md-12 card"><div class="card-body">'
   end
