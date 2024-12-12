@@ -1201,10 +1201,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def current_user_object
-    default_current_user = options['auth'] || "current_user"
-    if default_current_user
-      default_current_user
-    else
+
+    # TODO: in god mode, there's no way for the time input
+    # to know who the current user under this design
+    # for timeinput = user_centered , we need to know who the current user is
+    # so we can set the time zone to the user's time zone
+    #
+    if options['auth']
+      options['auth']
+    elsif @god
+      # do we use current_user here
       "nil"
     end
   end
@@ -1252,7 +1258,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       formats.each do |format|
         source_filename = cc_filename_with_extensions("#{@markup}/#{view}", "#{@markup}")
         dest_filename = cc_filename_with_extensions("#{view}", "#{@markup}")
-        # byebug
         dest_filepath = File.join("#{filepath_prefix}app/views#{namespace_with_dash}",
                                   @controller_build_folder, dest_filename)
 
@@ -1368,7 +1373,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     unless @no_edit
       res << 'edit'
-      res << 'update'
+
+      unless @big_edit
+        res << 'update'
+      end
     end
 
     res

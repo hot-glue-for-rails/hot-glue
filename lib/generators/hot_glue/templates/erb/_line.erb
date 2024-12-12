@@ -1,7 +1,7 @@
 <% if @turbo_streams %><\%= turbo_stream_from <%= singular %>  %>
 <% end %><\%= turbo_frame_tag "<%= @namespace %>__#{ dom_id(<%= singular %>) }" do  %>
   <div class='<%= @layout_strategy.row_classes %>' data-id='<\%= <%= singular  %>.id %>' data-edit='false'>
-    <\%= render partial: '<%= show_path_partial %>', locals: { <%= singular %>: <%= singular %><% if @nested_set.any? %>, <%= @nested_set.collect{|nest_arg|  "#{nest_arg[:singular]}: #{ nest_arg[:singular]  }"}.join(", ") %>, nested_for: "<%= @nested_set.collect{|nest_arg| nest_arg[:singular] + "-\#{#{nest_arg[:singular]}.id}"}.join("__") %>"<% end %> %>
+    <\%= render partial: '<%= show_path_partial %>', locals: { <%= singular %>: <%= singular %><% if @nested_set.any? %>, <%= @nested_set.collect{|nest_arg|  "#{nest_arg[:singular]}: #{ nest_arg[:singular]  }"}.join(", ") %>, nested_for: "<%= @nested_set.collect{|nest_arg| nest_arg[:singular] + "-\#{#{nest_arg[:singular]}.id}"}.join("__") %>"<% end %> } %>
   </div>
 <\% end %>
 

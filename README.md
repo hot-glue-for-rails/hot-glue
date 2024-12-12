@@ -1016,9 +1016,16 @@ Omits list views.
 
 ### `--big-edit`
 
-If you do not want inline editing of your list items but instead want to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
+If you do not want inline editing of your list items but instead want to fallback to full-page style behavior for your edit views, use `--big-edit`. 
+
+The user will be taken to a full-screen edit page instead of an edit-in-place interaction.
 
 When using `--big-edit`, any downnested portals will be displayed on the edit page instead of on the list page. 
+
+Big edit makes all edit and magic button operations happen using `'data-turbo': false`, fully reloading the page and submitting HTML requests instead of TURBO_STREAM requests. 
+
+Likewise, the controller's `update` action always redirects instead of using Turbo.
+
 
 ### `--display-list-after-update`
 
