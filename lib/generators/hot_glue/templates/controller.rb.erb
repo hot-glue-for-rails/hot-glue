@@ -88,9 +88,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
 
 <% if create_action %>  def new<% if @object_owner_sym %>
-    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name %><% if @pundit %>)<% end %>.new<% if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>(<%= @object_owner_sym %>: <%= @object_owner_eval %>)<% end %><% elsif @object_owner_optional && any_nested? %>
-    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name  %><% if @pundit %>)<% end %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}))<% else %>
-    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name  %><% if @pundit %>)<% end %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% end %>
+    @<%= singular_name %> = <%= class_name %>.new<% if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>(<%= @object_owner_sym %>: <%= @object_owner_eval %>)<% end %><% elsif @object_owner_optional && any_nested? %>
+    @<%= singular_name %> = <%= class_name  %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}))<% else %>
+    @<%= singular_name %> = <%= class_name  %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% end %>
     <% if @pundit %>authorize @<%= singular_name %><% end %><% if @pundit %>
     @action = 'new'
   rescue Pundit::NotAuthorizedError
