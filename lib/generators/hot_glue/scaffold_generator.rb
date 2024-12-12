@@ -1215,14 +1215,15 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def magic_button_output
     @template_builder.magic_button_output(
-      path: HotGlue.optionalized_ternary(namespace: @namespace,
-                                         target: @singular,
-                                         nested_set: @nested_set,
-                                         with_params: true,
-                                         put_form: true),
-      singular: singular,
-      magic_buttons: @magic_buttons,
-      small_buttons: @small_buttons
+      path: HotGlue.optionalized_ternary( namespace: @namespace,
+                                          target: @singular,
+                                          nested_set: @nested_set,
+                                          with_params: true,
+                                          put_form: true),
+                                          big_edit: @big_edit,
+                                          singular: singular,
+                                          magic_buttons: @magic_buttons,
+                                          small_buttons: @small_buttons
     )
   end
 

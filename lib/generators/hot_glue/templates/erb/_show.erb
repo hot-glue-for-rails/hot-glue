@@ -25,14 +25,15 @@
 <% end %>
 
 
-<% if @list_after_each_row_partial %><\%= render partial: "list_after_each_row", locals: {<%= @singular %>: <%= @singular %>} %> <% end %>
+<% if @list_after_each_row_partial %><\%= render partial: "<%= namespace_with_trailing_dash %><%= @controller_build_folder %>/list_after_each_row", locals: {<%= @singular %>: <%= @singular %><% if @nested_set.any? %>, <%= @nested_set.collect{|x| x[:singular] + ": " + x[:singular]  }.join(", ") %><% end %>} %>
+<% end %>
 
 <%= @layout_strategy.button_style %>
 <div class=" scaffold-line-buttons <%= @layout_strategy.column_classes_for_button_column %>" <%= @layout_strategy.button_style %>>
   <%= magic_button_output %>
 
   <% if destroy_action %>
-    <\%= form_with url: <%= delete_path_helper %>, html: {data: {'<%= @ujs_syntax ? 'confirm' : 'turbo-confirm' %>': "Are you sure you want to delete #{ <%= @singular + "." + display_class %> }?"}, style: "display: inline-block;"}, method: :delete do |f| %>
+    <\%= form_with url: <%= delete_path_helper %>, html: {data: {'<%= @ujs_syntax ? 'confirm' : 'turbo-confirm' %>': "Are you sure you want to delete #{ <%= @singular + "." + display_class %> }?" }, style: "display: inline-block;"}, method: :delete do |f| %>
       <\%= f.submit "Delete".html_safe,  class: "delete-<%= singular %>-button btn btn-primary btn-sm" %>
     <\% end %>
   <% end %>
