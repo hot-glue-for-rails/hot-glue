@@ -1686,6 +1686,24 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 # VERSION HISTORY
 
+#### 2024-12-12 v0.6.9
+
+• `--record-scope`
+Record scope allows you to apply a model based scope for the controller being generated.
+This is applied on top of all other scopes, searches, and modifiers applied to the
+
+`bin/rails :generate hot_glue:scaffold Order --record-scope='.is_open'`
+
+Be sure to use single quotes (') and don't forget the dot (`.`) before your scope(s).
+
+Make sure your Order model has a scope `is_open`
+
+• `--big-edit` now always uses non-turbo form submits, for update + magic buttons
+• refactor of modified datetime feature to prefer current user as set by the --auth setting (will not work in @gd mode). future implemenation will further refine
+• when using big edit, `update.turbo_stream.erb` is no longer written
+• removes Pundit policy_scope() around new operations
+• refactors to how parent objects from a nested controller pass these variables to lower-level partials; this implementation hard-cards the nested set as locals and also builds a `nested_for` key (string)
+
 
 #### 2024-12-05 - v0.6.8
 • fixes in modify_date_inputs_on_params for current_user_object
