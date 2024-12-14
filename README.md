@@ -1443,7 +1443,7 @@ However, two special variables are in scope which you can use in your calling co
 
 Either one must be received by your factory for your factory to create data based off the inputted data. 
 
-Rememebr, `*_params` has the input params passed only the through the sanitizer, and modified_params has it passed through the timezone aware mechanism and other Hot Glue-specific defaults.
+Remember, `*_params` has the input params passed only the through the sanitizer, and modified_params has it passed through the timezone aware mechanism and other Hot Glue-specific defaults.
 
 Always: 
 • In your factory calling code, assign the variable `factory = ` (do not use a different variable name),
@@ -1705,7 +1705,7 @@ Make sure your Order model has a scope `is_open`
 • refactor of modified datetime feature to prefer current user as set by the --auth setting (will not work in @gd mode). future implemenation will further refine
 • when using big edit, `update.turbo_stream.erb` is no longer written
 • removes Pundit policy_scope() around new operations
-• refactors to how parent objects from a nested controller pass these variables to lower-level partials; this implementation hard-cards the nested set as locals and also builds a `nested_for` key (string)
+• refactors to how parent objects from a nested controller pass these variables to lower-level partials; this implementation hard-codes the nested set as locals and also builds a `nested_for` key (string)
 
 
 #### 2024-12-05 - v0.6.8
