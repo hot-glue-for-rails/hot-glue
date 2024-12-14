@@ -62,9 +62,14 @@ module  HotGlue
       text.lines.collect{|line| add_spaces + line}.join("")
     end
 
-    def magic_button_output(path:, singular:, magic_buttons:, small_buttons: )
+    def magic_button_output(path:,
+                            singular:,
+                            big_edit: ,
+                            magic_buttons:, small_buttons: )
       magic_buttons.collect{ |button_name|
-        "<%= form_with model: #{singular}, url: #{path}, html: {style: 'display: inline', data: {\"turbo-confirm\": 'Are you sure you want to #{button_name} this #{singular}?'}} do |f| %>" +
+        "<%= form_with model: #{singular}, url: #{path}, html: {style: 'display: inline', data: {\"turbo-confirm\": 'Are you sure you want to #{button_name} this #{singular}?'  " +
+          (big_edit ? ", \"turbo\": false" : "") +
+           "}} do |f| %>" +
           "<%= f.hidden_field :__#{button_name}, value: \"__#{button_name}\" %>" +
           "<%= f.submit '#{button_name.titleize}'.html_safe, disabled: (#{singular}.respond_to?(:#{button_name}able?) && ! #{singular}.#{button_name}able? ), class: '#{singular}-button #{@layout_strategy.button_applied_classes} #{@layout_strategy.magic_button_classes}' %>" +
         "<% end %>"

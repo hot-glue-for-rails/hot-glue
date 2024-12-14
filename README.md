@@ -934,6 +934,23 @@ The 'Abcs' portal will display as 5 bootstrap columns instead of the typical 4. 
 This puts the downnested portals on top of one another (stacked top to bottom) instead of side-by-side (left to right). This is useful if you have a lot of downnested portals and you want to keep the page from getting too wide.
 
 
+
+### `--record-scope=`
+
+Record scope allows you to apply a model based scope for the controller being generated.
+This is applied on top of all other scopes, searches, and modifiers applied to the 
+
+`bin/rails :generate hot_glue:scaffold Order --record-scope='.is_open'`
+
+Be sure to use single quotes (') and don't forget the dot (`.`) before your scope(s).
+
+Make sure your Order model has a scope `is_open`
+```
+scope :is_open, -> {where(state == 'open')}
+```
+
+Now all records displayed through the generated controller 
+
 ## FLAGS (Options with no values)
 These options (flags) also uses `--` syntax but do not take any values. Everything is assumed (default) to be false unless specified.
 
@@ -999,9 +1016,16 @@ Omits list views.
 
 ### `--big-edit`
 
-If you do not want inline editing of your list items but instead want to fall back to full page style behavior for your edit views, use `--big-edit`. Turbo still handles the page interactions, but the user is taken to a full-screen edit page instead of an edit-in-place interaction.
+If you do not want inline editing of your list items but instead want to fallback to full-page style behavior for your edit views, use `--big-edit`. 
+
+The user will be taken to a full-screen edit page instead of an edit-in-place interaction.
 
 When using `--big-edit`, any downnested portals will be displayed on the edit page instead of on the list page. 
+
+Big edit makes all edit and magic button operations happen using `'data-turbo': false`, fully reloading the page and submitting HTML requests instead of TURBO_STREAM requests. 
+
+Likewise, the controller's `update` action always redirects instead of using Turbo.
+
 
 ### `--display-list-after-update`
 
@@ -1661,6 +1685,24 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 
 # VERSION HISTORY
+
+#### 2024-12-12 v0.6.9
+
+• `--record-scope`
+Record scope allows you to apply a model based scope for the controller being generated.
+This is applied on top of all other scopes, searches, and modifiers applied to the
+
+`bin/rails :generate hot_glue:scaffold Order --record-scope='.is_open'`
+
+Be sure to use single quotes (') and don't forget the dot (`.`) before your scope(s).
+
+Make sure your Order model has a scope `is_open`
+
+• `--big-edit` now always uses non-turbo form submits, for update + magic buttons
+• refactor of modified datetime feature to prefer current user as set by the --auth setting (will not work in @gd mode). future implemenation will further refine
+• when using big edit, `update.turbo_stream.erb` is no longer written
+• removes Pundit policy_scope() around new operations
+• refactors to how parent objects from a nested controller pass these variables to lower-level partials; this implementation hard-cards the nested set as locals and also builds a `nested_for` key (string)
 
 
 #### 2024-12-05 - v0.6.8

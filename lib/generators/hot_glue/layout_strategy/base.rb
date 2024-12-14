@@ -38,6 +38,10 @@ module LayoutStrategy
       ""
     end
 
+    def form_input_class
+      ""
+    end
+
     def search_closing
       ""
     end

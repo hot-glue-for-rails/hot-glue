@@ -60,20 +60,20 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   <% if !@self_auth %>
   def load_<%= singular_name %>
     <% if @nested_set[0] && @nested_set[0][:optional] %>if params.include?(:<%= @nested_set.last[:singular] %>_id)
-      @<%= singular_name %> = <%= object_scope.gsub("@",'') %>.find(params[:id])
-    else <% end %>@<%= singular_name %> = <%= object_scope %>.find(params[:id])<% if @nested_set[0] && @nested_set[0][:optional]  %>
+      @<%= singular_name %> = <%= object_scope.gsub("@",'') %><%= @record_scope %>.find(params[:id])
+    else <% end %>@<%= singular_name %> = <%= object_scope %><%= @record_scope %>.find(params[:id])<% if @nested_set[0] && @nested_set[0][:optional]  %>
     end<% end %>
   end
   <% else %>
   def load_<%= singular_name %>
-    @<%= singular_name %> = (<%= auth_object.gsub("@",'') %><%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set.any? && @nested_set[0][:optional] %>)<% if @nested_set.any? && @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %>
+    @<%= singular_name %> = (<%= auth_object.gsub("@",'') %><%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set.any? && @nested_set[0][:optional] %>)<% if @nested_set.any? && @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %><%= @record_scope %>
   end<% end %>
   <% if @paginate_per_page_selector %>def per
     params[:per] || 10
   end<% end %>
   <% unless @no_list %>
   def load_all_<%= plural %>
-    <%= load_all_code %>
+  <%= load_all_code %>
   end
 
   def index<% if @search == "set" %>
@@ -88,9 +88,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
 
 <% if create_action %>  def new<% if @object_owner_sym %>
-    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name %><% if @pundit %>)<% end %>.new<% if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>(<%= @object_owner_sym %>: <%= @object_owner_eval %>)<% end %><% elsif @object_owner_optional && any_nested? %>
-    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name  %><% if @pundit %>)<% end %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}))<% else %>
-    @<%= singular_name %> = <% if @pundit %>policy_scope(<% end %><%= class_name  %><% if @pundit %>)<% end %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% end %>
+    @<%= singular_name %> = <%= class_name %>.new<% if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>(<%= @object_owner_sym %>: <%= @object_owner_eval %>)<% end %><% elsif @object_owner_optional && any_nested? %>
+    @<%= singular_name %> = <%= class_name  %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}))<% else %>
+    @<%= singular_name %> = <%= class_name  %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% end %>
     <% if @pundit %>authorize @<%= singular_name %><% end %><% if @pundit %>
     @action = 'new'
   rescue Pundit::NotAuthorizedError
@@ -101,7 +101,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   def create
     flash[:notice] = +''
-    modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup, <%= current_user_object %>, <%= datetime_fields_list %>)<% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
+    modified_params = modify_date_inputs_on_params(<%= singular_name %>_params.dup, <%= current_user_object %>, <%= datetime_fields_list %>)<% if @object_owner_sym && eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
     modified_params = modified_params.merge(<%= @object_owner_sym %>: <%= @object_owner_eval %>) <% elsif @object_owner_optional && any_nested? %>
     modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% end %>
 
@@ -123,6 +123,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
                                  nested_set: @nested_set,
                                  modifier: 'edit_',
                                  with_params: true,
+                                 instance_last_item: true,
                                  put_form: true).gsub("(#{singular}", "(@#{singular}") %><% end %>
     else
       flash[:alert] = "Oops, your <%= singular_name %> could not be created. #{@hawk_alarm}"
@@ -138,11 +139,13 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 <% unless @no_edit %>
   def show<% if @pundit %>
     authorize @<%= singular %><% end %>
-    redirect_to <%=   HotGlue.optionalized_ternary(namespace: @namespace,
+    redirect_to <%=  HotGlue.optionalized_ternary(namespace: @namespace,
                                  target:  @singular,
+                                 top_level: false,
                                  nested_set: @nested_set,
                                  modifier: 'edit_',
                                  with_params: true,
+                                 instance_last_item: true,
                                  put_form: true).gsub("(#{singular}", "(@#{singular}") %>
   end
 
@@ -165,7 +168,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     end
     <% end %>
 
-    modified_params = modify_date_inputs_on_params(<% if @update_show_only %>update_<% end %><%= singular_name %>_params.dup<%= controller_update_params_tap_away_magic_buttons  %>, <%= current_user_object %>, <%= datetime_fields_list %>) <% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
+    modified_params = modify_date_inputs_on_params(<% if @update_show_only %>update_<% end %><%= singular_name %>_params.dup<%= controller_update_params_tap_away_magic_buttons  %>, <%= current_user_object %>, <%= datetime_fields_list %>)<% if @object_owner_sym &&  eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>
     modified_params = modified_params.merge(<%= @object_owner_sym %>: <%= @object_owner_eval %>) <% elsif @object_owner_optional && any_nested? %>
     modified_params = modified_params.merge(<%= @object_owner_name %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}) <% end %>
     <% if @pundit %><% @related_sets.each do |key, related_set| %>
@@ -186,7 +189,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
       flash[:notice] << "Saved #{@<%= singular %>.<%= display_class %>}"
       flash[:alert] = @hawk_alarm if @hawk_alarm
-      <% unless @big_edit %>render :update, status: :unprocessable_entity<% else  %>redirect_to <%= @namespace %>_<%= @plural %>_path<% end %>
+      <% unless @big_edit %>render :update, status: :unprocessable_entity<% else  %>
+      redirect_to <%= path_helper_plural(false) %>
+     <% end %>
     else
       flash[:alert] = "<%= singular_name.titlecase %> could not be saved. #{@hawk_alarm}"
       @action = 'edit'
