@@ -938,13 +938,14 @@ This puts the downnested portals on top of one another (stacked top to bottom) i
 ### `--record-scope=`
 
 Record scope allows you to apply a model based scope for the controller being generated.
-This is applied on top of all other scopes, searches, and modifiers applied to the 
+This is applied on top of all other scopes, searches, and modifiers applied to the built controller.
 
 `bin/rails :generate hot_glue:scaffold Order --record-scope='.is_open'`
 
-Be sure to use single quotes (') and don't forget the dot (`.`) before your scope(s).
+Be sure to use single quotes (`'`) and don't forget the dot (`.`) before your scope(s).
 
-Make sure your Order model has a scope `is_open`
+Make sure your Order model has a scope `is_open`, like so:
+
 ```
 scope :is_open, -> {where(state == 'open')}
 ```
@@ -1686,15 +1687,17 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 # VERSION HISTORY
 
-#### 2024-12-12 v0.6.9
+#### 2024-12-14 v0.6.9
 
 • `--record-scope`
 Record scope allows you to apply a model based scope for the controller being generated.
-This is applied on top of all other scopes, searches, and modifiers applied to the
+This is applied on top of all other scopes, searches, and modifiers applied to the built controller.
 
 `bin/rails :generate hot_glue:scaffold Order --record-scope='.is_open'`
 
-Be sure to use single quotes (') and don't forget the dot (`.`) before your scope(s).
+(You can chain multiple scopes.)
+
+Be sure to use single quote marks (`'`) and don't forget the dot (`.`) before your scope(s).
 
 Make sure your Order model has a scope `is_open`
 
