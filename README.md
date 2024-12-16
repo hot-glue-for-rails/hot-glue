@@ -1687,6 +1687,10 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 # VERSION HISTORY
 
+#### 2024-12-16 v0.6.9.1
+• Fixes hardcoding in #new action
+
+
 #### 2024-12-14 v0.6.9
 
 • `--record-scope`
