@@ -95,7 +95,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @action = 'new'
   rescue Pundit::NotAuthorizedError
     flash[:alert] = 'You are not authorized to perform this action.'
-    load_all_users
+    load_all_<%= plural %>
     render :index<% end %>
   end
 
