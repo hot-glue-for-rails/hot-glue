@@ -1686,6 +1686,9 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 
 # VERSION HISTORY
+#### 2024-12-17 v0.6.9.2
+• adds alt_lookup to related_set_field.rb and fixes a variable passdown problem in edit.html.erb
+
 
 #### 2024-12-16 v0.6.9.1
 • Fixes hardcoding in #new action
