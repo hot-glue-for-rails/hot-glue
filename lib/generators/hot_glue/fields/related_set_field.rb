@@ -4,6 +4,7 @@ class RelatedSetField < Field
 
   def initialize( class_name: , default_boolean_display:, display_as: ,
                   name: , singular: ,
+                  alt_lookup: ,
                   update_show_only: ,
                   hawk_keys: , auth: , sample_file_path:,  ownership_field: ,
                   attachment_data: nil , layout_strategy: , form_placeholder_labels: nil,
