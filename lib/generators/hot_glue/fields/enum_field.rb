@@ -72,7 +72,7 @@ class EnumField < Field
   end
 
   def partial_render
-    "<% if #{singular}.#{name} %><%=  render partial: #{singular}.#{name}, locals: { #{singular}: #{singular} } %><% end %>"
+    "<% if #{singular}.#{name} %><%=  render partial: \"#{namespace + "/" if namespace}#{plural}/\#{#{singular}.#{name}}\", locals: { #{singular}: #{singular} } %><% end %>"
   end
 
 

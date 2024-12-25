@@ -1,10 +1,13 @@
 <% if !@display_list_after_update %><\%= turbo_stream.replace "<%= @namespace %>__#{dom_id(@<%= singular %>)}" do %>
-  <\%= render partial: 'line', locals: {<%= singular %>: @<%= singular %> }<%= @nested_set.collect{|arg| ".merge(@#{arg[:singular]} ? {#{arg[:singular]}: @#{arg[:singular]}} : {})" }.join %> \%>
+  <\%= render partial: 'line', locals: {<%= singular %>: @<%= singular %>, <%= @nested_set.collect{|arg| " #{arg[:singular]}: @#{arg[:singular]}"}.join(", ") %> }   \%>
 <\% end %><% else %><\%= turbo_stream.replace "<%= plural %>-list" do %>
-  <\%= render partial: '<%= list_path_partial %>', locals: {<%= plural %>: @<%= plural %>}<%= @nested_set.collect{|arg| ".merge(@#{arg[:singular]} ? {#{arg[:singular]}: @#{arg[:singular]}} : {})" }.join %> \%>
+  <\%= render partial: '<%= list_path_partial %>', locals: {<%= plural %>: @<%= plural %><%= @nested_set.collect{|arg| " #{arg[:singular]}: @#{arg[:singular]}"}.join(", ") %>
+  \%>
 <\% end %>
 <% end %>
+<!-- parental updated -->
 <%= turbo_parental_updates %>
+<!-- flash notices -->
 <\%= turbo_stream.update "flash_notices" do %>
   <\%= render partial: "layouts/flash_notices", locals: {resource: @<%= singular %>} %>
 <\% end %>

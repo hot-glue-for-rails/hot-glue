@@ -3,7 +3,9 @@
   <\%= render partial: "list", locals: {<%= plural %>: @<%= plural %>}<%= @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {nested_for: \"" + arg[:singular] + "-\#{@" + arg[:singular] + ".id}\"" + ", " + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> \%>
   <\% end %>
   <\% end %>
+<!-- parental updated -->
 <%= turbo_parental_updates %>
+<!-- errors -->
   <\%= turbo_stream.replace "<%= @namespace %>__<%= singular %>-new" do %>
   <\% if @<%= singular %>.errors.none? %>
   <\%= render partial: "new_button", locals: {}<%=  @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {" + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> %>

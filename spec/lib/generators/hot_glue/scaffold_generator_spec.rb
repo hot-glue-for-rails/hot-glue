@@ -1324,7 +1324,8 @@ describe "HotGlue::ScaffoldGenerator" do
 
       end
 
-      describe "when 1st parameter is not empty string" do
+      describe "when
+1st parameter is not empty string" do
 
       end
     end
