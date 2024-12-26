@@ -60,13 +60,13 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   <% if !@self_auth %>
   def load_<%= singular_name %>
     <% if @nested_set[0] && @nested_set[0][:optional] %>if params.include?(:<%= @nested_set.last[:singular] %>_id)
-      @<%= singular_name %> = <%= object_scope.gsub("@",'') %><%= @record_scope %>.find(params[:id])
-    else <% end %>@<%= singular_name %> = <%= object_scope %><%= @record_scope %>.find(params[:id])<% if @nested_set[0] && @nested_set[0][:optional]  %>
+      @<%= singular_name %> = <%= object_scope.gsub("@",'') %>.find(params[:id])
+    else <% end %>@<%= singular_name %> = <%= object_scope %>.find(params[:id])<% if @nested_set[0] && @nested_set[0][:optional]  %>
     end<% end %>
   end
   <% else %>
   def load_<%= singular_name %>
-    @<%= singular_name %> = (<%= auth_object.gsub("@",'') %><%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set.any? && @nested_set[0][:optional] %>)<% if @nested_set.any? && @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %><%= @record_scope %>
+    @<%= singular_name %> = (<%= auth_object.gsub("@",'') %><%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set.any? && @nested_set[0][:optional] %>)<% if @nested_set.any? && @nested_set[0][:optional] %> || <%= class_name %>.find(params[:id])<% end %>
   end<% end %>
   <% if @paginate_per_page_selector %>def per
     params[:per] || 10
@@ -115,7 +115,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <%= @code_before_create ? "\n    " + @code_before_create.gsub(";", "\n") : "" %>
     if @<%= singular_name %>.save<%= @code_after_create ? ("\n      " + @code_after_create.gsub(";", "\n"))  : ""%>
       flash[:notice] = "Successfully created #{@<%= singular %>.<%= display_class %>}"
-      <%= post_action_parental_updates.join("\n      ") %>
+      <%= post_action_parental_updates.compact.join("\n      ") %>
       load_all_<%= plural %>
       <% unless @display_edit_after_create %>render :create<% else %>redirect_to <%=   HotGlue.optionalized_ternary(namespace: @namespace,
                                  top_level: true,
@@ -181,10 +181,11 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       authorize @<%= singular_name %>
       <%= @code_before_update ? "\n    " + @code_before_update.gsub(";", "\n") : "" %>
       @<%= singular_name %>.save
-    <% else %>
+      <% else %>
     <%= @code_before_update ? "\n    " + @code_before_update.gsub(";", "\n") : "" %>
     if @<%= singular_name %>.update(modified_params)
     <% end %>
+      <%= post_action_parental_updates.compact.join("\n      ") %>
       <%= @code_after_update ? "\n    " + @code_after_update.gsub(";", "\n") : "" %>
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>
       flash[:notice] << "Saved #{@<%= singular %>.<%= display_class %>}"

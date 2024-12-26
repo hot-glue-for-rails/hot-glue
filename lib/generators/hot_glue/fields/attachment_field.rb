@@ -2,6 +2,7 @@ class AttachmentField < Field
   attr_accessor :attachment_data
   def initialize(alt_lookup:,
                  attachment_data:,
+                 plural:,
                  auth:,
                  class_name:,
                  display_as:, singular:,

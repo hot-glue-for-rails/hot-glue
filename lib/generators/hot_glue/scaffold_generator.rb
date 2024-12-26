@@ -26,7 +26,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :singular_class, :smart_layout, :stacked_downnesting,
                 :update_show_only, :ownership_field,
                 :layout_strategy, :form_placeholder_labels,
-                :form_labels_position, :pundit,
+                :form_labels_position, :no_nav_menu, :pundit,
                 :self_auth, :namespace_value, :record_scope, :related_sets,
                 :search_clear_button, :search_autosearch
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
@@ -37,7 +37,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :singular_class, type: :string, default: nil
   class_option :nest, type: :string, default: nil # DEPRECATED —— DO NOT USE
   class_option :nested, type: :string, default: ""
-
   class_option :namespace, type: :string, default: nil
   class_option :auth, type: :string, default: nil
   class_option :auth_identifier, type: :string, default: nil
@@ -45,7 +44,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :include, type: :string, default: ""
   class_option :god, type: :boolean, default: false
   class_option :gd, type: :boolean, default: false # alias for god
-
   class_option :specs_only, type: :boolean, default: false
   class_option :no_specs, type: :boolean, default: false
   class_option :no_delete, type: :boolean, default: false
@@ -58,7 +56,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :big_edit, type: :boolean, default: false
   class_option :show_only, type: :string, default: ""
   class_option :update_show_only, type: :string, default: ""
-
   class_option :ujs_syntax, type: :boolean, default: nil
   class_option :downnest, type: :string, default: nil
   class_option :magic_buttons, type: :string, default: nil
@@ -71,7 +68,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :layout, type: :string, default: nil # if used here it will override what is in the config
   class_option :hawk, type: :string, default: nil
   class_option :with_turbo_streams, type: :boolean, default: false
-
   class_option :label, default: nil
   class_option :list_label_heading, default: nil
   class_option :new_button_label, default: nil
@@ -101,8 +97,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :code_before_update, default: nil
   class_option :code_after_update, default: nil
   class_option :record_scope, default: nil
+  class_option :no_nav_menu, type: :boolean, default: false # suppress writing to _nav template
 
 
+
+  # SEARCH OPTIONS
   class_option :search, default: nil # set or predicate
 
   # FOR THE SET SEARCH
@@ -111,11 +110,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   # for the single-entry search box, they will be removed from the list specified above.
   class_option :search_query_fields, default: '' # comma separated list of fields to search by single-entry search term
   class_option :search_position, default: 'vertical' # choices are vertical or horizontal
-
-
   class_option :search_clear_button, default: false
-  class_option :saerch_autosearch, default: false
-
+  class_option :search_autosearch, default: false
 
   # FOR THE PREDICATE SEARCH
   # TDB
@@ -343,6 +339,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @record_scope = options['record_scope']
 
     @pundit = options['pundit']
+
+    @no_nav_menu = options['no_nav_menu']
+
     if @pundit.nil?
       @pundit = get_default_from_config(key: :pundit_default)
     end
@@ -788,12 +787,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         raise(HotGlue::Error, exit_message)
 
       else
-        if eval(singular_class + ".reflect_on_association(:#{@object_owner_sym.to_s})").nil? && !eval(singular_class + ".reflect_on_association(:#{@object_owner_sym.to_s.singularize})").nil?
-          exit_message = "*** Oops: you tried to nest #{singular_class} within a route for `#{@object_owner_sym}` but I can't find an association for this relationship. Did you mean `#{@object_owner_sym.to_s.singularize}` (singular) instead?"
-          # else  # NOTE: not reachable
-          #   exit_message = "*** Oops: Missing relationship from class #{singular_class} to :#{@object_owner_sym}  maybe add `belongs_to :#{@object_owner_sym}` to #{singular_class}\n (If your user is called something else, pass with flag auth=current_X where X is the model for your auth object as lowercase.  Also, be sure to implement current_X as a method on your controller. If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for --auth-identifier flag). To make a controller that can read all records, specify with --god."
-        end
-
+        exit_message = "When trying to nest #{singular_class} within #{@nested_set.last[:plural]}, check the #{singular_class} model for the #{@object_owner_sym} association: \n belongs_to :#{@object_owner_sym}"
         raise(HotGlue::Error, exit_message)
       end
     elsif @object_owner_sym && !@object_owner_eval.include?(".")
@@ -1009,6 +1003,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @nested_set.map { |arg|
       "#{arg[:singular]}_id: #{arg[:singular] }.id"
     }.join(",\n          ")
+  end
+
+  def nest_path
+    @nested_set.collect{| arg| arg[:singular]  }.join("/") + "/" if @nested_set.any?
   end
 
   def controller_class_name
@@ -1238,7 +1236,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def include_nav_template
-    File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}")
+    File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}") ||
+      File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.#{@markup}")
   end
 
   def copy_view_files
@@ -1303,11 +1302,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
   end
 
-  def insert_into_nav_template
-    # how does this get called(?)
-    nav_file = "#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}"
-
+  def insert_into_nav_template # called from somewhere in the generator
+    return if @no_nav_menu
     if include_nav_template
+      if File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}")
+        nav_file = "#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.html.#{@markup}"
+      elsif File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.#{@markup}")
+        nav_file = "#{Rails.root}/app/views/#{namespace_with_trailing_dash}_nav.#{@markup}"
+      end
+
+
       append_text = "  <li class='nav-item'>
     <%= link_to '#{@list_label_heading.humanize}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
   </li>"
@@ -1604,20 +1608,26 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def post_action_parental_updates
     if @nested_set.any?
-       @nested_set.collect { |data|
+       @nested_set.collect {  |data|
         parent = data[:singular]
-        "@#{singular}.#{parent}.reload"
-      }
+        "#{parent}.reload"
+       }
     else
       []
     end
   end
 
   def turbo_parental_updates
+    set_path = @nested_set.collect { |data| "#{data[:singular]}" }.join("/") + "/"
+    puts "constructing for #{set_path}"
     @nested_set.collect { |data|
-      "<%= turbo_stream.replace \"__#{@namespace if @namespace}\#{dom_id(@#{data[:singular]})}\" do %>
-    <%= render partial: \"#{@namespace}/#{data[:plural]}/line\", locals: {#{data[:singular]}: @#{singular}.#{data[:singular]}.reload} %>
+      res = "<%= turbo_stream.replace \"__#{@namespace if @namespace}\#{dom_id(@#{data[:singular]})}\" do %>
+    <%= render partial: \"#{@namespace}/#{data[:plural]}/line\", locals: {#{@nested_set.collect { |d|
+        (set_path.index(data[:singular] + "/") > set_path.index(d[:singular] + "/") || d[:singular] == data[:singular]  ) ? "#{d[:singular]}: @#{d[:singular]}" : nil
+      }.compact.join(", ")}} %>
   <% end %>"
+
+      res
     }.join("\n")
   end
 end
