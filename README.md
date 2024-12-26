@@ -1426,7 +1426,7 @@ Always:
 
 Don't include this last line in your factory code. 
 
-## Nav Templates
+## Nav Templates and `--no-nav-menu`
 At the namespace level, you can have a file called `_nav.html.erb` to create tabbed bootstrap nav 
 
 To create the file for the first time (at each namespace), start by running
@@ -1449,6 +1449,10 @@ Once the file is present, any further builds in this namespace will:
 <%= render partial: "owner/nav", locals: {nav: "things"} %>
 ```
 (In this example `owner/` is the namespace and `things` is the name of the scaffold being built)
+
+To suppress this behavior, add `--no-nav-menu` to the build command and the _nav template will not be touched.
+
+
 
 ## Automatic Base Controller
 
@@ -1663,7 +1667,9 @@ These automatic pickups for partials are detected at buildtime. This means that 
     • adds `--no-nav-menu` option to supress writing to the _nav template
     • the _nav template itself can now end with either .html.erb or .erb
     • Removing feature: optionalized nested params (this was a bad idea)
-
+    • enum partials now correctly render within a namespace
+    • fixes for detecting missing belongs_to relationships
+    • fixes to post-create and post-update parental reloads
 
 
 #### 2024-12-17 v0.6.9.2
