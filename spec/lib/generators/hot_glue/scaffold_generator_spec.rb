@@ -82,7 +82,7 @@ describe "HotGlue::ScaffoldGenerator" do
             it "should suggest that I meant the singular version" do
               expect {
                 generator.identify_object_owner
-              }.to raise_exception("*** Oops: you tried to nest Ghi within a route for `dfgs` but I can't find an association for this relationship. Did you mean `dfg` (singular) instead?")
+              }.to raise_error(HotGlue::Error, "When trying to nest Ghi within dfgs, check the Ghi model for the dfgs association: \n belongs_to :dfgs")
             end
           end
         end
