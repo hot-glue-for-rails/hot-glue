@@ -3,13 +3,48 @@ class <%= ((@namespace.titleize.gsub(" ", "") + "::" if @namespace) || "") + @pl
   <% if defined?(RuboCop) %># rubocop:disable Layout/LineLength
   <% end %># <%= regenerate_me_code %><% if defined?(RuboCop) %>
   # rubocop:enable Layout/LineLength <% end %>
+  <% if @nested_set.any? %> <% nest_chain = [] %> <% @nested_set.each { |arg|
+    if @auth_identifier == arg[:singular]
+      this_scope =  @auth
+    elsif nest_chain.empty?
+      this_scope = "#{@auth ? @auth : @class_name}.#{arg}s"
+    else
+      this_scope = "#{nest_chain.last}.#{arg[:plural]}"
+    end
+     nest_chain << arg %>
+  before_action :<%= arg[:singular] %><%= ", if: -> { params.include?(:#{arg[:singular]}_id) }" if arg[:optional] %><% } %><% end %>
+
+  after_action -> { flash.discard }, if: -> { request.format.symbol == :turbo_stream }<% if @nested_set.any? %>
+  def <%= @nested_set[0][:singular] %><% if @god
+     next_object = nil
+     collect_objects = @nested_set.reverse.collect {|x|
+         if eval("#{next_object || class_name}.reflect_on_association(:#{x[:singular]})").nil?
+           raise "***** Unable to find the association `#{x[:singular]}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{x}` to the #{next_object || class_name} object?"
+         end
+         next_object = eval("#{next_object || class_name}.reflect_on_association(:#{x[:singular]})").class_name
+     }
+     root_object = collect_objects.last
+   else
+     if @nested_set[0][:singular] == @auth_identifier
+       root_object = @auth
+     else
+       root_object = @auth + "." + @nested_set[0][:plural]
+     end
+   end
+ %><% if !@god && @nested_set[0][:singular] == @auth_identifier %>
+  @<%= @nested_set[0][:singular] %> ||= <%= root_object %>
+    <% else %>
+    @<%= @nested_set[0][:singular] %> ||= <%= root_object %>.find(params[:<%=  @nested_set[0][:singular]  %>_id])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0][:optional] %> <% end %>
+  end
+  <% end %>
 
   def index
     <% if @pundit %>authorize <%= @class_name %>, :typeahead? <% end %>
     query = params[:query]
     @typeahead_identifier = params[:typeahead_identifier]
-    @<%= @plural %> = <%= @singular.titleize.gsub(" ", "") %>.where("<%= @search_by.collect{|search| "LOWER(#{search}) LIKE ?" }.join(" OR ") %>", <%= @search_by.collect{|search|  "\"%\#{query.downcase}%\"" }.join(", ") %>).limit(10)
-
+    <% if !@god && @nested_set[0][:singular] == @auth_identifier %> @<%= @nested_set[0][:singular] %> ||= <%= root_object %>
+    <% else %>@<%= @nested_set[0][:singular] %> ||= <%= root_object %>.find(params[:<%=  @nested_set[0][:singular]  %>_id])<%= " if params.include?(:#{@nested_set[0][:singular]}_id)" if @nested_set[0][:optional] %> <% end %>
+    @<%= @plural %> = <%= @nested_set.none? ?  @singular.titleize.gsub(" ", "") : @nested_set.last[:singular] + ".#{@plural}" %>.where("<%= @search_by.collect{|search| "LOWER(#{search}) LIKE ?" }.join(" OR ") %>", <%= @search_by.collect{|search|  "\"%\#{query.downcase}%\"" }.join(", ") %>).limit(10)
     render layout: false
   end
 end

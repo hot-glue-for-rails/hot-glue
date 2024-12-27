@@ -401,12 +401,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     if !@nested.nil?
       @nested_set = @nested.split("/").collect { |arg|
-        is_optional = arg.start_with?("~")
-        arg.gsub!("~", "")
         {
           singular: arg,
           plural: arg.pluralize,
-          optional: is_optional
         }
       }
       puts "NESTING: #{@nested_set}"

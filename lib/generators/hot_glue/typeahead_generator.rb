@@ -5,6 +5,11 @@ module HotGlue
     source_root File.expand_path('templates', __dir__)
     class_option :namespace, type: :string, default: nil
     class_option :search_by, type: :string, default: nil
+    class_option :nested, type: :string, default: nil
+    class_option :auth_identifier, type: :string, default: nil
+    class_option :auth, type: :string, default: nil
+
+
 
     include DefaultConfigLoader
     def filepath_prefix
@@ -28,6 +33,23 @@ module HotGlue
       @class_name = args.first
       @plural = args.first.tableize.pluralize
       @namespace = options['namespace']
+      @auth_identifier = options['auth_identifier']
+      @auth = options['auth']
+
+      @nested = options['nested']
+
+
+      @nested_set = []
+
+      if !@nested.nil?
+        @nested_set = @nested.split("/").collect { |arg|
+          {
+            singular: arg,
+            plural: arg.pluralize,
+          }
+        }
+        puts "NESTING: #{@nested_set}"
+      end
 
       if options['search_by']
         @search_by = options['search_by'].split(",")
@@ -71,7 +93,24 @@ module HotGlue
       if @namespace
         puts "namespace :#{@namespace} do"
       end
-      puts "  resources :#{@plural}_typeahead, only: [:index]"
+      if @nested_set.length > 0
+        space = "  "
+        @nested_set.each do |nested|
+          space += "  "
+          puts "  resources :#{nested[:plural]} do"
+        end
+      end
+      puts "#{space}  resources :#{@plural}_typeahead, only: [:index]"
+
+
+      if @nested_set.length > 0
+        @nested_set.each do |nested|
+          space = space[0..-3]
+          puts "#{space}end"
+        end
+      end
+
+
       if @namespace
         puts "end"
       end
