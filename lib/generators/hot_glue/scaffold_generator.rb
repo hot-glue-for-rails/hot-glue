@@ -1069,7 +1069,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @controller_build_folder,
                                  nested_set: @nested_set,
-                                 with_params: true,
+                                 with_params: false,
                                  top_level: false)
   end
 
@@ -1077,7 +1077,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @singular,
                                  nested_set: @nested_set,
-                                 with_params: true,
+                                 with_params: false,
                                  put_form: true,
                                  top_level: false)
   end
@@ -1086,7 +1086,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @singular,
                                  nested_set: @nested_set,
-                                 with_params: true,
+                                 with_params: false,
                                  put_form: true)
   end
 
@@ -1095,7 +1095,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  target: @singular,
                                  nested_set: @nested_set,
                                  modifier: "edit_",
-                                 with_params: true,
+                                 with_params: false,
                                  put_form: true)
   end
 
@@ -1124,7 +1124,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  target: singular,
                                  nested_set: @nested_set,
                                  modifier: "new_",
-                                 with_params: true)
+                                 with_params: false)
   end
 
   def nested_assignments
@@ -1222,7 +1222,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       path: HotGlue.optionalized_ternary( namespace: @namespace,
                                           target: @singular,
                                           nested_set: @nested_set,
-                                          with_params: true,
+                                          with_params: false,
                                           put_form: true),
                                           big_edit: @big_edit,
                                           singular: singular,
