@@ -99,6 +99,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :record_scope, default: nil
   class_option :no_nav_menu, type: :boolean, default: false # suppress writing to _nav template
   class_option :include_object_names, type: :boolean, default: false
+  class_option :new_button_position, type: :string, default: 'above'
+  class_option :downnest_shows_headings, type: :boolean, default: nil
 
 
   # SEARCH OPTIONS
@@ -338,6 +340,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @smart_layout = options['smart_layout']
     @record_scope = options['record_scope']
+    @downnest_shows_headings = options['downnest_shows_headings']
+    @new_button_position = options['new_button_position']
+
 
     @pundit = options['pundit']
 
@@ -467,6 +472,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @factory_creation = options['factory_creation'].gsub(";", "\n")
     identify_object_owner
     setup_fields
+
 
     if (@columns - @show_only - (@ownership_field ? [@ownership_field.to_sym] : [])).empty?
       @no_field_form = true
@@ -1074,7 +1080,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @controller_build_folder,
                                  nested_set: @nested_set,
-                                 with_params: true,
+                                 with_params: false,
                                  top_level: false)
   end
 
@@ -1082,7 +1088,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @singular,
                                  nested_set: @nested_set,
-                                 with_params: true,
+                                 with_params: false,
                                  put_form: true,
                                  top_level: false)
   end
@@ -1091,7 +1097,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @singular,
                                  nested_set: @nested_set,
-                                 with_params: true,
+                                 with_params: false,
                                  put_form: true)
   end
 
@@ -1100,7 +1106,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  target: @singular,
                                  nested_set: @nested_set,
                                  modifier: "edit_",
-                                 with_params: true,
+                                 with_params: false,
                                  put_form: true)
   end
 
@@ -1129,7 +1135,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  target: singular,
                                  nested_set: @nested_set,
                                  modifier: "new_",
-                                 with_params: true)
+                                 with_params: false)
   end
 
   def nested_assignments
@@ -1227,7 +1233,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       path: HotGlue.optionalized_ternary( namespace: @namespace,
                                           target: @singular,
                                           nested_set: @nested_set,
-                                          with_params: true,
+                                          with_params: false,
                                           put_form: true),
                                           big_edit: @big_edit,
                                           singular: singular,
