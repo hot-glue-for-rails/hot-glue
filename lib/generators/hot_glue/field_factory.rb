@@ -12,8 +12,6 @@ require_relative "fields/uuid_field"
 require_relative "fields/attachment_field"
 require_relative "fields/related_set_field"
 
-
-
 class FieldFactory
   attr_accessor :field, :class_name
   def initialize(type: , name: , generator: )
@@ -32,6 +30,8 @@ class FieldFactory
               TextField
             when :float
               FloatField
+            when :decimal
+              FloatField
             when :datetime
               DateTimeField
             when :date
@@ -49,6 +49,9 @@ class FieldFactory
             end
     @class_name = class_name
 
+    if field_class.nil?
+      raise "Field type could be identified  #{name} "
+    end
 
     @field = field_class.new(name: name,
                              layout_strategy: generator.layout_strategy,
