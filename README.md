@@ -1106,7 +1106,16 @@ Use `before` to make the labels come before or `after` to make them come after. 
 
 Omits the heading of column names that appears above the 1st row of data.
 
+### `--include-object-names`
 
+When you are "Editing X" we specify that X is a ___ (author, book, room, etc)
+
+e.g. "Editing author Edgar Allan Poe" vs "Editing Edgar Allan Poe"
+
+Can also be specified globally in `config/hot_glue.yml`
+
+
+### Code insertions
 
 `--code-before-create`
 `--code-after-create`
@@ -1585,6 +1594,76 @@ puts the value into the search box and the id into a hidden field.
 
 You need to making a selection *and* click "Save" to update the record.
 
+The typeahead itself can be both namespaced and nested. (Remember, all controllers are generated at the namespace.)
+
+Pay close attention to a nested typeahead: When generating the typeahead scaffold use both `--namespace=aaa` and `--nested=bbb/ccc`
+
+In this example, the typeahead controller will operate at a namespace of `aaa` with two parents: `bbb` and `ccc`
+
+Combined with `--auth-identifier`, you can load only objects that are related from the `ccc` thing that gets loaded off the `bbb` thing that gets loaded off the current_user.
+
+This scopes the list returned by the typeahead. 
+
+You need to specify this twice: Once when specifying the typehead scaffold, and also any place in a regular scaffold that uses typeahead:
+
+For example, assuming we have a reciprocal has_many through for Accounts & Users
+
+user.rb
+```
+has_many :account_users
+has_many :accounts, through: :account_users
+```
+
+
+account.rb
+```
+has_many :account_users
+has_many :users, through: :account_users
+```
+
+
+`bin/rails generate hot_glue:scaffold Member --auth='current_user' --auth-identifier='user' --auth-identifier=user --modify='user_id{typeahead}[account]'`
+
+in our routes.rb file, we have
+```
+namespace :account_dashboard do
+  resources :accounts do
+    resources :users_typeahead
+    resources :rooms do
+      resources :members
+    end
+  end
+end 
+```
+
+Notice that the scaffold with the references to users is 2 levels deep: accounts -> rooms -> members (and is also in a namespace)
+
+Notice also that the *users typeahead* operates only one level deep in the same namespace.
+
+This means that to find users within the search, the essential piece of information is the account, because we want to scope the result set to the users belong to that account.
+
+• The account must belong to the current_user (notice the account uses nested account provided by the route)
+• Any users found by the typeahead must belong to the account
+
+```
+  def account
+    @account ||= current_user.accounts.find(params[:account_id]) 
+  end
+  
+  def index
+    authorize User, :typeahead? 
+    query = params[:query]
+    @typeahead_identifier = params[:typeahead_identifier]
+    @users = account.users.where("LOWER(email) LIKE ?  ", "%#{query.downcase}%").limit(10)
+    render layout: false
+  end
+```
+
+
+
+--
+
+
 ### TinyMCE
 1. `bundle add tinymce-rails` to add it to your Gemfile
 
@@ -1662,6 +1741,36 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 
 # VERSION HISTORY
+
+
+#### 2025-01-28 v0.6.11
+
+• Typeahead now can use --auth, --auth-identifier, --namespace, and --nested
+• Works similar to how same flags work on scaffold generator. (Notice that the typeahead generator is a completely separate generator). 
+• When using nested, your results are scoped the parent objects in the nest chain (which is the last one)
+
+e.g.
+`bin/rails generate hot_glue:scaffold Member --auth='current_user' --auth-identifier='user' --auth-identifier=user --modify='user_id{typeahead}[account]'`
+
+here the user_id field on members will use a typeahead that is built in the namespace `account_dashboard` under 1 parent: `account`
+
+This would be used in conjunction with a typeahead built using the same namespace and nesting that matches:
+
+```
+bin/rails generate hot_glue:typeahead User --namespace='account_dashboard' --nested='account' --auth-identifier='user' --auth='current_user'
+```
+
+(See 'typeahead' section for details)
+
+`--include-object-names`
+
+When you are "Editing X" we specify that X is a ___ (author, book, room, etc)
+
+e.g. "Editing author Edgar Allan Poe" vs "Editing Edgar Allan Poe"
+
+Can also be specified globally in `config/hot_glue.yml`
+
+
 
 #### 2024-12-25 v0.6.10
     • adds `--no-nav-menu` option to supress writing to the _nav template
