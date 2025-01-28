@@ -987,6 +987,13 @@ Omits controller.
 
 Omits list views. 
 
+`--new-button-position` (above, below; default: above)
+Show the new button above or below the list.
+
+`--downnest-shows-headings` (default: false)
+Show headings above downnested portals.
+
+
 ### `--big-edit`
 
 If you do not want inline editing of your list items but instead want to fallback to full-page style behavior for your edit views, use `--big-edit`. 
@@ -1770,6 +1777,12 @@ e.g. "Editing author Edgar Allan Poe" vs "Editing Edgar Allan Poe"
 
 Can also be specified globally in `config/hot_glue.yml`
 
+
+`--new-button-position` (above, below; default: above)
+Show the new button above or below the list.
+
+`--downnest-shows-headings` (default: false)
+Show headings above downnested portals.
 
 
 #### 2024-12-25 v0.6.10
