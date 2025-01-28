@@ -4,12 +4,38 @@ class <%= ((@namespace.titleize.gsub(" ", "") + "::" if @namespace) || "") + @pl
   <% end %># <%= regenerate_me_code %><% if defined?(RuboCop) %>
   # rubocop:enable Layout/LineLength <% end %>
 
+
+  <% @nested_set.each do |nest| %>before_action :<%= nest[:singular] %>
+  def <%= nest[:singular] %>
+    @<%= nest[:singular] %> ||= current_user.accounts.find(params[:account_id])
+  end
+  <% end %>
+
+  <% nest_chain = [] %>
+  <% @nested_set.each { |arg|
+      if @auth_identifier == arg[:singular]
+        this_scope = auth_object
+      elsif nest_chain.empty?
+        this_scope = "#{@auth ? @auth : class_name}.#{arg[:plural]}"
+      else
+        this_scope = "#{nest_chain.last}.#{arg[:plural]}"
+      end
+       nest_chain << arg
+     }%>
+
   def index
     <% if @pundit %>authorize <%= @class_name %>, :typeahead? <% end %>
     query = params[:query]
     @typeahead_identifier = params[:typeahead_identifier]
-    @<%= @plural %> = <%= @singular.titleize.gsub(" ", "") %>.where("<%= @search_by.collect{|search| "LOWER(#{search}) LIKE ?" }.join(" OR ") %>", <%= @search_by.collect{|search|  "\"%\#{query.downcase}%\"" }.join(", ") %>).limit(10)
 
+
+    <% if @nested_set.none? %>
+    @<%= @plural %> = <%= @singular.titleize.gsub(" ", "") %>.where("<%= @search_by.collect{|search| "LOWER(#{search}) LIKE ?" }.join(" OR ") %>", <%= @search_by.collect{|search|  "\"%\#{query.downcase}%\"" }.join(", ") %>).limit(10)
+    <% else %>
+    <% @nested_set.each do |arg| %>
+    @<%= @plural %> = <%= @nested_set.last[:singular] %>.<%= @plural %>.where("<%= @search_by.collect{|search| "LOWER(#{search}) LIKE ?" }.join(" OR ") %>", <%= @search_by.collect{|search|  "\"%\#{query.downcase}%\"" }.join(", ") %>).limit(10)
+    <% end %>
+      <% end %>
     render layout: false
   end
 end
