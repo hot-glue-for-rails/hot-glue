@@ -28,7 +28,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :layout_strategy, :form_placeholder_labels,
                 :form_labels_position, :no_nav_menu, :pundit,
                 :self_auth, :namespace_value, :record_scope, :related_sets,
-                :search_clear_button, :search_autosearch
+                :search_clear_button, :search_autosearch, :include_object_names
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -98,7 +98,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :code_after_update, default: nil
   class_option :record_scope, default: nil
   class_option :no_nav_menu, type: :boolean, default: false # suppress writing to _nav template
-
+  class_option :include_object_names, type: :boolean, default: false
 
 
   # SEARCH OPTIONS
@@ -260,7 +260,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         elsif $2 == "tinymce"
           @modify_as[key.to_sym] =  {tinymce: 1, badges: $3}
         elsif $2 == "typeahead"
-          @modify_as[key.to_sym] =  {typeahead: 1, badges: $3}
+          nested = $3.split("/")
+          @modify_as[key.to_sym] =  {typeahead: 1, nested: nested}
         elsif $2 == "timezone"
           @modify_as[key.to_sym] =  {timezone: 1, badges: $3}
         elsif $2 == "none"
@@ -360,6 +361,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @downnest_children = @downnest.split(",").map { |child| child.gsub("+", "") }
       @downnest_object = HotGlue.construct_downnest_object(@downnest)
     end
+
+    @include_object_names = options['include_object_names'] || get_default_from_config(key: :include_object_names)
+
+
 
     if @god
       # @auth = nil

@@ -110,7 +110,15 @@ class AssociationField < Field
       # else
       # end
     elsif modify_as && modify_as[:typeahead]
-      search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
+      search_url  = "#{namespace ? namespace + "_" : ""}" +
+        modify_as[:nested].join("_") +
+        + "_#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
+
+
+      if @modify_as[:nested].any?
+        search_url  << "(" + modify_as[:nested].collect{|x| "#{x}"}.join(",") + ")"
+      end
+
       "<div class='typeahead typeahead--#{assoc.name}_id'
       data-controller='typeahead'
       data-typeahead-url-value='<%= #{search_url} %>'

@@ -154,7 +154,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @action = 'edit'
     render :edit<% if @pundit %>
   rescue Pundit::NotAuthorizedError
-    flash[:notice] = "Editing #{@<%= singular %>.<%= display_class %>} not authorized."
+    flash[:notice] = "Editing <%= singular + ' ' if @include_object_names %>#{@<%= singular %>.<%= display_class %>} not authorized."
     render :index <% end %>
   end
 
