@@ -40,19 +40,18 @@ class BooleanField < Field
     if display_boolean_as.nil?
 
     end
-    "<div class='#{@layout_strategy.form_checkbox_wrapper_class} #{'form-switch' if display_boolean_as == 'switch'}'>\n" +
+    "<span class='#{@layout_strategy.form_checkbox_wrapper_class} #{'form-switch' if display_boolean_as == 'switch'}'>\n" +
       (if display_boolean_as == 'radio'
       radio_button_display
     elsif display_boolean_as == 'checkbox'
       checkbox_display
     elsif display_boolean_as == 'switch'
       switch_display
-   end) + "</div> \n"
+   end) + "</span> \n"
   end
 
   def form_field_output
-    (form_labels_position == 'before' ?  " <br />"  : "") +
-      form_field_display + (form_labels_position == 'after' ?  " <br />"  : "")
+    form_field_display
   end
 
   def line_field_output

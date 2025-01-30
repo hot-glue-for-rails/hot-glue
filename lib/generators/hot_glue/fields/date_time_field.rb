@@ -40,7 +40,7 @@ class DateTimeField < Field
   end
 
   def form_field_output
-    "<%= f.datetime_field( :#{name}, value: #{singular}.#{name} && #{singular}.#{name}.change(sec: 0), class: '#{@layout_strategy.form_input_class}'  ) %>"
+    "<%= f.datetime_field( :#{name}, value: #{singular}.#{name} && #{singular}.#{name}.in_time_zone(current_timezone), class: '#{@layout_strategy.form_input_class}'  ) %><%= current_timezone %>"
   end
 
   def viewable_output

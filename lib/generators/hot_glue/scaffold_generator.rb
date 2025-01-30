@@ -81,7 +81,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :form_placeholder_labels, type: :boolean, default: false # puts the field names into the placeholder labels
 
   # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
-  class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
+  class_option :inline_list_labels, default: nil # default is set below
   class_option :factory_creation, default: ''
   class_option :alt_foreign_key_lookup, default: '' #
   class_option :attachments, default: ''
@@ -262,7 +262,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         elsif $2 == "tinymce"
           @modify_as[key.to_sym] =  {tinymce: 1, badges: $3}
         elsif $2 == "typeahead"
-          nested = $3.split("/")
+          if !$3.nil?
+            nested = $3.split("/")
+          else
+            nested = []
+          end
           @modify_as[key.to_sym] =  {typeahead: 1, nested: nested}
         elsif $2 == "timezone"
           @modify_as[key.to_sym] =  {timezone: 1, badges: $3}
@@ -303,7 +307,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     setup_hawk_keys
     @form_placeholder_labels = options['form_placeholder_labels'] # true or false
-    @inline_list_labels = options['inline_list_labels'] || 'omit' # 'before','after','omit'
+    @inline_list_labels = options['inline_list_labels'] || get_default_from_config(key: :inline_list_labels) || 'omit' # 'before','after','omit'
 
     @form_labels_position = options['form_labels_position']
     if !['before', 'after', 'omit'].include?(@form_labels_position)

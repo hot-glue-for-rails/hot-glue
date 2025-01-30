@@ -72,13 +72,14 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     params[:per] || 10
   end<% end %>
   <% unless @no_list %>
-  def load_all_<%= plural %>
+  def load_all_<%= plural %><% if @search == "set" %>
+    @q = params[:q] ||  <%= {"0" => @search_fields.collect{|foo| {"#{foo}_match".to_sym => ((@columns_map[foo.to_sym].modify_as && @columns_map[foo.to_sym].modify_as[:binary]) ? "-1" : ""), "#{foo}_search".to_sym => ""}}.reduce({}, :merge)  } %> <% end %>
   <%= load_all_code %>
   end
 
-  def index<% if @search == "set" %>
-    @q = params[:q] ||  <%= {"0" => @search_fields.collect{|foo|
-    {"#{foo}_match".to_sym => ((@columns_map[foo.to_sym].modify_as && @columns_map[foo.to_sym].modify_as[:binary]) ? "-1" : ""), "#{foo}_search".to_sym => ""}}.reduce({}, :merge)  } %> <% end %><% if @search_fields %>
+  def index
+    load_all_<%= plural %>
+      <% if @search_fields %>
 <%= @search_fields.collect{|field_name| @columns_map[field_name.to_sym].code_to_reset_match_if_search_is_blank}.compact.join("     \n") %><% end %>
     load_all_<%= plural %><% if @pundit %><% if @pundit %>
     authorize @<%= plural_name %><% end %>

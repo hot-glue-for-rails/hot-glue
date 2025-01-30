@@ -111,8 +111,8 @@ class AssociationField < Field
       # end
     elsif modify_as && modify_as[:typeahead]
       search_url  = "#{namespace ? namespace + "_" : ""}" +
-        modify_as[:nested].join("_") +
-        + "_#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
+        modify_as[:nested].join("_") + ("_" if modify_as[:nested].any?) +
+        + "#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
 
 
       if @modify_as[:nested].any?

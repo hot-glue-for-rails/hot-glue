@@ -3,7 +3,7 @@ class RelatedSetField < Field
   attr_accessor :assoc_name, :assoc_class, :assoc
 
   def initialize( class_name: , default_boolean_display:, display_as: ,
-                  name: , singular: ,
+                  name: , singular: , plural:,
                   alt_lookup: ,
                   update_show_only: ,
                   hawk_keys: , auth: , sample_file_path:,  ownership_field: ,

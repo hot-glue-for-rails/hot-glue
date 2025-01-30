@@ -182,7 +182,7 @@ describe HotGlue::ErbTemplate do
 
     it "should make a datetime column" do
       res = factory_all_form_fields({columns: [:approved_at]})
-      expect(res).to include("<%= f.datetime_field( :approved_at, value: jkl.approved_at && jkl.approved_at.change(sec: 0), class: ''  ) %>")
+      expect(res).to include("<%= f.datetime_field( :approved_at, value: jkl.approved_at && jkl.approved_at.in_time_zone(current_timezone), class: ''  ) %>")
     end
 
     it "should make a date column " do
