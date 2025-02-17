@@ -32,6 +32,8 @@ class FieldFactory
               TextField
             when :float
               FloatField
+            when :decimal
+              FloatField
             when :datetime
               DateTimeField
             when :date
