@@ -132,8 +132,18 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       <% unless @display_edit_after_create %>render :create, status: :unprocessable_entity<% else %>render :new , status: :unprocessable_entity<% end %>
     end<% if @pundit %>
   rescue Pundit::NotAuthorizedError => e
+    flash[:alert] = "Not authorized."
     @<%= singular %>.errors.add(:base, e.message)
-    render :create, status: :unprocessable_entity<% end %>
+    <% unless @display_edit_after_create %>render :create, status: :unprocessable_entity<% else %>redirect_to <%=   HotGlue.optionalized_ternary(namespace: @namespace,
+                                 top_level: true,
+                                 target:  @singular,
+                                 nested_set: @nested_set,
+                                 modifier: 'edit_',
+                                 with_params: true,
+                                 instance_last_item: true,
+                                 put_form: true).gsub("(#{singular}", "(@#{singular}") %><% end %>
+
+    <% end %>
   end
 
 <% end %>
