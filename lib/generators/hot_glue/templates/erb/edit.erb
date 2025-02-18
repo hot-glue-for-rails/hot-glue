@@ -11,6 +11,7 @@
 
 
 <% if @downnest_children.any? && @big_edit %>
+  <hr />
   <% each_downnest_width = @downnest_children.count == 1 ? 33 : (53/@downnest_children.count).floor %>
     <% @downnest_object.each do |downnest, size| %>
       <div class="row">
@@ -22,7 +23,7 @@
           <% downnest_style = @layout_strategy.downnest_style %>
           <% if @downnest_shows_headings %>
             <h3>
-              <%= downnest_class.humanize %>
+              <%= downnest_class.titlecase.pluralize %>
             </h3>
           <% end %>
           <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest_object_name %>/list", locals: {<%= @singular %>: @<%= @singular %>,  <%= downnest_object_name %>: @<%= @singular %>.<%= downnest %><% if @nested_set.any? %>, <%= @nested_set.collect{|x| "#{x[:singular]}: @#{x[:singular]}"}.join(", ") %>, nested_for: "<%= @nested_set.collect{|x| "#{x[:singular]}-" + "\#{" + "@#{x[:singular]}.id}"}.join("__") %>__<%= singular %>-#{@<%= @singular %>.id}" <% end %> } \%>
