@@ -1744,15 +1744,15 @@ If you have a partial in your view folder called `_list_after_each_row_heading`,
 
 The `within` partials should do operations within the form (like hidden fields), and the `after` partials should do entirely unrelated operations, like a different form entirely.
 
-These automatic pickups for partials are detected at buildtime. This means that if you add these partials later, you must rebuild your scaffold.
+These automatic pickups for partials are detected at build time. This means that if you add these partials later, you must rebuild your scaffold.
 
 
 # VERSION HISTORY
 
-#### ???? - v0.6.12
-• adds decimal field type (displays as float)
-• guard against polymorphic belongs_to -- not a full implementation for polymorphic, just hides the fields
-• fixes heading with multiword names on downnested portals
+#### 2025-02-19 - v0.6.12
+• adds decimal field type (displays as float-- there is no special handling for decimal on the UI)
+• guard against polymorphic belongs_to -- not a full implementation for polymorphic fields, just hides the fields on the form; on the list uses to_label always
+• fixes heading with multiword names on downnested portals to display nicely capitalized
 
 #### 2025-01-28 v0.6.11
 
