@@ -1749,6 +1749,10 @@ These automatic pickups for partials are detected at buildtime. This means that 
 
 # VERSION HISTORY
 
+#### ???? - v0.6.12
+• adds decimal field type (displays as float)
+• guard against polymorphic belongs_to -- not a full implementation for polymorphic, just hides the fields
+• fixes heading with multiword names on downnested portals
 
 #### 2025-01-28 v0.6.11
 
