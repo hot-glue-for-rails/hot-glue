@@ -1753,6 +1753,7 @@ These automatic pickups for partials are detected at build time. This means that
 • adds decimal field type (displays as float-- there is no special handling for decimal on the UI)
 • guard against polymorphic belongs_to -- not a full implementation for polymorphic fields, just hides the fields on the form; on the list uses to_label always
 • fixes heading with multiword names on downnested portals to display nicely capitalized
+• removes open struct
 
 #### 2025-01-28 v0.6.11
 
