@@ -1749,7 +1749,7 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
-#### 2025-02-19 - v0.6.12
+#### 2025-02-20 - v0.6.12
 • adds decimal field type (displays as float-- there is no special handling for decimal on the UI)
 • guard against polymorphic belongs_to -- not a full implementation for polymorphic fields, just hides the fields on the form; on the list uses to_label always
 • fixes heading with multiword names on downnested portals to display nicely capitalized
