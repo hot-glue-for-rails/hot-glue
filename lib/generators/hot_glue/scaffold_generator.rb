@@ -1531,9 +1531,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if @nested_set.none?
       "\"\""
     else
-      @nested_set.collect { |arg|
-        "(((\"__#{arg[:singular]}-\#{" + "@" + arg[:singular] + ".id}\") if @" + arg[:singular] + ") || \"\")"
-      }.join(" + ")
+      "\"" + @nested_set.collect { |arg|
+        "__#{arg[:singular]}-\#{" + "@" + arg[:singular] + ".id}"
+      }.join("") + "\""
     end
   end
 
