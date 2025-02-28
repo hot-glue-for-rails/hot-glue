@@ -674,7 +674,9 @@ Applies a badge `bg-primary` to rows with opened_at truthy and `bg-secondary` to
 to display a badge on everything, use the `none` modifier with the
 `--modify=opened_at{none}[bg-dark]`
 
+For the `$` modifier only, if the field name ends with `_cents`, the modifier will automatically divide the field by 100 before displaying it.
 
+(This is consistent with Stripe'e paradigm to always store money in cents, and this way I force myself to put `_cents` on the end of my field names to remind myself that they are in cents.)
 
 ### `--alt-foreign-key-lookup=`
 
@@ -1748,6 +1750,13 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+#### 2025-02-28 - v0.6.14
+
+• fixes bug in association field involving scaffolds built without nesting
+• fixes bug in paginated display
+• when applying $ modifier to a numerical field, if the field ends with `_cents`, the number will be /100 before being displayed
+
 
 #### 2025-02-20 - v0.6.12
 • adds decimal field type (displays as float-- there is no special handling for decimal on the UI)
