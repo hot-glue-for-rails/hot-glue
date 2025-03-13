@@ -158,6 +158,8 @@ module  HotGlue
                  # show only on the update action overrides any pundit policy
               elsif @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
                 "<% if policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output  + "<% end %>"
+              elsif update_show_only.include?(col)
+                "<% if @action == 'edit' %>" + columns_map[col].form_show_only_output + "<% else %>" + columns_map[col].form_field_output + "<% end %>"
               else
                 columns_map[col].form_field_output
               end
@@ -168,7 +170,7 @@ module  HotGlue
             add_spaces_each_line( "\n  <span #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>'  #{'style="display: inherit;"'}  >\n" +
                                     add_spaces_each_line( (form_labels_position == 'before' ? (the_label || "") + "<br />\n"  : "") +
                                                         +  field_result +
-                                        (form_labels_position == 'after' ? "<br />\n" + (the_label || "") : "")  , 4) +
+                                        (form_labels_position == 'after' ? (  columns_map[col].newline_after_field? ? "<br />\n" : "") + (the_label || "") : "")  , 4) +
                                     "\n  </span>\n ", 2)
 
           }.join("") + "\n  </div>"

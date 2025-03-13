@@ -77,7 +77,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :no_list_heading, type: :boolean, default: false
 
   # determines if the labels show up BEFORE or AFTER on the NEW/EDIT (form)
-  class_option :form_labels_position, type: :string, default: 'after' #  choices are before, after, omit
+  class_option :form_labels_position, type: :string #  choices are before, after, omit
   class_option :form_placeholder_labels, type: :boolean, default: false # puts the field names into the placeholder labels
 
   # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
@@ -310,9 +310,17 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @inline_list_labels = options['inline_list_labels'] || get_default_from_config(key: :inline_list_labels) || 'omit' # 'before','after','omit'
 
     @form_labels_position = options['form_labels_position']
-    if !['before', 'after', 'omit'].include?(@form_labels_position)
-      raise HotGlue::Error, "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
+    if @form_labels_position.nil?
+      @form_labels_position = get_default_from_config(key: :form_labels_position)
+      if @form_labels_position.nil?
+        @form_labels_position = 'after'
+      end
+    else
+      if !['before', 'after', 'omit'].include?(@form_labels_position)
+        raise HotGlue::Error, "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
+      end
     end
+
 
     if !['before', 'after', 'omit'].include?(@inline_list_labels)
       raise HotGlue::Error, "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
@@ -651,6 +659,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @menu_file_exists = true if @nested_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
     @turbo_streams = !!options['with_turbo_streams']
+
+    puts "show only #{@show_only}"
+    puts "update show only #{@update_show_only}"
+
   end
 
   def setup_hawk_keys
@@ -1330,9 +1342,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       append_text = "  <li class='nav-item'>
     <%= link_to '#{@list_label_heading.humanize}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
   </li>"
+      alt_append_text = "  <li class='nav-item'>
+    <%= link_to '#{@list_label_heading.humanize.upcase}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
+  </li>"
 
       text = File.read(nav_file)
-      if text.include?(append_text)
+      if text.include?(append_text) || text.include?(alt_append_text)
         puts "SKIPPING: Nav link for #{singular_name} already exists in #{nav_file}"
       else
         puts "APPENDING: nav link for #{singular_name} #{nav_file}"
