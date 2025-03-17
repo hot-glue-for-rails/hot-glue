@@ -68,8 +68,16 @@ module HotGlue
       end
     end
 
+    def is_dst_now?
+      Time.now.utc.month > 3 && Time.now.month < 11 ||
+        (Time.now.utc.month == 3 && Time.now.day >= (14 - Time.now.utc.wday)) ||
+        (Time.now.utc.month == 11 && Time.now.utc.day < (7 - Time.now.utc.wday))
+    end
+
     def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = nil)
       use_timezone = (current_user_object.try(:timezone)) || Time.zone
+      uses_dst = (current_user_object.try(:locale_uses_dst)) || false
+
       modified_params = modified_params.tap do |params|
         params.keys.each{|k|
 
@@ -88,7 +96,9 @@ module HotGlue
               # if they already exist in your database, you should zero them out
               # or apply .change(sec: 0) when displaying them as output in the form
               # this will prevent seconds from being added by the browser
-              params[k] = Time.strptime(parse_date, "%Y-%m-%d %H:%M %Z")
+              parsed_time = Time.strptime(parse_date, "%Y-%m-%d %H:%M %Z")
+              parsed_time = parsed_time.to_time - 60.minutes if uses_dst && is_dst_now?
+              params[k] = parsed_time
             end
           end
         }
