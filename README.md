@@ -1751,6 +1751,13 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
+#### 2025-03-17 - v0.6.15
+
+• now store on your current_user model (this is automatically passed into the method modify_date_inputs_on_params). HG will set user-inputted values correctly to daylight savings time during April-Nov months only (#195)
+• fixes issue with turbo frame name after create is rendered (#194)
+• removes vestigates of optionalized partents
+
+
 #### 2025-02-28 - v0.6.14
 
 • fixes bug in association field involving scaffolds built without nesting
