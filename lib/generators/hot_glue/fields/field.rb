@@ -219,4 +219,9 @@ class Field
   def code_to_reset_match_if_search_is_blank
     nil
   end
+
+  def newline_after_field?
+    false
+  end
+
 end
