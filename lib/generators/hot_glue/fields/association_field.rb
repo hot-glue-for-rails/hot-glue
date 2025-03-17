@@ -155,6 +155,7 @@ class AssociationField < Field
         hawked_association = "#{assoc.class_name}.all"
       end
 
+
       (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
         "  <%= f.collection_select(:#{name}, #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: #{singular}.#{name} }, class: 'form-control') %>\n" +
         (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
@@ -253,6 +254,13 @@ class AssociationField < Field
     #   "\n     "
   end
 
+  def newline_after_field?
+    if modify_as && modify_as[:typeahead]
+      false
+    else
+      true
+    end
+  end
 
   def where_query_statement
     ".where(*#{name}_query)"
