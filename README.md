@@ -1770,6 +1770,16 @@ These automatic pickups for partials are detected at build time. This means that
 
 #### 2025-03-31 v0.6.16
 
+• Downnested Portals are now built using Bootstrap Tab Panes
+
+Downnested portals are now built with bootstrap tab panes (always) and are no longer stacked on top of one another.
+
+It looks like this:
+https://getbootstrap.com/docs/5.0/components/navs-tabs/#javascript-behavior
+
+
+
+
 • Pundit Policy Override
 
 if you use the flag `--pundit-policy-override` your controller operations will bypass the invisible (pundit provided) access control and use the pundit policy you specify.

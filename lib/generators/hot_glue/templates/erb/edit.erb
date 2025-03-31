@@ -19,7 +19,7 @@
         <% downnest = data[0] %>
         <li class="nav-item" role="presentation">
           <button class="nav-link <%= "active" if index==0 %>" id="<%= downnest %>-tab" data-bs-toggle="tab" data-bs-target="#<%= downnest %>-portal" type="button" role="tab" aria-controls="home" aria-selected="true">
-            <%= downnest.upcase %>
+            <%= downnest.titlecase.pluralize %>
           </button>
         </li>
       <% end %>
