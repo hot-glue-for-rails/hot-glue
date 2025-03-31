@@ -978,7 +978,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def list_column_headings
     @template_builder.list_column_headings(
-      col_identifier: @layout_strategy.column_classes_for_column_headings,
       column_width: @layout_strategy.column_width,
       singular: @singular
     )
@@ -1442,7 +1441,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def all_line_fields
     @template_builder.all_line_fields(
-      col_identifier: @layout_strategy.column_classes_for_line_fields,
       perc_width: @layout_strategy.each_col, # undefined method `each_col'
       layout_strategy: @layout_strategy
     )

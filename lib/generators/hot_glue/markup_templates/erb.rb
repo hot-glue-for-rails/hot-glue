@@ -76,13 +76,14 @@ module  HotGlue
       }.join("\n")
     end
 
-    def list_column_headings(col_identifier: ,
-                             column_width:, singular: )
+    def list_column_headings(column_width:, singular: )
       col_style = @layout_strategy.column_headings_col_style
 
       columns = layout_object[:columns][:container]
-      result = columns.map{ |column|
-        "<div class='#{col_identifier} hg-heading-row heading--#{singular}--#{column.join("-")}' " + col_style + ">" +
+      result = columns.map.with_index{ |column,i|
+
+        size = layout_object[:columns][:bootstrap_column_width][i]
+        "<div class='#{layout_strategy.column_classes_for_column_headings(size)} hg-heading-row heading--#{singular}--#{column.join("-")}' " + col_style + ">" +
           column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
       }.join("\n")
       return result
@@ -95,7 +96,6 @@ module  HotGlue
 
     def search_input_area
       columns = layout_object[:columns][:container]
-      column_classes = layout_strategy.column_classes_for_form_fields
 
       res =+ "<\%= form_with url: #{form_path}, method: :get, html: {'data-turbo-action': 'advance', 'data-controller': 'search-form'} do |f| %>"
       res << "<div class=\"#{@layout_strategy.row_classes} search--#{@plural}\">"
@@ -116,12 +116,13 @@ module  HotGlue
           end
         }.compact.join("\n")
 
-        "  <div class='#{column_classes} search-cell--#{singular}--#{column.join("-")}' >" +
+        size = col.size
+        "  <div class='#{layout_strategy.column_classes_for_form_fields(size)} search-cell--#{singular}--#{column.join("-")}' >" +
           cols_result + "</div>"
 
       }.join("\n")
       res << "</div>"
-      res << "<div class='#{column_classes}'>"
+      res << "<div class='#{layout_strategy.column_classes_for_form_fields(size)}'>"
       if @search_clear_button
         res << "<\%= f.button \"Clear\", name: nil, 'data-search-form-target': 'clearButton', class: 'btn btn-sm btn-secondary' %>"
       end
@@ -132,11 +133,12 @@ module  HotGlue
 
 
     def all_form_fields(layout_strategy:)
-      column_classes = layout_strategy.column_classes_for_form_fields
       columns = layout_object[:columns][:container]
 
       result = columns.map{ |column|
-        "  <div class='#{column_classes} cell--#{singular}--#{column.join("-")}' >" +
+        size  = layout_object[:columns][:bootstrap_column_width][columns.index(column)]
+
+        "  <div class='#{layout_strategy.column_classes_for_form_fields(size)} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
 
             field_error_name = columns_map[col].field_error_name
@@ -192,10 +194,8 @@ module  HotGlue
     ################################################################
 
     def all_line_fields(layout_strategy:,
-                        perc_width:,
-                        col_identifier: nil)
+                        perc_width:)
 
-      @col_identifier =  layout_strategy.column_classes_for_line_fields
 
       inline_list_labels = @inline_list_labels  || 'omit'
       columns = layout_object[:columns][:container]
@@ -205,9 +205,11 @@ module  HotGlue
 
       style_with_flex_basis = layout_strategy.style_with_flex_basis(perc_width)
 
-      result = columns.map{ |column|
+      result = columns.map.with_index{ |column,i|
 
-        "<div class='hg-col #{col_identifier} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
+        size = layout_object[:columns][:bootstrap_column_width][i]
+
+        "<div class='hg-col #{layout_strategy.column_classes_for_line_fields(size)} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
         column.map { |col|
           if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
@@ -219,6 +221,8 @@ module  HotGlue
           "#{inline_list_labels == 'before' ? label + "<br/>" : ''}#{field_output}#{inline_list_labels == 'after' ? "<br/>" + label : ''}"
         }.join(  "<br />") + "</div>"
       }.join("\n")
+      return result
+
     end
   end
 end
