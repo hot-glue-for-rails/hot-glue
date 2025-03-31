@@ -1770,18 +1770,18 @@ These automatic pickups for partials are detected at build time. This means that
 
 #### 2025-03-31 v0.6.16
 
-• Downnested Portals are now built using Bootstrap Tab Panes
-
+• Bootstrap Tab Panes For Downnested Portals
 Downnested portals are now built with bootstrap tab panes (always) and are no longer stacked on top of one another.
 
 It looks like this:
 https://getbootstrap.com/docs/5.0/components/navs-tabs/#javascript-behavior
 
-
-
+• inline_list_labels can be set in hot_glue.yml
+• typeaheads nested inside of routes are fixed
+• switches back to current_timezone implementation, displaying times relative to the user's set timezone
+• load all code now sets query parameters
 
 • Pundit Policy Override
-
 if you use the flag `--pundit-policy-override` your controller operations will bypass the invisible (pundit provided) access control and use the pundit policy you specify.
 
 example
@@ -1789,6 +1789,12 @@ example
 `rails generate hot_glue:scaffold Invoice --gd --pundit-policy-override='UniqueInvoicePolicy'`
 
 Implement  `UniqueInvoicePolicy` using actions with question mark `?` endings corresponding to the same actions you are building, `new?`, `create?`, `edit?`, `update?`, and `destroy?`
+
+
+• Bootstrap column builder has been changed.
+The bootstrap column bulder previously defaulted all real columns to col-sm-2 (or whichever bootstrap column with you set)
+
+The builder has been refactored to allow for a per-column width generated automatically by the builder. If there are unused bootstrap columns, the builder will add width to the first columns in your layout, making them wider. 
 
 
 
