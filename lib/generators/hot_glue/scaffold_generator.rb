@@ -1085,6 +1085,17 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  top_level: top_level)
   end
 
+  def edit_parent_path_helper
+    # the path to the edit route of the PARENT
+    if @nested_set.any? && @nested
+      "edit_#{@namespace + "_" if @namespace}#{(@nested_set.collect { |x| x[:singular] }.join("_") + "_" if @nested_set.any?)}path(" +
+      "#{@nested_set.collect { |x| x[:singular] }.join(", ")}" + ")"
+
+    else
+      "edit_#{@namespace + "_" if @namespace}path"
+    end
+  end
+
   def datetime_fields_list
     @columns.select do |col|
       if @the_object.columns_hash[col.to_s]
