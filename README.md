@@ -790,6 +790,23 @@ end
 Because Hot Glue detects the `*_able?` methods at build time, if you add them to your policy, you will have to rebuild your scaffold.
 
 
+### `--pundit-policy-override`
+if you use the flag `--pundit-policy-override` your controller operations will bypass the invisible (pundit provided) access control and use the pundit policy you specify.
+
+example
+
+`rails generate hot_glue:scaffold Invoice --gd --pundit-policy-override='UniqueInvoicePolicy'`
+
+You will implement a Pundit policy for `UniqueInvoicePolicy` and it should implement actions with question mark `?` endings corresponding to the same actions you are building, `new?`, `create?`, `edit?`, `update?`, and `destroy?`
+
+If provided, the output code looks something like (in this example, showing the `edit?` method)
+
+```
+    skip_authorization
+    raise Pundit::NotAuthorizedError if ! UniqueInvoicePolicy.edit?
+```
+
+
 ### `--show-only=`
 (separate field names by COMMA)
 
@@ -1750,6 +1767,23 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+#### 2025-03-31 v0.6.16
+
+• Pundit Policy Override
+
+if you use the flag `--pundit-policy-override` your controller operations will bypass the invisible (pundit provided) access control and use the pundit policy you specify.
+
+example
+
+`rails generate hot_glue:scaffold Invoice --gd --pundit-policy-override='UniqueInvoicePolicy'`
+
+Implement  `UniqueInvoicePolicy` using actions with question mark `?` endings corresponding to the same actions you are building, `new?`, `create?`, `edit?`, `update?`, and `destroy?`
+
+
+
+
+
 
 #### 2025-03-17 - v0.6.15
 
