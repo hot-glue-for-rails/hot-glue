@@ -7,7 +7,9 @@
       </h4><% end %>
     <% end %>
 
+    <% if @new_button_position == 'above' %>
     <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  @controller_build_folder + '/new_button", locals: {}' + @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join()  + ' %\>'.gsub('\\',"")  %><br /><% end %>
+    <% end %>
 
     <% unless @no_list %>
       <% unless @no_list_heading %>
@@ -59,12 +61,17 @@
         %>
       <\% end %>
       <% if @paginate_per_page_selector %>
-        <\%= form_with url: things_path, method: :get do |f| %>
+        <\%= form_with url: '<%= path_helper_plural(top_level: false) %>', method: :get do |f| %>
            Show per page
         <\%= f.collection_select  "per", [10, 25, 100], :to_s, :to_s, {prompt: true, selected: params[:per]}, {onChange: "this.form.submit();"} %>
         <\% end %>
       <% end %>
     <%=  @no_paginate ? "" : paginate %>
   <% end  %>
+
+
+  <% if @new_button_position == 'below' %>
+    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  @controller_build_folder + '/new_button", locals: {}' + @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join()  + ' %\>'.gsub('\\',"")  %><br /><% end %>
+  <% end %>
   </div>
 <\% end %>

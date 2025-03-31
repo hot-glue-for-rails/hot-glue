@@ -24,17 +24,18 @@ class AssociationField < Field
       raise(HotGlue::Error, exit_message)
     end
 
-    @assoc_class = eval(assoc_model.try(:class_name))
+    if ! eval("#{class_name}.reflect_on_association(:#{assoc}).polymorphic?")
+      @assoc_class = eval(assoc_model.try(:class_name))
 
-    name_list = [:name, :to_label, :full_name, :display_name, :email]
+      name_list = [:name, :to_label, :full_name, :display_name, :email]
 
-    if assoc_class && name_list.collect{ |field|
-      assoc_class.respond_to?(field.to_s) || assoc_class.instance_methods.include?(field)
-    }.none?
-      exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{@assoc_name} association on the #{class_name} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
-      raise(HotGlue::Error, exit_message)
+      if assoc_class && name_list.collect{ |field|
+        assoc_class.respond_to?(field.to_s) || assoc_class.instance_methods.include?(field)
+      }.none?
+        exit_message = "Oops: Missing a label for `#{assoc_class}`. Can't find any column to use as the display label for the #{@assoc_name} association on the #{class_name} model. TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name 5) email. You can implement any of these directly on your`#{assoc_class}` model (can be database fields or model methods) or alias them to field you want to use as your display label. Then RERUN THIS GENERATOR. (Field used will be chosen based on rank here.)"
+        raise(HotGlue::Error, exit_message)
+      end
     end
-
   end
 
   def assoc_label
@@ -110,7 +111,15 @@ class AssociationField < Field
       # else
       # end
     elsif modify_as && modify_as[:typeahead]
-      search_url  = "#{namespace ? namespace + "_" : ""}#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
+      search_url  = "#{namespace ? namespace + "_" : ""}" +
+        modify_as[:nested].join("_") + ( modify_as[:nested].any? ? "_" : "") +
+        + "#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
+
+
+      if @modify_as[:nested].any?
+        search_url  << "(" + modify_as[:nested].collect{|x| "#{x}"}.join(",") + ")"
+      end
+
       "<div class='typeahead typeahead--#{assoc.name}_id'
       data-controller='typeahead'
       data-typeahead-url-value='<%= #{search_url} %>'
@@ -132,7 +141,12 @@ class AssociationField < Field
 
       is_owner = name == ownership_field
       assoc_class_name = assoc.class_name.to_s
-      display_column = HotGlue.derrive_reference_name(assoc_class_name)
+      if assoc_class
+        display_column = HotGlue.derrive_reference_name(assoc_class_name)
+      else
+        # polymorphic
+        display_column = "name"
+      end
 
       if hawk_keys[assoc.foreign_key.to_sym]
         hawk_definition = hawk_keys[assoc.foreign_key.to_sym]
@@ -140,6 +154,7 @@ class AssociationField < Field
       else
         hawked_association = "#{assoc.class_name}.all"
       end
+
 
       (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
         "  <%= f.collection_select(:#{name}, #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: #{singular}.#{name} }, class: 'form-control') %>\n" +
@@ -170,9 +185,16 @@ class AssociationField < Field
 
   def line_field_output
 
-    display_column =  HotGlue.derrive_reference_name(assoc_class.to_s)
 
-    "<%= #{singular}.#{assoc}.try(:#{display_column}) || '<span class=\"content \">MISSING</span>'.html_safe %>"
+    if assoc_class
+      display_column =  HotGlue.derrive_reference_name(assoc_class.to_s)
+
+      "<%= #{singular}.#{assoc}.try(:#{display_column}) || '<span class=\"content \">MISSING</span>'.html_safe %>"
+    else
+      "<%= #{singular}.#{assoc}.try(:to_label) || '<span class=\"content \">MISSING</span>'.html_safe %>"
+
+    end
+
   end
 
 
@@ -232,6 +254,13 @@ class AssociationField < Field
     #   "\n     "
   end
 
+  def newline_after_field?
+    if modify_as && modify_as[:typeahead]
+      false
+    else
+      true
+    end
+  end
 
   def where_query_statement
     ".where(*#{name}_query)"

@@ -674,7 +674,9 @@ Applies a badge `bg-primary` to rows with opened_at truthy and `bg-secondary` to
 to display a badge on everything, use the `none` modifier with the
 `--modify=opened_at{none}[bg-dark]`
 
+For the `$` modifier only, if the field name ends with `_cents`, the modifier will automatically divide the field by 100 before displaying it.
 
+(This is consistent with Stripe'e paradigm to always store money in cents, and this way I force myself to put `_cents` on the end of my field names to remind myself that they are in cents.)
 
 ### `--alt-foreign-key-lookup=`
 
@@ -786,6 +788,23 @@ end
 
 
 Because Hot Glue detects the `*_able?` methods at build time, if you add them to your policy, you will have to rebuild your scaffold.
+
+
+### `--pundit-policy-override`
+if you use the flag `--pundit-policy-override` your controller operations will bypass the invisible (pundit provided) access control and use the pundit policy you specify.
+
+example
+
+`rails generate hot_glue:scaffold Invoice --gd --pundit-policy-override='UniqueInvoicePolicy'`
+
+You will implement a Pundit policy for `UniqueInvoicePolicy` and it should implement actions with question mark `?` endings corresponding to the same actions you are building, `new?`, `create?`, `edit?`, `update?`, and `destroy?`
+
+If provided, the output code looks something like (in this example, showing the `edit?` method)
+
+```
+    skip_authorization
+    raise Pundit::NotAuthorizedError if ! UniqueInvoicePolicy.edit?
+```
 
 
 ### `--show-only=`
@@ -987,6 +1006,13 @@ Omits controller.
 
 Omits list views. 
 
+`--new-button-position` (above, below; default: above)
+Show the new button above or below the list.
+
+`--downnest-shows-headings` (default: false)
+Show headings above downnested portals.
+
+
 ### `--big-edit`
 
 If you do not want inline editing of your list items but instead want to fallback to full-page style behavior for your edit views, use `--big-edit`. 
@@ -1106,7 +1132,16 @@ Use `before` to make the labels come before or `after` to make them come after. 
 
 Omits the heading of column names that appears above the 1st row of data.
 
+### `--include-object-names`
 
+When you are "Editing X" we specify that X is a ___ (author, book, room, etc)
+
+e.g. "Editing author Edgar Allan Poe" vs "Editing Edgar Allan Poe"
+
+Can also be specified globally in `config/hot_glue.yml`
+
+
+### Code insertions
 
 `--code-before-create`
 `--code-after-create`
@@ -1585,6 +1620,76 @@ puts the value into the search box and the id into a hidden field.
 
 You need to making a selection *and* click "Save" to update the record.
 
+The typeahead itself can be both namespaced and nested. (Remember, all controllers are generated at the namespace.)
+
+Pay close attention to a nested typeahead: When generating the typeahead scaffold use both `--namespace=aaa` and `--nested=bbb/ccc`
+
+In this example, the typeahead controller will operate at a namespace of `aaa` with two parents: `bbb` and `ccc`
+
+Combined with `--auth-identifier`, you can load only objects that are related from the `ccc` thing that gets loaded off the `bbb` thing that gets loaded off the current_user.
+
+This scopes the list returned by the typeahead. 
+
+You need to specify this twice: Once when specifying the typehead scaffold, and also any place in a regular scaffold that uses typeahead:
+
+For example, assuming we have a reciprocal has_many through for Accounts & Users
+
+user.rb
+```
+has_many :account_users
+has_many :accounts, through: :account_users
+```
+
+
+account.rb
+```
+has_many :account_users
+has_many :users, through: :account_users
+```
+
+
+`bin/rails generate hot_glue:scaffold Member --auth='current_user' --auth-identifier='user' --auth-identifier=user --modify='user_id{typeahead}[account]'`
+
+in our routes.rb file, we have
+```
+namespace :account_dashboard do
+  resources :accounts do
+    resources :users_typeahead
+    resources :rooms do
+      resources :members
+    end
+  end
+end 
+```
+
+Notice that the scaffold with the references to users is 2 levels deep: accounts -> rooms -> members (and is also in a namespace)
+
+Notice also that the *users typeahead* operates only one level deep in the same namespace.
+
+This means that to find users within the search, the essential piece of information is the account, because we want to scope the result set to the users belong to that account.
+
+• The account must belong to the current_user (notice the account uses nested account provided by the route)
+• Any users found by the typeahead must belong to the account
+
+```
+  def account
+    @account ||= current_user.accounts.find(params[:account_id]) 
+  end
+  
+  def index
+    authorize User, :typeahead? 
+    query = params[:query]
+    @typeahead_identifier = params[:typeahead_identifier]
+    @users = account.users.where("LOWER(email) LIKE ?  ", "%#{query.downcase}%").limit(10)
+    render layout: false
+  end
+```
+
+
+
+--
+
+
 ### TinyMCE
 1. `bundle add tinymce-rails` to add it to your Gemfile
 
@@ -1658,10 +1763,92 @@ If you have a partial in your view folder called `_list_after_each_row_heading`,
 
 The `within` partials should do operations within the form (like hidden fields), and the `after` partials should do entirely unrelated operations, like a different form entirely.
 
-These automatic pickups for partials are detected at buildtime. This means that if you add these partials later, you must rebuild your scaffold.
+These automatic pickups for partials are detected at build time. This means that if you add these partials later, you must rebuild your scaffold.
 
 
 # VERSION HISTORY
+
+#### 2025-03-31 v0.6.16
+
+• Downnested Portals are now built using Bootstrap Tab Panes
+
+Downnested portals are now built with bootstrap tab panes (always) and are no longer stacked on top of one another.
+
+It looks like this:
+https://getbootstrap.com/docs/5.0/components/navs-tabs/#javascript-behavior
+
+
+
+
+• Pundit Policy Override
+
+if you use the flag `--pundit-policy-override` your controller operations will bypass the invisible (pundit provided) access control and use the pundit policy you specify.
+
+example
+
+`rails generate hot_glue:scaffold Invoice --gd --pundit-policy-override='UniqueInvoicePolicy'`
+
+Implement  `UniqueInvoicePolicy` using actions with question mark `?` endings corresponding to the same actions you are building, `new?`, `create?`, `edit?`, `update?`, and `destroy?`
+
+
+
+
+
+
+#### 2025-03-17 - v0.6.15
+
+• now store on your current_user model (this is automatically passed into the method modify_date_inputs_on_params). HG will set user-inputted values correctly to daylight savings time during April-Nov months only (#195)
+• fixes issue with turbo frame name after create is rendered (#194)
+• removes vestigates of optionalized partents
+
+
+#### 2025-02-28 - v0.6.14
+
+• fixes bug in association field involving scaffolds built without nesting
+• fixes bug in paginated display
+• when applying $ modifier to a numerical field, if the field ends with `_cents`, the number will be /100 before being displayed
+
+
+#### 2025-02-20 - v0.6.12
+• adds decimal field type (displays as float-- there is no special handling for decimal on the UI)
+• guard against polymorphic belongs_to -- not a full implementation for polymorphic fields, just hides the fields on the form; on the list uses to_label always
+• fixes heading with multiword names on downnested portals to display nicely capitalized
+• removes open struct
+
+#### 2025-01-28 v0.6.11
+
+• Typeahead now can use --auth, --auth-identifier, --namespace, and --nested
+• Works similar to how same flags work on scaffold generator. (Notice that the typeahead generator is a completely separate generator). 
+• When using nested, your results are scoped the parent objects in the nest chain (which is the last one)
+
+e.g.
+`bin/rails generate hot_glue:scaffold Member --auth='current_user' --auth-identifier='user' --auth-identifier=user --modify='user_id{typeahead}[account]'`
+
+here the user_id field on members will use a typeahead that is built in the namespace `account_dashboard` under 1 parent: `account`
+
+This would be used in conjunction with a typeahead built using the same namespace and nesting that matches:
+
+```
+bin/rails generate hot_glue:typeahead User --namespace='account_dashboard' --nested='account' --auth-identifier='user' --auth='current_user'
+```
+
+(See 'typeahead' section for details)
+
+`--include-object-names`
+
+When you are "Editing X" we specify that X is a ___ (author, book, room, etc)
+
+e.g. "Editing author Edgar Allan Poe" vs "Editing Edgar Allan Poe"
+
+Can also be specified globally in `config/hot_glue.yml`
+
+
+`--new-button-position` (above, below; default: above)
+Show the new button above or below the list.
+
+`--downnest-shows-headings` (default: false)
+Show headings above downnested portals.
+
 
 #### 2024-12-25 v0.6.10
     • adds `--no-nav-menu` option to supress writing to the _nav template

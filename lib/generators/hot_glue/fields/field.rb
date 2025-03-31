@@ -145,7 +145,11 @@ class Field
     res = +''
 
     if modify_as[:cast] && modify_as[:cast] == "$"
-      res += "<%= number_to_currency(#{singular}.#{name}) %>"
+      if name.ends_with?("_cents")
+        res += "<%= number_to_currency(#{singular}.#{name} / 100) %>"
+      else
+        res += "<%= number_to_currency(#{singular}.#{name}) %>"
+      end
     elsif modify_as[:binary]
       res += "<%= #{singular}.#{name} ? '#{modify_as[:binary][:truthy]}' : '#{modify_as[:binary][:falsy]}' %>"
     elsif modify_as[:tinymce]
@@ -215,4 +219,9 @@ class Field
   def code_to_reset_match_if_search_is_blank
     nil
   end
+
+  def newline_after_field?
+    false
+  end
+
 end

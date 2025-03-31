@@ -28,7 +28,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :layout_strategy, :form_placeholder_labels,
                 :form_labels_position, :no_nav_menu, :pundit,
                 :self_auth, :namespace_value, :record_scope, :related_sets,
-                :search_clear_button, :search_autosearch
+                :search_clear_button, :search_autosearch, :include_object_names
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -77,11 +77,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :no_list_heading, type: :boolean, default: false
 
   # determines if the labels show up BEFORE or AFTER on the NEW/EDIT (form)
-  class_option :form_labels_position, type: :string, default: 'after' #  choices are before, after, omit
+  class_option :form_labels_position, type: :string #  choices are before, after, omit
   class_option :form_placeholder_labels, type: :boolean, default: false # puts the field names into the placeholder labels
 
   # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
-  class_option :inline_list_labels, default: 'omit' # choices are before, after, omit
+  class_option :inline_list_labels, default: nil # default is set below
   class_option :factory_creation, default: ''
   class_option :alt_foreign_key_lookup, default: '' #
   class_option :attachments, default: ''
@@ -91,6 +91,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :modify, default: {}
   class_option :display_as, default: {}
   class_option :pundit, default: nil
+  class_option :pundit_policy_override, default: nil
   class_option :related_sets, default: ''
   class_option :code_before_create, default: nil
   class_option :code_after_create, default: nil
@@ -98,7 +99,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :code_after_update, default: nil
   class_option :record_scope, default: nil
   class_option :no_nav_menu, type: :boolean, default: false # suppress writing to _nav template
-
+  class_option :include_object_names, type: :boolean, default: false
+  class_option :new_button_position, type: :string, default: 'above'
+  class_option :downnest_shows_headings, type: :boolean, default: nil
 
 
   # SEARCH OPTIONS
@@ -260,7 +263,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         elsif $2 == "tinymce"
           @modify_as[key.to_sym] =  {tinymce: 1, badges: $3}
         elsif $2 == "typeahead"
-          @modify_as[key.to_sym] =  {typeahead: 1, badges: $3}
+          if !$3.nil?
+            nested = $3.split("/")
+          else
+            nested = []
+          end
+          @modify_as[key.to_sym] =  {typeahead: 1, nested: nested}
         elsif $2 == "timezone"
           @modify_as[key.to_sym] =  {timezone: 1, badges: $3}
         elsif $2 == "none"
@@ -300,12 +308,20 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     setup_hawk_keys
     @form_placeholder_labels = options['form_placeholder_labels'] # true or false
-    @inline_list_labels = options['inline_list_labels'] || 'omit' # 'before','after','omit'
+    @inline_list_labels = options['inline_list_labels'] || get_default_from_config(key: :inline_list_labels) || 'omit' # 'before','after','omit'
 
     @form_labels_position = options['form_labels_position']
-    if !['before', 'after', 'omit'].include?(@form_labels_position)
-      raise HotGlue::Error, "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
+    if @form_labels_position.nil?
+      @form_labels_position = get_default_from_config(key: :form_labels_position)
+      if @form_labels_position.nil?
+        @form_labels_position = 'after'
+      end
+    else
+      if !['before', 'after', 'omit'].include?(@form_labels_position)
+        raise HotGlue::Error, "You passed '#{@form_labels_position}' as the setting for --form-labels-position but the only allowed options are before, after (default), and omit"
+      end
     end
+
 
     if !['before', 'after', 'omit'].include?(@inline_list_labels)
       raise HotGlue::Error, "You passed '#{@inline_list_labels}' as the setting for --inline-list-labels but the only allowed options are before, after, and omit (default)"
@@ -337,8 +353,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @smart_layout = options['smart_layout']
     @record_scope = options['record_scope']
+    @downnest_shows_headings = options['downnest_shows_headings']
+    @new_button_position = options['new_button_position']
+
 
     @pundit = options['pundit']
+    @pundit_policy_override = options['pundit_policy_override']
 
     @no_nav_menu = options['no_nav_menu']
 
@@ -360,6 +380,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @downnest_children = @downnest.split(",").map { |child| child.gsub("+", "") }
       @downnest_object = HotGlue.construct_downnest_object(@downnest)
     end
+
+    @include_object_names = options['include_object_names'] || get_default_from_config(key: :include_object_names)
+
+
 
     if @god
       # @auth = nil
@@ -462,6 +486,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @factory_creation = options['factory_creation'].gsub(";", "\n")
     identify_object_owner
     setup_fields
+
 
     if (@columns - @show_only - (@ownership_field ? [@ownership_field.to_sym] : [])).empty?
       @no_field_form = true
@@ -636,6 +661,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @menu_file_exists = true if @nested_set.none? && File.exist?("#{Rails.root}/app/views/#{namespace_with_trailing_dash}_menu.#{@markup}")
 
     @turbo_streams = !!options['with_turbo_streams']
+
+    puts "show only #{@show_only}"
+    puts "update show only #{@update_show_only}"
+
   end
 
   def setup_hawk_keys
@@ -1069,7 +1098,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @controller_build_folder,
                                  nested_set: @nested_set,
-                                 with_params: true,
+                                 with_params: false,
                                  top_level: false)
   end
 
@@ -1077,7 +1106,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @singular,
                                  nested_set: @nested_set,
-                                 with_params: true,
+                                 with_params: false,
                                  put_form: true,
                                  top_level: false)
   end
@@ -1086,7 +1115,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: @singular,
                                  nested_set: @nested_set,
-                                 with_params: true,
+                                 with_params: false,
                                  put_form: true)
   end
 
@@ -1095,7 +1124,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  target: @singular,
                                  nested_set: @nested_set,
                                  modifier: "edit_",
-                                 with_params: true,
+                                 with_params: false,
                                  put_form: true)
   end
 
@@ -1124,7 +1153,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  target: singular,
                                  nested_set: @nested_set,
                                  modifier: "new_",
-                                 with_params: true)
+                                 with_params: false)
   end
 
   def nested_assignments
@@ -1222,7 +1251,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       path: HotGlue.optionalized_ternary( namespace: @namespace,
                                           target: @singular,
                                           nested_set: @nested_set,
-                                          with_params: true,
+                                          with_params: false,
                                           put_form: true),
                                           big_edit: @big_edit,
                                           singular: singular,
@@ -1315,9 +1344,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       append_text = "  <li class='nav-item'>
     <%= link_to '#{@list_label_heading.humanize}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
   </li>"
+      alt_append_text = "  <li class='nav-item'>
+    <%= link_to '#{@list_label_heading.humanize.upcase}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
+  </li>"
 
       text = File.read(nav_file)
-      if text.include?(append_text)
+      if text.include?(append_text) || text.include?(alt_append_text)
         puts "SKIPPING: Nav link for #{singular_name} already exists in #{nav_file}"
       else
         puts "APPENDING: nav link for #{singular_name} #{nav_file}"
@@ -1516,9 +1548,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if @nested_set.none?
       "\"\""
     else
-      @nested_set.collect { |arg|
-        "(((\"__#{arg[:singular]}-\#{" + "@" + arg[:singular] + ".id}\") if @" + arg[:singular] + ") || \"\")"
-      }.join(" + ")
+      "\"" + @nested_set.collect { |arg|
+        "__#{arg[:singular]}-\#{" + "@" + arg[:singular] + ".id}"
+      }.join("") + "\""
     end
   end
 

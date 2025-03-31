@@ -8,13 +8,27 @@
 <% if @big_edit %>
     </div>
   </div>
+</div>
+
 
 
 <% if @downnest_children.any? && @big_edit %>
-  <% each_downnest_width = @downnest_children.count == 1 ? 33 : (53/@downnest_children.count).floor %>
-    <% @downnest_object.each do |downnest, size| %>
-      <div class="row">
-        <div class="col-md-<%= @big_edit  ? 12 : 6  %>">
+<div class="container" data-controller="bootstrap-tabbed-nav">
+    <ul class="nav nav-tabs" id="<%= singular + "_downnest_portals" %>" role="tablist">
+      <% @downnest_object.each_with_index do |data,index| %>
+        <% downnest = data[0] %>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link <%= "active" if index==0 %>" id="<%= downnest %>-tab" data-bs-toggle="tab" data-bs-target="#<%= downnest %>-portal" type="button" role="tab" aria-controls="home" aria-selected="true">
+            <%= downnest.titlecase.pluralize %>
+          </button>
+        </li>
+      <% end %>
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+      <% @downnest_object.each_with_index do |data, index| %>
+        <% downnest = data[0] %>
+        <div class="tab-pane fade <%= "show active" if index==0 %>" id="<%= downnest %>-portal" role="tabpanel" aria-labelledby="<%= downnest %>-tab">
           <% downnest_object =  eval("#{singular_class}.reflect_on_association(:#{downnest})") %>
           <% if downnest_object.nil?; raise "no relationship for downnested portal `#{downnest}` found on `#{singular_class}`; please check relationship for has_many :#{downnest}"; end; %>
           <% downnest_class = downnest_object.class_name %>
@@ -22,11 +36,12 @@
           <% downnest_style = @layout_strategy.downnest_style %>
 
           <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest_object_name %>/list", locals: {<%= @singular %>: @<%= @singular %>,  <%= downnest_object_name %>: @<%= @singular %>.<%= downnest %><% if @nested_set.any? %>, <%= @nested_set.collect{|x| "#{x[:singular]}: @#{x[:singular]}"}.join(", ") %>, nested_for: "<%= @nested_set.collect{|x| "#{x[:singular]}-" + "\#{" + "@#{x[:singular]}.id}"}.join("__") %>__<%= singular %>-#{@<%= @singular %>.id}" <% end %> } \%>
-
-          </div>
         </div>
       <% end %>
-  <% end %>
+    </div>
+
 </div>
 <% end %>
 
+
+<% end %>

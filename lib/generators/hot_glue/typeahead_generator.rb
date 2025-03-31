@@ -5,6 +5,10 @@ module HotGlue
     source_root File.expand_path('templates', __dir__)
     class_option :namespace, type: :string, default: nil
     class_option :search_by, type: :string, default: nil
+    class_option :nested, type: :string, default: nil
+    class_option :auth, type: :string, default: nil
+    class_option :auth_identifier, type: :string, default: nil
+
 
     include DefaultConfigLoader
     def filepath_prefix
@@ -28,6 +32,25 @@ module HotGlue
       @class_name = args.first
       @plural = args.first.tableize.pluralize
       @namespace = options['namespace']
+      @nested = options['nested'] if options['nested']
+
+      if !@nested.nil?
+        @nested_set = @nested.split("/").collect { |arg|
+          is_optional = arg.start_with?("~")
+          arg.gsub!("~", "")
+          {
+            singular: arg,
+            plural: arg.pluralize,
+            optional: is_optional
+          }
+        }
+        puts "NESTING: #{@nested_set}"
+      else
+        @nested_set = []
+      end
+
+      @auth = options['auth'] || "current_user"
+      @auth_identifier = options['auth_identifier'] || "user"
 
       if options['search_by']
         @search_by = options['search_by'].split(",")
