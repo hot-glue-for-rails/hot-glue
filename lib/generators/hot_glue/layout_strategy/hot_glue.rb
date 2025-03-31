@@ -39,18 +39,18 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
     "scaffold-row"
   end
 
-  def column_classes_for_form_fields
+  def column_classes_for_form_fields(size = nil)
     "scaffold-cell"
   end
 
   def row_heading_classes
     "scaffold-heading-row"
   end
-  def column_classes_for_line_fields
+  def column_classes_for_line_fields(size = nil)
     "scaffold-cell"
   end
 
-  def column_classes_for_column_headings
+  def column_classes_for_column_headings(size = nil)
     "scaffold-cell"
   end
 

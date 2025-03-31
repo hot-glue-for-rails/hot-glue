@@ -17,20 +17,20 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   end
 
 
-  def column_classes_for_form_fields
-    "col-md-#{builder.layout_object[:columns][:size_each]}"
+  def column_classes_for_form_fields(size = nil)
+    "col-md-#{size || builder.layout_object[:columns][:size_each]}"
   end
 
-  def column_classes_for_column_headings
-    column_classes_for_line_fields
+  def column_classes_for_column_headings(size = nil)
+    column_classes_for_line_fields(size)
   end
 
   def container_name
     "container"
   end
 
-  def column_classes_for_line_fields
-    "col-sm-#{builder.layout_object[:columns][:size_each]}"
+  def column_classes_for_line_fields(size = nil)
+    "col-sm-#{size || builder.layout_object[:columns][:size_each]}"
   end
 
   def column_width

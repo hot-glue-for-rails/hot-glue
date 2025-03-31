@@ -40,7 +40,8 @@ module HotGlue
         layout_object = {
           columns: {
             size_each: smart_layout ? bootstrap_column_width : (specified_grouping_mode ? nil : 1),
-            container: [] # array of arrays
+            container: [] , # array of arrays,
+            bootstrap_column_width: []
           },
           portals:  {
 
@@ -99,7 +100,7 @@ module HotGlue
             }
             layout_object[:columns][:container] = (0..available_columns-1).collect { |x|  [columns[x]] }
             layout_object[:columns][:container].reject!{|x| x == [nil]}
-            layout_object[:columns][:size_each] = bootstrap_column_width
+            # layout_object[:columns][:size_each] = bootstrap_column_width
           end
         elsif ! specified_grouping_mode
           # not smart and no specified grouping
@@ -117,21 +118,32 @@ module HotGlue
           # input control
 
           user_layout_columns = @include_setting.split(":")
-          size_each = (bootstrap_columns / user_layout_columns.count).floor # this is the bootstrap size
 
-          layout_object[:columns][:size_each] = size_each
+          extra_columns = available_columns - user_layout_columns.size
+          # size_each = (bootstrap_columns / user_layout_columns.count).floor # this is the bootstrap size
+          #
+          # layout_object[:columns][:size_each] = size_each
 
-          if user_layout_columns.size > available_columns
-            raise "Your include statement #{@include_setting } has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
-          end
+          # if user_layout_columns.size > available_columns
+          #   raise "Your include statement #{@include_setting } has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
+          # end
           user_layout_columns.each_with_index  do |column,i|
             layout_object[:columns][:container][i] = column.split(",").collect(&:to_sym)
+
+            default_col_width = 1
+            if extra_columns > 0
+              default_col_width += 1
+              extra_columns -= 1
+            end
+            layout_object[:columns][:bootstrap_column_width][i] = default_col_width
           end
 
           if user_layout_columns.size < layout_object[:columns][:container].size
             layout_object[:columns][:container].reject!{|x| x == []}
           end
+
         end
+
 
         puts "*** constructed smart layout columns #{layout_object.inspect}"
         layout_object
