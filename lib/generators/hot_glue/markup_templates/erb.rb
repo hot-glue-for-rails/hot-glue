@@ -116,13 +116,13 @@ module  HotGlue
           end
         }.compact.join("\n")
 
-        size = col.size
+        size = layout_object[:columns][:bootstrap_column_width][columns.index(column)]
         "  <div class='#{layout_strategy.column_classes_for_form_fields(size)} search-cell--#{singular}--#{column.join("-")}' >" +
           cols_result + "</div>"
 
       }.join("\n")
       res << "</div>"
-      res << "<div class='#{layout_strategy.column_classes_for_form_fields(size)}'>"
+      res << "<div class='#{layout_strategy.column_classes_for_form_fields(nil)}'>"
       if @search_clear_button
         res << "<\%= f.button \"Clear\", name: nil, 'data-search-form-target': 'clearButton', class: 'btn btn-sm btn-secondary' %>"
       end

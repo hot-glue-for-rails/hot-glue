@@ -6,9 +6,9 @@ class LayoutStrategy::Tailwind < LayoutStrategy::Base
   def button_style ; ""; end
   def column_headings_col_style; "" ; end
   def column_width; ""; end
-  def column_classes_for_line_fields; ""; end
-  def column_classes_for_form_fields; ""; end
-  def column_classes_for_column_headings; ""; end
+  def column_classes_for_line_fields(size = nil); ""; end
+  def column_classes_for_form_fields(size = nil); ""; end
+  def column_classes_for_column_headings(size = nil); ""; end
   def col_width; 100; end
   def container_name; ""; end
   def downnest_style ; ""; end
