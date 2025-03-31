@@ -32,6 +32,7 @@ class EnumField < Field
 
   def form_field_output
     enum_type = eval("#{class_name}.columns.select{|x| x.name == '#{name}'}[0].sql_type")
+
     if eval("defined? #{class_name}.#{enum_type}_labels") == "method"
       enum_definer = "#{class_name}.#{enum_type}_labels"
     else

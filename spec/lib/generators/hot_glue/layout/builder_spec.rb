@@ -39,7 +39,7 @@ describe HotGlue::Layout::Builder do
 
 
           expect(result).to eq({columns: {size_each: 2,
-                                           # :button_columns => 2,
+                                          :bootstrap_column_width=>[],
                                            container:  [[:name, :author_id],
                                               [:blurb, :long_description],
                                               [:cost, :how_many_printed],
