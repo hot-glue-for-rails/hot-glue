@@ -91,6 +91,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :modify, default: {}
   class_option :display_as, default: {}
   class_option :pundit, default: nil
+  class_option :pundit_policy_override, default: nil
   class_option :related_sets, default: ''
   class_option :code_before_create, default: nil
   class_option :code_after_create, default: nil
@@ -357,6 +358,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
     @pundit = options['pundit']
+    @pundit_policy_override = options['pundit_policy_override']
 
     @no_nav_menu = options['no_nav_menu']
 
