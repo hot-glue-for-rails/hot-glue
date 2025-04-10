@@ -2,13 +2,7 @@ class RelatedSetField < Field
 
   attr_accessor :assoc_name, :assoc_class, :assoc
 
-  def initialize( class_name: , default_boolean_display:, display_as: ,
-                  name: , singular: , plural:,
-                  alt_lookup: ,
-                  update_show_only: ,
-                  hawk_keys: , auth: , sample_file_path:,  ownership_field: ,
-                  attachment_data: nil , layout_strategy: , form_placeholder_labels: nil,
-                  form_labels_position:, modify_as: , self_auth: , namespace:, pundit:)
+  def initialize( scaffold: )
     super
 
     @related_set_model = eval("#{class_name}.reflect_on_association(:#{name})")

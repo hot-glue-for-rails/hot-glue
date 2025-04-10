@@ -53,25 +53,25 @@ class FieldFactory
       raise "Field type could be identified  #{name} "
     end
 
-    @field = field_class.new(name: name,
-                             layout_strategy: generator.layout_strategy,
-                             form_placeholder_labels: generator.form_placeholder_labels,
-                             form_labels_position: generator.form_labels_position,
-                             ownership_field: generator.ownership_field,
-                             hawk_keys: generator.hawk_keys,
-                             auth: generator.auth,
-                             class_name: generator.singular_class,
-                             alt_lookup: generator.alt_lookups[name] || nil,
-                             singular: generator.singular,
-                             self_auth: generator.self_auth,
-                             update_show_only: generator.update_show_only,
-                             attachment_data: generator.attachments[name.to_sym],
-                             sample_file_path: generator.sample_file_path,
-                             modify_as: generator.modify_as[name.to_sym] || nil,
-                             plural: generator.plural,
-                             display_as: generator.display_as[name.to_sym] || nil,
-                             default_boolean_display: generator.default_boolean_display,
-                             namespace: generator.namespace_value,
-                             pundit: generator.pundit )
+    @field = field_class.new(scaffold: generator,  name: name)
+      #                        layout_strategy: generator.layout_strategy,
+      #                        form_placeholder_labels: generator.form_placeholder_labels,
+      #                        form_labels_position: generator.form_labels_position,
+      #                        ownership_field: generator.ownership_field,
+      #                        hawk_keys: generator.hawk_keys,
+      #                        auth: generator.auth,
+      #                        class_name: generator.singular_class,
+      #                        alt_lookup: generator.alt_lookups[name] || nil,
+      #                        singular: generator.singular,
+      #                        self_auth: generator.self_auth,
+      #                        update_show_only: generator.update_show_only,
+      #                        attachment_data: generator.attachments[name.to_sym],
+      #                        sample_file_path: generator.sample_file_path,
+      #                        modify_as: generator.modify_as[name.to_sym] || nil,
+      #                        plural: generator.plural,
+      #                        display_as: generator.display_as[name.to_sym] || nil,
+      #                        default_boolean_display: generator.default_boolean_display,
+      #                        namespace: generator.namespace_value,
+      #                        pundit: generator.pundit )
   end
 end

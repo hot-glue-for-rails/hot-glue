@@ -2,7 +2,9 @@
   <h3>
     <%= @new_form_heading %>
   </h3>
-  <\%= form_with model:  <%= singular %>, url: <%= form_path_new_helper %>, method: :post<%= @display_edit_after_create ? ", html: {'data-turbo': false}" : "" %> do  |f| \%>
+  <\%= form_with model:  <%= singular %>,
+         <% if @stimmify %>data: {controller: '<%= @stimmify %>' },
+<% end %>url: <%= form_path_new_helper %>, method: :post<%= @display_edit_after_create ? ", html: {'data-turbo': false}" : "" %> do  |f| \%>
     <\%=  render partial: "<%= namespace_with_slash +  @controller_build_folder %>/form",
 locals: { <%=  singular %>: <%= singular %>, f: f}<%= @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}}: {})" }.join %> \%>
 
