@@ -10,6 +10,18 @@ module HotGlue
   class Error < StandardError
   end
 
+
+  def self.to_camel_case(str)
+    words = str.split(/[^a-zA-Z0-9]/) # split by non-alphanumeric characters
+    return '' if words.empty?
+
+    first_word = words.first.downcase
+    rest_words = words[1..-1].map { |w| w.capitalize }
+
+    first_word + rest_words.join
+  end
+
+
   def self.construct_downnest_object(input)
     res = input.split(",").map { |child|
       child_name = child.gsub("+","")

@@ -28,7 +28,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :layout_strategy, :form_placeholder_labels,
                 :form_labels_position, :no_nav_menu, :pundit,
                 :self_auth, :namespace_value, :record_scope, :related_sets,
-                :search_clear_button, :search_autosearch, :include_object_names
+                :search_clear_button, :search_autosearch, :include_object_names,
+                :stimmify, :stimmify_camel
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -102,6 +103,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :include_object_names, type: :boolean, default: false
   class_option :new_button_position, type: :string, default: 'above'
   class_option :downnest_shows_headings, type: :boolean, default: nil
+  class_option :stimmify, type: :string, default: nil
 
 
   # SEARCH OPTIONS
@@ -524,7 +526,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     #     {  key: value }
     #     : nil}.compact
 
-
+    @stimmify = options['stimmify']
+    if @stimmify === "stimmify"
+      @stimmify = @singular.gsub("_", "-") + "-form"
+      @stimify_camel = @stimmify.camelize
+    end
 
     # build a new polymorphic object
     @associations = []
@@ -649,7 +655,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         search_position: @search_position,
         search_clear_button: @search_clear_button,
         search_autosearch: @search_autosearch,
-        form_path: form_path_new_helper
+        form_path: form_path_new_helper,
+        stimmify: @stimmify,
+        stimmify_camel: @stimmify_camel,
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")
@@ -1083,6 +1091,17 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  target: @controller_build_folder,
                                  nested_set: @nested_set,
                                  top_level: top_level)
+  end
+
+  def edit_parent_path_helper
+    # the path to the edit route of the PARENT
+    if @nested_set.any? && @nested
+      "edit_#{@namespace + "_" if @namespace}#{(@nested_set.collect { |x| x[:singular] }.join("_") + "_" if @nested_set.any?)}path(" +
+      "#{@nested_set.collect { |x| x[:singular] }.join(", ")}" + ")"
+
+    else
+      "edit_#{@namespace + "_" if @namespace}path"
+    end
   end
 
   def datetime_fields_list

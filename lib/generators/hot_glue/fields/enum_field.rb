@@ -31,6 +31,12 @@ class EnumField < Field
   end
 
   def form_field_output
+
+    if @stimmify
+      col_target = HotGlue.to_camel_case(name.to_s.gsub("_", " "))
+      data_attr = ",  data: {'#{@stimmify}-target': '#{col_target}'} "
+    end
+
     enum_type = eval("#{class_name}.columns.select{|x| x.name == '#{name}'}[0].sql_type")
 
     if eval("defined? #{class_name}.#{enum_type}_labels") == "method"
@@ -39,7 +45,7 @@ class EnumField < Field
       enum_definer = "#{class_name}.defined_enums['#{name}']"
     end
 
-    res = "<%= f.collection_select(:#{name},  enum_to_collection_select(#{enum_definer}), :key, :value, {include_blank: true, selected: #{singular}.#{name} }, class: 'form-control') %>"
+    res = "<%= f.collection_select(:#{name}, enum_to_collection_select(#{enum_definer}), :key, :value, {include_blank: true, selected: #{singular}.#{name} }, class: 'form-control' #{data_attr} )%>"
 
 
     if modify_as && modify_as[:enum] == :partials

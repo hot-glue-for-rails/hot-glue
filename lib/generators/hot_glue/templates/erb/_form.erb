@@ -2,7 +2,8 @@
 <%= form_fields_html %>
 
   <div class="<%= @layout_strategy.column_classes_for_button_column %>">
-    <\%= link_to "Cancel", <%= path_helper_plural %>,  {class: "btn btn-secondary"} %><% if @no_field_form %>
+    <\%= link_to "Cancel", <%=
+    @nested_set.none? ? path_helper_plural : edit_parent_path_helper %>,  {class: "btn btn-secondary"} %><% if @no_field_form %>
     <\%= f.hidden_field "_________" %><% end %>
     <\%= f.submit "Save", class: "btn btn-primary pull-right" %>
   </div>
