@@ -6,31 +6,12 @@ class Field
                 :self_auth,
                 :singular_class,  :singular, :sql_type, :ownership_field,
                 :update_show_only, :namespace, :pundit, :plural,
-                :stimmify
+                :stimmify, :hidden
 
 
   def initialize(
     scaffold:, name:
-    # auth: ,
-    # attachment_data: nil,
-    # class_name: ,
-    # alt_lookup: ,
-    # default_boolean_display: ,
-    # display_as: ,
-    # form_labels_position:,
-    # form_placeholder_labels: ,
-    # hawk_keys: nil,
-    # layout_strategy:  ,
-    # modify_as: ,   #note non-standard naming as to avoid collision with Ruby reserved word modify
-    # name: ,
-    # ownership_field: ,
-    # sample_file_path: nil,
-    # singular: ,
-    # update_show_only:,
-    # self_auth:,
-    # namespace:,
-    # pundit: ,
-    # plural:
+
   )
     @name = name
     @layout_strategy = scaffold.layout_strategy
@@ -48,12 +29,11 @@ class Field
     @display_as = scaffold.display_as
     @pundit = scaffold.pundit
     @plural = scaffold.plural
-
-
     @self_auth = scaffold.self_auth
     @default_boolean_display = scaffold.default_boolean_display
     @namespace = scaffold.namespace_value
     @stimmify = scaffold.stimmify
+    @hidden = scaffold.hidden
 
 
     # TODO: remove knowledge of subclasses from Field
@@ -131,7 +111,7 @@ class Field
   end
 
   def viewable_output
-    if modify_as
+    if modify_as[:modify]
       modified_display_output(show_only: true)
     else
       field_view_output
@@ -185,8 +165,18 @@ class Field
     if modify_as && modify_as[:timezone]
       "<%= f.time_zone_select :#{name}, ActiveSupport::TimeZone.all, {}, {class: 'form-control'} %>"
     else
-      "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  +  " %>\n " + "\n"
+      parts = name.split('_')
+      camelcase_name = parts.first + parts[1..].map(&:capitalize).join
+      "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  + (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "")  +  " %>\n " + "\n"
     end
+  end
+
+  def hidden_output
+    parts = name.split('_')
+    camelcase_name = parts.first + parts[1..].map(&:capitalize).join
+    "<%= f.hidden_field :#{name}, value: #{singular}.#{name} " +
+      (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "") +
+       " %>"
   end
 
   def text_area_output(field_length, extra_classes: "")
@@ -194,7 +184,11 @@ class Field
     if lines > 5
       lines = 5
     end
-    "<%= f.text_area :#{name}, class: 'form-control#{extra_classes}', autocomplete: 'off', cols: 40, rows: '#{lines}'"  + ( form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "") + " %>"
+
+    parts = name.split('_')
+    camelcase_name = parts.first + parts[1..].map(&:capitalize).join
+    "<%= f.text_area :#{name}, class: 'form-control#{extra_classes}', autocomplete: 'off', cols: 40, rows: '#{lines}'"  + ( form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "") +
+      (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "") + " %>"
   end
 
   def modify_binary? # safe

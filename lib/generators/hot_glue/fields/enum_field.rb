@@ -31,7 +31,6 @@ class EnumField < Field
   end
 
   def form_field_output
-
     if @stimmify
       col_target = HotGlue.to_camel_case(name.to_s.gsub("_", " "))
       data_attr = ",  data: {'#{@stimmify}-target': '#{col_target}'} "

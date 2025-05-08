@@ -31,12 +31,13 @@ class RelatedSetField < Field
 
   def form_field_output
     disabled_syntax = +""
+
     if pundit
       disabled_syntax << ", {disabled: ! #{class_name}Policy.new(#{auth}, @#{singular}).role_ids_able?}"
     end
     " <%= f.collection_check_boxes :#{association_ids_method}, #{association_class_name}.all, :id, :label, {}#{disabled_syntax} do |m| %>
-      <%= m.check_box %> <%= m.label %><br />
-    <% end %>"
+    <%= m.check_box %> <%= m.label %><br />
+  <% end %>"
   end
 
   def association_ids_method

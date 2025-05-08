@@ -29,7 +29,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :form_labels_position, :no_nav_menu, :pundit,
                 :self_auth, :namespace_value, :record_scope, :related_sets,
                 :search_clear_button, :search_autosearch, :include_object_names,
-                :stimmify, :stimmify_camel
+                :stimmify, :stimmify_camel, :hidden
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -57,6 +57,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :big_edit, type: :boolean, default: false
   class_option :show_only, type: :string, default: ""
   class_option :update_show_only, type: :string, default: ""
+  class_option :hidden, type: :string, default: ""
   class_option :ujs_syntax, type: :boolean, default: nil
   class_option :downnest, type: :string, default: nil
   class_option :magic_buttons, type: :string, default: nil
@@ -223,23 +224,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @include_fields += options['include'].split(":").collect { |x| x.split(",") }.flatten.collect(&:to_sym)
     end
 
-    # @show_only_data = {}
-    # if !options['show_only'].empty?
-    #   show_only_input = options['show_only'].split(",")
-    #   show_only_input.each do |setting|
-    #     if setting.include?("[")
-    #       setting =~ /(.*)\[(.*)\]/
-    #       key, lookup_as = $1, $2
-    #       @show_only_data[key.to_sym] = {cast: $2 }
-    #     else
-    #       @show_only_data[setting.to_sym] = {cast: nil}
-    #     end
-    #   end
-    # end
+
 
     @show_only = options['show_only'].split(",").collect(&:to_sym)
     if @show_only.any?
       puts "show only field #{@show_only}}"
+    end
+
+    @hidden = options['hidden'].split(",").collect(&:to_sym)
+    if @hidden.any?
+      puts "hidden fields #{@hidden}}"
     end
 
     @modify_as = {}
@@ -658,6 +652,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         form_path: form_path_new_helper,
         stimmify: @stimmify,
         stimmify_camel: @stimmify_camel,
+        hidden: @hidden
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")

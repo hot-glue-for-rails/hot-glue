@@ -95,7 +95,8 @@ class AssociationField < Field
       assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
 
       alt = alt_lookup[:lookup_as]
-      "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" %>"
+      parts = name.split('_')
+      "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" " + (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "")  + "%>"
 
       # if modify_as
       #   modified_display_output

@@ -1381,6 +1381,54 @@ Then run:
 This will 1) copy the dropzone_controller.js file into your app and 2) add the dropzone css into your app's application.css or application.bootstrap.css file.
 
 
+### Attach Stimulus JS Controllers to Your Forms with `--stimmify` or `--stimmify=xyz`
+
+Automatically build the new and edit form with `data-controller='xyz'` to attach cooresponding stimulus controllers. 
+
+If you use the shorthand (specify no `=`) your stimulus controller's name will be inferred from the Singular form of the scaffolding beild built, with dashes for underscores, and ending with `-form`
+
+`@singular.gsub("_", "-") + "-form"`
+
+(For example, `rails g hot_glue:scaffold Thing --stimmy` generates a form that looks like
+
+```
+    <%= form_with model: thing,
+                url: things_path(account,crusade,email_template),
+                  html: {
+                      'data-controller': "thing-form"
+                      }
+          %>
+          ...
+
+```
+
+Note that your fields also appended with `data-thing-target=abc` and also `data-thing-target=abcWrapper`
+(assuming `thing` is the scaffold being built and abc is the field name)
+
+
+Here, we are building a `thing` scaffold. The  field `name` is decorated twice: once for the wrapper span and again for the specific form element itself.
+```
+<span class="" data-thing-form-target="nameWrapper">
+        <input value="asdfadf" autocomplete="off" size="40" class="form-control" type="" data-thing-form-target="name" name="thing[name]" id="thing_name">
+
+
+      <label class="text-muted small form-text" for="">Name</label>
+    </span>
+```
+
+Your stimulus controller will need two targets for each field:
+
+```
+  static targets = ['name', 'nameWrapper'];
+```
+You can interact with the wrapper for things like clicks or hovers, or to hide/show the entire box surrounding the form element.
+
+Use the form field element itself to affect things like enabled or the value of the field.
+
+
+For a crash course on Stimulus, see
+https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js-basics-with-importmap-rails/
+
 
 
 ### `--factory-creation={ ... }`
@@ -1767,6 +1815,37 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+#### 2025-05-07 - v0.6.17
+
+
+• Adds Stimulus JS & `--stimmify` or `--stimmify=xyz`
+
+Automatically build the new and edit form with `data-controller='xyz'` to attach stimulus
+
+If you use the shorthand (specify no `=`) your stimulus controller's name will be inferred from the Singular form of the scaffolding beild built, with dashes for underscores, and ending with `-form`
+
+(For example, `rails g hot_glue:scaffold Thing --stimmy` generates a form that looks like
+
+```
+    <%= form_with model: thing,
+                url: things_path(account,crusade,email_template),
+                  html: {
+                      'data-controller': "thing-form"
+                      }
+          %>
+          ...
+
+```
+
+Note that your fields also appended with `data-thing-target=abc` and also `data-thing-target=abcWrapper`
+
+See section "Attach Stimulus JS Controllers to Your Forms with `--stimmify` or `--stimmify=xyz`"
+
+For a crash course on Stimulus, see
+https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js-basics-with-importmap-rails/
+
+
 
 #### 2025-03-31 v0.6.16
 

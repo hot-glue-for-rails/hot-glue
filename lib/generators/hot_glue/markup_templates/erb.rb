@@ -11,7 +11,7 @@ module  HotGlue
                   :attachments, :show_only, :columns_map, :pundit, :related_sets,
                   :search, :search_fields, :search_query_fields, :search_position,
                   :form_path, :layout_object, :search_clear_button, :search_autosearch,
-                  :stimmify, :stimmify_camel
+                  :stimmify, :stimmify_camel, :hidden
 
 
     def initialize(singular:, singular_class: ,
@@ -23,7 +23,7 @@ module  HotGlue
                  update_show_only:, attachments: , columns_map:, pundit:, related_sets:,
                  search:, search_fields:, search_query_fields: , search_position:,
                  search_clear_button:, search_autosearch:, layout_object:,
-                 form_path: , stimmify: , stimmify_camel:)
+                 form_path: , stimmify: , stimmify_camel:, hidden: )
 
 
       @form_path = form_path
@@ -34,6 +34,7 @@ module  HotGlue
       @layout_object = layout_object
       @stimmify = stimmify
       @stimmify_camel = stimmify_camel
+      @hidden = hidden
 
       @singular = singular
       @singular_class = singular_class
@@ -176,11 +177,17 @@ module  HotGlue
               col_target = HotGlue.to_camel_case(col.to_s.gsub("_", " "))
               data_attr = " data-#{@stimmify}-target='#{col_target}Wrapper'"
             end
-            add_spaces_each_line( "\n  <span #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>' #{data_attr} >\n" +
-                                    add_spaces_each_line( (form_labels_position == 'before' ? (the_label || "") + "<br />\n"  : "") +
-                                                        +  field_result +
-                                        (form_labels_position == 'after' ? (  columns_map[col].newline_after_field? ? "<br />\n" : "") + (the_label || "") : "")  , 4) +
-                                    "\n  </span>\n ", 2)
+
+            unless hidden.include?(col.to_sym)
+              add_spaces_each_line( "\n  <span #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>' #{data_attr} >\n" +
+                                      add_spaces_each_line( (form_labels_position == 'before' ? (the_label || "") + "<br />\n"  : "") +
+                                                              +  field_result +
+                                                              (form_labels_position == 'after' ? (  columns_map[col].newline_after_field? ? "<br />\n" : "") + (the_label || "") : "")  , 4) +
+                                      "\n  </span>\n ", 2)
+            else
+              columns_map[col].hidden_output
+            end
+
 
           }.join("") + "\n  </div>"
       }.join("\n")
@@ -221,6 +228,7 @@ module  HotGlue
           if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
           end
+
           field_output = columns_map[col].line_field_output
           
           label = "<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"

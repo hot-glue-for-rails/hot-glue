@@ -1,6 +1,6 @@
 class AttachmentField < Field
   attr_accessor :attachment_data
-  def initialize(scaffold:)
+  def initialize(scaffold:, name:)
     super
 
     @attachment_data = attachment_data
