@@ -868,6 +868,92 @@ Remember, if there's a corresponding `*_able?` method on the policy, it will be 
 As shown in the method `name_able?` of the example ThingPolicy above, if this field on your policy returns true, the field will be editable. If it returns false, the field will be viewable (read-only).
 
 
+### `--hidden`
+
+Separate list of fields. 
+
+These fields will be hidden from the form but will exist as hidden_field, and so the update will still work.
+
+
+EXAMPLE:
+
+```
+bin/rails generate hot_glue:scaffold Wrapper --namespace='account_dashboard' --no-nav-menu --big-edit --smart-layout --stimmify --hidden=raw_source
+```
+
+In the `wrappers` folder, I am using a special sticky partial `_edit_within_form.html.erb`, which contains code preserved from build-to-build and included in the form:
+
+
+```
+<div class="row" style="position: relative; width: 100%; overflow: auto;">
+  <div class="col-md-12">
+    <div id="wrapper__raw_source"
+         style="position: static">
+
+      <div id="wrapper__raw_source-toolbar">
+
+      </div>
+
+
+      <div cols="60"
+           data-wrapper-form-target="editor"
+           id="wrapper__raw_source-editor" >
+      </div>
+    </div>
+
+
+  </div>
+</div>
+<div class="col-md-2">
+</div>
+```
+
+
+Then, create a `app/javascript/controllers/wrapper_form_controller.js` file with the following code:
+
+```javascript
+
+
+import { Controller } from "@hotwired/stimulus"
+
+import {basicSetup} from "codemirror"
+import {EditorView} from "@codemirror/view"
+
+// Connects to data-controller="wrapper-form"
+export default class extends Controller {
+  static targets = ['rawSource', 'name', 'nameWrapper', 'editor'];
+
+  connect() {
+    console.log("WrapperFormController connected")
+    this.account_id = this.element.dataset['accountId']
+    this.crusade_id = this.element.dataset['crusadeId']
+    this.wrapper_id = this.element.dataset['wrapperId']
+
+    const view = new EditorView({
+      doc: this.rawSourceTarget.value,
+      parent: this.editorTarget,
+      extensions: [basicSetup]
+    })
+
+    this.view = view;
+    this.element.addEventListener('submit', this.formSubmit.bind(this))
+    // this.previewButtonTarget.addEventListener('click', this.previewClick.bind(this))
+  }
+
+  formSubmit(event) {
+    this.rawSourceTarget.value = this.view.state.doc.toString();
+  }
+}
+```
+
+Notice we are also using `--stimmify` to decorate the form with a Stimulus controller.
+
+The code above uses Code Mirror to act as a code editor, which requires pulling the value off the hidden form element (putting it into the code mirror interface) and pushing it back into the hidden form element when the Submit button is clicked.
+
+
+
+
+
 ### `--ujs_syntax=true` (Default is set automatically based on whether you have turbo-rails installed)
 
 If you are pre-Turbo (UJS), your delete buttons will come out like this:
@@ -1844,6 +1930,12 @@ See section "Attach Stimulus JS Controllers to Your Forms with `--stimmify` or `
 
 For a crash course on Stimulus, see
 https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js-basics-with-importmap-rails/
+
+
+• Adds `--hidden` option
+Pass a list of fields, like include or show-only. This will make the field hidden on the form <strong>but still updated via its submission</strong>
+
+
 
 
 
