@@ -5,50 +5,37 @@ class Field
                 :hawk_keys,   :layout_strategy, :limit, :modify_as, :name, :object, :sample_file_path,
                 :self_auth,
                 :singular_class,  :singular, :sql_type, :ownership_field,
-                :update_show_only, :namespace, :pundit, :plural
+                :update_show_only, :namespace, :pundit, :plural,
+                :stimmify, :hidden, :attachment_data
+
 
   def initialize(
-    auth: ,
-    attachment_data: nil,
-    class_name: ,
-    alt_lookup: ,
-    default_boolean_display: ,
-    display_as: ,
-    form_labels_position:,
-    form_placeholder_labels: ,
-    hawk_keys: nil,
-    layout_strategy:  ,
-    modify_as: ,   #note non-standard naming as to avoid collision with Ruby reserved word modify
-    name: ,
-    ownership_field: ,
-    sample_file_path: nil,
-    singular: ,
-    update_show_only:,
-    self_auth:,
-    namespace:,
-    pundit: ,
-    plural:
+    scaffold:, name:
+
   )
     @name = name
-    @layout_strategy = layout_strategy
-    @alt_lookup = alt_lookup
-    @singular = singular
-    @class_name = class_name
-    @update_show_only = update_show_only
-    @hawk_keys = hawk_keys
-    @auth = auth
-    @sample_file_path = sample_file_path
-    @form_placeholder_labels = form_placeholder_labels
-    @ownership_field = ownership_field
-    @form_labels_position = form_labels_position
-    @modify_as = modify_as
-    @display_as = display_as
-    @pundit = pundit
-    @plural = plural
+    @layout_strategy = scaffold.layout_strategy
+    @alt_lookup = scaffold.alt_lookups
+    @singular = scaffold.singular
+    @class_name = scaffold.singular_class
+    @update_show_only = scaffold.update_show_only
+    @hawk_keys = scaffold.hawk_keys
+    @auth = scaffold.auth
+    @sample_file_path = scaffold.sample_file_path
+    @form_placeholder_labels = scaffold.form_placeholder_labels
+    @ownership_field = scaffold.ownership_field
+    @form_labels_position = scaffold.form_labels_position
+    @modify_as = scaffold.modify_as
+    @display_as = scaffold.display_as
+    @pundit = scaffold.pundit
+    @plural = scaffold.plural
+    @self_auth = scaffold.self_auth
+    @default_boolean_display = scaffold.default_boolean_display
+    @namespace = scaffold.namespace_value
+    @stimmify = scaffold.stimmify
+    @hidden = scaffold.hidden
+    @attachment_data = scaffold.attachments[name.to_sym]
 
-    @self_auth = self_auth
-    @default_boolean_display = default_boolean_display
-    @namespace = namespace
 
     # TODO: remove knowledge of subclasses from Field
     unless self.class == AttachmentField || self.class == RelatedSetField
@@ -125,7 +112,7 @@ class Field
   end
 
   def viewable_output
-    if modify_as
+    if modify_as[:modify]
       modified_display_output(show_only: true)
     else
       field_view_output
@@ -179,8 +166,18 @@ class Field
     if modify_as && modify_as[:timezone]
       "<%= f.time_zone_select :#{name}, ActiveSupport::TimeZone.all, {}, {class: 'form-control'} %>"
     else
-      "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  +  " %>\n " + "\n"
+      parts = name.split('_')
+      camelcase_name = parts.first + parts[1..].map(&:capitalize).join
+      "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  + (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "")  +  " %>\n " + "\n"
     end
+  end
+
+  def hidden_output
+    parts = name.split('_')
+    camelcase_name = parts.first + parts[1..].map(&:capitalize).join
+    "<%= f.hidden_field :#{name}, value: #{singular}.#{name} " +
+      (@stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "") +
+       " %>"
   end
 
   def text_area_output(field_length, extra_classes: "")
@@ -188,11 +185,15 @@ class Field
     if lines > 5
       lines = 5
     end
-    "<%= f.text_area :#{name}, class: 'form-control#{extra_classes}', autocomplete: 'off', cols: 40, rows: '#{lines}'"  + ( form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "") + " %>"
+
+    parts = name.split('_')
+    camelcase_name = parts.first + parts[1..].map(&:capitalize).join
+    "<%= f.text_area :#{name}, class: 'form-control#{extra_classes}', autocomplete: 'off', cols: 40, rows: '#{lines}'"  + ( form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "") +
+      (@stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "") + " %>"
   end
 
-  def modify_binary? # safe
-    !!(modify_as && modify_as[:binary])
+  def modify_binary?
+    !!(modify_as && modify_as[name.to_sym] && modify_as[name.to_sym][:binary])
   end
 
   def display_boolean_as
@@ -201,8 +202,8 @@ class Field
       @default_boolean_display = "radio"
     end
 
-    if display_as
-      return display_as[:boolean] || "radio"
+    if  display_as[name.to_sym]
+      return display_as[name.to_sym][:boolean] || "radio"
     else
       return @default_boolean_display
     end

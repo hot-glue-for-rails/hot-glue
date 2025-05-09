@@ -54,7 +54,6 @@ describe HotGlue::ErbTemplate do
       singular: options[:singular] || "jkl",
       hawk_keys: options[:hawk_keys] || {},
       ownership_field: "hgi",
-      layout_strategy: layout_strategy,
       magic_buttons: [],
       small_buttons: false,
       inline_list_labels: 'omit',
@@ -73,7 +72,10 @@ describe HotGlue::ErbTemplate do
       search_clear_button: nil,
       search_autosearch: nil,
       layout_object: layout_object,
-      form_path: "/jkls")
+      form_path: "/jkls",
+      stimmify: nil,
+      stimmify_camel: nil,
+      hidden: [])
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy)
 
@@ -89,17 +91,7 @@ describe HotGlue::ErbTemplate do
 
       selected: FieldFactory.new(type: :boolean, name: "selected", generator: generator).field,
       name: FieldFactory.new(type: :string, name: "name", generator: generator).field,
-      hgi_id: AssociationField.new(
-              alt_lookup: nil,
-              plural: "hgis",
-              self_auth: false,
-              default_boolean_display: "radio" , display_as: {},
-              namespace: nil,
-              layout_strategy: layout_strategy,
-                                   form_labels_position: 'before',
-                                   ownership_field: "", name: "hgi_id", class_name: "Jkl",
-                                   singular: "Jkl", update_show_only: nil, hawk_keys: options[:hawk_keys],
-                                   auth: "", sample_file_path: nil, attachment_data: nil, modify_as: {}, pundit: false),
+      hgi_id: AssociationField.new(  scaffold: generator, name: "hgi_id"),
       time_of_day: FieldFactory.new(type: :time, name: "time_of_day", generator: generator).field,
       release_on: FieldFactory.new(type: :date, name: "release_on", generator: generator).field,
       approved_at: FieldFactory.new(type: :datetime, name: "approved_at", generator: generator).field,
@@ -145,7 +137,10 @@ describe HotGlue::ErbTemplate do
       search_clear_button: nil,
       search_autosearch: nil,
       layout_object: layout_object,
-      form_path: "/jkls"
+      form_path: "/jkls",
+      stimmify: nil,
+      stimmify_camel: nil,
+      hidden: options[:hidden] || []
       )
 
     @template_builder.all_line_fields( perc_width: 15,
@@ -158,7 +153,9 @@ describe HotGlue::ErbTemplate do
     it "should create two columns" do
       res = factory_all_form_fields({columns: [:name, :blurb]})
 
-      expect(res).to include("<div class='scaffold-cell cell--jkl--name' >  \n    <span class='<%= \"alert alert-danger\" if jkl.errors.details.keys.include?(:name) %>'  style=\"display: inherit;\"  >" )
+      expect(res).to include("<div class='scaffold-cell cell--jkl--name' >")
+
+      expect(res).to include(" <span class='<%= \"alert alert-danger\" if jkl.errors.details.keys.include?(:name) %>'  >" )
       expect(res).to include("<%= f.text_field :name, value: jkl.name, autocomplete: 'off', size: 40, class: 'form-control', type: '' %>")
     end
 
@@ -208,7 +205,7 @@ describe HotGlue::ErbTemplate do
       expect(res).to include('<div class=\'scaffold-cell cell--jkl--genre\' >')
       expect(res).to include('<span class=\'<%= "alert alert-danger" if jkl.errors.details.keys.include?(:genre) %>')
 
-      expect(res).to include("<%= f.collection_select(:genre,  enum_to_collection_select(Jkl.defined_enums['genre']), :key, :value, {include_blank: true, selected: jkl.genre }, class: 'form-control') %>")
+      expect(res).to include("<%= f.collection_select(:genre, enum_to_collection_select(Jkl.defined_enums['genre']), :key, :value, {include_blank: true, selected: jkl.genre }, class: 'form-control'  )%>")
     end
   end
 

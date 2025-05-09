@@ -10,8 +10,10 @@ class DateField < Field
 
 
   def form_field_output
-    "<%= date_field_localized(f, :#{name}, #{singular}.#{name}, label:  '#{ name.to_s.humanize  }') %>"
-  end
+    parts = name.to_s.split('_')
+    camelcase_name = parts.map(&:capitalize).join
+    "<%= date_field_localized(f, :#{name}, #{singular}.#{name}, label:  '#{ name.to_s.humanize  }'" + (stimmify ? ", html: {'data-#{@stimmify}-target': '#{camelcase_name}'}" : "")  + ") %>"
+end
 
   def line_field_output
     "<% unless #{singular}.#{name}.nil? %>

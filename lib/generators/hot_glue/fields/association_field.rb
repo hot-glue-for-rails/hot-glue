@@ -5,17 +5,8 @@ class AssociationField < Field
 
   attr_accessor :assoc_name, :assoc_class, :assoc, :alt_lookup
 
-  def initialize( alt_lookup: ,
-                  class_name: ,
-                  default_boolean_display:, display_as: ,
-                  name: , singular: ,
-                  update_show_only: ,
-                  hawk_keys: , auth: , sample_file_path:,  ownership_field: ,
-                  attachment_data: nil , layout_strategy: , form_placeholder_labels: nil,
-                  form_labels_position:, modify_as: , self_auth: , namespace:, pundit: , plural:  )
+  def initialize(scaffold: , name: )
     super
-
-
     @assoc_model = eval("#{class_name}.reflect_on_association(:#{assoc})")
 
     if assoc_model.nil?
@@ -97,14 +88,14 @@ class AssociationField < Field
   def form_field_output
     assoc_name = name.to_s.gsub("_id","")
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
-
-    if alt_lookup
+    if alt_lookup.keys.include?(name.to_sym)
       alt = alt_lookup[:lookup_as]
       assoc_name = name.to_s.gsub("_id","")
       assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
 
       alt = alt_lookup[:lookup_as]
-      "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" %>"
+      parts = name.split('_')
+      "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" " + (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "")  + "%>"
 
       # if modify_as
       #   modified_display_output
@@ -156,8 +147,17 @@ class AssociationField < Field
       end
 
 
+      if @stimmify
+        col_target = HotGlue.to_camel_case(name.to_s.gsub("_", " "))
+        data_attr = ", data: {'#{@stimmify}-target': '#{col_target}'} "
+      els
+        data_attr = ""
+      end
+
+
+
       (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
-        "  <%= f.collection_select(:#{name}, #{hawked_association}, :id, :#{display_column}, {prompt: true, selected: #{singular}.#{name} }, class: 'form-control') %>\n" +
+        "  <%= f.collection_select(:#{name}, #{hawked_association}, :id, :#{display_column}, { prompt: true, selected: #{singular}.#{name} }, class: 'form-control'#{data_attr}) %>\n" +
         (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
         (is_owner ? "\n<% end %>" : "")
     end

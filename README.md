@@ -868,6 +868,92 @@ Remember, if there's a corresponding `*_able?` method on the policy, it will be 
 As shown in the method `name_able?` of the example ThingPolicy above, if this field on your policy returns true, the field will be editable. If it returns false, the field will be viewable (read-only).
 
 
+### `--hidden`
+
+Separate list of fields. 
+
+These fields will be hidden from the form but will exist as hidden_field, and so the update will still work.
+
+
+EXAMPLE:
+
+```
+bin/rails generate hot_glue:scaffold Wrapper --namespace='account_dashboard' --no-nav-menu --big-edit --smart-layout --stimmify --hidden=raw_source
+```
+
+In the `wrappers` folder, I am using a special sticky partial `_edit_within_form.html.erb`, which contains code preserved from build-to-build and included in the form:
+
+
+```
+<div class="row" style="position: relative; width: 100%; overflow: auto;">
+  <div class="col-md-12">
+    <div id="wrapper__raw_source"
+         style="position: static">
+
+      <div id="wrapper__raw_source-toolbar">
+
+      </div>
+
+
+      <div cols="60"
+           data-wrapper-form-target="editor"
+           id="wrapper__raw_source-editor" >
+      </div>
+    </div>
+
+
+  </div>
+</div>
+<div class="col-md-2">
+</div>
+```
+
+
+Then, create a `app/javascript/controllers/wrapper_form_controller.js` file with the following code:
+
+```javascript
+
+
+import { Controller } from "@hotwired/stimulus"
+
+import {basicSetup} from "codemirror"
+import {EditorView} from "@codemirror/view"
+
+// Connects to data-controller="wrapper-form"
+export default class extends Controller {
+  static targets = ['rawSource', 'name', 'nameWrapper', 'editor'];
+
+  connect() {
+    console.log("WrapperFormController connected")
+    this.account_id = this.element.dataset['accountId']
+    this.crusade_id = this.element.dataset['crusadeId']
+    this.wrapper_id = this.element.dataset['wrapperId']
+
+    const view = new EditorView({
+      doc: this.rawSourceTarget.value,
+      parent: this.editorTarget,
+      extensions: [basicSetup]
+    })
+
+    this.view = view;
+    this.element.addEventListener('submit', this.formSubmit.bind(this))
+    // this.previewButtonTarget.addEventListener('click', this.previewClick.bind(this))
+  }
+
+  formSubmit(event) {
+    this.rawSourceTarget.value = this.view.state.doc.toString();
+  }
+}
+```
+
+Notice we are also using `--stimmify` to decorate the form with a Stimulus controller.
+
+The code above uses Code Mirror to act as a code editor, which requires pulling the value off the hidden form element (putting it into the code mirror interface) and pushing it back into the hidden form element when the Submit button is clicked.
+
+
+
+
+
 ### `--ujs_syntax=true` (Default is set automatically based on whether you have turbo-rails installed)
 
 If you are pre-Turbo (UJS), your delete buttons will come out like this:
@@ -1381,6 +1467,54 @@ Then run:
 This will 1) copy the dropzone_controller.js file into your app and 2) add the dropzone css into your app's application.css or application.bootstrap.css file.
 
 
+### Attach Stimulus JS Controllers to Your Forms with `--stimmify` or `--stimmify=xyz`
+
+Automatically build the new and edit form with `data-controller='xyz'` to attach cooresponding stimulus controllers. 
+
+If you use the shorthand (specify no `=`) your stimulus controller's name will be inferred from the Singular form of the scaffolding beild built, with dashes for underscores, and ending with `-form`
+
+`@singular.gsub("_", "-") + "-form"`
+
+(For example, `rails g hot_glue:scaffold Thing --stimmy` generates a form that looks like
+
+```
+    <%= form_with model: thing,
+                url: things_path(account,crusade,email_template),
+                  html: {
+                      'data-controller': "thing-form"
+                      }
+          %>
+          ...
+
+```
+
+Note that your fields also appended with `data-thing-target=abc` and also `data-thing-target=abcWrapper`
+(assuming `thing` is the scaffold being built and abc is the field name)
+
+
+Here, we are building a `thing` scaffold. The  field `name` is decorated twice: once for the wrapper span and again for the specific form element itself.
+```
+<span class="" data-thing-form-target="nameWrapper">
+        <input value="asdfadf" autocomplete="off" size="40" class="form-control" type="" data-thing-form-target="name" name="thing[name]" id="thing_name">
+
+
+      <label class="text-muted small form-text" for="">Name</label>
+    </span>
+```
+
+Your stimulus controller will need two targets for each field:
+
+```
+  static targets = ['name', 'nameWrapper'];
+```
+You can interact with the wrapper for things like clicks or hovers, or to hide/show the entire box surrounding the form element.
+
+Use the form field element itself to affect things like enabled or the value of the field.
+
+
+For a crash course on Stimulus, see
+https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js-basics-with-importmap-rails/
+
 
 
 ### `--factory-creation={ ... }`
@@ -1767,6 +1901,43 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+#### 2025-05-0097 - v0.6.17
+
+
+• Adds Stimulus JS & `--stimmify` or `--stimmify=xyz`
+
+Automatically build the new and edit form with `data-controller='xyz'` to attach stimulus
+
+If you use the shorthand (specify no `=`) your stimulus controller's name will be inferred from the Singular form of the scaffolding beild built, with dashes for underscores, and ending with `-form`
+
+(For example, `rails g hot_glue:scaffold Thing --stimmy` generates a form that looks like
+
+```
+    <%= form_with model: thing,
+                url: things_path(account,crusade,email_template),
+                  html: {
+                      'data-controller': "thing-form"
+                      }
+          %>
+          ...
+
+```
+
+Note that your fields also appended with `data-thing-target=abc` and also `data-thing-target=abcWrapper`
+
+See section "Attach Stimulus JS Controllers to Your Forms with `--stimmify` or `--stimmify=xyz`"
+
+For a crash course on Stimulus, see
+https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js-basics-with-importmap-rails/
+
+
+• Adds `--hidden` option
+Pass a list of fields, like include or show-only. This will make the field hidden on the form *but still updated via its submission*
+
+
+
+
 
 #### 2025-03-31 v0.6.16
 
