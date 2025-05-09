@@ -1902,7 +1902,7 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
-#### 2025-05-07 - v0.6.17
+#### 2025-05-0097 - v0.6.17
 
 
 • Adds Stimulus JS & `--stimmify` or `--stimmify=xyz`
@@ -1933,7 +1933,7 @@ https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js
 
 
 • Adds `--hidden` option
-Pass a list of fields, like include or show-only. This will make the field hidden on the form <strong>but still updated via its submission</strong>
+Pass a list of fields, like include or show-only. This will make the field hidden on the form *but still updated via its submission*
 
 
 
