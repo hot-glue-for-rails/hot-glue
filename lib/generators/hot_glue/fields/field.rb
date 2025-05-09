@@ -6,7 +6,7 @@ class Field
                 :self_auth,
                 :singular_class,  :singular, :sql_type, :ownership_field,
                 :update_show_only, :namespace, :pundit, :plural,
-                :stimmify, :hidden
+                :stimmify, :hidden, :attachment_data
 
 
   def initialize(
@@ -34,6 +34,7 @@ class Field
     @namespace = scaffold.namespace_value
     @stimmify = scaffold.stimmify
     @hidden = scaffold.hidden
+    @attachment_data = scaffold.attachments[name.to_sym]
 
 
     # TODO: remove knowledge of subclasses from Field
@@ -175,7 +176,7 @@ class Field
     parts = name.split('_')
     camelcase_name = parts.first + parts[1..].map(&:capitalize).join
     "<%= f.hidden_field :#{name}, value: #{singular}.#{name} " +
-      (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "") +
+      (@stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "") +
        " %>"
   end
 
@@ -188,11 +189,11 @@ class Field
     parts = name.split('_')
     camelcase_name = parts.first + parts[1..].map(&:capitalize).join
     "<%= f.text_area :#{name}, class: 'form-control#{extra_classes}', autocomplete: 'off', cols: 40, rows: '#{lines}'"  + ( form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "") +
-      (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "") + " %>"
+      (@stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "") + " %>"
   end
 
-  def modify_binary? # safe
-    !!(modify_as && modify_as[:binary])
+  def modify_binary?
+    !!(modify_as && modify_as[name.to_sym] && modify_as[name.to_sym][:binary])
   end
 
   def display_boolean_as
@@ -201,8 +202,8 @@ class Field
       @default_boolean_display = "radio"
     end
 
-    if display_as
-      return display_as[:boolean] || "radio"
+    if  display_as[name.to_sym]
+      return display_as[name.to_sym][:boolean] || "radio"
     else
       return @default_boolean_display
     end
