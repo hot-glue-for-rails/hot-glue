@@ -5,7 +5,7 @@ class AssociationField < Field
 
   attr_accessor :assoc_name, :assoc_class, :assoc, :alt_lookup
 
-  def initialize(scaffold:  )
+  def initialize(scaffold: , name: )
     super
     @assoc_model = eval("#{class_name}.reflect_on_association(:#{assoc})")
 
@@ -88,8 +88,7 @@ class AssociationField < Field
   def form_field_output
     assoc_name = name.to_s.gsub("_id","")
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
-
-    if alt_lookup
+    if alt_lookup.keys.include?(name.to_sym)
       alt = alt_lookup[:lookup_as]
       assoc_name = name.to_s.gsub("_id","")
       assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
@@ -147,8 +146,18 @@ class AssociationField < Field
         hawked_association = "#{assoc.class_name}.all"
       end
 
+
+      if @stimmify
+        col_target = HotGlue.to_camel_case(name.to_s.gsub("_", " "))
+        data_attr = ", data: {'#{@stimmify}-target': '#{col_target}'} "
+      els
+        data_attr = ""
+      end
+
+
+
       (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
-        "  <%= f.collection_select(:#{name}, #{hawked_association}, :id, :#{display_column}, { prompt: true, selected: #{singular}.#{name} }, class: 'form-control'#{data_attr}') %>\n" +
+        "  <%= f.collection_select(:#{name}, #{hawked_association}, :id, :#{display_column}, { prompt: true, selected: #{singular}.#{name} }, class: 'form-control'#{data_attr}) %>\n" +
         (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
         (is_owner ? "\n<% end %>" : "")
     end

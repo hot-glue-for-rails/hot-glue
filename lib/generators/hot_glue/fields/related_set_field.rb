@@ -2,7 +2,7 @@ class RelatedSetField < Field
 
   attr_accessor :assoc_name, :assoc_class, :assoc
 
-  def initialize( scaffold: )
+  def initialize( scaffold: , name: )
     super
 
     @related_set_model = eval("#{class_name}.reflect_on_association(:#{name})")

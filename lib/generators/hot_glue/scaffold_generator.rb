@@ -437,6 +437,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @related_sets = {}
     related_set_input.each do |setting|
       name = setting.to_sym
+      byebug
       association_ids_method = eval("#{singular_class}.reflect_on_association(:#{setting.to_sym})").class_name.underscore + "_ids"
       class_name = eval("#{singular_class}.reflect_on_association(:#{setting.to_sym})").class_name
 
