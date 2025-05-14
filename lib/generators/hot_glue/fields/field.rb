@@ -225,4 +225,6 @@ class Field
     false
   end
 
+  def prelookup_syntax; nil; end
+
 end

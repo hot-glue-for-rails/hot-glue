@@ -888,8 +888,21 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def creation_syntax
-    if @factory_creation == ''
+    if @factory_creation == '' && ! @alt_lookups.any?
       "@#{singular } = #{ class_name }.new(modified_params)"
+    elsif @factory_creation == '' && @alt_lookups.any?
+
+      prelookup_syntax = @alt_lookups.collect{|lookup, data|
+        col = @columns_map[lookup.to_sym]
+        col.prelookup_syntax
+      }.join("\n")
+
+      prelookup_syntax + "\n     @#{singular } = #{ class_name }.new(modified_params" +
+        (@alt_lookups.any? ? (".merge(" + @alt_lookups.collect{|lookup,field|
+          field_name = lookup.gsub("_id","")
+          "#{field_name}: #{field_name}"
+        }.join(",") + ")" ) : "") + ")"
+
     else
       res = +"begin
       #{@factory_creation}
