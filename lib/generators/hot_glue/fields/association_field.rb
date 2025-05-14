@@ -272,11 +272,12 @@ class AssociationField < Field
 
   def prelookup_syntax
     field =  @alt_lookup[name.to_s]
-    lookup = field[:assoc].downcase
+    assoc_name = field[:assoc].downcase
     if field[:with_create]
-      "#{lookup.gsub("_id","")} = #{auth}.targets.find_or_create_by(#{field[:lookup_as]}: params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]}] )"
+
+      "#{assoc_name.gsub("_id","")} = #{auth}.#{assoc_name.pluralize}.find_or_create_by(#{field[:lookup_as]}: params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]}] )"
     else
-      "#{lookup.gsub("_id","")} = #{auth}.targets.find_by(#{field[:lookup_as]}: params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]} ] )"
+      "#{assoc_name.gsub("_id","")} = #{auth}.#{assoc_name.pluralize}.find_by(#{field[:lookup_as]}: params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]} ] )"
     end
   end
 
