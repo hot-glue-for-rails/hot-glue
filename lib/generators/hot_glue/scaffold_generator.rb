@@ -20,7 +20,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :big_edit, :button_icons, :bootstrap_column_width,
                 :columns,
                 :default_boolean_display,
-                :display_as, :downnest_children, :downnest_object, :hawk_keys, :layout_object,
+                :display_as, :downnest_children, :downnest_object, :god,  :hawk_keys, :layout_object,
                 :modify_as,
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting,
@@ -84,7 +84,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
   class_option :inline_list_labels, default: nil # default is set below
-  class_option :factory_creation, default: ''
+  class_option :factory_creation, default: nil
   class_option :alt_foreign_key_lookup, default: '' #
   class_option :attachments, default: ''
   class_option :stacked_downnesting, default: false
@@ -480,7 +480,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
     end
 
-    @factory_creation = options['factory_creation'].gsub(";", "\n")
+    unless options['factory_creation'].nil?
+      @factory_creation = options['factory_creation'].gsub(";", "\n")
+    end
+
     identify_object_owner
     setup_fields
 
@@ -506,6 +509,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       setting =~ /(.*){(.*)}/
       key, lookup_as = $1, $2
 
+      if !eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")})")
+        raise "couldn't find association for #{key} in the object #{class_name}"
+      end
       assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
 
       data = {lookup_as: lookup_as.gsub("+",""),
@@ -514,7 +520,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @alt_lookups[key] = data
     end
 
-    puts "------ ALT LOOKUPS for #{@alt_lookups}"
+
 
     # @update_alt_lookups = @alt_lookups.collect{|key, value|
     #   @update_show_only.include?(key) ?
@@ -575,6 +581,18 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
             puts "##############################################"
           end
         end
+      end
+    end
+
+
+    puts "------ ALT LOOKUPS for #{@alt_lookups}"
+    @alt_lookups.each do |key, value|
+      if !@columns_map[key.to_sym]
+        raise "You specified an alt-lookup for #{key} but that field does not exist in the list of columns"
+      elsif @god
+                              #awlays allow
+      elsif !@god && !eval("defined?(#{@auth}.#{value[:assoc]})")
+        raise "You specified an alt-lookup for #{key} but the association #{value[:assoc]} does not exist on the object #{@auth}; to fix, 1. associate #{value[:assoc].pluralize} to #{auth}, 2. run as a --gd controller, or 3. use a factory pattern to create the associated object.  "
       end
     end
 
@@ -888,9 +906,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def creation_syntax
-    if @factory_creation == '' && ! @alt_lookups.any?
+    if @factory_creation.nil? && ! @alt_lookups.any?
       "@#{singular } = #{ class_name }.new(modified_params)"
-    elsif @factory_creation == '' && @alt_lookups.any?
+    elsif @factory_creation.nil? && @alt_lookups.any?
 
       prelookup_syntax = @alt_lookups.collect{|lookup, data|
         col = @columns_map[lookup.to_sym]

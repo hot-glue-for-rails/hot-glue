@@ -272,13 +272,30 @@ class AssociationField < Field
 
   def prelookup_syntax
     field =  @alt_lookup[name.to_s]
-    assoc_name = field[:assoc].downcase
     if field[:with_create]
 
-      "#{assoc_name.gsub("_id","")} = #{auth}.#{assoc_name.pluralize}.find_or_create_by(#{field[:lookup_as]}: params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]}] )"
-    else
-      "#{assoc_name.gsub("_id","")} = #{auth}.#{assoc_name.pluralize}.find_by(#{field[:lookup_as]}: params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]} ] )"
-    end
-  end
+      method_name = "find_or_create_by"
 
+    else
+      method_name = "find_by"
+    end
+    field_name = field[:assoc].downcase.gsub("_id","")
+    assoc_class = field[:assoc].classify
+
+    assoc = plural
+
+    ## TODO: add the hawk here
+    res = +""
+    if !@god
+      res << "#{field_name} = #{auth}.#{assoc_name.pluralize}.#{method_name}(#{field[:lookup_as]}: #{singular}_params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]}] )"
+    else
+
+      assoc_name = field[:assoc]
+      res << "#{field_name} = #{assoc_class}.#{method_name}(#{field[:lookup_as]}: #{singular}_params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]}] )"
+    end
+
+    res << "\n    modified_params.tap { |hs| hs.delete(:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]})}"
+    return res
+
+  end
 end
