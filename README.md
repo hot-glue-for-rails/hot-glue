@@ -680,15 +680,47 @@ For the `$` modifier only, if the field name ends with `_cents`, the modifier wi
 
 ### `--alt-foreign-key-lookup=`
 
-Use for a join table to specify that a field should be looked up by a different field
+Use for a join table to specify that a field should be looked up by a different field.
 
+Use `+` to map to the `find_or_create_by` method. (Without `+` it will use `find_by`.)
 
-`./bin/rails generate hot_glue:scaffold AccountUser --alt-foreign-key-lookup=user_id{email}`
+This is accomlished using a little magic of a lookup field called `__lookup_X_Y` passed in the form parameters.
+
+The lookup field is used to look up the associated record, then deleted from the params.
+
+#### When used in `--gd` mode
+The lookup will use the base class and have access to all records.
+`user = User.find_or_create_by!(email: params[:__lookup_email])`
+`modified_params.tap { |hs| hs.delete(:__lookup_target_email)}`
+`modified_params.merge!(user: user)`
+
+Example 1
+`./bin/rails generate hot_glue:scaffold AccountUser --gd --alt-foreign-key-lookup=user_id{email}`
 
 Here we are specifying that the `user_id` field should be looked up by the `email` field on the User table. 
 If no existing user exists, we create one because we are using the `find_or_create_by!` method.
 
+### When used with a Hawk
+
+A hawk applied to the same field will be enforced within this mechanism.
+
+Example #2
+`bin/rails generate hot_glue:scaffold Appointment --gd --alt-foreign-key-lookup='user_id{email}' --hawk='user_id{current_user.family}'`
+
+
+Whether or not in Gd mode, the hawk is  enforced by scoping the find to the hawk's scope
+```
+user = current_user.family.users.find_by(email: appointment_params[:__lookup_user_email] )
+modified_params.tap { |hs| hs.delete(:__lookup_user_email)}
+@appointment = Appointment.new(modified_params.merge(user: user))
+```
+
+
+
+### With Factory
+
 Use with a factory pattern like this one:
+
 ``` 
 class AccountUserFactory
   attr_accessor :account_user

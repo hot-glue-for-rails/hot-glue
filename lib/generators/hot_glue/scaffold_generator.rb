@@ -694,7 +694,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if options["hawk"]
       options['hawk'].split(",").each do |hawk_entry|
         # format is: abc_id[thing]
-
         if hawk_entry.include?("{")
           hawk_entry =~ /(.*){(.*)}/
           key, hawk_to = $1, $2

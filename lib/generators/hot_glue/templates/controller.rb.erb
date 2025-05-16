@@ -196,16 +196,15 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     check_<%= related_set[:association_ids_method].to_s %>_permissions(modified_params, :update)<% end %><% end %>
       <% if (@alt_lookups.any?) %>
     <%=  @alt_lookups.collect{|lookup, data|
-       @columns_map[lookup.to_sym].prelookup_syntax
+       @columns_map[lookup.to_sym].prelookup_syntax unless @update_show_only.include?(lookup.to_sym)
     }.join("\n") %>
-
       <% elsif @factory_creation %>
 
       <% end %>
-      <% if @alt_lookups.any? %>
+      <% if (@alt_lookups.keys.collect(&:to_sym) - @update_show_only).any? %>
     modified_params.merge!(<%=  @alt_lookups.collect{|lookup,field|
     field_name = lookup.gsub("_id","")
-      "#{field_name}: #{field_name}"
+      "#{field_name}: #{field_name}" unless @update_show_only.include?(lookup.to_sym)
     }.join(",") %>)
     <% end %>
    <% if @hawk_keys.any? %> modified_params = hawk_params({<%= hawk_to_ruby %>}, modified_params)<% end %>
