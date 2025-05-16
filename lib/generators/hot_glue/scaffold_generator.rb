@@ -985,10 +985,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
       template "system_spec.rb.erb", dest_file
     end
-
-    if File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/_errors.#{@markup}")
-      File.delete("#{filepath_prefix}app/views#{namespace_with_dash}/_errors.#{@markup}")
-    end
+    # if !File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/_errors.#{@markup}")
+    #   # File.delete("#{filepath_prefix}app/views#{namespace_with_dash}/_errors.#{@markup}")
+    #
+    #   template "_errors.erb", File.join("#{filepath_prefix}app/views#{namespace_with_dash}", "_errors.#{@markup}")
+    # end
   end
 
   def spec_foreign_association_merge_hash
