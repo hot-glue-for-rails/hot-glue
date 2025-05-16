@@ -286,12 +286,13 @@ class AssociationField < Field
 
     ## TODO: add the hawk here
     res = +""
-    if !@god
-      res << "#{field_name} = #{auth}.#{assoc_name.pluralize}.#{method_name}(#{field[:lookup_as]}: #{singular}_params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]}] )"
-    else
-
+    if @hawk_keys[name.to_sym]
+      res << "#{field_name} = #{@hawk_keys[name.to_sym][:bind_to].first}.#{assoc_name.pluralize}.#{method_name}(#{field[:lookup_as]}: #{singular}_params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]}] )"
+    elsif @god
       assoc_name = field[:assoc]
       res << "#{field_name} = #{assoc_class}.#{method_name}(#{field[:lookup_as]}: #{singular}_params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]}] )"
+    else
+      raise "Field #{field_name} is an alt lookup in a non-Gd context which is a security vulnerability"
     end
 
     res << "\n    modified_params.tap { |hs| hs.delete(:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]})}"

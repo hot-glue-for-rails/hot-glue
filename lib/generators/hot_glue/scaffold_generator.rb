@@ -437,7 +437,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @related_sets = {}
     related_set_input.each do |setting|
       name = setting.to_sym
-      byebug
       association_ids_method = eval("#{singular_class}.reflect_on_association(:#{setting.to_sym})").class_name.underscore + "_ids"
       class_name = eval("#{singular_class}.reflect_on_association(:#{setting.to_sym})").class_name
 
@@ -587,15 +586,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     puts "------ ALT LOOKUPS for #{@alt_lookups}"
     @alt_lookups.each do |key, value|
-
-      if !@columns_map[key.to_sym]
+      if !@columns_map[key.to_sym].is_a?(AssociationField)
+        raise "You specified an alt-lookup for #{key} but that field is not an association field"
+      elsif !@columns_map[key.to_sym]
         raise "You specified an alt-lookup for #{key} but that field does not exist in the list of columns"
-      elsif @god
-                              #awlays allow
-      # elsif !@god && !eval("defined?(#{@auth})")
-      #
-      #   byebug
-      #   raise "You specified an alt-lookup for #{key} but the association #{value[:assoc]} does not exist on the object #{@auth}; to fix, 1. associate #{value[:assoc].pluralize} to #{auth}, 2. run as a --gd controller, or 3. use a factory pattern to create the associated object.  "
+      elsif !@god && !@hawk_keys.include?(key.to_sym)
+        raise "You specified an alt-lookup for #{key} in non-Gd mode but this would leave the lookup unprotected. To fix, use with --hawk or with --factory-creation "
       end
     end
 
@@ -857,7 +853,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                            :confirmation_token, :confirmed_at,
                            :confirmation_sent_at, :unconfirmed_email
 
-      @exclude_fields.push(@ownership_field.to_sym) if !@ownership_field.nil?
+
+      # TODO: this should exclude any nested parents
+      # @exclude_fields.push(@ownership_field.to_sym) if !@ownership_field.nil?
 
       @columns = @the_object.columns.map(&:name).map(&:to_sym).reject { |field| @exclude_fields.include?(field) }
 
@@ -865,7 +863,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @columns = @the_object.columns.map(&:name).map(&:to_sym).reject { |field| !@include_fields.include?(field) }
     end
 
-    @columns = @columns -@nested_set.collect { |set| (set[:singular] + "_id").to_sym  }
+    @columns = @columns - @nested_set.collect { |set| (set[:singular] + "_id").to_sym  }
 
     if @attachments.any?
       puts "Adding attachments-as-columns: #{@attachments}"
@@ -910,7 +908,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def creation_syntax
     if @factory_creation.nil? && ! @alt_lookups.any?
-      "@#{singular } = #{ class_name }.new(modified_params)"
+      (      @hawk_keys.any? ?   "modified_params = hawk_params({#{ hawk_to_ruby }}, modified_params)\n    " : "")  + "@#{singular } = #{ class_name }.new(modified_params)"
     elsif @factory_creation.nil? && @alt_lookups.any?
 
       prelookup_syntax = @alt_lookups.collect{|lookup, data|
