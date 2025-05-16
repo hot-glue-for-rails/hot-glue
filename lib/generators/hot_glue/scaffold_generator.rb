@@ -587,12 +587,15 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     puts "------ ALT LOOKUPS for #{@alt_lookups}"
     @alt_lookups.each do |key, value|
+
       if !@columns_map[key.to_sym]
         raise "You specified an alt-lookup for #{key} but that field does not exist in the list of columns"
       elsif @god
                               #awlays allow
-      elsif !@god && !eval("defined?(#{@auth}.#{value[:assoc]})")
-        raise "You specified an alt-lookup for #{key} but the association #{value[:assoc]} does not exist on the object #{@auth}; to fix, 1. associate #{value[:assoc].pluralize} to #{auth}, 2. run as a --gd controller, or 3. use a factory pattern to create the associated object.  "
+      # elsif !@god && !eval("defined?(#{@auth})")
+      #
+      #   byebug
+      #   raise "You specified an alt-lookup for #{key} but the association #{value[:assoc]} does not exist on the object #{@auth}; to fix, 1. associate #{value[:assoc].pluralize} to #{auth}, 2. run as a --gd controller, or 3. use a factory pattern to create the associated object.  "
       end
     end
 

@@ -208,7 +208,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       "#{field_name}: #{field_name}"
     }.join(",") %>)
     <% end %>
-    <% if @hawk_keys.any? %>    modified_params = hawk_params({<%= hawk_to_ruby %>}, modified_params)<% end %>
+   <% if @hawk_keys.any? %> modified_params = hawk_params({<%= hawk_to_ruby %>}, modified_params)<% end %>
     <%= controller_attachment_orig_filename_pickup_syntax %>
       <% if @pundit && !@pundit_policy_override %>
       authorize @<%= singular_name %>
