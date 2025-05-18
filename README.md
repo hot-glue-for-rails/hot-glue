@@ -1946,12 +1946,18 @@ These automatic pickups for partials are detected at build time. This means that
 
 #### 2025-05-18  v0.6.18
 • Significant additions to `--alt-foreign-key-lookups` which can now work:
-- on its on, without needing a factory
+- on its own, without needing a factory (`--factory-creation`)
 - with a factory
 - with our without the hawk
-- in Gd mode or, if not, use with `--factory-creation` or use with `--hawk`
+- in Gd mode 
+- if not in Gd mode, use with `--factory-creation` or use with the `--hawk`
 
 See notes above for details.
+
+example apps
+https://github.com/hot-glue-for-rails/HGHumanSpaMay25
+https://github.com/hot-glue-for-rails/HGAltLookups11
+
 
 • Adds Integer as searchable field
 
