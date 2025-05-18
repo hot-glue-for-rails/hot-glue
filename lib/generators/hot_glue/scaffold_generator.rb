@@ -855,7 +855,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
       # TODO: this should exclude any nested parents
-      # @exclude_fields.push(@ownership_field.to_sym) if !@ownership_field.nil?
+      @exclude_fields.push(@ownership_field.to_sym) if !@ownership_field.nil?
 
       @columns = @the_object.columns.map(&:name).map(&:to_sym).reject { |field| @exclude_fields.include?(field) }
 

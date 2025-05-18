@@ -579,7 +579,7 @@ describe "HotGlue::ScaffoldGenerator" do
         res = File.read("spec/dummy/app/views/dfgs/_form.erb")
 
         expect(res).to include("<% if policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, { prompt: true, selected: dfg.cantelope_id }, class: 'form-control') %>")
-        expect(res).to include("<% else %><%= dfg.cantelope.name %><% end %>")
+        expect(res).to include("<% else %><%= dfg.cantelope&.name %><% end %>")
         expect(res).to include("<label class='text-muted small form-text' for=''>Cantelope</label>")
 
       end
@@ -603,7 +603,7 @@ describe "HotGlue::ScaffoldGenerator" do
                                              "--pundit"])
         res = File.read("spec/dummy/app/views/dfgs/_form.erb")
         expect(res).to include("<% if @action == 'new' && policy(@dfg).cantelope_id_able? %>  <%= f.collection_select(:cantelope_id, Fruits::Cantelope.all, :id, :name, { prompt: true, selected: dfg.cantelope_id }, class: 'form-control') %>")
-        expect(res).to include("<% else %><%= dfg.cantelope.name %><% end %>")
+        expect(res).to include("<% else %><%= dfg.cantelope&.name %><% end %>")
       end
 
       it "should not include the update show-only fields in the allowed parameters" do
