@@ -1944,7 +1944,24 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
-#### 2025-05-0097 - v0.6.17
+#### 2025-05-18  v0.6.18
+• Significant additions to `--alt-foreign-key-lookups` which can now work:
+- on its on, without needing a factory
+- with a factory
+- with our without the hawk
+- in Gd mode or, if not, use with `--factory-creation` or use with `--hawk`
+
+See notes above for details.
+
+• Adds Integer as serachable field
+
+_ foo and bar are integers _ 
+
+`rails g hot_glue:scaffold Thing --include=foo,bar --search=set --search-fields=foo,bar`
+
+
+
+#### 2025-05-09 - v0.6.17
 
 
 • Adds Stimulus JS & `--stimmify` or `--stimmify=xyz`
