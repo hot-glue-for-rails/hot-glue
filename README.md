@@ -1953,12 +1953,13 @@ These automatic pickups for partials are detected at build time. This means that
 
 See notes above for details.
 
-• Adds Integer as serachable field
+• Adds Integer as searchable field
 
 _ foo and bar are integers _ 
 
 `rails g hot_glue:scaffold Thing --include=foo,bar --search=set --search-fields=foo,bar`
 
+• On show only association fields, view output is now safe-nil using `&` to not crash if the association doesn't exist.
 
 
 #### 2025-05-09 - v0.6.17
