@@ -1994,6 +1994,7 @@ https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js
 • Adds `--hidden` option
 Pass a list of fields, like include or show-only. This will make the field hidden on the form *but still updated via its submission*
 
+• Show only fields associations are now safe-nil using `&` to not crash if the association doesn't exist
 
 
 
