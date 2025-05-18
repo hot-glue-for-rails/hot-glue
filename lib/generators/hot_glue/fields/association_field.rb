@@ -82,25 +82,23 @@ class AssociationField < Field
     display_column = HotGlue.derrive_reference_name(assoc_class_name)
 
 
-    "<%= #{singular}.#{assoc_name}.#{display_column} %>"
+    "<%= #{singular}.#{assoc_name}&.#{display_column} %>"
   end
 
   def form_field_output
     assoc_name = name.to_s.gsub("_id","")
+
+
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
-    if alt_lookup.keys.include?(name.to_sym)
-      alt = alt_lookup[:lookup_as]
+
+    if alt_lookup.keys.include?(name)
       assoc_name = name.to_s.gsub("_id","")
       assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
 
-      alt = alt_lookup[:lookup_as]
+      lookup_field = alt_lookup[name][:lookup_as]
+      assoc = alt_lookup[name][:assoc].downcase
       parts = name.split('_')
-      "<%= f.text_field :__lookup_#{alt}, value: @#{singular}.#{assoc_name}.try(:#{alt}), placeholder: \"search by #{alt}\" " + (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "")  + "%>"
-
-      # if modify_as
-      #   modified_display_output
-      # else
-      # end
+      "<%= f.text_field :__lookup_#{assoc}_#{lookup_field}, value: @#{singular}.#{assoc_name}&.#{lookup_field}, placeholder: \"#{lookup_field}\" " + (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "")  + "%>"
     elsif modify_as && modify_as[:typeahead]
       search_url  = "#{namespace ? namespace + "_" : ""}" +
         modify_as[:nested].join("_") + ( modify_as[:nested].any? ? "_" : "") +
@@ -188,11 +186,9 @@ class AssociationField < Field
 
     if assoc_class
       display_column =  HotGlue.derrive_reference_name(assoc_class.to_s)
-
       "<%= #{singular}.#{assoc}.try(:#{display_column}) || '<span class=\"content \">MISSING</span>'.html_safe %>"
     else
       "<%= #{singular}.#{assoc}.try(:to_label) || '<span class=\"content \">MISSING</span>'.html_safe %>"
-
     end
 
   end
@@ -274,5 +270,33 @@ class AssociationField < Field
     end
   end
 
+  def prelookup_syntax
+    field =  @alt_lookup[name.to_s]
+    if field[:with_create]
 
+      method_name = "find_or_create_by"
+
+    else
+      method_name = "find_by"
+    end
+    field_name = field[:assoc].downcase.gsub("_id","")
+    assoc_class = field[:assoc].classify
+
+    assoc = plural
+
+    ## TODO: add the hawk here
+    res = +""
+    if @hawk_keys[name.to_sym]
+      res << "#{field_name} = #{@hawk_keys[name.to_sym][:bind_to].first}.#{method_name}(#{field[:lookup_as]}: #{singular}_params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]}] )"
+    elsif @god
+      assoc_name = field[:assoc]
+      res << "#{field_name} = #{assoc_class}.#{method_name}(#{field[:lookup_as]}: #{singular}_params[:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]}] )"
+    else
+      raise "Field #{field_name} is an alt lookup in a non-Gd context which is a security vulnerability"
+    end
+
+    res << "\n    modified_params.tap { |hs| hs.delete(:__lookup_#{field[:assoc].downcase}_#{field[:lookup_as]})}"
+    return res
+
+  end
 end

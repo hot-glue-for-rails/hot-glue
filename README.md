@@ -680,15 +680,49 @@ For the `$` modifier only, if the field name ends with `_cents`, the modifier wi
 
 ### `--alt-foreign-key-lookup=`
 
-Use for a join table to specify that a field should be looked up by a different field
+Use for a join table to specify that a field should be looked up by a different field. For example, when you want to lookup a user by a (complete) email address.
 
+In these contexts, the lookup must be exact match to the text entered (no partial matches supported). 
 
-`./bin/rails generate hot_glue:scaffold AccountUser --alt-foreign-key-lookup=user_id{email}`
+Use `+` to map to the `find_or_create_by` method. (Without `+` it will use `find_by`.)
+
+This is accomlished using a little magic of a lookup field called `__lookup_X_Y` passed in the form parameters.
+
+The lookup field is used to look up the associated record, then deleted from the params.
+
+#### When used in `--gd` mode
+The lookup will use the base class and have access to all records.
+`user = User.find_or_create_by!(email: params[:__lookup_email])`
+`modified_params.tap { |hs| hs.delete(:__lookup_target_email)}`
+`modified_params.merge!(user: user)`
+
+Example 1
+`./bin/rails generate hot_glue:scaffold AccountUser --gd --alt-foreign-key-lookup=user_id{email}`
 
 Here we are specifying that the `user_id` field should be looked up by the `email` field on the User table. 
 If no existing user exists, we create one because we are using the `find_or_create_by!` method.
 
+### When used with a Hawk
+
+A hawk applied to the same field will be enforced within this mechanism.
+
+Example #2
+`bin/rails generate hot_glue:scaffold Appointment --gd --alt-foreign-key-lookup='user_id{email}' --hawk='user_id{current_user.family}'`
+
+
+Whether or not in Gd mode, the hawk is  enforced by scoping the find to the hawk's scope
+```
+user = current_user.family.users.find_by(email: appointment_params[:__lookup_user_email] )
+modified_params.tap { |hs| hs.delete(:__lookup_user_email)}
+@appointment = Appointment.new(modified_params.merge(user: user))
+```
+
+
+
+### With Factory
+
 Use with a factory pattern like this one:
+
 ``` 
 class AccountUserFactory
   attr_accessor :account_user
@@ -712,9 +746,17 @@ end
 this works with a factory creation syntax like so:
 
 ```
---factory-creation='factory = AccountUserFactory.new(params: account_user_params, account: account)
+rails generate hot_glue:scaffold AccountUser --alt-foreign-key-lookup=user_id{email} --factory-creation='factory = AccountUserFactory.new(params: account_user_params, account: account)
 ```
-*See the `--factory-creation` section. 
+
+In this example, the lookup is *not performed inside of the create action*, because it is assumed you will do so yourself inside of your factory.
+
+As you see in the example above, params is passed to your factory and it is the `account_user_params` fromm the controller. 
+
+#### Warning:
+When building a non-Gd controller with a `--alt-foreign-key-lookup`, if you don't also hawk the same field you will get an error. 
+
+To fix, either hawk the field or use with a factory creation pattern. This is because the associated object is on your graph but Hot Glue doesn't know how to securly load it without knowing its relationship to the current user. Use the `--hawk` mechanism to specify that relationship, and the lookup mechanism will integrate nicely. 
 
 
 
@@ -1902,7 +1944,24 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
-#### 2025-05-0097 - v0.6.17
+#### 2025-05-18  v0.6.18
+• Significant additions to `--alt-foreign-key-lookups` which can now work:
+- on its on, without needing a factory
+- with a factory
+- with our without the hawk
+- in Gd mode or, if not, use with `--factory-creation` or use with `--hawk`
+
+See notes above for details.
+
+• Adds Integer as serachable field
+
+_ foo and bar are integers _ 
+
+`rails g hot_glue:scaffold Thing --include=foo,bar --search=set --search-fields=foo,bar`
+
+
+
+#### 2025-05-09 - v0.6.17
 
 
 • Adds Stimulus JS & `--stimmify` or `--stimmify=xyz`
@@ -1935,6 +1994,7 @@ https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js
 • Adds `--hidden` option
 Pass a list of fields, like include or show-only. This will make the field hidden on the form *but still updated via its submission*
 
+• Show only fields associations are now safe-nil using `&` to not crash if the association doesn't exist
 
 
 

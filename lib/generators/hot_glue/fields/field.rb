@@ -6,7 +6,7 @@ class Field
                 :self_auth,
                 :singular_class,  :singular, :sql_type, :ownership_field,
                 :update_show_only, :namespace, :pundit, :plural,
-                :stimmify, :hidden, :attachment_data
+                :stimmify, :hidden, :attachment_data, :god
 
 
   def initialize(
@@ -35,6 +35,7 @@ class Field
     @stimmify = scaffold.stimmify
     @hidden = scaffold.hidden
     @attachment_data = scaffold.attachments[name.to_sym]
+    @god = scaffold.god
 
 
     # TODO: remove knowledge of subclasses from Field
@@ -224,5 +225,7 @@ class Field
   def newline_after_field?
     false
   end
+
+  def prelookup_syntax; nil; end
 
 end

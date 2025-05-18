@@ -20,7 +20,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :big_edit, :button_icons, :bootstrap_column_width,
                 :columns,
                 :default_boolean_display,
-                :display_as, :downnest_children, :downnest_object, :hawk_keys, :layout_object,
+                :display_as, :downnest_children, :downnest_object, :god,  :hawk_keys, :layout_object,
                 :modify_as,
                 :nest_with, :path, :plural, :sample_file_path, :show_only_data, :singular,
                 :singular_class, :smart_layout, :stacked_downnesting,
@@ -84,7 +84,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   # determines if labels appear within the rows of the VIEWABLE list (does NOT affect the list heading)
   class_option :inline_list_labels, default: nil # default is set below
-  class_option :factory_creation, default: ''
+  class_option :factory_creation, default: nil
   class_option :alt_foreign_key_lookup, default: '' #
   class_option :attachments, default: ''
   class_option :stacked_downnesting, default: false
@@ -437,7 +437,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @related_sets = {}
     related_set_input.each do |setting|
       name = setting.to_sym
-      byebug
       association_ids_method = eval("#{singular_class}.reflect_on_association(:#{setting.to_sym})").class_name.underscore + "_ids"
       class_name = eval("#{singular_class}.reflect_on_association(:#{setting.to_sym})").class_name
 
@@ -480,7 +479,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
     end
 
-    @factory_creation = options['factory_creation'].gsub(";", "\n")
+    unless options['factory_creation'].nil?
+      @factory_creation = options['factory_creation'].gsub(";", "\n")
+    end
+
     identify_object_owner
     setup_fields
 
@@ -506,6 +508,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       setting =~ /(.*){(.*)}/
       key, lookup_as = $1, $2
 
+      if !eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")})")
+        raise "couldn't find association for #{key} in the object #{class_name}"
+      end
       assoc = eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")}).class_name")
 
       data = {lookup_as: lookup_as.gsub("+",""),
@@ -514,7 +519,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @alt_lookups[key] = data
     end
 
-    puts "------ ALT LOOKUPS for #{@alt_lookups}"
+
 
     # @update_alt_lookups = @alt_lookups.collect{|key, value|
     #   @update_show_only.include?(key) ?
@@ -575,6 +580,18 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
             puts "##############################################"
           end
         end
+      end
+    end
+
+
+    puts "------ ALT LOOKUPS for #{@alt_lookups}"
+    @alt_lookups.each do |key, value|
+      if !@columns_map[key.to_sym].is_a?(AssociationField)
+        raise "You specified an alt-lookup for #{key} but that field is not an association field"
+      elsif !@columns_map[key.to_sym]
+        raise "You specified an alt-lookup for #{key} but that field does not exist in the list of columns"
+      elsif !@god && !@hawk_keys.include?(key.to_sym)
+        raise "You specified an alt-lookup for #{key} in non-Gd mode but this would leave the lookup unprotected. To fix, use with --hawk or with --factory-creation "
       end
     end
 
@@ -677,7 +694,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if options["hawk"]
       options['hawk'].split(",").each do |hawk_entry|
         # format is: abc_id[thing]
-
         if hawk_entry.include?("{")
           hawk_entry =~ /(.*){(.*)}/
           key, hawk_to = $1, $2
@@ -687,6 +703,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         end
 
         hawk_scope = key.gsub("_id", "").pluralize
+
         if eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})").nil?
           raise "Could not find `#{key.gsub('_id', '')}` association; add this to the #{singular_class} class: \nbelongs_to :#{key.gsub('_id', '')} "
         end
@@ -836,6 +853,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                            :confirmation_token, :confirmed_at,
                            :confirmation_sent_at, :unconfirmed_email
 
+
+      # TODO: this should exclude any nested parents
       @exclude_fields.push(@ownership_field.to_sym) if !@ownership_field.nil?
 
       @columns = @the_object.columns.map(&:name).map(&:to_sym).reject { |field| @exclude_fields.include?(field) }
@@ -844,7 +863,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @columns = @the_object.columns.map(&:name).map(&:to_sym).reject { |field| !@include_fields.include?(field) }
     end
 
-    @columns = @columns -@nested_set.collect { |set| (set[:singular] + "_id").to_sym  }
+    @columns = @columns - @nested_set.collect { |set| (set[:singular] + "_id").to_sym  }
 
     if @attachments.any?
       puts "Adding attachments-as-columns: #{@attachments}"
@@ -888,8 +907,21 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def creation_syntax
-    if @factory_creation == ''
-      "@#{singular } = #{ class_name }.new(modified_params)"
+    if @factory_creation.nil? && ! @alt_lookups.any?
+      (      @hawk_keys.any? ?   "modified_params = hawk_params({#{ hawk_to_ruby }}, modified_params)\n    " : "")  + "@#{singular } = #{ class_name }.new(modified_params)"
+    elsif @factory_creation.nil? && @alt_lookups.any?
+
+      prelookup_syntax = @alt_lookups.collect{|lookup, data|
+        col = @columns_map[lookup.to_sym]
+        col.prelookup_syntax
+      }.join("\n")
+
+      prelookup_syntax + "\n     @#{singular } = #{ class_name }.new(modified_params" +
+        (@alt_lookups.any? ? (".merge(" + @alt_lookups.collect{|lookup,field|
+          field_name = lookup.gsub("_id","")
+          "#{field_name}: #{field_name}"
+        }.join(",") + ")" ) : "") + ")"
+
     else
       res = +"begin
       #{@factory_creation}
@@ -954,10 +986,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
       template "system_spec.rb.erb", dest_file
     end
-
-    if File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/_errors.#{@markup}")
-      File.delete("#{filepath_prefix}app/views#{namespace_with_dash}/_errors.#{@markup}")
-    end
+    # if !File.exist?("#{filepath_prefix}app/views#{namespace_with_dash}/_errors.#{@markup}")
+    #   # File.delete("#{filepath_prefix}app/views#{namespace_with_dash}/_errors.#{@markup}")
+    #
+    #   template "_errors.erb", File.join("#{filepath_prefix}app/views#{namespace_with_dash}", "_errors.#{@markup}")
+    # end
   end
 
   def spec_foreign_association_merge_hash
