@@ -143,6 +143,27 @@ module HotGlue
       end
     end
 
+    def integer_query_constructor(match, search)
+      if match.blank? || search.blank?
+        nil
+      else
+        case match
+        when '='
+          "= #{search.to_i}"
+        when '≥'
+          ">= #{search.to_i}"
+        when '>'
+          "> #{search.to_i}"
+        when '≤'
+          "<= #{search.to_i}"
+        when '<'
+          "< #{search.to_i}"
+        else
+          nil
+        end
+      end
+    end
+
     def enum_constructor(field_name, value, **args)
       return nil if value.blank?
       ["#{field_name} = ?", value]

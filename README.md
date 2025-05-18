@@ -680,7 +680,9 @@ For the `$` modifier only, if the field name ends with `_cents`, the modifier wi
 
 ### `--alt-foreign-key-lookup=`
 
-Use for a join table to specify that a field should be looked up by a different field.
+Use for a join table to specify that a field should be looked up by a different field. For example, when you want to lookup a user by a (complete) email address.
+
+In these contexts, the lookup must be exact match to the text entered (no partial matches supported). 
 
 Use `+` to map to the `find_or_create_by` method. (Without `+` it will use `find_by`.)
 
@@ -744,9 +746,17 @@ end
 this works with a factory creation syntax like so:
 
 ```
---factory-creation='factory = AccountUserFactory.new(params: account_user_params, account: account)
+rails generate hot_glue:scaffold AccountUser --alt-foreign-key-lookup=user_id{email} --factory-creation='factory = AccountUserFactory.new(params: account_user_params, account: account)
 ```
-*See the `--factory-creation` section. 
+
+In this example, the lookup is *not performed inside of the create action*, because it is assumed you will do so yourself inside of your factory.
+
+As you see in the example above, params is passed to your factory and it is the `account_user_params` fromm the controller. 
+
+#### Warning:
+When building a non-Gd controller with a `--alt-foreign-key-lookup`, if you don't also hawk the same field you will get an error. 
+
+To fix, either hawk the field or use with a factory creation pattern. This is because the associated object is on your graph but Hot Glue doesn't know how to securly load it without knowing its relationship to the current user. Use the `--hawk` mechanism to specify that relationship, and the lookup mechanism will integrate nicely. 
 
 
 

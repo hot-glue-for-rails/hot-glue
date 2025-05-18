@@ -703,6 +703,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         end
 
         hawk_scope = key.gsub("_id", "").pluralize
+
         if eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})").nil?
           raise "Could not find `#{key.gsub('_id', '')}` association; add this to the #{singular_class} class: \nbelongs_to :#{key.gsub('_id', '')} "
         end
