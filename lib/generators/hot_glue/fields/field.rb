@@ -25,7 +25,7 @@ class Field
     @form_placeholder_labels = scaffold.form_placeholder_labels
     @ownership_field = scaffold.ownership_field
     @form_labels_position = scaffold.form_labels_position
-    @modify_as = scaffold.modify_as
+    @modify_as = scaffold.modify_as[name.to_sym] # note whenever used as field, don't relookup the key
     @display_as = scaffold.display_as
     @pundit = scaffold.pundit
     @plural = scaffold.plural
@@ -113,7 +113,7 @@ class Field
   end
 
   def viewable_output
-    if modify_as[:modify]
+    if modify_as
       modified_display_output(show_only: true)
     else
       field_view_output
@@ -159,7 +159,6 @@ class Field
     #                end
     #   res = "<span class='badge <%= #{badge_code} %>'>" + res + "</span>"
     # end
-    # byebug
     res
   end
 
