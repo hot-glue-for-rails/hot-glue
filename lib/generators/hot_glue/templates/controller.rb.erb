@@ -186,8 +186,13 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     flash[:alert] = nil
     <% @magic_buttons.each do |button| %>
     if <%= singular_name %>_params[:__<%= button %>]
-      @<%= singular_name %>.<%= button %>!
-      flash[:notice] << "<% singular %> <%= button.titlecase %>."
+
+      if res = @<%= singular_name %>.<%= button %>!
+        flash[:notice] << "<% singular %> <%= button.titlecase %>"
+        flash[:notice] << " #{res}" if res.is_a?(String)
+      else
+        flash[:alert] = " <%= button.titlecase %> failed."
+      end
     end
     <% end %>
 
