@@ -259,9 +259,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     skip_authorization
     raise Pundit::NotAuthorizedError if ! <%= @pundit_policy_override %>.destroy?<% end %>
     begin
-      @<%=singular_name%>.destroy
+      @<%=singular_name%>.destroy!
       flash[:notice] = '<%= singular_name.titlecase %> successfully deleted'
-    rescue ActiveRecordError => e
+    rescue ActiveRecord::RecordNotDestroyed => e
       flash[:alert] = '<%= singular_name.titlecase %> could not be deleted'
     end
     <%= post_action_parental_updates.join("\n    ") %>

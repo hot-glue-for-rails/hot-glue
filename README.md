@@ -1443,6 +1443,16 @@ If you leave the 2nd parameter blank when using the 3rd parameter, it will defau
 
 `--attachments='avatar{thumbnail||direct}'`
 
+#### `--attachments` Long form syntax with 4 parameters
+
+The final (4th) parameter should be `dropzone` to enable dropzone support for this attachment.
+
+```
+bin/rails generate hot_glue:scaffold Video --auth='current_user' --auth-identifier='user' --namespace='account_dashboard' --nested='account' --smart-layout  --attachments='video_file{thumbnail||direct|dropzone}'
+```
+
+See below for dropzone details.
+
 
 #### For S3 Setup
 
@@ -1945,7 +1955,7 @@ These automatic pickups for partials are detected at build time. This means that
 # VERSION HISTORY
 
 #### 2025-05-18  v0.6.18
-• Significant additions to `--alt-foreign-key-lookups` which can now work:
+• Significant additions to `--alt-foreign-key-lookup` which can now work:
 - on its own, without needing a factory (`--factory-creation`)
 - with a factory
 - with our without the hawk
