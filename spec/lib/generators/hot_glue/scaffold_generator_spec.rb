@@ -757,10 +757,10 @@ describe "HotGlue::ScaffoldGenerator" do
 
 
       expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '')")
-      expect(res).to include("<%= f.label(:selected, value: 'off', for: 'jkl_selected_0') %>")
+      expect(res).to include("<%= f.label(:selected, value: 'No', for: 'jkl_selected_0') %>")
       expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '') %>")
       expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '' , class: '')")
-      expect(res).to include("<%= f.label(:selected, value: 'on', for: 'jkl_selected_1') %>")
+      expect(res).to include("<%= f.label(:selected, value: 'Yes', for: 'jkl_selected_1') %>")
     end
   end
 
@@ -773,10 +773,10 @@ describe "HotGlue::ScaffoldGenerator" do
 
       res = File.read("spec/dummy/app/views/jkls/_form.erb")
       expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '')")
-      expect(res).to include("<%= f.label(:selected, value: 'off', for: 'jkl_selected_0') %>")
+      expect(res).to include("<%= f.label(:selected, value: 'No', for: 'jkl_selected_0') %>")
       expect(res).to include("<%= f.radio_button(:selected, '0', checked: jkl.selected  ? '' : 'checked', class: '') %>")
       expect(res).to include("<%= f.radio_button(:selected, '1',  checked: jkl.selected  ? 'checked' : '' , class: '')")
-      expect(res).to include("<%= f.label(:selected, value: 'on', for: 'jkl_selected_1') %>")
+      expect(res).to include("<%= f.label(:selected, value: 'Yes', for: 'jkl_selected_1') %>")
 
     end
 
