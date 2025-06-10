@@ -1954,6 +1954,13 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
+#### 2025-06-10 v0.6.19
+
+• Fixes magic button output behavior to correctly show the string returned by the bang menthod
+• Fixes internal syntax of modify_as for modified fields; note default is now 'Yes' and 'No' for radio buttons
+• fixes destroy behavior with explicit .destroy! and ActiveRecord::RecordNotDestroyed; documents previously undocumented 4th parameter for attachment input
+
+
 #### 2025-05-18  v0.6.18
 • Significant additions to `--alt-foreign-key-lookup` which can now work:
 - on its own, without needing a factory (`--factory-creation`)
