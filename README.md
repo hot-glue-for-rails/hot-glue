@@ -909,18 +909,19 @@ Remember, if there's a corresponding `*_able?` method on the policy, it will be 
 
 As shown in the method `name_able?` of the example ThingPolicy above, if this field on your policy returns true, the field will be editable. If it returns false, the field will be viewable (read-only).
 
-
-### `--hidden`
-
+### `--invisible` (affects both create + update actions)
+### `--create-invisible`
+### `--update-invisible`
+TODO: RENAME ME TO INVISIBLE 
 Separate list of fields. 
 
-These fields will be hidden from the form but will exist as hidden_field, and so the update will still work.
+These fields will be INVISIBLE on either the create or update form but will exist as hidden_field, and so the update will still work.
 
 
 EXAMPLE:
 
 ```
-bin/rails generate hot_glue:scaffold Wrapper --namespace='account_dashboard' --no-nav-menu --big-edit --smart-layout --stimmify --hidden=raw_source
+bin/rails generate hot_glue:scaffold Wrapper --namespace='account_dashboard' --no-nav-menu --big-edit --smart-layout --stimmify --invisible=raw_source
 ```
 
 In the `wrappers` folder, I am using a special sticky partial `_edit_within_form.html.erb`, which contains code preserved from build-to-build and included in the form:
@@ -992,6 +993,16 @@ Notice we are also using `--stimmify` to decorate the form with a Stimulus contr
 
 The code above uses Code Mirror to act as a code editor, which requires pulling the value off the hidden form element (putting it into the code mirror interface) and pushing it back into the hidden form element when the Submit button is clicked.
 
+
+### `--create-hidden` (NEW HIDDEN)
+### `--update-hidden` (NEW HIDDEN)
+
+These will check for `*_able?` methods on the object or Policy and will only display the field if the method returns true.
+It will also block the field from being updated on the backend, so don't use this if you want create a hidden_field tag but still keep the field invisible on the form. (For that, see `--invisible`)
+
+| Normal fields                                  | Show only                                                                                     | Update Show only                                                      | Invisible                                                                                                                                                                                                                                                 | Hidden                                                                                       |
+|------------------------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| Included on both the create + update actions.  | Viewable only (non-editable) on both create + edit/update or if Pundit doesn't allow editing. | Viewable only on the update screen or if Pundit doesn't allow editing | Displayed in the HTML output and received by the controller for create or update action but shown as a hidden_field on the HTML, invisible to the user. You should use this if you want to construct your own form input or set the value via Javascript  | Not displayed or updatable if the field respond false to _able? or the Policy doesn't allow. |
 
 
 
