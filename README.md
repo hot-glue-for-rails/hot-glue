@@ -321,6 +321,166 @@ TitleCase class name of the thing you want to build a scaffolding for.
 
 (note: Your `Thing` object must `belong_to` an authenticated `User` or alternatively you must create a Gd controller, see below.)
 
+
+## FLAGS (Options with no values)
+These options (flags) also uses `--` syntax but do not take any values. (Notice no equal sign.) Everything is assumed (default) to be false unless specified.
+
+
+### `--stacked-downnesting`
+
+This puts the downnested portals on top of one another (stacked top to bottom) instead of side-by-side (left to right). This is useful if you have a lot of downnested portals and you want to keep the page from getting too wide.
+
+
+
+### `--god` or `--gd`
+
+Use this flag to create controllers with no root authentication. You can still use an auth_identifier, which can be useful for a meta-leval authentication to the controller.
+
+For example, FOR ADMIN CONTROLLERS ONLY, supply a auth_identifier and use `--god` flag.
+
+In Gd mode, the objects are loaded directly from the base class (these controllers have full access)
+```
+def load_thing
+    @thing = Thing.find(params[:id])
+end
+
+```
+
+### `--button-icons` (default is no icons)
+You can specify this either as builder flag or as a config setting (in `config/hot_glue.yml`)
+Use `font-awesome` for Font Awesome or `none` for no icons.
+
+
+### `--specs-only`
+
+Produces ONLY the controller spec file, nothing else.
+
+
+### `--no-specs`
+
+Produces all the files except the spec file.
+
+
+### `--no-paginate` (default: false)
+
+Omits pagination. (All list views have pagination by default.)
+
+### `--paginate-per-page-selector` (default: false)
+
+Show a small drop-down below the list to let the user choose 10, 25, or 100 results per page.
+
+
+### `--no-list`
+
+Omits list action. Only makes sense to use this if want to create a view where you only want the create button or to navigate to the update screen alternative ways. (The new/create still appears, as well the edit, update & destroy actions are still created even though there is no natural way to navigate to them.)
+
+
+
+### `--no-create`
+
+Omits new & create actions.
+
+### `--no-delete`
+
+Omits delete button & destroy action.
+
+### `--no-controller`
+
+Omits controller.
+
+### `--no-list`
+
+Omits list views.
+
+`--new-button-position` (above, below; default: above)
+Show the new button above or below the list.
+
+`--downnest-shows-headings` (default: false)
+Show headings above downnested portals.
+
+
+### `--big-edit`
+
+If you do not want inline editing of your list items but instead want to fallback to full-page style behavior for your edit views, use `--big-edit`.
+
+The user will be taken to a full-screen edit page instead of an edit-in-place interaction.
+
+When using `--big-edit`, any downnested portals will be displayed on the edit page instead of on the list page.
+
+Big edit makes all edit and magic button operations happen using `'data-turbo': false`, fully reloading the page and submitting HTML requests instead of TURBO_STREAM requests.
+
+Likewise, the controller's `update` action always redirects instead of using Turbo.
+
+
+### `--display-list-after-update`
+
+After an update-in-place normally only the edit view is swapped out for the show view of the record you just edited.
+
+Sometimes you might want to redisplay the entire list after you make an update (for example, if your action removes that record from the result set).
+
+To do this, use flag `--display-list-after-update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
+
+### `--with-turbo-streams`
+
+If and only if you specify `--with-turbo-streams`, your views will contain `turbo_stream_from` directives. Whereas your views will always contain `turbo_frame_tags` (whether or not this flag is specified) and will use the Turbo stream replacement mechanism for non-idempotent actions (create & update). This flag just brings the magic of live-reload to the scaffold interfaces themselves.
+
+**_To test_**: Open the same interface in two separate browser windows. Make an edit in one window and watch your edit appear in the other window instantly.
+
+This happens using two interconnected mechanisms:
+
+1) by default, all Hot Glue scaffold is wrapped in `turbo_frame_tag`s. The id of these tags is your namespace + the Rails dom_id(...). That means all Hot Glue scaffold is namespaced to the namespaces you use and won't collide with other turbo_frame_tag you might be using elsewhere
+
+2) by appending **model callbacks**, we can automatically broadcast updates to the users who are using the Hot Glue scaffold. The model callbacks (after_update_commit and after_destroy_commit) get appended automatically to the top of your model file. Each model callback targets the scaffold being built (so just this scaffold), using its namespace, and renders the line partial (or destroys the content in the case of delete) from the scaffolding.
+
+please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
+
+
+### `--no-list-label`
+Omits list LABEL itself above the list. (Do not confuse with the list heading which contains the field labels.)
+
+Note that list labels may  be automatically omitted on downnested scaffolds.
+
+
+### `--no-list-heading`
+
+Omits the heading of column names that appears above the 1st row of data.
+
+### `--include-object-names`
+
+When you are "Editing X" we specify that X is a ___ (author, book, room, etc)
+
+e.g. "Editing author Edgar Allan Poe" vs "Editing Edgar Allan Poe"
+
+Can also be specified globally in `config/hot_glue.yml`
+
+## Nav Templates and `--no-nav-menu`
+At the namespace level, you can have a file called `_nav.html.erb` to create tabbed bootstrap nav
+
+To create the file for the first time (at each namespace), start by running
+```
+bin/rails generate hot_glue:nav_template --namespace=xyz
+```
+
+This will append the file `_nav.html.erb` to the views folder at `views/xyz`. To begin, this file contains only the following:
+
+```
+<ul class='nav nav-tabs'>
+</ul>
+```
+
+Once the file is present, any further builds in this namespace will:
+
+1) Append to this `_nav.html.erb` file, adding a tab for the new built scaffold
+2) On the list view of the scaffold being built, it will include a render to the _nav partial, passing the name of the currently-viewed thing as the local variable `nav` (this is how the nav template knows which tab to make active).
+```
+<%= render partial: "owner/nav", locals: {nav: "things"} %>
+```
+(In this example `owner/` is the namespace and `things` is the name of the scaffold being built)
+
+To suppress this behavior, add `--no-nav-menu` to the build command and the _nav template will not be touched.
+
+
+
 ## Options With Arguments
 
 All options begin with two dashes (`--`) and a followed by an `=` and a value
@@ -347,7 +507,6 @@ class Dashboard::ThingsController < ApplicationController
 end
 
 ```
-
 
 ### `--nested=`
 
@@ -832,7 +991,7 @@ end
 Because Hot Glue detects the `*_able?` methods at build time, if you add them to your policy, you will have to rebuild your scaffold.
 
 
-### `--pundit-policy-override`
+### `--pundit-policy-override=`
 if you use the flag `--pundit-policy-override` your controller operations will bypass the invisible (pundit provided) access control and use the pundit policy you specify.
 
 example
@@ -860,7 +1019,7 @@ IMPORTANT: By default, all fields that begin with an underscore (`_`) are automa
 This is for fields you want globally non-editable by users in your app. For example, a counter cache or other field set only by a backend mechanism.
 
 
-### `--update-show-only`
+### `--update-show-only=`
 (separate field names by COMMA)
 
 • Make this field appear as viewable only for the edit action (and not allowed in the update action). 
@@ -909,9 +1068,9 @@ Remember, if there's a corresponding `*_able?` method on the policy, it will be 
 
 As shown in the method `name_able?` of the example ThingPolicy above, if this field on your policy returns true, the field will be editable. If it returns false, the field will be viewable (read-only).
 
-### `--invisible` (affects both create + update actions)
-### `--create-invisible`
-### `--update-invisible`
+### `--invisible=` (affects both create + update actions)
+### `--create-invisible=`
+### `--update-invisible=`
 TODO: RENAME ME TO INVISIBLE 
 Separate list of fields. 
 
@@ -994,8 +1153,8 @@ Notice we are also using `--stimmify` to decorate the form with a Stimulus contr
 The code above uses Code Mirror to act as a code editor, which requires pulling the value off the hidden form element (putting it into the code mirror interface) and pushing it back into the hidden form element when the Submit button is clicked.
 
 
-### `--create-hidden` (NEW HIDDEN)
-### `--update-hidden` (NEW HIDDEN)
+### `--create-hidden=` (NEW HIDDEN)
+### `--update-hidden=` (NEW HIDDEN)
 
 These will check for `*_able?` methods on the object or Policy and will only display the field if the method returns true.
 It will also block the field from being updated on the backend, so don't use this if you want create a hidden_field tag but still keep the field invisible on the form. (For that, see `--invisible`)
@@ -1003,6 +1162,8 @@ It will also block the field from being updated on the backend, so don't use thi
 | Normal fields                                  | Show only                                                                                     | Update Show only                                                      | Invisible                                                                                                                                                                                                                                                 | Hidden                                                                                       |
 |------------------------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
 | Included on both the create + update actions.  | Viewable only (non-editable) on both create + edit/update or if Pundit doesn't allow editing. | Viewable only on the update screen or if Pundit doesn't allow editing | Displayed in the HTML output and received by the controller for create or update action but shown as a hidden_field on the HTML, invisible to the user. You should use this if you want to construct your own form input or set the value via Javascript  | Not displayed or updatable if the field respond false to _able? or the Policy doesn't allow. |
+
+Note that slightly counterintuitively, invisible fields use the HTML `hidden_field` tag to make the field invisible on the form, whereas hidden fields are never displayed at all.
 
 
 
@@ -1025,7 +1186,7 @@ and also fix any Rails apps created since October 2021 by fixing the Gemfile. De
 https://stackoverflow.com/questions/70671324/new-rails-7-turbo-app-doesnt-show-the-data-turbo-confirm-alert-messages-dont-f
 
 
-### `--magic-buttons` 
+### `--magic-buttons=` 
 If you pass a list of magic buttons (separated by commas), they will appear in the button area on your list.
 
 It will be assumed there will be corresponding bang methods on your models.
@@ -1047,7 +1208,7 @@ Finally, you can raise an ActiveRecord error which will also get passed to the u
 For more information see [Example 6 in the Tutorial](https://school.jfbcodes.com/8188)
 
 
-### `--downnest`
+### `--downnest=`
 
 Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object.
 You will need to build scaffolding with the same name for the related object as well. On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line.
@@ -1058,11 +1219,6 @@ Can now be created with more space (wider) by adding a `+` to the end of the dow
 - e.g. `--downnest=abc+,xyz`
 
 The 'Abcs' portal will display as 5 bootstrap columns instead of the typical 4. (You may use multiple ++ to keep making it wider but the inverse with minus is not supported
-
-### `--stacked-downnesting`
-
-This puts the downnested portals on top of one another (stacked top to bottom) instead of side-by-side (left to right). This is useful if you have a lot of downnested portals and you want to keep the page from getting too wide.
-
 
 
 ### `--record-scope=`
@@ -1082,113 +1238,9 @@ scope :is_open, -> {where(state == 'open')}
 
 Now all records displayed through the generated controller 
 
-## FLAGS (Options with no values)
-These options (flags) also uses `--` syntax but do not take any values. Everything is assumed (default) to be false unless specified.
-
-### `--god` or `--gd`
-
-Use this flag to create controllers with no root authentication. You can still use an auth_identifier, which can be useful for a meta-leval authentication to the controller.
-
-For example, FOR ADMIN CONTROLLERS ONLY, supply a auth_identifier and use `--god` flag.
-
-In Gd mode, the objects are loaded directly from the base class (these controllers have full access)
-```
-def load_thing
-    @thing = Thing.find(params[:id])
-end
-
-```
-
-### `--button-icons` (default is no icons)
-You can specify this either as builder flag or as a config setting (in `config/hot_glue.yml`)
-Use `font-awesome` for Font Awesome or `none` for no icons.
 
 
-### `--specs-only`
-
-Produces ONLY the controller spec file, nothing else.
-
-
-### `--no-specs`
-
-Produces all the files except the spec file.
-
-
-### `--no-paginate` (default: false)
-
-Omits pagination. (All list views have pagination by default.)
-
-### `--paginate-per-page-selector` (default: false)
-
-Show a small drop-down below the list to let the user choose 10, 25, or 100 results per page.
-
-
-### `--no-list`
-
-Omits list action. Only makes sense to use this if want to create a view where you only want the create button or to navigate to the update screen alternative ways. (The new/create still appears, as well the edit, update & destroy actions are still created even though there is no natural way to navigate to them.)
-
-
-
-### `--no-create`
-
-Omits new & create actions.
-
-### `--no-delete`
-
-Omits delete button & destroy action.
-
-### `--no-controller`
-
-Omits controller.
-
-### `--no-list`
-
-Omits list views. 
-
-`--new-button-position` (above, below; default: above)
-Show the new button above or below the list.
-
-`--downnest-shows-headings` (default: false)
-Show headings above downnested portals.
-
-
-### `--big-edit`
-
-If you do not want inline editing of your list items but instead want to fallback to full-page style behavior for your edit views, use `--big-edit`. 
-
-The user will be taken to a full-screen edit page instead of an edit-in-place interaction.
-
-When using `--big-edit`, any downnested portals will be displayed on the edit page instead of on the list page. 
-
-Big edit makes all edit and magic button operations happen using `'data-turbo': false`, fully reloading the page and submitting HTML requests instead of TURBO_STREAM requests. 
-
-Likewise, the controller's `update` action always redirects instead of using Turbo.
-
-
-### `--display-list-after-update`
-
-After an update-in-place normally only the edit view is swapped out for the show view of the record you just edited.
-
-Sometimes you might want to redisplay the entire list after you make an update (for example, if your action removes that record from the result set).
-
-To do this, use flag `--display-list-after-update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
-
-### `--with-turbo-streams`
-
-If and only if you specify `--with-turbo-streams`, your views will contain `turbo_stream_from` directives. Whereas your views will always contain `turbo_frame_tags` (whether or not this flag is specified) and will use the Turbo stream replacement mechanism for non-idempotent actions (create & update). This flag just brings the magic of live-reload to the scaffold interfaces themselves.
-
-**_To test_**: Open the same interface in two separate browser windows. Make an edit in one window and watch your edit appear in the other window instantly.
-
-This happens using two interconnected mechanisms:
-
-1) by default, all Hot Glue scaffold is wrapped in `turbo_frame_tag`s. The id of these tags is your namespace + the Rails dom_id(...). That means all Hot Glue scaffold is namespaced to the namespaces you use and won't collide with other turbo_frame_tag you might be using elsewhere
-
-2) by appending **model callbacks**, we can automatically broadcast updates to the users who are using the Hot Glue scaffold. The model callbacks (after_update_commit and after_destroy_commit) get appended automatically to the top of your model file. Each model callback targets the scaffold being built (so just this scaffold), using its namespace, and renders the line partial (or destroys the content in the case of delete) from the scaffolding.
-
-please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
-
-
-### `--related-sets`
+### `--related-sets=`
 
 Used to show a checkbox set of related records. The relationship should be a `has_and_belongs_to_many` or a `has_many through:` from the object being built.
 
@@ -1207,49 +1259,43 @@ Note this leaves open a privileged escalation attack (a security vulnerability).
 To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see [Example #17 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
 
 
-### `--label`
+### `--label=`
 
 The general name of the thing, will be applied as "New ___" for the new button & form. Will be *pluralized* for list label heading, so if the word has a non-standard pluralization, be sure to specify it in `config/inflictions.rb`
 
 If you specify anything explicitly, it will be used.
 If not, a specification that exists as `@@tabel_label_singular` from the Model will be used.
-If this does not exist, the Titleized (capitalized) version of the model name. 
+If this does not exist, the Titleized (capitalized) version of the model name.
 
-### `--list-label-heading`
+### `--list-label-heading=`
 The plural of the list of things at the top of the list.
 If not, a specification that exists as `@@tabel_label_plural` from the Model will be used.
 If this does not exist, the UPCASE (all-uppercase) version of the model name.
 
-### `--new-button-label`
+### `--new-button-label=`
 Overrides the button on the list that the user clicks onto to create a new record.
 (Default is to follow the same rules described in the `--label` option but with the word "New" prepended.)
 
-### `--new-form-heading`
+### `--new-form-heading=`
 The text at the top of the new form that appears when the new input entry is displayed.
 (Default follows the same rules described in the `--label` option but with the word "New" prepended.)
 
-### `--no-list-label`
-Omits list LABEL itself above the list. (Do not confuse with the list heading which contains the field labels.)
-
-Note that list labels may  be automatically omitted on downnested scaffolds.
-
-
 ## Field Labels
 
-### `--form-labels-position` (default: `after`; options are **before**, **after**, and **omit**)
+### `--form-labels-position=` (default: `after`; options are **before**, **after**, and **omit**)
 By default form labels appear after the form inputs. To make them appear before or omit them, use this flag.
 
 See also `--form-placeholder-labels` to use placeolder labels.
 
 
-### `--form-placeholder-labels` (default: false)
+### `--form-placeholder-labels=` (default: false)
 
 When set to true, fields, numbers, and text areas will have placeholder labels.
 Will not apply to dates, times, datetimes, dropdowns (enums + foreign keys), or booleans.
 
 See also setting `--form-labels-position` to control position or omit normal labels.
 
-### `--inline-list-labels` (before, after, omit; default: omit)
+### `--inline-list-labels=` (before, after, omit; default: omit)
 
 Determines if field label will appear on the LIST VIEW. Note that because Hot Glue has no separate show route or page, this affects the `_show` template which is rendered as a partial from the LIST view.
 
@@ -1258,25 +1304,12 @@ Because the labels are already in the heading, this is `omit` by default. (Use w
 Use `before` to make the labels come before or `after` to make them come after. See Version 0.5.1 release notes for an example.
 
 
-### `--no-list-heading`
-
-Omits the heading of column names that appears above the 1st row of data.
-
-### `--include-object-names`
-
-When you are "Editing X" we specify that X is a ___ (author, book, room, etc)
-
-e.g. "Editing author Edgar Allan Poe" vs "Editing Edgar Allan Poe"
-
-Can also be specified globally in `config/hot_glue.yml`
-
-
 ### Code insertions
 
-`--code-before-create`
-`--code-after-create`
-`--code-before-update`
-`--code-after-update`
+### `--code-before-create=`
+### `--code-after-create=`
+### `--code-before-update=`
+### `--code-after-update=`
 
 Insert some code into the `create` action or `update` actions.
 The **before code** is called _after authorization_ but _before saving_ (which creates the record, or fails validation).
@@ -1285,9 +1318,8 @@ Both should be wrapped in quotation marks when specified in the command line, an
 (Notice the funky indentation of the lines in the generated code. Adjust you input to get the indentation correct.)
 
 
-## Searching
 
-### `--search` (options: simple, set, false predicate, default: false)
+### `--search=` (options: simple, set, false predicate, default: false)
 
 
 #### Set Search
@@ -1338,12 +1370,12 @@ Here's how you would add a search interface to Example #1 in the [Hot Glue Tutor
 bin/rails generate Book --include=name,author_id --search=set --search-fields=name,author_id
 ```
 
-#### Predicate
+#### Predicate Search
 NOT IMPLEMENTED YET
 TODO: implement me
 
 
-### `--attachments`
+### `--attachments=`
 
 #### ActiveStorage Quick Setup
 (For complete docs, refer to https://guides.rubyonrails.org/active_storage_overview.html)
@@ -1387,7 +1419,7 @@ If it finds one, it will render thumbnails from the attachment variant `thumb`. 
 
 If using the shortform syntax and Hot Glue does **not find a variant** called `thumb` at the code generation time, it will build scaffolding without thumbnails.
 
-#### `--attachments` Long form syntax with 1 parameter
+#### `--attachments=` Long form syntax with 1 parameter
 
 **--attachments='_attachment name_{_variant name_}'** 
 
@@ -1407,7 +1439,7 @@ end
 If using the long-form syntax with 1 parameter and Hot Glue does not find the specified variant declared in your attachment, it will stop and raise an error. 
 
 
-#### `--attachments` Long form syntax with 1st and 2nd parameters
+#### `--attachments=` Long form syntax with 1st and 2nd parameters
 
 **--attachments='_attachment name_{_variant name_|_field for saving original filename_}'**
 
@@ -1421,7 +1453,7 @@ Note that the `orig_filename` is not part of the inputted parameters,  it simply
 
 Note: The 1st and 2nd parameters may be left empty (use `||`) but the 3rd and 4th parameters must either be specified or the parameter must be left off. 
 
-#### `--attachments` Long form syntax with 1st, 2nd, and 3rd parameters
+#### `--attachments=` Long form syntax with 1st, 2nd, and 3rd parameters
 
 An optional 3rd parameter to the long-form syntax allows you to specify direct upload using the word "direct", which will add direct_upload: true to your f.file_field tags.
 
@@ -1433,7 +1465,7 @@ If you leave the 2nd parameter blank when using the 3rd parameter, it will defau
 
 `--attachments='avatar{thumbnail||direct}'`
 
-#### `--attachments` Long form syntax with 4 parameters
+#### `--attachments=` Long form syntax with 4 parameters
 
 The final (4th) parameter should be `dropzone` to enable dropzone support for this attachment.
 
@@ -1636,32 +1668,6 @@ Always:
 `@agent = factory.agent`
 
 Don't include this last line in your factory code. 
-
-## Nav Templates and `--no-nav-menu`
-At the namespace level, you can have a file called `_nav.html.erb` to create tabbed bootstrap nav 
-
-To create the file for the first time (at each namespace), start by running
-```
-bin/rails generate hot_glue:nav_template --namespace=xyz
-```
-
-This will append the file `_nav.html.erb` to the views folder at `views/xyz`. To begin, this file contains only the following:
-
-```
-<ul class='nav nav-tabs'>
-</ul>
-```
-
-Once the file is present, any further builds in this namespace will:
-
-1) Append to this `_nav.html.erb` file, adding a tab for the new built scaffold
-2) On the list view of the scaffold being built, it will include a render to the _nav partial, passing the name of the currently-viewed thing as the local variable `nav` (this is how the nav template knows which tab to make active). 
-```
-<%= render partial: "owner/nav", locals: {nav: "things"} %>
-```
-(In this example `owner/` is the namespace and `things` is the name of the scaffold being built)
-
-To suppress this behavior, add `--no-nav-menu` to the build command and the _nav template will not be touched.
 
 
 # SPECIAL FEATURES
