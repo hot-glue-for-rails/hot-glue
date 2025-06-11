@@ -1196,15 +1196,6 @@ Note this leaves open a privileged escalation attack (a security vulnerability).
 To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see [Example #17 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
 
 
-## "Thing" Label
-
-Note that on a per model basis, you can also globally omit the label or set a unique label value using
-`@@table_label_singular` and `@@table_label_plural` on your model objects.
-
-You have three options to specify labels explicitly with a string, and 1 option to specify a global name for which the words "Delete ___" and "New ___" will be added.
-
-If no `--label` is specified, it will be inferred to be the Capitalized version of the name of the thing you are building, with spaces for two or more words.
-
 ### `--label`
 
 The general name of the thing, will be applied as "New ___" for the new button & form. Will be *pluralized* for list label heading, so if the word has a non-standard pluralization, be sure to specify it in `config/inflictions.rb`
@@ -1219,12 +1210,12 @@ If not, a specification that exists as `@@tabel_label_plural` from the Model wil
 If this does not exist, the UPCASE (all-uppercase) version of the model name.
 
 ### `--new-button-label`
-The button on the list that the user clicks onto to create a new record.
-(Follows same rules described in the `--label` option but with the word "New" prepended.)
+Overrides the button on the list that the user clicks onto to create a new record.
+(Default is to follow the same rules described in the `--label` option but with the word "New" prepended.)
 
 ### `--new-form-heading`
 The text at the top of the new form that appears when the new input entry is displayed.
-(Follows same rules described in the `--label` option but with the word "New" prepended.)
+(Default follows the same rules described in the `--label` option but with the word "New" prepended.)
 
 ### `--no-list-label`
 Omits list LABEL itself above the list. (Do not confuse with the list heading which contains the field labels.)
@@ -1336,22 +1327,10 @@ Here's how you would add a search interface to Example #1 in the [Hot Glue Tutor
 bin/rails generate Book --include=name,author_id --search=set --search-fields=name,author_id
 ```
 
-
-
-
-
 #### Predicate
 NOT IMPLEMENTED YET
 TODO: implement me
 
-
-
-
-
-
-
-
-## Special Features
 
 ### `--attachments`
 
@@ -1674,6 +1653,18 @@ Once the file is present, any further builds in this namespace will:
 To suppress this behavior, add `--no-nav-menu` to the build command and the _nav template will not be touched.
 
 
+# SPECIAL FEATURES
+
+
+## "Thing" Label
+
+Note that on a per model basis, you can also globally omit the label or set a unique label value using
+`@@table_label_singular` and `@@table_label_plural` on your model objects.
+
+You have three options to specify labels explicitly with a string, and 1 option to specify a global name for which the words "Delete ___" and "New ___" will be added.
+
+If no `--label` is specified, it will be inferred to be the Capitalized version of the name of the thing you are building, with spaces for two or more words.
+
 
 ## Automatic Base Controller
 
@@ -1715,7 +1706,7 @@ Child portals have the headings omitted automatically (there is a heading identi
 
 
 
-# Note about enums
+## Note about enums
 
 The Rails 7 enum implementation for Postgres is very slick but has a counter-intuitive facet.
 
@@ -1760,7 +1751,7 @@ Now, your labels will show up on the front-end as defined in the `_labels` ("Is 
 
 You can modify an enum so that instead of a drop down list, it displays a partial view that you must build. See the [v0.5.23 Release notes](https://github.com/hot-glue-for-rails/hot-glue#2023-10-01---v0523) for details.
 
-### Validation Magic
+## Validation Magic
 
 Use ActiveRecord validations or hooks to validate your data. Hot Glue will automatically display the errors in the UI.
 
@@ -1778,7 +1769,7 @@ end
 
 ```
 
-### Typeahead Foreign Keys
+## Typeahead Foreign Keys
 
 Let's go back to the first Books & Authors example.
 assuming you have created
@@ -1876,7 +1867,7 @@ This means that to find users within the search, the essential piece of informat
 --
 
 
-### TinyMCE
+## TinyMCE
 1. `bundle add tinymce-rails` to add it to your Gemfile
 
 2. Add this inside of your `<head>` tag (at the bottom is fine)

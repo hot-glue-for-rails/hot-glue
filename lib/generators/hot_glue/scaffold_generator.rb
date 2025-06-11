@@ -302,6 +302,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @new_button_label = options['new_button_label'] || (eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? "New " + eval("#{class_name}.class_variable_get(:@@table_label_singular)") : "New " + singular.gsub("_", " ").titleize)
     @new_form_heading = options['new_form_heading'] || "New #{@label}"
 
+    # @table_display_name_singular = (eval("#{class_name}.class_variable_defined?(:@@table_label_singular)") ? eval("#{class_name}.class_variable_get(:@@table_label_singular)") : singular.gsub("_", " ").titleize)
+    @table_display_name_plural = (eval("#{class_name}.class_variable_defined?(:@@table_label_plural)") ? eval("#{class_name}.class_variable_get(:@@table_label_plural)") : plural.gsub("_", " ").titleize)
+
     setup_hawk_keys
     @form_placeholder_labels = options['form_placeholder_labels'] # true or false
     @inline_list_labels = options['inline_list_labels'] || get_default_from_config(key: :inline_list_labels) || 'omit' # 'before','after','omit'
