@@ -127,15 +127,24 @@ module HotGlue
           # if user_layout_columns.size > available_columns
           #   raise "Your include statement #{@include_setting } has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
           # end
+
+
+          columns_to_work_with =  (12 - @buttons_width)
+
+          if columns_to_work_with < user_layout_columns.size
+            raise "Your include statement #{@include_setting } has #{user_layout_columns.size} columns, but I can only construct up to #{columns_to_work_with}"
+          end
+
+          target_col_size = columns_to_work_with / user_layout_columns.size
+          extra_columns = columns_to_work_with % user_layout_columns.size
+
+
           user_layout_columns.each_with_index  do |column,i|
             layout_object[:columns][:container][i] = column.split(",").collect(&:to_sym)
-
-            default_col_width = 1
-            if extra_columns > 0
-              default_col_width += 1
-              extra_columns -= 1
+            layout_object[:columns][:bootstrap_column_width][i] = target_col_size
+            if i < extra_columns
+              layout_object[:columns][:bootstrap_column_width][i] += 1
             end
-            layout_object[:columns][:bootstrap_column_width][i] = default_col_width
           end
 
           if user_layout_columns.size < layout_object[:columns][:container].size
