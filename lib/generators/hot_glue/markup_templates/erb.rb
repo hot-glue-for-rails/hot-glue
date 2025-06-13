@@ -100,7 +100,7 @@ module  HotGlue
               if_statements = []
               if_statements << "false" if invisible_update.include?(col_name.to_sym)
               # if_statements << "@action == 'new'" if invisible_create.include?(col_name.to_sym)
-              the_output = "<% if ( " +  if_statements.join(" || ") + " || policy(@#{@plural}).#{col_name}_able? ) %>" +
+              the_output = "<% if ( " +  if_statements.join(" || ") + " || policy(#{@plural}).#{col_name}_able? ) %>" +
                 +  the_output + "<% end %>"
 
             end

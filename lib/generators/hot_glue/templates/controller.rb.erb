@@ -288,7 +288,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <%= (fields_filtered_for_strong_params - @show_only).collect{|col|
     # TODO : fields not on show only also not invisible should be checked here
     # for _able? methods and added only when able
-    if (eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym))
+    if (@invisible_create.include?(col) || eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym))
         "fields.delete :#{col} if !policy(@#{singular}).#{col}_able?"
     else
       nil
@@ -303,7 +303,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <%= (fields_filtered_for_strong_params - @update_show_only).collect{|col|
     # TODO : fields not on show only also not invisible should be checked here
     # for _able? methods and added only when able
-    if (eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym))
+    if (@invisible_create.include?(col) || eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym))
         "fields.delete :#{col} if !policy(@#{singular}).#{col}_able?"
     else
       nil
