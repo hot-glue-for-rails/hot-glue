@@ -12,7 +12,7 @@ module  HotGlue
                   :search, :search_fields, :search_query_fields, :search_position,
                   :form_path, :layout_object, :search_clear_button, :search_autosearch,
                   :stimmify, :stimmify_camel, :hidden_create, :hidden_update, :invisible_create,
-                  :invisible_update
+                  :invisible_update, :plural
 
 
     def initialize(singular:, singular_class: ,
@@ -25,7 +25,7 @@ module  HotGlue
                  search:, search_fields:, search_query_fields: , search_position:,
                  search_clear_button:, search_autosearch:, layout_object:,
                  form_path: , stimmify: , stimmify_camel:, hidden_create:, hidden_update: ,
-                 invisible_create:, invisible_update: )
+                 invisible_create:, invisible_update: , plural: )
 
 
       @form_path = form_path
@@ -40,6 +40,7 @@ module  HotGlue
       @hidden_update = hidden_update
       @invisible_create = invisible_create
       @invisible_update = invisible_update
+      @plural = plural
 
       @singular = singular
       @singular_class = singular_class
@@ -93,7 +94,18 @@ module  HotGlue
 
         size = layout_object[:columns][:bootstrap_column_width][i]
         "<div class='#{layout_strategy.column_classes_for_column_headings(size)} hg-heading-row heading--#{singular}--#{column.join("-")}' " + col_style + ">" +
-          column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
+          column.map(&:to_s).map{|col_name|
+            the_output = "#{col_name.humanize}"
+            if invisible_update.include?(col_name.to_sym)
+              if_statements = []
+              if_statements << "false" if invisible_update.include?(col_name.to_sym)
+              # if_statements << "@action == 'new'" if invisible_create.include?(col_name.to_sym)
+              the_output = "<% if ( " +  if_statements.join(" || ") + " || policy(@#{@plural}).#{col_name}_able? ) %>" +
+                +  the_output + "<% end %>"
+
+            end
+            the_output
+          }.join("<br />")  + "</div>"
       }.join("\n")
       return result
     end

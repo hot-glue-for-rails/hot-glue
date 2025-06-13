@@ -992,7 +992,7 @@ Because Hot Glue detects the `*_able?` methods at build time, if you add them to
 
 
 ### `--pundit-policy-override=`
-if you use the flag `--pundit-policy-override` your controller operations will bypass the invisible (pundit provided) access control and use the pundit policy you specify.
+if you pass a custom pundit class to `--pundit-policy-override=` your controller operations will bypass the invisible (pundit provided) access control and use the pundit policy you specify.
 
 example
 
@@ -1006,6 +1006,8 @@ If provided, the output code looks something like (in this example, showing the 
     skip_authorization
     raise Pundit::NotAuthorizedError if ! UniqueInvoicePolicy.edit?
 ```
+
+
 
 
 ### `--show-only=`
@@ -1183,6 +1185,46 @@ Must be used with Pundit. Without pundit, see other alternatives: hidden fields,
 | Invisible                              | Displayed in the HTML output and received by the controller for create or update action but shown as a hidden_field on the HTML, invisible to the user. You should use this if you want to construct your own form input or set the value via Javascript | Cannot be used without Pundit. With pundit, fields editable via the policy are editable on the screen and non-editable via the policy are make invisible (completely removed) from the screen. |   |   |
 | Hidden                                 | Not displayed or updatable if the field respond false to _able? or the Policy doesn't allow.                                                                                                                                                             | Unrelated to pundit Policy                                                                                                                                                                     |   |   |
 |                                        |                                                                                                                                                                                                                                                          |                                                                                                                                                                                                |   |   |
+
+
+Pundit calls the policy for every action, including the index action. In these cases it passes an association instead of a single record.
+
+Normally, field level access control that applies for show only and invisible is affects each record, in the list view, new page, or edit page.
+
+For that reason, your `_able?` methods may check the individual records, except in the case of the `index` action for which the pundit policy has no individual record.
+
+For these special cases, you might want to hide the entire column itself when the `_able?` return false on the association call (not in the context any of any record).
+
+You'd want to do this for a global switch, unrelated to the record, to show or hide the column itself. When using invisible fields, the column headings are check against the policy's `_able?` fields, too, but since this called on the list, the entire set of objects being returned by the list is passed to the policy. (For example `policy(@things)`)
+
+This makes it impossible to make your access control depend solely on the record itself, so can be used only for context-based access control that is applied to the column headings. 
+
+
+In a case like this, you'll want the `_able?` method on the policy to know if the object is a record or many records.
+
+```
+class ThingPolicy  < ApplicationPolicy
+  attr_reader :user, :thing
+
+  def initialize(user, thing)
+    @user = user
+    @thing = thing if thing.is_a? Thing  # a thing is not a Thing when it is an active relation of many things
+  end
+
+  def ccc_able?
+    if thing.is_a? Thing
+      !!thing.bbb
+    else 
+      current_user.is_admin?
+    end
+  end
+  # more policy method here ...
+end
+```
+Here, for all CRUD actions, the object is a thing, and so the editablility of ccc is dependent on bbb being true.
+If thing is not a Thing, then it is active relation (so this applies to the column headings) and we show it only to admins. 
+
+Remember, since the `_able?` methods are not otherwise called during Pundit's index cycle, this applies only to the list column headings and has no bearing on create, update, read, delete for which the access control can be anything you want that is available to the Poilcy. 
 
 
 

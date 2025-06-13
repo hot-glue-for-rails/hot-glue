@@ -689,6 +689,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         update_show_only: @update_show_only,
         singular_class: singular_class,
         singular: singular,
+        plural: @plural,
         hawk_keys: @hawk_keys,
         ownership_field: @ownership_field,
         form_labels_position: @form_labels_position,
