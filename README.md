@@ -1157,18 +1157,21 @@ The code above uses Code Mirror to act as a code editor, which requires pulling 
 ### `--update-invisible=`
 (two lists are maintained: create and update. any fields on the unnamed invisible list will be invisible on both create and update actions)
 
-If a field is on the invisible list, the policy will be checked for a _able? method.
-If this method returns true, it will be either be displayed as a normal, editable field (when editable).
+If a field is on the invisible list, the policy will be checked for a `_able?` method.
+If this method returns true, displayed like a normal editable field.
 
-If the policy doesn't allow editing, this field will be completely removed from the form.
+If the policy doesn't allow editing, this field will be made invisible: completely removed from the form.
 
 Like show only, these will check for `*_able?` methods on the object or Policy and will only display the field if the method returns true.
 
-It will also block the field from being updated on the backend, so don't use this if you want create a hidden_field tag but still allow the controller to update it. (For that, see `--hidden=`.)
+It will also block the field from being updated on the backend, so don't use this if you want to create a hidden_field tag but still allow the controller to update it. (For that, see `--hidden=`.)
 
 A field cannot be marked invisible and show-only at the same time.
 
 Like show-only, note special behavior with pundit.
+
+Hidden can be used with invisible. In this case, the access control will be applied to the field. When editable, the hidden field output will be used.
+
 
 Must be used with Pundit. Without pundit, see other alternatives: hidden fields, show only fields, or just removing the field completely by using the exclude list or leaving it off the include list. 
 
