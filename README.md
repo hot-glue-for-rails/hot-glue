@@ -1258,7 +1258,8 @@ Finally, you can raise an ActiveRecord error which will also get passed to the u
 
 For more information see [Example 6 in the Tutorial](https://school.jfbcodes.com/8188)
 
-You can also define methods on your model that have the same name as the button with `_able?` at the end. 
+You can also define methods on your model that have the same name as the button with `_able?` at the end.
+(Prior to v0.6.20, these methods expected names with `able?` but no underscore.)
 
 The button will be display as disabled if the method returns false.
 
@@ -2016,6 +2017,25 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+
+#### 2025-06-13 v0.6.20
+Breaking changes:
+• the setting in your hot_glue.yml file for `:pundit_default:` has been renamed just `:pundit:`.
+If you fail to rename it in your config file, hot glue will not build if it finds the old config setting.
+
+• previously magic methods had a ability method that was the name of the magic method + `able?` as one word.
+this has been renamed to `_able?` and you must fix your cooresponding magic method ability methods by adding the underscore
+
+
+New Features
+• adds new invisibilty feature with  `--invisible`, `--create-invisible`, and `--update-invisible` see docs above
+• changes previous `--hidden` into `--hidden`, `--create-hidden`, and `--update-hidden`. use hidden to apply to both fields
+• restores functionality of layout builder to magically distribute bootstrap 12 columns
+(4 columns use rows of 3 col widths; 2 columns use 6, 3 uses 4, etc). WHen using specified grouping mode, you
+probably want about 3 or 4 columns. When you have more than 5 it's difficult to build layouts that look good.
+
+
 
 #### 2025-06-10 v0.6.19
 
