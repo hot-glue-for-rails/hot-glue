@@ -930,8 +930,7 @@ Hot Glue gives you automatic field level access control if you create `*_able?` 
 The `*_able?` method should return true or false depending on whether or not the field can be edited. No distinction is made between the `new` and `edit` contexts. You may check if the record is new using `new_record?`.
 
 
-**The `*_able?` method is used by Hot Glue only on the new and edit actions. You must incorporate it into the policy's `update?` method as in the example, or else no guard will check prevent the user doesn't pass a value to input it anyway.**
-
+**The `*_able?` method is used by Hot Glue only on the new and edit actions and also affects the strong parameters, so you no longer need to incorporate it into your policy's `update?` method
 
 Add one `*_able?` method to the policy for each field you want to allow field-level access control. 
 
@@ -940,12 +939,8 @@ Replace `*` with the name of the field you want under access control. Remember t
 When the method returns true, the field will be displayed to the user (and allowed) for editing. 
 When the method returns false, the field will be displayed as read-only (viewable) to the user.
 
-Important: These special fields determine *only* display behavior (new and edit), not create and update. 
-
-For create & update field-level access control, you must also implement the `update?` method on the Policy. Notice how in the example policy below, the `update?` method uses the `name_able?` method when it is checking if the name field can be updated, tying the feature together.
-
 You can set Pundit to be enabled globally on the whole project for every build in `config/hot_glue.yml` (then you can leave off the `--pundit` flag from the scaffold command)
-`:pundit_default:` (all builds in that project will use Pundit)
+`:pundit:` (all builds in that project will use Pundit)
 
 
 Here's an example `ThingPolicy` that would allow **editing the name field** only if:
@@ -967,14 +962,11 @@ class ThingPolicy < ApplicationPolicy
   end
   
   def update?
-     if !@user.is_admin?
-       return false
-    elsif record.name_changed? && !name_able?
-      record.errors.add(:name, "cannot be changed.")
-      return false
-    else
-      return true
-    end
+    !@user.is_admin?
+  end
+    
+  def edit?
+    !@user.is_admin?
   end
   
   class Scope < Scope
@@ -986,7 +978,6 @@ class ThingPolicy < ApplicationPolicy
   end
 end
 ```
-
 
 Because Hot Glue detects the `*_able?` methods at build time, if you add them to your policy, you will have to rebuild your scaffold.
 
@@ -1168,23 +1159,23 @@ Like show only, these will check for `*_able?` methods on the object or Policy a
 
 It will also block the field from being updated on the backend, so don't use this if you want to create a hidden_field tag but still allow the controller to update it. (For that, see `--hidden=`.)
 
-A field cannot be marked invisible and show-only at the same time.
 
 Like show-only, note special behavior with pundit.
 
-Hidden can be used with invisible. In this case, the access control will be applied to the field. When editable, the hidden field output will be used.
+A field can be marked invisible and show-only, in which case the invisible rule take prescedence when the access control is denied (field removed from form) but th show-only rule takes prescedance when the access control is granted,
 
+Hidden can be used with invisible. In this case, the access control will be applied to the field. When editable, the hidden field output will be used.
 
 Must be used with Pundit. Without pundit, see other alternatives: hidden fields, show only fields, or just removing the field completely by using the exclude list or leaving it off the include list. 
 
-|                                        |                                                                                                                                                                                                                                                          | Pundit                                                                                                                                                                                         |   |   |
-|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|---|
-| fields not on any of these other lists | Included as editable on both the create + update actions                                                                                                                                                                                                 | Without pundit, everything is editable. With pundit, the Policy is checked for an `_able?` method                                                                                              |   |   |
-| Show only                              | Viewable only (non-editable) on both create + edit/update or if Pundit doesn't allow editing.                                                                                                                                                            | Without pundit, everything is viewable only. With pundit, what is editable via the Policy is editable on the screen and what is not editable is viewable to the user.                          |   |   |
-| Update Show only                       | Viewable only on the update screen or if Pundit doesn't allow editing                                                                                                                                                                                    | Same as above but apply only to the update screen.                                                                                                                                             |   |   |
-| Invisible                              | Displayed in the HTML output and received by the controller for create or update action but shown as a hidden_field on the HTML, invisible to the user. You should use this if you want to construct your own form input or set the value via Javascript | Cannot be used without Pundit. With pundit, fields editable via the policy are editable on the screen and non-editable via the policy are make invisible (completely removed) from the screen. |   |   |
-| Hidden                                 | Not displayed or updatable if the field respond false to _able? or the Policy doesn't allow.                                                                                                                                                             | Unrelated to pundit Policy                                                                                                                                                                     |   |   |
-|                                        |                                                                                                                                                                                                                                                          |                                                                                                                                                                                                |   |   |
+|                                        |                                                                                                                                                                                                                                                          | Pundit                                                                                                                                                                                                                                                          |   |   |
+|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|---|
+| fields not on any of these other lists | Included as editable on both the create + update actions or as viewable if Policy access control returns false                                                                                                                                           | Without pundit, everything is editable. With pundit, the Policy is checked for an `_able?` method for each field at build time. When this method returns false, the field is viewable.                                                                          |   |   |
+| Show only                              | Viewable only (non-editable) on both create + edit/update overriding whatever Policy returns.                                                                                                                                                            | Without pundit, this field is viewable only. Overrides whatever policy returns.                                                                                                                                                                                 |   |   |
+| Update Show only                       | Viewable only on the update screen or if Pundit doesn't allow editing                                                                                                                                                                                    | Same as above but apply only to the update screen.                                                                                                                                                                                                              |   |   |
+| Invisible                              | Displayed in the HTML output and received by the controller for create or update action but shown as a hidden_field on the HTML, invisible to the user. You should use this if you want to construct your own form input or set the value via Javascript | Cannot be used without Pundit. With pundit, fields editable via the policy are editable on the screen (unless they are also show-only, in which case they are visible) and non-editable via the policy are made invisible (completely removed) from the screen. |   |   |
+| Hidden                                 | Not displayed or updatable if the field respond false to _able? or the Policy doesn't allow.                                                                                                                                                             | Unrelated to pundit Policy                                                                                                                                                                                                                                      |   |   |
+|                                        |                                                                                                                                                                                                                                                          |                                                                                                                                                                                                                                                                 |   |   |
 
 
 Pundit calls the policy for every action, including the index action. In these cases it passes an association instead of a single record.
@@ -1208,14 +1199,14 @@ class ThingPolicy  < ApplicationPolicy
 
   def initialize(user, thing)
     @user = user
-    @thing = thing if thing.is_a? Thing  # a thing is not a Thing when it is an active relation of many things
+    @thing = thing 
   end
 
   def ccc_able?
-    if thing.is_a? Thing
-      !!thing.bbb
+    if thing.is_a?(Thing) # a thing is not a Thing when it is an active relation of many things
+      !!thing.bbb # show or hide ccc based on whether or not bbb is true
     else 
-      current_user.is_admin?
+      current_user.is_admin? # show or hide the column heading for ccc based on whether or not the current user is an admin
     end
   end
   # more policy method here ...
