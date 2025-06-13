@@ -285,15 +285,6 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   def <%=singular_name%>_params
     fields = <%= ((fields_filtered_for_strong_params - @show_only) + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %><%= ", " +  @alt_lookups.collect{|k,v|  ":__lookup_#{v[:assoc].downcase}_#{v[:lookup_as]}"  }.join(", ") if @alt_lookups.any? %>
-    <%= (fields_filtered_for_strong_params - @show_only).collect{|col|
-    # TODO : fields not on show only also not invisible should be checked here
-    # for _able? methods and added only when able
-    if (@invisible_create.include?(col) || eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym))
-        "fields.delete :#{col} if !policy(@#{singular}).#{col}_able?"
-    else
-      nil
-    end
-    }.compact.join("\n    ") %>
     params.require(:<%= testing_name %>).permit(fields)
   end<% if @update_show_only %>
 
