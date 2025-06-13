@@ -11,7 +11,8 @@ module  HotGlue
                   :attachments, :show_only, :columns_map, :pundit, :related_sets,
                   :search, :search_fields, :search_query_fields, :search_position,
                   :form_path, :layout_object, :search_clear_button, :search_autosearch,
-                  :stimmify, :stimmify_camel, :hidden_create, :hidden_update
+                  :stimmify, :stimmify_camel, :hidden_create, :hidden_update, :invisible_create,
+                  :invisible_update
 
 
     def initialize(singular:, singular_class: ,
@@ -23,7 +24,8 @@ module  HotGlue
                  update_show_only:, attachments: , columns_map:, pundit:, related_sets:,
                  search:, search_fields:, search_query_fields: , search_position:,
                  search_clear_button:, search_autosearch:, layout_object:,
-                 form_path: , stimmify: , stimmify_camel:, hidden_create:, hidden_update: )
+                 form_path: , stimmify: , stimmify_camel:, hidden_create:, hidden_update: ,
+                 invisible_create:, invisible_update: )
 
 
       @form_path = form_path
@@ -36,6 +38,8 @@ module  HotGlue
       @stimmify_camel = stimmify_camel
       @hidden_create = hidden_create
       @hidden_update = hidden_update
+      @invisible_create = invisible_create
+      @invisible_update = invisible_update
 
       @singular = singular
       @singular_class = singular_class
@@ -163,6 +167,7 @@ module  HotGlue
                 "<% if @action == 'new' && policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output + "<% end %>"
 
                  # show only on the update action overrides any pundit policy
+
               elsif @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
                 "<% if policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output  + "<% end %>"
               elsif update_show_only.include?(col)
@@ -195,6 +200,18 @@ module  HotGlue
               the_output = "<% if " + if_statements.join(" || ") + " %>" +
                 columns_map[col].hidden_output + "<% else %>" +  the_output + "<% end %>"
             end
+
+            if invisible_create.include?(col) || invisible_update.include?(col)
+              if_statements = []
+              if_statements << "@action == 'edit'" if invisible_update.include?(col.to_sym)
+              if_statements << "@action == 'new'" if invisible_create.include?(col.to_sym)
+
+              the_output = "<% if !(" + if_statements.join(" || ") + ") || policy(@#{singular}).#{col}_able? %>" +
+                +  the_output + "<% end %>"
+            end
+
+
+
             the_output
           }.join("") + "\n  </div>"
       }.join("\n")
@@ -240,7 +257,21 @@ module  HotGlue
           
           label = "<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
-          "#{inline_list_labels == 'before' ? label + "<br/>" : ''}#{field_output}#{inline_list_labels == 'after' ? "<br/>" + label : ''}"
+          the_output = "#{inline_list_labels == 'before' ? label + "<br/>" : ''}#{field_output}#{inline_list_labels == 'after' ? "<br/>" + label : ''}"
+          if invisible_create.include?(col) || invisible_update.include?(col)
+            if_statements = []
+            if invisible_update.include?(col.to_sym) && invisible_create.include?(col.to_sym)
+            # elsif invisible_create.include?(col.to_sym)
+            #   if_statements << "!(@action == 'new')"
+            else
+              if_statements << "@action == 'edit'"
+            end
+
+            if_statements << " policy(#{singular}).#{col}_able?"
+            the_output = "<% if  " +  if_statements.join(" || ") + " %>" +
+              +  the_output + "<% end %>"
+          end
+          the_output
         }.join(  "<br />") + "</div>"
       }.join("\n")
       return result

@@ -29,7 +29,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :form_labels_position, :no_nav_menu, :pundit,
                 :self_auth, :namespace_value, :record_scope, :related_sets,
                 :search_clear_button, :search_autosearch, :include_object_names,
-                :stimmify, :stimmify_camel, :hidden_create, :hidden_update
+                :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
+                :invisible_create, :invisible_update
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -60,6 +61,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :hidden, type: :string, default: ""
   class_option :hidden_create, type: :string, default: ""
   class_option :hidden_update, type: :string, default: ""
+  class_option :invisible, type: :string, default: ""
+  class_option :invisible_create, type: :string, default: ""
+  class_option :invisible_update, type: :string, default: ""
+
   class_option :ujs_syntax, type: :boolean, default: nil
   class_option :downnest, type: :string, default: nil
   class_option :magic_buttons, type: :string, default: nil
@@ -246,6 +251,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       puts "hidden create fields #{@hidden_create}}"
     end
 
+
+    @invisible_all = options['invisible'].split(",").collect(&:to_sym)
+    @invisible_create = options['invisible_create'].split(",").collect(&:to_sym)
+    @invisible_update = options['invisible_update'].split(",").collect(&:to_sym)
+    @invisible_update.concat(@invisible_all) if @invisible_all.any?
+    @invisible_update.uniq!
+    @invisible_create.concat(@invisible_all) if @invisible_all.any?
+    @invisible_create.uniq!
+
+
     @modify_as = {}
     if !options['modify'].empty?
       modify_input = options['modify'].split(",")
@@ -371,10 +386,18 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @no_nav_menu = options['no_nav_menu']
 
-    if @pundit.nil?
-      @pundit = get_default_from_config(key: :pundit_default)
+    if get_default_from_config(key: :pundit_default)
+      raise "please note the config setting `pundit_default` has been renamed `pundit`. please update your hot_glue.yml file"
     end
 
+    if @pundit.nil?
+      @pundit = get_default_from_config(key: :pundit)
+    end
+
+
+    if (@invisible_create + @invisible_update).any? && !@pundit
+      raise "you specified invisible fields without using Pundit. please remove the invisible fields or use --pundit"
+    end
 
     if options['include'].include?(":") && @smart_layout
       raise HotGlue::Error, "You specified both --smart-layout and also specified grouping mode (there is a : character in your field include list); you must remove the colon(s) from your --include tag or remove the --smart-layout option"
@@ -685,6 +708,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         stimmify_camel: @stimmify_camel,
         hidden_create: @hidden_create,
         hidden_update: @hidden_update,
+        invisible_create: @invisible_create,
+        invisible_update: @invisible_update,
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")
