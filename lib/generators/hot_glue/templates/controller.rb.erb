@@ -98,8 +98,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <% if @pundit && !@pundit_policy_override %>
     authorize @<%= singular %><% elsif @pundit && @pundit_policy_override %>
     skip_authorization
-    raise Pundit::NotAuthorizedError if ! <%= @pundit_policy_override %>.new?<% end %><% if @pundit %>
-    @action = 'new'
+    raise Pundit::NotAuthorizedError if ! <%= @pundit_policy_override %>.new?<% end %>
+    @action = 'new' <% if @pundit %>
   rescue Pundit::NotAuthorizedError
     flash[:alert] = 'You are not authorized to perform this action.'
     load_all_<%= plural %>

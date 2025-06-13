@@ -6,7 +6,7 @@ class Field
                 :self_auth,
                 :singular_class,  :singular, :sql_type, :ownership_field,
                 :update_show_only, :namespace, :pundit, :plural,
-                :stimmify, :hidden, :attachment_data, :god
+                :stimmify, :hidden_create, :hidden_update, :attachment_data, :god
 
 
   def initialize(
@@ -33,7 +33,8 @@ class Field
     @default_boolean_display = scaffold.default_boolean_display
     @namespace = scaffold.namespace_value
     @stimmify = scaffold.stimmify
-    @hidden = scaffold.hidden
+    @hidden_create = scaffold.hidden_create
+    @hidden_update = scaffold.hidden_update
     @attachment_data = scaffold.attachments[name.to_sym]
     @god = scaffold.god
 
