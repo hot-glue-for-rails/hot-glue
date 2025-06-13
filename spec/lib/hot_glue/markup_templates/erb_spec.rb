@@ -75,7 +75,11 @@ describe HotGlue::ErbTemplate do
       form_path: "/jkls",
       stimmify: nil,
       stimmify_camel: nil,
-      hidden: [])
+      hidden_create: [],
+      hidden_update: [],
+      invisible_create: [],
+      invisible_update: [],
+      plural: [])
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy)
 
@@ -140,7 +144,11 @@ describe HotGlue::ErbTemplate do
       form_path: "/jkls",
       stimmify: nil,
       stimmify_camel: nil,
-      hidden: options[:hidden] || []
+      hidden_create: [],
+      hidden_update: [],
+      invisible_create: [],
+      invisible_update: [],
+      plural: "jkls"
       )
 
     @template_builder.all_line_fields( perc_width: 15,

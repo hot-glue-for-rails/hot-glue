@@ -11,7 +11,8 @@ module  HotGlue
                   :attachments, :show_only, :columns_map, :pundit, :related_sets,
                   :search, :search_fields, :search_query_fields, :search_position,
                   :form_path, :layout_object, :search_clear_button, :search_autosearch,
-                  :stimmify, :stimmify_camel, :hidden
+                  :stimmify, :stimmify_camel, :hidden_create, :hidden_update, :invisible_create,
+                  :invisible_update, :plural
 
 
     def initialize(singular:, singular_class: ,
@@ -23,7 +24,8 @@ module  HotGlue
                  update_show_only:, attachments: , columns_map:, pundit:, related_sets:,
                  search:, search_fields:, search_query_fields: , search_position:,
                  search_clear_button:, search_autosearch:, layout_object:,
-                 form_path: , stimmify: , stimmify_camel:, hidden: )
+                 form_path: , stimmify: , stimmify_camel:, hidden_create:, hidden_update: ,
+                 invisible_create:, invisible_update: , plural: )
 
 
       @form_path = form_path
@@ -34,7 +36,11 @@ module  HotGlue
       @layout_object = layout_object
       @stimmify = stimmify
       @stimmify_camel = stimmify_camel
-      @hidden = hidden
+      @hidden_create = hidden_create
+      @hidden_update = hidden_update
+      @invisible_create = invisible_create
+      @invisible_update = invisible_update
+      @plural = plural
 
       @singular = singular
       @singular_class = singular_class
@@ -75,7 +81,7 @@ module  HotGlue
           (big_edit ? ", \"turbo\": false" : "") +
            "}} do |f| %>" +
           "<%= f.hidden_field :__#{button_name}, value: \"__#{button_name}\" %>" +
-          "<%= f.submit '#{button_name.titleize}'.html_safe, disabled: (#{singular}.respond_to?(:#{button_name}able?) && ! #{singular}.#{button_name}able? ), class: '#{singular}-button #{@layout_strategy.button_applied_classes} #{@layout_strategy.magic_button_classes}' %>" +
+          "<%= f.submit '#{button_name.titleize}'.html_safe, disabled: (#{singular}.respond_to?(:#{button_name}_able?) && ! #{singular}.#{button_name}_able? ), class: '#{singular}-button #{@layout_strategy.button_applied_classes} #{@layout_strategy.magic_button_classes}' %>" +
         "<% end %>"
       }.join("\n")
     end
@@ -88,7 +94,18 @@ module  HotGlue
 
         size = layout_object[:columns][:bootstrap_column_width][i]
         "<div class='#{layout_strategy.column_classes_for_column_headings(size)} hg-heading-row heading--#{singular}--#{column.join("-")}' " + col_style + ">" +
-          column.map(&:to_s).map{|col_name| "#{col_name.humanize}"}.join("<br />")  + "</div>"
+          column.map(&:to_s).map{|col_name|
+            the_output = "#{col_name.humanize}"
+            if invisible_update.include?(col_name.to_sym)
+              if_statements = []
+              if_statements << "false" if invisible_update.include?(col_name.to_sym)
+              # if_statements << "@action == 'new'" if invisible_create.include?(col_name.to_sym)
+              the_output = "<% if ( " +  if_statements.join(" || ") + " || policy(#{@plural}).#{col_name}_able? ) %>" +
+                +  the_output + "<% end %>"
+
+            end
+            the_output
+          }.join("<br />")  + "</div>"
       }.join("\n")
       return result
     end
@@ -160,7 +177,6 @@ module  HotGlue
                 "<% if @action == 'edit' %>" + columns_map[col].form_show_only_output + "<% else %>" + columns_map[col].form_field_output + "<% end %>"
               elsif update_show_only.include?(col) && @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
                 "<% if @action == 'new' && policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output + "<% end %>"
-
                  # show only on the update action overrides any pundit policy
               elsif @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
                 "<% if policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output  + "<% end %>"
@@ -178,17 +194,35 @@ module  HotGlue
               data_attr = " data-#{@stimmify}-target='#{col_target}Wrapper'"
             end
 
-            unless hidden.include?(col.to_sym)
-              add_spaces_each_line( "\n  <span #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>' #{data_attr} >\n" +
-                                      add_spaces_each_line( (form_labels_position == 'before' ? (the_label || "") + "<br />\n"  : "") +
-                                                              +  field_result +
-                                                              (form_labels_position == 'after' ? (  columns_map[col].newline_after_field? ? "<br />\n" : "") + (the_label || "") : "")  , 4) +
-                                      "\n  </span>\n ", 2)
-            else
-              columns_map[col].hidden_output
+
+            the_output =   add_spaces_each_line( "\n  <span #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>' #{data_attr} >\n" +
+                                                             add_spaces_each_line( (form_labels_position == 'before' ? (the_label || "") + "<br />\n"  : "") +
+                                                                                     +  field_result +
+                                                                                     (form_labels_position == 'after' ? (  columns_map[col].newline_after_field? ? "<br />\n" : "") + (the_label || "") : "")  , 4) +
+                                                             "\n  </span>\n ", 2)
+
+
+            if hidden_create.include?(col.to_sym) || hidden_update.include?(col.to_sym)
+              if_statements = []
+              if_statements << "@action == 'edit'" if hidden_update.include?(col.to_sym)
+              if_statements << "@action == 'new'" if hidden_create.include?(col.to_sym)
+
+              the_output = "<% if " + if_statements.join(" || ") + " %>" +
+                columns_map[col].hidden_output + "<% else %>" +  the_output + "<% end %>"
+            end
+
+            if invisible_create.include?(col) || invisible_update.include?(col)
+              if_statements = []
+              if_statements << "@action == 'edit'" if invisible_update.include?(col.to_sym)
+              if_statements << "@action == 'new'" if invisible_create.include?(col.to_sym)
+
+              the_output = "<% if !(" + if_statements.join(" || ") + ") || policy(@#{singular}).#{col}_able? %>" +
+                +  the_output + "<% end %>"
             end
 
 
+
+            the_output
           }.join("") + "\n  </div>"
       }.join("\n")
       return result
@@ -233,7 +267,21 @@ module  HotGlue
           
           label = "<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
 
-          "#{inline_list_labels == 'before' ? label + "<br/>" : ''}#{field_output}#{inline_list_labels == 'after' ? "<br/>" + label : ''}"
+          the_output = "#{inline_list_labels == 'before' ? label + "<br/>" : ''}#{field_output}#{inline_list_labels == 'after' ? "<br/>" + label : ''}"
+          if invisible_create.include?(col) || invisible_update.include?(col)
+            if_statements = []
+            if invisible_update.include?(col.to_sym) && invisible_create.include?(col.to_sym)
+            # elsif invisible_create.include?(col.to_sym)
+            #   if_statements << "!(@action == 'new')"
+            else
+              if_statements << "@action == 'edit'"
+            end
+
+            if_statements << " policy(#{singular}).#{col}_able?"
+            the_output = "<% if  " +  if_statements.join(" || ") + " %>" +
+              +  the_output + "<% end %>"
+          end
+          the_output
         }.join(  "<br />") + "</div>"
       }.join("\n")
       return result

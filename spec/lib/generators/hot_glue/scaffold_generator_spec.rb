@@ -590,7 +590,7 @@ describe "HotGlue::ScaffoldGenerator" do
         res = File.read("spec/dummy/app/controllers/dfgs_controller.rb")
 
         expect(res).to include("def update_dfg_params")
-        expect(res).to include("def dfg_params\n    params.require(:dfg).permit(:cantelope_id)")
+        expect(res).to include("def dfg_params\n    fields = :cantelope_id")
       end
     end
 
@@ -613,8 +613,7 @@ describe "HotGlue::ScaffoldGenerator" do
         res = File.read("spec/dummy/app/controllers/dfgs_controller.rb")
         expect(res).to include("def update_dfg_params")
 
-        expect(res).to include("def update_dfg_params\n    params.require(:dfg).permit(:cantelope_id)")
-        expect(res).to include("def update_dfg_params\n    params.require(:dfg).permit(:cantelope_id)")
+        expect(res).to include("def update_dfg_params\n    fields = :cantelope_id")
       end
 
 
@@ -624,8 +623,9 @@ describe "HotGlue::ScaffoldGenerator" do
 
         res = File.read("spec/dummy/app/controllers/dfgs_controller.rb")
         expect(res).to include("def update_dfg_params")
-        expect(res).to include("def dfg_params\n    params.require(:dfg).permit(:name, :cantelope_id)")
-        expect(res).to include("def update_dfg_params\n    params.require(:dfg).permit(:cantelope_id)")
+        expect(res).to include("def dfg_params\n    fields = :name, :cantelope_id\n    params.require(:dfg).permit(fields)")
+        expect(res).to include("def update_dfg_params\n    fields = :cantelope_id")
+        expect(res).to include("fields.delete :cantelope_id if !policy(@dfg).cantelope_id_able?\n    params.require(:dfg).permit(fields)")
       end
     end
   end
@@ -672,7 +672,7 @@ describe "HotGlue::ScaffoldGenerator" do
                                             ["Dfg","--show-only=name"])
 
         res = File.read("spec/dummy/app/controllers/dfgs_controller.rb")
-        expect(res).to include(" def dfg_params\n    params.require(:dfg).permit(:cantelope_id)")
+        expect(res).to include(" def dfg_params\n    fields = :cantelope_id")
       end
 
 
@@ -696,8 +696,8 @@ describe "HotGlue::ScaffoldGenerator" do
           expect(res).to include("def update_dfg_params")
 
           expect(res).to_not include("def dfg_params\n    params.require(:dfg).permit(:name)")
-          expect(res).to_not include("def update_dfg_params\n    params.require(:dfg).permit(:name, :cantelope_id)")
-          expect(res).to include("def update_dfg_params\n    params.require(:dfg).permit(:cantelope_id)")
+          expect(res).to_not include("def update_dfg_params\n    fields = :name, :cantelope_id")
+          expect(res).to include("def update_dfg_params\n    fields = :cantelope_id")
         end
       end
     end
@@ -1019,7 +1019,7 @@ describe "HotGlue::ScaffoldGenerator" do
                                           ["Dfg","--god",
                                            "--magic-buttons=activate"])
       res = File.read("spec/dummy/app/views/dfgs/_show.erb")
-      expect(res).to include("<%= f.submit 'Activate'.html_safe, disabled: (dfg.respond_to?(:activateable?) && ! dfg.activateable? ), class: 'dfg-button  ' %>")
+      expect(res).to include("<%= f.submit 'Activate'.html_safe, disabled: (dfg.respond_to?(:activate_able?) && ! dfg.activate_able? ), class: 'dfg-button  ' %>")
     end
   end
 
