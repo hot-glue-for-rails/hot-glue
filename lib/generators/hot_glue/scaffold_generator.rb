@@ -106,6 +106,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :code_after_create, default: nil
   class_option :code_before_update, default: nil
   class_option :code_after_update, default: nil
+  class_option :code_after_new, default: nil
   class_option :record_scope, default: nil
   class_option :no_nav_menu, type: :boolean, default: false # suppress writing to _nav template
   class_option :include_object_names, type: :boolean, default: false
@@ -531,6 +532,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @code_after_create = options['code_after_create']
     @code_before_update = options['code_before_update']
     @code_after_update = options['code_after_update']
+    @code_after_new = options['code_after_new']
 
     buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
 
@@ -967,10 +969,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       #{@factory_creation}
       "
       res << "\n      " + "@#{singular} = factory.#{singular}" unless res.include?("@#{singular} = factory.#{singular}")
-      res << "\n      flash[:notice] = \"Successfully created \#{@#{singular}.name}\" unless @#{singular}.new_record?
-    rescue ActiveRecord::RecordInvalid
+      res << "\n    rescue ActiveRecord::RecordInvalid
       @#{singular} = factory.#{singular}
-      flash[:alert] = \"Oops, your #{singular} could not be created. #{@hawk_alarm}\"
       @action = 'new'
     end"
       res

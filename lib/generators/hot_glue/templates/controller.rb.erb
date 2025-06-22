@@ -95,6 +95,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @<%= singular_name %> = <%= class_name %>.new<% if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>(<%= @object_owner_sym %>: <%= @object_owner_eval %>)<% end %><% elsif @object_owner_optional && any_nested? %>
     @<%= singular_name %> = <%= class_name  %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}))<% else %>
     @<%= singular_name %> = <%= class_name  %>.new(<% if any_nested? %><%= @object_owner_sym %>: <%= @object_owner_eval %><% end %>)<% end %>
+    <%=  @code_after_new ?  @code_after_new.gsub(";","\n") + "\n" : "" %>
+
     <% if @pundit && !@pundit_policy_override %>
     authorize @<%= singular %><% elsif @pundit && @pundit_policy_override %>
     skip_authorization
@@ -216,19 +218,20 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <% end %>
    <% if @hawk_keys.any? %> modified_params = hawk_params({<%= hawk_to_ruby %>}, modified_params)<% end %>
     <%= controller_attachment_orig_filename_pickup_syntax %>
+      @<%= singular_name %>.assign_attributes(modified_params)
       <% if @pundit && !@pundit_policy_override %>
       authorize @<%= singular_name %>
       <%= @code_before_update ? "\n    " + @code_before_update.gsub(";", "\n") : "" %>
 
-    if @<%= singular_name %>.update(modified_params)
+    if @<%= singular_name %>.save
 
     <% elsif @pundit && @pundit_policy_override %>
     skip_authorization
     raise Pundit::NotAuthorizedError if ! <%= @pundit_policy_override %>.update?
-    if @<%= singular_name %>.update(modified_params)
+    if @<%= singular_name %>.save
       <% else %>
       <%= @code_before_update ? "\n    " + @code_before_update.gsub(";", "\n") : "" %>
-    if @<%= singular_name %>.update(modified_params)<% end %>
+    if @<%= singular_name %>.save<% end %>
       <%= post_action_parental_updates.compact.join("\n      ") %>
       <%= @code_after_update ? "\n    " + @code_after_update.gsub(";", "\n") : "" %>
       <% if @display_list_after_update %>    load_all_<%= plural %><% end %>

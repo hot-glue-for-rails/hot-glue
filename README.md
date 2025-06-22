@@ -1361,17 +1361,31 @@ Use `before` to make the labels come before or `after` to make them come after. 
 
 
 ### Code insertions
+Insert some code into the `new`, `create` or `update` action actions.
 
-### `--code-before-create=`
-### `--code-after-create=`
-### `--code-before-update=`
-### `--code-after-update=`
-
-Insert some code into the `create` action or `update` actions.
-The **before code** is called _after authorization_ but _before saving_ (which creates the record, or fails validation).
-The **after create** code is called after the record is saved (and thus has an id in the case of the create action).
-Both should be wrapped in quotation marks when specified in the command line, and use semicolons to separate multiple lines of code.
+Wrapped in quotation marks when specified in the command line, and use semicolons to separate multiple lines of code.
 (Notice the funky indentation of the lines in the generated code. Adjust you input to get the indentation correct.)
+
+
+
+#### `--code-before-create=`
+
+called _after authorization_ but _before saving the new record_ 
+(which creates the record, or fails validation).
+Here you can do things like set default values, or modify the params before the record is saved.
+
+#### `--code-after-create=`
+is called after the record is saved (and thus has an id in the case of the create action).
+
+#### `--code-before-update=`
+is called in the `update` action _before_ it is saved.
+`
+#### `--code-after-update=`
+is called in the `update` action _after_ it is saved.
+
+#### `--code-after-new=`
+is called in the `new` after the .new() call
+
 
 
 
