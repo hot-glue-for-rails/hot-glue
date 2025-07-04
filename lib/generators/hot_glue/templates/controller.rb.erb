@@ -218,7 +218,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <% end %>
    <% if @hawk_keys.any? %> modified_params = hawk_params({<%= hawk_to_ruby %>}, modified_params)<% end %>
     <%= controller_attachment_orig_filename_pickup_syntax %>
-      @<%= singular_name %>.assign_attributes(modified_params)
+    @<%= singular_name %>.assign_attributes(modified_params)
       <% if @pundit && !@pundit_policy_override %>
       authorize @<%= singular_name %>
       <%= @code_before_update ? "\n    " + @code_before_update.gsub(";", "\n") : "" %>
