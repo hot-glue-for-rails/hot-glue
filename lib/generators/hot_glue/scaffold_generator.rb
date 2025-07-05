@@ -1324,8 +1324,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if options['auth']
       options['auth']
     elsif @god
-      # do we use current_user here
       "nil"
+    elsif @self_auth
+      @auth
     end
   end
 

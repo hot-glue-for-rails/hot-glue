@@ -74,20 +74,26 @@ module HotGlue
         (Time.now.utc.month == 11 && Time.now.utc.day < (7 - Time.now.utc.wday))
     end
 
-    def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = nil)
-      use_timezone = (current_user_object.try(:timezone)) || Time.zone
+    def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = {})
+      use_timezone = (ActiveSupport::TimeZone[current_user_object.try(:timezone)]) || Time.zone
+
+
       uses_dst = (current_user_object.try(:locale_uses_dst)) || false
 
       modified_params = modified_params.tap do |params|
         params.keys.each{|k|
-
-          if field_list.nil? # legacy pre v0.5.18 behavior
-            include_me = k.ends_with?("_at") || k.ends_with?("_date")
-          else
-            include_me = field_list.include?(k.to_sym)
+          if field_list.is_a?(Hash)
+            include_me = field_list[k.to_sym].present?
+          elsif field_list.is_a?(Array)
+            field_list.include?(k.to_sym)
           end
+
+          parsables =  {date: "%Y-%m-%d %H:%M %Z",
+                        time: "%H:%M %Z"}
+
           if include_me && params[k].present?
             if use_timezone
+
               parse_date = "#{params[k].gsub("T", " ")} #{use_timezone.formatted_offset}"
               # note: as according to https://stackoverflow.com/questions/20111413/html5-datetime-local-control-how-to-hide-seconds
               # there is no way to set the seconds to 00 in the datetime-local input field
@@ -96,8 +102,13 @@ module HotGlue
               # if they already exist in your database, you should zero them out
               # or apply .change(sec: 0) when displaying them as output in the form
               # this will prevent seconds from being added by the browser
-              parsed_time = Time.strptime(parse_date, "%Y-%m-%d %H:%M %Z")
-              parsed_time = parsed_time.to_time - 60.minutes if uses_dst && is_dst_now?
+              if  field_list.is_a?(Array)
+                parsed_time = Time.strptime(parse_date, "%Y-%m-%d %H:%M %Z")
+              else
+                parsed_time = Time.strptime(parse_date, parsables[field_list[k.to_sym]])
+              end
+
+              # parsed_time = parsed_time.to_time - 60.minutes if uses_dst && is_dst_now?
               params[k] = parsed_time
             end
           end
