@@ -39,6 +39,7 @@ class Field
     @god = scaffold.god
 
 
+
     # TODO: remove knowledge of subclasses from Field
     unless self.class == AttachmentField || self.class == RelatedSetField
       @sql_type = eval("#{class_name}.columns_hash['#{name}']").sql_type
@@ -194,7 +195,8 @@ class Field
   end
 
   def modify_binary?
-    !!(modify_as && modify_as[name.to_sym] && modify_as[name.to_sym][:binary])
+    return false if !modify_as
+    modify_as[:binary]
   end
 
   def display_boolean_as
