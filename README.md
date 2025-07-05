@@ -2033,6 +2033,17 @@ These automatic pickups for partials are detected at build time. This means that
 # VERSION HISTORY
 
 
+#### 2025-07-05 v0.6.21
+•Now use new code insertion `--code-after-new` for code that happens directly after `.new()` call. use semicolon (`;`) to create linebreaks; no reason why the factories should insert flash messages
+
+• removes duplicitous flash messages in factory context
+
+• adds documentation for `--code-before-create`, `--code-after-create`, `--code-before-update`, `--code-after-update` (these features were already implemented)
+
+• updates are now built using `.assign_attributes` followed by `.save` (previously, they were updated with one `.update()` call); this allows your Pundit policy to check if the changed values are valid and raise an exception if not allowed based on the changed data (can be checked on Rails models with `.changed` or `.changes`; see https://api.rubyonrails.org/classes/ActiveModel/Dirty.html)
+
+
+
 #### 2025-06-13 v0.6.20
 Breaking changes:
 • the setting in your hot_glue.yml file for `:pundit_default:` has been renamed just `:pundit:`.
