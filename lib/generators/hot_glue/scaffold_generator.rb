@@ -1174,12 +1174,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def datetime_fields_list
-    @columns.select do |col|
-      if @the_object.columns_hash[col.to_s]
-        @the_object.columns_hash[col.to_s].type == :datetime
+    @columns.each_with_object({}) do |col, hash|
+      column = @the_object.columns_hash[col.to_s]
+      if column && [:datetime, :time].include?(column.type)
+        hash[col.to_sym] = column.type
       end
     end
   end
+
+
+
 
   def form_path_new_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
@@ -1320,12 +1324,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # to know who the current user under this design
     # for timeinput = user_centered , we need to know who the current user is
     # so we can set the time zone to the user's time zone
-    #
+
     if options['auth']
       options['auth']
     elsif @god
       "nil"
-    elsif @self_auth
+    else
       @auth
     end
   end

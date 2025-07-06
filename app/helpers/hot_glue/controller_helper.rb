@@ -75,7 +75,12 @@ module HotGlue
     end
 
     def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = {})
-      use_timezone = (ActiveSupport::TimeZone[current_user_object.try(:timezone)]) || Time.zone
+
+      use_timezone = if current_user_object.try(:timezone)
+        (ActiveSupport::TimeZone[current_user_object.timezone])
+      else
+        Time.zone
+      end
 
 
       uses_dst = (current_user_object.try(:locale_uses_dst)) || false
@@ -88,8 +93,8 @@ module HotGlue
             field_list.include?(k.to_sym)
           end
 
-          parsables =  {date: "%Y-%m-%d %H:%M %Z",
-                        time: "%H:%M %Z"}
+          parsables =  {datetime: "%Y-%m-%d %H:%M %z",
+                        time: "%H:%M %z"}
 
           if include_me && params[k].present?
             if use_timezone
@@ -103,11 +108,10 @@ module HotGlue
               # or apply .change(sec: 0) when displaying them as output in the form
               # this will prevent seconds from being added by the browser
               if  field_list.is_a?(Array)
-                parsed_time = Time.strptime(parse_date, "%Y-%m-%d %H:%M %Z")
+                parsed_time = Time.strptime(parse_date, "%Y-%m-%d %H:%M %z")
               else
                 parsed_time = Time.strptime(parse_date, parsables[field_list[k.to_sym]])
               end
-
               # parsed_time = parsed_time.to_time - 60.minutes if uses_dst && is_dst_now?
               params[k] = parsed_time
             end
