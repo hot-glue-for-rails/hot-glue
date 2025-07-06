@@ -2042,6 +2042,11 @@ These automatic pickups for partials are detected at build time. This means that
 
 • updates are now built using `.assign_attributes` followed by `.save` (previously, they were updated with one `.update()` call); this allows your Pundit policy to check if the changed values are valid and raise an exception if not allowed based on the changed data (can be checked on Rails models with `.changed` or `.changes`; see https://api.rubyonrails.org/classes/ActiveModel/Dirty.html)
 
+• Fixes to timezone aware input. If your `current_user` (or auth object) has a method `timezone`, your datetime and time inputs will be timezone-aware.
+
+If a timezone is present, datetimes & times will be converted from database-native UTC into the current user's timezone when displayed (either as viewable or editable)
+
+If a user puts a time into the interface, it is assumed to be in the user's timezone and is converted to UTC before being saved. 
 
 
 #### 2025-06-13 v0.6.20
