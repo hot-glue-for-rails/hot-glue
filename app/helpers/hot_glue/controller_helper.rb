@@ -95,7 +95,7 @@ module HotGlue
 
           parsables =  {datetime: "%Y-%m-%d %H:%M %z",
                         time: "%H:%M %z"}
-          
+
           if include_me && params[k].present?
             if use_timezone
 
