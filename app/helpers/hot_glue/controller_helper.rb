@@ -95,7 +95,7 @@ module HotGlue
 
           parsables =  {datetime: "%Y-%m-%d %H:%M %z",
                         time: "%H:%M %z"}
-
+          
           if include_me && params[k].present?
             if use_timezone
 
@@ -112,7 +112,7 @@ module HotGlue
               else
                 parsed_time = Time.strptime(parse_date, parsables[field_list[k.to_sym]])
               end
-              # parsed_time = parsed_time.to_time - 60.minutes if uses_dst && is_dst_now?
+              parsed_time = parsed_time.to_time - 60.minutes if uses_dst && is_dst_now?
               params[k] = parsed_time
             end
           end
