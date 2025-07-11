@@ -5,7 +5,9 @@ class TimeField < Field
   end
 
   def form_field_output
-    "<%= time_field_localized(f, :#{name}, #{singular}.#{name}, label: '#{ name.to_s.humanize  }') %>"
+
+
+    "<%= time_field_localized(f, :#{name}, #{singular}.#{name}&.in_time_zone(current_user.timezone)&.strftime('%H:%M'), label: '#{ name.to_s.humanize  }') %>"
   end
 
   def line_field_output
