@@ -103,7 +103,7 @@ module HotGlue
               min  = natural_offset.split(":").last
               hour = hour.to_i  - 1 if uses_dst && is_dst_now?
 
-               use_offset = "#{hour}:#{min}"
+              use_offset = "#{hour}:#{min}"
               parse_date = "#{params[k].gsub("T", " ")} #{use_offset}"
               # note: as according to https://stackoverflow.com/questions/20111413/html5-datetime-local-control-how-to-hide-seconds
               # there is no way to set the seconds to 00 in the datetime-local input field
