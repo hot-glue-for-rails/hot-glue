@@ -197,7 +197,7 @@ describe HotGlue::ErbTemplate do
 
     it "should make a time column " do
       res = factory_all_form_fields({columns: [:time_of_day]})
-      expect(res).to include("<%= time_field_localized(f, :time_of_day, jkl.time_of_day, label: 'Time of day') %>")
+      expect(res).to include("<%= time_field_localized(f, :time_of_day, jkl.time_of_day&.in_time_zone(current_user.timezone)&.strftime('%H:%M'), label: 'Time of day') %>")
     end
 
     it "should make a boolean column" do
