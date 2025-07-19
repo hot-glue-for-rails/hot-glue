@@ -23,12 +23,7 @@ module HotGlue
 
 
   def self.construct_downnest_object(input)
-    res = input.split(",").map { |child|
-      child_name = child.gsub("+","")
-      extra_size = child.count("+")
-      {child_name => 4+extra_size}
-    }
-    Hash[*res.collect{|hash| hash.collect{|key,value| [key,value].flatten}.flatten}.flatten]
+
   end
 
   def self.optionalized_ternary(namespace: nil,
@@ -71,15 +66,16 @@ module HotGlue
         put_form: put_form,
         nested_set: [nonoptional, *rest_of_nest])
 
-      is_missing_path = HotGlue.optionalized_ternary(
-        namespace: namespace,
-        target: target,
-        modifier: modifier,
-        top_level: top_level,
-        with_params: with_params,
-        put_form: put_form,
-        nested_set: rest_of_nest  )
-      return "defined?(#{instance_sym + nested_set[0][:singular]}2) ? #{is_present_path} : #{is_missing_path}"
+      # is_missing_path = HotGlue.optionalized_ternary(
+      #   namespace: namespace,
+      #   target: target,
+      #   modifier: modifier,
+      #   top_level: top_level,
+      #   with_params: with_params,
+      #   put_form: put_form,
+      #   nested_set: rest_of_nest  )
+      #
+      return "#{is_present_path}"
     end
   end
 

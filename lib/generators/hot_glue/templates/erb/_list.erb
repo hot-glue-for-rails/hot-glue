@@ -19,19 +19,21 @@
           <% if @downnest_object.any? && !@big_edit %>
             <% if !@stacked_downnesting %>
               <%= @layout_strategy.downnest_column_style  %>
-              <% @downnest_object.each do |downnest,i| %>
-                <div class=" scaffold-col-heading <%= @layout_strategy.downnest_portal_column_width(downnest) %> <%= @layout_strategy.downnest_column_style %>">
+
+              <% @downnest_object.each do |downnest| %>
+
+                <div class=" scaffold-col-heading <%= @layout_strategy.downnest_portal_column_width(downnest.name) %> <%= @layout_strategy.downnest_column_style %>">
                   <strong>
-                    <%= downnest.titleize %>
+                    <%= downnest.name.titleize %>
                   </strong>
                 </div>
               <% end %>
             <% else %>
               <div class=" scaffold-col-heading  <%= @layout_strategy.downnest_portal_stacked_column_width  %> <%= @layout_strategy.downnest_column_style %>">
               <%= @layout_strategy.downnest_column_style  %>
-              <% @downnest_object.each do |downnest,i| %>
+              <% @downnest_object.each_with_index do |downnest,i| %>
                   <strong>
-                    <%= downnest.titleize %>
+                    <%= downnest.name.titleize %>
                   </strong>
               <% end %>
               </div>

@@ -572,6 +572,37 @@ Then, finally the @charge will be loaded
 This is "starfish access control" or "poor man's access control."  It works when the current user has several things they can manage, and by extension can manage children of those things.  
 
 
+#### Example #3: Polymorphic Nesting
+Use `(` and `)` to specify a non-standard upwards relationship from the child, as in the case of a polymorphic belongs_to
+
+```
+class Blast
+  has_many :rules, as: :ruleable
+end
+
+class Rule
+  # ruleable_id
+  # ruleable_type
+
+  belongs_to :ruleable, polymorphic: true
+end
+```
+
+routes.rb
+```
+resources :blasts do
+  resources :rules 
+end
+```
+
+`rails generate hot_glue:scaffold Blast --downnest=rules`
+
+`rails generate hot_glue:scaffold Rules --nested='blast(ruleable)'`
+
+Notices the relationship from the parent to child is `rules` but from the child to parent, it is `ruleable` instead of `blast`
+
+
+
 ### `--auth=`
 
 By default, it will be assumed you have a `current_user` for your user authentication. This will be treated as the "authentication root" for the "poor man's auth" explained above.

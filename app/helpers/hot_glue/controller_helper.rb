@@ -68,11 +68,17 @@ module HotGlue
       end
     end
 
-    def is_dst_now?
-      Time.now.utc.month > 3 && Time.now.month < 11 ||
-        (Time.now.utc.month == 3 && Time.now.day >= (14 - Time.now.utc.wday)) ||
-        (Time.now.utc.month == 11 && Time.now.utc.day < (7 - Time.now.utc.wday))
+    # def is_dst_now?
+    #   Time.now.utc.month > 3 && Time.now.month < 11 ||
+    #     (Time.now.utc.month == 3 && Time.now.day >= (14 - Time.now.utc.wday)) ||
+    #     (Time.now.utc.month == 11 && Time.now.utc.day < (7 - Time.now.utc.wday))
+    # end
+
+
+    def is_dst_now?(tz = Time.zone)
+      tz.now.dst?
     end
+
 
     def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = {})
 
@@ -117,6 +123,10 @@ module HotGlue
               else
                 parsed_time = Time.strptime(parse_date, parsables[field_list[k.to_sym]])
               end
+              Rails.logger.info "Timezone: #{use_timezone.name}"
+              Rails.logger.info "Offset: #{use_timezone.formatted_offset}"
+              Rails.logger.info "DST? #{uses_dst} | is_dst_now? => #{is_dst_now?}"
+              Rails.logger.info "Final offset used: #{use_offset}"
 
               params[k] = parsed_time
             end
