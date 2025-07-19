@@ -39,7 +39,7 @@
 
   <% if destroy_action %>
     <\%= form_with url: <%= delete_path_helper %>, html: {data: {'<%= @ujs_syntax ? 'confirm' : 'turbo-confirm' %>': "Are you sure you want to delete #{ <%= @singular + "." + display_class %> }?" }, style: "display: inline-block;"}, method: :delete do |f| %>
-      <\%= f.submit "Delete".html_safe,  class: "delete-<%= singular %>-button btn btn-primary btn-sm" %>
+      <\%= f.submit "Delete".html_safe,  class: "delete-<%= singular %>-button btn btn-primary btn-sm", disabled: (<%= @singular %>.respond_to?(:delete_able?) && ! <%= @singular %>.delete_able? ) %>
     <\% end %>
   <% end %>
 

@@ -572,6 +572,37 @@ Then, finally the @charge will be loaded
 This is "starfish access control" or "poor man's access control."  It works when the current user has several things they can manage, and by extension can manage children of those things.  
 
 
+#### Example #3: Polymorphic Nesting
+Use `(` and `)` to specify a non-standard upwards relationship from the child, as in the case of a polymorphic belongs_to
+
+```
+class Blast
+  has_many :rules, as: :ruleable
+end
+
+class Rule
+  # ruleable_id
+  # ruleable_type
+
+  belongs_to :ruleable, polymorphic: true
+end
+```
+
+routes.rb
+```
+resources :blasts do
+  resources :rules 
+end
+```
+
+`rails generate hot_glue:scaffold Blast --downnest=rules`
+
+`rails generate hot_glue:scaffold Rules --nested='blast(ruleable)'`
+
+Notices the relationship from the parent to child is `rules` but from the child to parent, it is `ruleable` instead of `blast`
+
+
+
 ### `--auth=`
 
 By default, it will be assumed you have a `current_user` for your user authentication. This will be treated as the "authentication root" for the "poor man's auth" explained above.
@@ -2031,6 +2062,49 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+
+#### 2025-07-19 v0.6.22
+
+`--phantom-create-params`
+These parameters get added in the strong parameters safelist for the create action
+
+You'll probably wnat to use this along with --code-after-create to check that phanton param
+
+TODO: you have to tap these away yourself 
+TODO: can they be tapped away automatically if not using a factory
+
+
+
+`--phantom-update-params`
+These parameters get added in the strong parameters safelist for the update action
+
+
+`--controller-prefix`
+
+Prefix the controller name, and the cooresponding route & path structure, with this prefix.
+For example, ussing `--controller-prefix='Open'` on a Document build will produce a controller
+
+`OpenDocumentsController`
+
+The controller will still treat the `Document` model as the thing it is building, just a different style of Document named with the prefix.
+(To make this meaningful, you'll want to add a `--record-scope` or in some other way differentiate this controller based on its descriptive prefix)
+
+
+• Nested and downnest can now both acceept a param pass in parenthesis `(`..`)` to use with polymorphism
+
+• Magic buttons no longer take up 2 bootstrap columns for each button
+
+• Adds auto-disable to all Delete buttons; use with a `delete_able?` method on the model
+
+• Removes more vestiages of optionalized nesting (which I had implemented 3 years ago!)
+I no longer like optionalized nesting at all, and recommend against it. Nesting should always be part of the structure, 
+and every route should operate firmly in its nest path.
+
+Use new controller-prefix to make on-off exceptions or with polymorphic children.
+
+• Fixes for localized datetime & time inputs
+
 
 
 #### 2025-07-05 v0.6.21
