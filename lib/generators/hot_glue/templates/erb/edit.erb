@@ -36,7 +36,7 @@
           <% downnest_object_name = downnest[:name]  %>
           <% downnest_style = @layout_strategy.downnest_style %>
 
-          <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest_object_name %>/list", locals: {<%= @singular %>: @<%= @singular %>,  <%= downnest_object_name %>: @<%= @singular %>.<%= downnest[:polymorph_as] || downnest[:name] %><% if @nested_set.any? %>, <%= @nested_set.collect{|x| "#{x[:singular]}: @#{x[:singular]}"}.join(", ") %>, nested_for: "<%= @nested_set.collect{|x| "#{x[:singular]}-" + "\#{" + "@#{x[:singular]}.id}"}.join("__") %>__<%= singular %>-#{@<%= @singular %>.id}" <% end %> } \%>
+          <\%= render partial: "<%= namespace_with_trailing_dash %><%= downnest_object_name %>/list", locals: {<%= @singular %>: @<%= @singular %>,  <%= downnest[:polymorph_as] || downnest[:name] %>: @<%= @singular %>.<%= downnest[:polymorph_as] || downnest[:name] %><% if @nested_set.any? %>, <%= @nested_set.collect{|x| "#{x[:singular]}: @#{x[:singular]}"}.join(", ") %>, nested_for: "<%= @nested_set.collect{|x| "#{x[:singular]}-" + "\#{" + "@#{x[:singular]}.id}"}.join("__") %>__<%= singular %>-#{@<%= @singular %>.id}" <% end %> } \%>
         </div>
       <% end %>
     </div>
