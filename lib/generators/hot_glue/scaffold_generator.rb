@@ -1235,7 +1235,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def form_path_edit_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
-                                 target: @singular,
+                                 target:  @singular,
+                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
                                  nested_set: @nested_set,
                                  with_params: false,
                                  put_form: true,
@@ -1244,6 +1245,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def delete_path_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
+                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
                                  target: @singular,
                                  nested_set: @nested_set,
                                  with_params: false,
@@ -1252,12 +1254,23 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def edit_path_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
+                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
                                  target: @singular,
                                  nested_set: @nested_set,
                                  modifier: "edit_",
                                  with_params: false,
                                  put_form: true)
   end
+
+  def new_path_name
+    HotGlue.optionalized_ternary(namespace: @namespace,
+                                 target: singular,
+                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
+                                 nested_set: @nested_set,
+                                 modifier: "new_",
+                                 with_params: false)
+  end
+
 
   def path_arity
     res = ""
@@ -1279,13 +1292,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     "#{@namespace + "/" if @namespace}#{@controller_build_folder}/list"
   end
 
-  def new_path_name
-    HotGlue.optionalized_ternary(namespace: @namespace,
-                                 target: singular,
-                                 nested_set: @nested_set,
-                                 modifier: "new_",
-                                 with_params: false)
-  end
 
   def nested_assignments
     return "" if @nested_set.none?
