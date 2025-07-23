@@ -29,6 +29,7 @@ module HotGlue
   def self.optionalized_ternary(namespace: nil,
                                 target:,
                                 nested_set:,
+                                prefix: nil, # is this used
                                 modifier: "",
                                 with_params: false,
                                 top_level: false,

@@ -1405,8 +1405,6 @@ called _after authorization_ but _before saving the new record_
 (which creates the record, or fails validation).
 Here you can do things like set default values, or modify the params before the record is saved.
 
-#### `--code-after-create=`
-is called after the record is saved (and thus has an id in the case of the create action).
 
 #### `--code-before-update=`
 is called in the `update` action _before_ it is saved.
@@ -1414,9 +1412,54 @@ is called in the `update` action _before_ it is saved.
 #### `--code-after-update=`
 is called in the `update` action _after_ it is saved.
 
-#### `--code-after-new=`
-is called in the `new` after the .new() call
 
+#### `--code-after-create=`
+is called after a new record is saved (and thus has an id).
+
+Here is where you will call operations that depend on the record having an id, like building child table records.
+
+Notice that the next option is inserted in both `new` and `create`, making it the more suitable choice for setting default values.
+
+
+#### `--code-after-new=`
+is called in both the  `new` and `create` actions _directly after the .new() call_
+
+This is a good place to set your created_by user id, like so 
+
+`--code-after-new='@email_template.created_by_user = current_user'`
+
+
+
+```
+def new
+    @email_template = EmailTemplate.new(crusade: crusade)
+    @email_template.created_by_user = current_user //   <--- YOUR CUSTOM CODE via --code-after-new
+    
+    authorize @email_template
+    @action = 'new' 
+    ...
+```
+
+Notice that a separate hook for code-after-create is also available, but that happens after the save
+
+Using both together `--code-after-new='@email_template.created_by_user = current_user' --code-after-create='@email_template.do_something'`
+
+
+
+```
+def create
+    ...
+    @email_template = EmailTemplate.new(modified_params)
+    @email_template.created_by_user = current_user    //   <--- YOUR CUSTOM CODE via --code-after-new
+    
+    authorize @email_template
+    
+    if @email_template.save
+      @email_template.do_something     // <--- YOUR CUSTOM CODE via --code-after-create
+      flash[:notice] = "Successfully created #{@email_template.name}"
+      account.reload
+      ...
+```
 
 
 
