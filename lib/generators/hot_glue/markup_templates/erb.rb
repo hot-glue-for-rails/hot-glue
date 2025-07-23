@@ -195,11 +195,11 @@ module  HotGlue
             end
 
 
-            the_output =   add_spaces_each_line( "\n  <span #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>' #{data_attr} >\n" +
+            the_output =   add_spaces_each_line( "\n  <div #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>' #{data_attr} >\n" +
                                                              add_spaces_each_line( (form_labels_position == 'before' ? (the_label || "") + "<br />\n"  : "") +
                                                                                      +  field_result +
                                                                                      (form_labels_position == 'after' ? (  columns_map[col].newline_after_field? ? "<br />\n" : "") + (the_label || "") : "")  , 4) +
-                                                             "\n  </span>\n ", 2)
+                                                             "\n  </div>\n ", 2)
 
 
             if hidden_create.include?(col.to_sym) || hidden_update.include?(col.to_sym)
@@ -243,7 +243,6 @@ module  HotGlue
 
     def all_line_fields(layout_strategy:,
                         perc_width:)
-
 
       inline_list_labels = @inline_list_labels  || 'omit'
       columns = layout_object[:columns][:container]

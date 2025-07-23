@@ -34,6 +34,7 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   end
 
   def column_width
+
     builder.layout_object[:columns][:size_each]
   end
 

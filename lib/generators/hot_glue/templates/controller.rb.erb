@@ -116,6 +116,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
     <%= controller_attachment_orig_filename_pickup_syntax %>
     <%= creation_syntax %>
+    <%=  @code_after_new ?  @code_after_new.gsub(";","\n") + "\n" : "" %>
 
       <% if @pundit %><% @related_sets.each do |key, related_set| %>
     check_<%= related_set[:association_ids_method].to_s %>_permissions(modified_params, :create)<% end %><% end %>
@@ -144,14 +145,13 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   rescue Pundit::NotAuthorizedError => e
     flash[:alert] = "Not authorized."
     @<%= singular %>.errors.add(:base, e.message)
-    <% unless @display_edit_after_create %>render :create, status: :unprocessable_entity<% else %>redirect_to <%=   HotGlue.optionalized_ternary(namespace: @namespace,
+    <% unless @display_edit_after_create %>render :create, status: :unprocessable_entity<% else %>redirect_to <%= HotGlue.optionalized_ternary(namespace: @namespace,
                                  top_level: true,
-                                 target:  @singular,
+                                 target:  @plural,
                                  nested_set: @nested_set,
-                                 modifier: 'edit_',
                                  with_params: true,
-                                 instance_last_item: true,
-                                 put_form: true).gsub("(#{singular}", "(@#{singular}") %><% end %>
+                                 instance_last_item: false,
+                                 put_form: false).gsub("(#{singular}", "(@#{singular}") %><% end %>
 
     <% end %>
   end
@@ -287,13 +287,13 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %><% end %>
 
   def <%=singular_name%>_params
-    fields = <%= ((fields_filtered_for_strong_params - @show_only) + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %><%= ", " +  @alt_lookups.collect{|k,v|  ":__lookup_#{v[:assoc].downcase}_#{v[:lookup_as]}"  }.join(", ") if @alt_lookups.any? %>
+    fields = <%= ((fields_filtered_for_strong_params - @show_only) + @magic_buttons.collect{|x| "__#{x}"}  + @phantom_create_params.split(",")).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %><%= ", " +  @alt_lookups.collect{|k,v|  ":__lookup_#{v[:assoc].downcase}_#{v[:lookup_as]}"  }.join(", ") if @alt_lookups.any? %>
     params.require(:<%= testing_name %>).permit(fields)
   end<% if @update_show_only %>
 
   <% unless @no_edit %>
   def update_<%=singular_name%>_params
-    fields = <%= ((fields_filtered_for_strong_params - @update_show_only)  + @magic_buttons.collect{|x| "__#{x}"}).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %><%=  ", " + @alt_lookups.collect{|k,v|  ":__lookup_#{v[:assoc].downcase}_#{v[:lookup_as]}"  }.join(", ") if @alt_lookups.any?  %>
+    fields = <%= ((fields_filtered_for_strong_params - @update_show_only)  + @magic_buttons.collect{|x| "__#{x}"} +  @phantom_update_params.split(",")).collect{|sym| ":#{sym}"}.join(", ") %><%= ", " + @related_sets.collect{|key, rs| "#{rs[:association_ids_method]}: []"}.join(", ") if @related_sets.any? %><%=  ", " + @alt_lookups.collect{|k,v|  ":__lookup_#{v[:assoc].downcase}_#{v[:lookup_as]}"  }.join(", ") if @alt_lookups.any?  %>
     <%= (fields_filtered_for_strong_params - @update_show_only).collect{|col|
     # TODO : fields not on show only also not invisible should be checked here
     # for _able? methods and added only when able
