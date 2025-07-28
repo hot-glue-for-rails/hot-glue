@@ -30,7 +30,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :self_auth, :namespace_value, :record_scope, :related_sets,
                 :search_clear_button, :search_autosearch, :include_object_names,
                 :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
-                :invisible_create, :invisible_update
+                :invisible_create, :invisible_update, :phantom_create_params,
+                :phantom_update_params
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -113,7 +114,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :new_button_position, type: :string, default: 'above'
   class_option :downnest_shows_headings, type: :boolean, default: nil
   class_option :stimmify, type: :string, default: nil
-
+  class_option :phantom_create_params, type: :string, default: nil
+  class_option :phantom_update_params, type: :string, default: nil
+  class_option :controller_prefix, type: :string, default: nil
 
   # SEARCH OPTIONS
   class_option :search, default: nil # set or predicate
@@ -170,7 +173,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       get_default_from_config(key: :bootstrap_column_width) || 2
 
 
-
+    @controller_prefix = options['controller_prefix']
     @default_boolean_display = get_default_from_config(key: :default_boolean_display)
     if options['layout']
       layout = options['layout']
@@ -195,18 +198,25 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
 
     args = meta_args[0]
-    @singular = args.first.tableize.singularize # should be in form hello_world
+    @singular =   args.first.tableize.singularize # should be in form hello_world
 
     if @singular.include?("/")
       @singular = @singular.split("/").last
     end
 
-    @plural = options['plural'] || @singular.pluralize # respects what you set in inflections.rb, to override, use plural option
+    @plural = (options['plural'] ||  args.first.tableize.singularize.pluralize) # respects what you set in inflections.rb, to override, use plural option
+
+    puts "SINGULAR: #{@singular}"
+    puts "PLURAL: #{@plural}"
+
+
     @namespace = options['namespace'] || nil
     @namespace_value = @namespace
-    use_controller_name = plural.titleize.gsub(" ", "")
-    @controller_build_name = ((@namespace.titleize.gsub(" ", "") + "::" if @namespace) || "") + use_controller_name + "Controller"
-    @controller_build_folder = use_controller_name.underscore
+    use_controller_name =  plural.titleize.gsub(" ", "")
+
+
+    @controller_build_name =  ((@namespace.titleize.gsub(" ", "") + "::" if @namespace) || "") + (@controller_prefix ? @controller_prefix.titleize : "") + use_controller_name + "Controller"
+    @controller_build_folder = (@controller_prefix ? @controller_prefix.downcase + "_" : "") + use_controller_name.underscore
     @controller_build_folder_singular = singular
 
     @auth = options['auth'] || "current_user"
@@ -387,6 +397,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @no_nav_menu = options['no_nav_menu']
 
+    @phantom_create_params = options['phantom_create_params'] || ""
+    @phantom_update_params = options['phantom_update_params'] || ""
+
     if get_default_from_config(key: :pundit_default)
       raise "please note the config setting `pundit_default` has been renamed `pundit`. please update your hot_glue.yml file"
     end
@@ -409,10 +422,30 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @downnest_children = [] # TODO: defactor @downnest_children in favor of downnest_object
     @downnest_object = {}
+
     if @downnest
-      @downnest_children = @downnest.split(",").map { |child| child.gsub("+", "") }
-      @downnest_object = HotGlue.construct_downnest_object(@downnest)
+      @downnest_children = @downnest.split(",")
+
+      @downnest_children.each do |child|
+        if child.include?("(")
+          child =~ /(.*)\((.*)\)/
+          child_name, polymorph_as = $1, $2
+        else
+          child_name = child
+        end
+        extra_size = child_name.count("+")
+
+        child_name.gsub!("+","")
+
+
+        @downnest_object[child] = {
+          name: child_name,
+          extra_size: extra_size,
+          polymorph_as: polymorph_as
+        }
+      end
     end
+
 
     @include_object_names = options['include_object_names'] || get_default_from_config(key: :include_object_names)
 
@@ -458,12 +491,17 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     if !@nested.nil?
       @nested_set = @nested.split("/").collect { |arg|
-        is_optional = arg.start_with?("~")
-        arg.gsub!("~", "")
+        if arg.include?("(")
+          arg =~ /(.*)\((.*)\)/
+          singular, polymorph_as = $1, $2
+        else
+          singular = arg
+        end
+
         {
-          singular: arg,
-          plural: arg.pluralize,
-          optional: is_optional
+          singular: singular,
+          plural: singular.pluralize,
+          polymorph_as: polymorph_as
         }
       }
       puts "NESTING: #{@nested_set}"
@@ -489,6 +527,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     # OBJECT OWNERSHIP & NESTING
     @reference_name = HotGlue.derrive_reference_name(singular_class)
+
+
     if @auth && @self_auth
       @object_owner_sym = @auth.gsub("current_", "").to_sym
       @object_owner_eval = @auth
@@ -506,10 +546,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @object_owner_eval = @auth
     else
       if @nested_set.any?
-        @object_owner_sym = @nested_set.last[:singular].to_sym
-        @object_owner_eval = "@#{@nested_set.last[:singular]}"
-        @object_owner_name = @nested_set.last[:singular]
-        @object_owner_optional = @nested_set.last[:optional]
+
+        @object_owner_sym = (@nested_set.last[:polymorph_as] || @nested_set.last[:singular]).to_sym
+
+        @object_owner_eval = "#{( @nested_set.last[:singular])}"
+        @object_owner_name = (@nested_set.last[:polymorph_as] || @nested_set.last[:singular])
       else
         @object_owner_sym = nil
         @object_owner_eval = ""
@@ -534,7 +575,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @code_after_update = options['code_after_update']
     @code_after_new = options['code_after_new']
 
-    buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + @magic_buttons.count
+    buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + (@magic_buttons.any? ? 1 : 0)
 
 
     # alt_lookups_entry =
@@ -665,6 +706,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     builder = HotGlue::Layout::Builder.new(generator: self,
                                            include_setting: options['include'],
                                            buttons_width: buttons_width)
+
     @layout_object = builder.construct
 
 
@@ -1195,7 +1237,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def form_path_edit_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
-                                 target: @singular,
+                                 target:  @singular,
+                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
                                  nested_set: @nested_set,
                                  with_params: false,
                                  put_form: true,
@@ -1204,6 +1247,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def delete_path_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
+                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
                                  target: @singular,
                                  nested_set: @nested_set,
                                  with_params: false,
@@ -1212,12 +1256,23 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def edit_path_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
+                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
                                  target: @singular,
                                  nested_set: @nested_set,
                                  modifier: "edit_",
                                  with_params: false,
                                  put_form: true)
   end
+
+  def new_path_name
+    HotGlue.optionalized_ternary(namespace: @namespace,
+                                 target: singular,
+                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
+                                 nested_set: @nested_set,
+                                 modifier: "new_",
+                                 with_params: false)
+  end
+
 
   def path_arity
     res = ""
@@ -1239,13 +1294,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     "#{@namespace + "/" if @namespace}#{@controller_build_folder}/list"
   end
 
-  def new_path_name
-    HotGlue.optionalized_ternary(namespace: @namespace,
-                                 target: singular,
-                                 nested_set: @nested_set,
-                                 modifier: "new_",
-                                 with_params: false)
-  end
 
   def nested_assignments
     return "" if @nested_set.none?

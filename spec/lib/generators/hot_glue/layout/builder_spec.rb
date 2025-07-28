@@ -77,7 +77,11 @@ describe HotGlue::Layout::Builder do
 
     describe "Specified Grouping mode ( using colons)" do
       it "should concat the two fields into one column " do
-        generator =  OpenStruct.new(downnest_object: {get_emails_rules: 4} ,
+        generator =  OpenStruct.new(downnest_object: {"get_emails_rules": {
+          name: "get_emails_rules",
+          extra_size: 0,
+          polymorph_as: nil
+        }} ,
                                     columns: [:api_key, :api_id],
                                     smart_layout: false,
                                     bootstrap_column_width: 2)
@@ -112,7 +116,11 @@ describe HotGlue::Layout::Builder do
           #        -[[:api_key, :api_id]]
           #        +[[:api_key], [:api_id]]
 
-          generator =  OpenStruct.new(downnest_object: {get_emails_rules: 4} ,
+          generator =  OpenStruct.new(downnest_object: {"get_emails_rules": {
+            name: "get_emails_rules",
+            extra_size: 0,
+            polymorph_as: nil
+          }} ,
                                       columns: [:api_key, :api_id],
                                       smart_layout: false,
                                       buttons_width: 0,
