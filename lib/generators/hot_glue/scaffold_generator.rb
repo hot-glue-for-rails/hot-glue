@@ -422,6 +422,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @downnest_children = [] # TODO: defactor @downnest_children in favor of downnest_object
     @downnest_object = {}
+
     if @downnest
       @downnest_children = @downnest.split(",")
 
@@ -444,6 +445,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         }
       end
     end
+
 
     @include_object_names = options['include_object_names'] || get_default_from_config(key: :include_object_names)
 

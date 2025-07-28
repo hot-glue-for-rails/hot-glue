@@ -1,7 +1,7 @@
 require "rails_helper"
 
 describe HotGlue do
-  
+
   describe "#optionalized_ternary" do
 
     describe "when the first parent is optional" do
