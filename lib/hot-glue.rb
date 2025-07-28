@@ -22,10 +22,6 @@ module HotGlue
   end
 
 
-  def self.construct_downnest_object(input)
-
-  end
-
   def self.optionalized_ternary(namespace: nil,
                                 target:,
                                 nested_set:,

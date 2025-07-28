@@ -1,37 +1,7 @@
 require "rails_helper"
 
 describe HotGlue do
-
-  describe "#construct_downnest_object" do
-
-    it "should work when passed nothing" do
-      res = HotGlue.construct_downnest_object("")
-      expect(res).to eq({})
-    end
-
-    it "should work when passed one downnested" do
-      res = HotGlue.construct_downnest_object("abc")
-      expect(res).to eq({"abc"=>4})
-    end
-
-    it "should work when passed two downnested" do
-      res = HotGlue.construct_downnest_object("abc,def")
-      expect(res).to eq({"abc"=>4,"def"=>4})
-    end
-
-    it "should work when passed two downnested" do
-      res = HotGlue.construct_downnest_object("abc+,def")
-      expect(res).to eq({"abc"=>5,"def"=>4})
-    end
-
-    it "should work when passed two downnested" do
-      res = HotGlue.construct_downnest_object("abc,def+")
-      expect(res).to eq({"abc"=>4,"def"=>5})
-    end
-  end
-
-
-
+  
   describe "#optionalized_ternary" do
 
     describe "when the first parent is optional" do
