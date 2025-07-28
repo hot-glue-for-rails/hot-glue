@@ -39,6 +39,7 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
   end
 
   def downnest_portal_column_width(downnest)
+
     "col-sm-#{ builder.layout_object[:portals][downnest][:size] }"
   end
 

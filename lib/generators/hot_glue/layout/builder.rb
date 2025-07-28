@@ -60,16 +60,18 @@ module HotGlue
         unless @big_edit
           # how_many_downnest = downnest_object.size
           if(!stacked_downnesting)
-            bootstrap_columns = bootstrap_columns - (downnest_object.collect{|k,v| v}.sum)
+            bootstrap_columns = bootstrap_columns - (downnest_object.collect{|k,v| v}.count * 4)
           else
             bootstrap_columns = bootstrap_columns - 4
           end
 
           # downnest_children_width = []
-          downnest_object.each do |child, size|
-            layout_object[:portals][child] = {size:  size}
+
+          downnest_object.each do |child, data|
+            layout_object[:portals][child] = {size:  data[:extra_size] + 4}
           end
         end
+
         available_columns = (bootstrap_columns / bootstrap_column_width).floor
 
         # when set to 2, turns the 12-column grid into a 6-column grid

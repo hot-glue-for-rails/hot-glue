@@ -200,9 +200,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     args = meta_args[0]
     @singular =   args.first.tableize.singularize # should be in form hello_world
 
-    # if @singular.include?("/")
-    #   @singular = @singular.split("/").last
-    # end
+    if @singular.include?("/")
+      @singular = @singular.split("/").last
+    end
 
     @plural = (options['plural'] ||  args.first.tableize.singularize.pluralize) # respects what you set in inflections.rb, to override, use plural option
 
