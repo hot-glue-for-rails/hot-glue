@@ -1308,6 +1308,45 @@ Can now be created with more space (wider) by adding a `+` to the end of the dow
 The 'Abcs' portal will display as 5 bootstrap columns instead of the typical 4. (You may use multiple ++ to keep making it wider but the inverse with minus is not supported
 
 
+Polymorphic Downnesting
+
+Here, a `Blast` `has_many :rules, as: :ruleable`
+
+The child object is named `Rule` but it can belong to a Blast or an Agent. (Agent also has a similar has_many for Rules)
+
+`belongs_to :ruleable, polymorphic: true`
+
+We build the blast & agent controllers like so:
+
+bin/rails generate hot_glue:scaffold Blast  --downnest='blast_rules(rules)'
+bin/rails generate hot_glue:scaffold Agent  --downnest='agent_rules(rules)'
+
+Notice that the relationship name is `rules` (not blast_rules), so what goes before the parenthesis is the controller name (with prefix)
+What goes inside the controller name is the real relationship name.
+
+For the children, we can't build one controller for the Rule, instead we build one for the `AgentRules` and another for the `BlastRules`
+
+bin/rails generate hot_glue:scaffold Rule  --nested='blast(ruleable)' --controller-prefix='Blast'
+bin/rails generate hot_glue:scaffold Rule  --nested='agent(ruleable)' --controller-prefix='Agent'
+
+(I realize building one child controller for each type of polymorph is tedius, but this is the best solution I could come up with.)
+
+As these are children, what goes into the `--netsed` setting inside the parentheses is the polymorphic name specified by `as:` when declaring the `belongs_to`
+
+routes.rb
+
+```
+        resources :agents do
+          resources :agent_rules
+        end
+
+        resources :blasts do
+          resources :blast_rules
+        end
+```
+
+
+
 ### `--record-scope=`
 
 Record scope allows you to apply a model based scope for the controller being generated.
@@ -2107,7 +2146,7 @@ These automatic pickups for partials are detected at build time. This means that
 # VERSION HISTORY
 
 
-#### 2025-07-19 v0.6.22
+#### 2025-07-28 v0.6.22
 
 `--phantom-create-params`
 These parameters get added in the strong parameters safelist for the create action
@@ -2117,32 +2156,35 @@ You'll probably wnat to use this along with --code-after-create to check that ph
 TODO: you have to tap these away yourself 
 TODO: can they be tapped away automatically if not using a factory
 
-
-
 `--phantom-update-params`
 These parameters get added in the strong parameters safelist for the update action
-
 
 `--controller-prefix`
 
 Prefix the controller name, and the cooresponding route & path structure, with this prefix.
-For example, ussing `--controller-prefix='Open'` on a Document build will produce a controller
+For example, using `--controller-prefix='Open'` on a Document build will produce a controller
 
 `OpenDocumentsController`
 
 The controller will still treat the `Document` model as the thing it is building, just a different style of Document named with the prefix.
+
 (To make this meaningful, you'll want to add a `--record-scope` or in some other way differentiate this controller based on its descriptive prefix)
 
+• Polymorphic Downnesting
 
-• Nested and downnest can now both acceept a param pass in parenthesis `(`..`)` to use with polymorphism
+- `--nested` and `--downnest` can now both accept a param pass in parentheses `(`..`)` to use with polymorphism
+
+See "Polymorphic downnesting" in the downnesting section for an example.
 
 • Magic buttons no longer take up 2 bootstrap columns for each button
 
 • Adds auto-disable to all Delete buttons; use with a `delete_able?` method on the model
 
-• Removes more vestiages of optionalized nesting (which I had implemented 3 years ago!)
-I no longer like optionalized nesting at all, and recommend against it. Nesting should always be part of the structure, 
-and every route should operate firmly in its nest path.
+• Removes more vestiges of optionalized nesting (which I had implemented 3 years ago!)
+
+I no longer like optionalized nesting, and recommend against it. 
+
+Nesting should always be part of the structure, and every route should operate firmly in its nest path.
 
 Use new controller-prefix to make on-off exceptions or with polymorphic children.
 
