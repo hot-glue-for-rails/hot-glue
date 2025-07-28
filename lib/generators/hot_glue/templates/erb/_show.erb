@@ -1,7 +1,5 @@
 <%= all_line_fields %>
 
-
-
 <% if @downnest_children.any? && ! @big_edit %>
   <% each_downnest_width = @downnest_children.count == 1 ? 33 : (53/@downnest_children.count).floor %>
   <% if @stacked_downnesting %><div class="<%= @layout_strategy.downnest_portal_stacked_column_width  %> scaffold-downnest" ><% end %>
@@ -44,6 +42,6 @@
   <% end %>
 
   <% unless @no_edit %>
-  <\%= link_to "Edit <% if @button_icons == 'font-awesome' %><i class='fa fa-1x fa-list-alt'></i><% end %>".html_safe, <%= edit_path_helper %>, <% if @big_edit %>'data-turbo' => 'false', <% end %>disable_with: "Loading...", class: "edit-<%= singular %>-button btn btn-primary btn-sm" %>
+  <\%= link_to "Edit <% if @button_icons == 'font-awesome' %><i class='fa fa-1x fa-list-alt'></i><% end %>".html_safe, <%= edit_path_helper %> + (params[:page] ? "?page=#{params[:page]}" : ""), <% if @big_edit %>'data-turbo' => 'false', <% end %>disable_with: "Loading...", class: "edit-<%= singular %>-button btn btn-primary btn-sm" %>
   <% end %>
 </div>
