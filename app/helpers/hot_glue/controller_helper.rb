@@ -9,7 +9,7 @@ module HotGlue
       current_timezone
 
       args = args.merge({class: 'form-control',
-                                  type: 'datetime-local' })
+                         type: 'datetime-local' })
 
       if !value.nil?
         args[:value] = date_to_current_timezone(value, current_timezone) + timezonize(current_timezone)
@@ -23,8 +23,8 @@ module HotGlue
     def date_field_localized(form_object, field_name, value, **args)
 
       form_object.text_field(field_name,  args.merge({class: 'form-control',
-                                                       type: 'date',
-                                                       value: value }))
+                                                      type: 'date',
+                                                      value: value }))
     end
 
     def time_field_localized(form_object, field_name, value, **args )
@@ -69,18 +69,23 @@ module HotGlue
     end
 
     def is_dst_now?
-      Time.now.utc.month > 3 && Time.now.month < 11 ||
-        (Time.now.utc.month == 3 && Time.now.day >= (14 - Time.now.utc.wday)) ||
-        (Time.now.utc.month == 11 && Time.now.utc.day < (7 - Time.now.utc.wday))
+      ActiveSupport::TimeZone['Eastern Time (US & Canada)'].now.dst?
+    end
+
+    def format_timezone_offset(hour, minute)
+      sign = hour < 0 ? "-" : "+"
+      hour_abs = hour.abs.to_s.rjust(2, '0')
+      minute_str = minute.to_s.rjust(2, '0')
+      "#{sign}#{hour_abs}#{minute_str}"
     end
 
     def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = {})
 
       use_timezone = if current_user_object.try(:timezone)
-        (ActiveSupport::TimeZone[current_user_object.timezone])
-      else
-        Time.zone
-      end
+                       (ActiveSupport::TimeZone[current_user_object.timezone])
+                     else
+                       Time.zone
+                     end
 
 
       uses_dst = (current_user_object.try(:locale_uses_dst)) || false
@@ -93,18 +98,28 @@ module HotGlue
             field_list.include?(k.to_sym)
           end
 
-          parsables =  {datetime: "%Y-%m-%d %H:%M %z",
-                        time: "%H:%M %z"}
+          parsables =  {
+            datetime: "%Y-%m-%d %H:%M %z",
+            time: "%H:%M %z"
+          }
+
 
           if include_me && params[k].present?
             if use_timezone
               natural_offset = use_timezone.formatted_offset
-              hour = natural_offset.split(":").first
-              min  = natural_offset.split(":").last
-              hour = hour.to_i  - 1 if uses_dst && is_dst_now?
+              hour = natural_offset.split(":").first.to_i
+              min  = natural_offset.split(":").last.to_i
 
-              use_offset = "#{hour}:#{min}"
+              hour = hour + 1 if uses_dst && is_dst_now?
+
+              use_offset = format_timezone_offset(hour, min)
               parse_date = "#{params[k].gsub("T", " ")} #{use_offset}"
+
+
+              Rails.logger.info("use_offset: #{use_offset}")
+
+              Rails.logger.info("parse_date: #{parse_date}")
+
               # note: as according to https://stackoverflow.com/questions/20111413/html5-datetime-local-control-how-to-hide-seconds
               # there is no way to set the seconds to 00 in the datetime-local input field
               # as I have implemented a "seconds don't matter" solution,
@@ -117,6 +132,11 @@ module HotGlue
               else
                 parsed_time = Time.strptime(parse_date, parsables[field_list[k.to_sym]])
               end
+              Rails.logger.info "parsed_time #{parsed_time}"
+              Rails.logger.info "Timezone: #{use_timezone.name}"
+              Rails.logger.info "Offset: #{use_timezone.formatted_offset}"
+              Rails.logger.info "DST? #{uses_dst} | is_dst_now? => #{is_dst_now?}"
+              Rails.logger.info "Final offset used: #{use_offset}"
 
               params[k] = parsed_time
             end
@@ -229,12 +249,12 @@ module HotGlue
         when 'is_at_exactly'
           ["EXTRACT(HOUR FROM #{field}) = ?
           AND EXTRACT(MINUTE FROM #{field}) = ? ", search_start.split(":")[0], search_start.split(":")[1]]
-        # when 'is_at_or_after'
-        #   ["#{field} = ? OR #{field} > ?", search_start, search_start]
-        # when "is_before_or_at"
-        #   ["#{field} = ? OR #{field} < ?", search_end, search_end]
-        # when "is_between"
-        #   ["#{field} BETWEEN ? AND ?", search_start, search_end]
+          # when 'is_at_or_after'
+          #   ["#{field} = ? OR #{field} > ?", search_start, search_start]
+          # when "is_before_or_at"
+          #   ["#{field} = ? OR #{field} < ?", search_end, search_end]
+          # when "is_between"
+          #   ["#{field} BETWEEN ? AND ?", search_start, search_end]
         end
       end
     end
@@ -265,8 +285,5 @@ module HotGlue
 
     private
 
-    # def server_timezone_offset # returns integer of hours to add/subtract from UTC
-    #   Time.now.in_time_zone(Rails.application.config.time_zone).strftime("%z").to_i/100
-    # end
   end
 end
