@@ -1,0 +1,7 @@
+<\%= tag.turbo_frame id: "<%= @namespace %>__<%= plural %>-list" <%= nested_for_turbo_id_list_constructor %>,
+                    src: <%= path_helper_plural %> + "?__lazy",
+                    loading: "lazy" do %>
+
+  <div class="text-muted">Loading ...</div>
+
+<\% end %>
