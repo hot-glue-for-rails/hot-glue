@@ -31,7 +31,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :search_clear_button, :search_autosearch, :include_object_names,
                 :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
                 :invisible_create, :invisible_update, :phantom_create_params,
-                :phantom_update_params
+                :phantom_update_params, :lazy
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -507,6 +507,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       puts "NESTING: #{@nested_set}"
     end
 
+    if @nested_set.any?
+      @lazy = true
+    end
+
     # related_sets
     related_set_input = options['related_sets'].split(",")
     @related_sets = {}
@@ -586,6 +590,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     options['alt_foreign_key_lookup'].split(",").each do |setting|
       setting =~ /(.*){(.*)}/
       key, lookup_as = $1, $2
+
+
 
       if !eval("#{class_name}.reflect_on_association(:#{key.to_s.gsub("_id","")})")
         raise "couldn't find association for #{key} in the object #{class_name}"
@@ -1532,6 +1538,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     if @no_list
       res -= %w{_list _line index}
+    end
+
+    if @lazy
+      res << '_lazy_list'
     end
 
     res

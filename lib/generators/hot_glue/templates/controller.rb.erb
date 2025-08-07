@@ -86,6 +86,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     authorize @<%= plural_name %><% elsif @pundit && @pundit_policy_override %>
     skip_authorization
     raise Pundit::NotAuthorizedError if ! <%= @pundit_policy_override %>.index?<% end %>
+    <% if @lazy %>render layout: params[:__lazy].present?<% end %>
   rescue Pundit::NotAuthorizedError
     flash[:alert] = 'You are not authorized to perform this action.'
     render 'layouts/error'<% end %>

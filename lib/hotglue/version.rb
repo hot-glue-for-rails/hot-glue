@@ -1,5 +1,5 @@
 module HotGlue
   class Version
-    CURRENT = '0.6.21.2'
+    CURRENT = '0.6.22'
   end
 end

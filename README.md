@@ -2148,12 +2148,17 @@ These automatic pickups for partials are detected at build time. This means that
 
 #### 2025-07-28 v0.6.22
 
+
+
+#### 2025-07-05 v0.6.21
+•Now use new code insertion `--code-after-new` for code that happens directly after `.new()` call. use semicolon (`;`) to create linebreaks; no reason why the factories should insert flash messages
+
 `--phantom-create-params`
 These parameters get added in the strong parameters safelist for the create action
 
 You'll probably wnat to use this along with --code-after-create to check that phanton param
 
-TODO: you have to tap these away yourself 
+TODO: you have to tap these away yourself
 TODO: can they be tapped away automatically if not using a factory
 
 `--phantom-update-params`
@@ -2182,18 +2187,13 @@ See "Polymorphic downnesting" in the downnesting section for an example.
 
 • Removes more vestiges of optionalized nesting (which I had implemented 3 years ago!)
 
-I no longer like optionalized nesting, and recommend against it. 
+I no longer like optionalized nesting, and recommend against it.
 
 Nesting should always be part of the structure, and every route should operate firmly in its nest path.
 
 Use new controller-prefix to make on-off exceptions or with polymorphic children.
 
 • Fixes for localized datetime & time inputs
-
-
-
-#### 2025-07-05 v0.6.21
-•Now use new code insertion `--code-after-new` for code that happens directly after `.new()` call. use semicolon (`;`) to create linebreaks; no reason why the factories should insert flash messages
 
 • removes duplicitous flash messages in factory context
 
