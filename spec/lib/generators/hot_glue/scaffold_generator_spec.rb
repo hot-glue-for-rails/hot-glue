@@ -167,7 +167,8 @@ describe "HotGlue::ScaffoldGenerator" do
       list_view = File.read("spec/dummy/app/views/users/_show.erb")
       expect(list_view ).to_not include("Dfgs")
       edit_view = File.read("spec/dummy/app/views/users/edit.erb")
-      expect(edit_view ).to include("<%= render partial: \"dfgs/list")
+      
+      expect(edit_view ).to include("<%= render partial: \"dfgs/lazy_list")
     end
   end
 
