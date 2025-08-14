@@ -3,7 +3,7 @@
 
   <div class="<%= @layout_strategy.column_classes_for_button_column %>">
     <\%= link_to "Cancel", <%=
-    @nested_set.none? ? path_helper_plural : edit_parent_path_helper %>,  {class: "btn btn-secondary"} %><% if @no_field_form %>
+    (@nested_set.count >= 2) ? edit_parent_path_helper : path_helper_plural %> + (params[:page] ? "?page=" + params[:page] : ""),  {class: "btn btn-secondary"} %><% if @no_field_form %>
     <\%= f.hidden_field "_________" %><% end %>
     <\%= f.submit "Save", class: "btn btn-primary pull-right" %>
   </div>
