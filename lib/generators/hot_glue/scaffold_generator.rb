@@ -303,6 +303,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           @modify_as[key.to_sym] =  {typeahead: 1, nested: nested}
         elsif $2 == "timezone"
           @modify_as[key.to_sym] =  {timezone: 1, badges: $3}
+        elsif $2 == "include_blank"
+          @modify_as[key.to_sym] =  {include_blank: true}
         elsif $2 == "none"
           @modify_as[key.to_sym] =  {none: 1, badges: $3}
         else
