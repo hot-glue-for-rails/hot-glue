@@ -86,6 +86,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     authorize @<%= plural_name %><% elsif @pundit && @pundit_policy_override %>
     skip_authorization
     raise Pundit::NotAuthorizedError if ! <%= @pundit_policy_override %>.index?<% end %>
+    <% if @lazy %>render layout: (params[:__lazy].present? ? false : true)<% end %>
   rescue Pundit::NotAuthorizedError
     flash[:alert] = 'You are not authorized to perform this action.'
     render 'layouts/error'<% end %>
@@ -164,7 +165,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     raise Pundit::NotAuthorizedError if ! <%= @pundit_policy_override %>.show?<% end %>
     redirect_to <%=  HotGlue.optionalized_ternary(namespace: @namespace,
                                  target:  @singular,
-                                 top_level: false,
+                                 top_level: true,
                                  nested_set: @nested_set,
                                  modifier: 'edit_',
                                  with_params: true,
