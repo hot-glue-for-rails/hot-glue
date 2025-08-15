@@ -1,6 +1,6 @@
 <\% if @<%= singular %>.errors.none? %>
   <\%= turbo_stream.replace "<%= @namespace %>__<%= plural %>-list" + <%= nested_for_turbo_nested_constructor %> do %>
-  <\%= render partial: "list", locals: {<%= plural %>: @<%= plural %><% if @nested_set.any? %>, <%= @nested_set.collect{|arg| "#{arg[:singular]}: @#{arg[:singular]}"}.join(", ")  %>, nested_for: '<%= @nested_set.collect{|arg| "\"#{arg[:singular]}-\#{@#{arg[:singular]}.id}\""}.join("__") %>' <% end %> } %>
+  <\%= render partial: "list", locals: {<%= plural %>: @<%= plural %><% if @nested_set.any? %>, <%= @nested_set.collect{|arg| "#{arg[:singular]}: @#{arg[:singular]}"}.join(", ")  %>, nested_for: "<%= @nested_set.collect{|arg| "#{arg[:singular]}-\#{@#{arg[:singular]}.id}"}.join("__") %>" <% end %> } %>
 
 <\% end %>
   <\% end %>
