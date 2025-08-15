@@ -852,7 +852,8 @@ Notice that each modifiers can be used with specific field types.
 | tinymce                       | applies to text fields only, be sure to setup TineMCE globally                                                                                                       | text fields only                  |    |   |
 | typeahead                     | turns a foreign key (only) into a searchable typeahead field                                                                                                         | foreign keys only                 |   |   |
 | timezone                      | turns a string (varchar) into a drop down of timezones                                                                                                               | foreign keys only                 |   |   |
-| none                          | special modifier for using badges |
+| include_blank                 | special modifier for association fields, adds include_blank to the created dropdown                                                                                   |                                   |
+| none                          | special modifier for using badges                                                                                                                                    |
 
 Except for "(truthy label)" and "(falsy label)" which use the special syntax, use the modifier _exactly_ as it is named.
 
@@ -2144,6 +2145,61 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+#### 2025-08-15 - v.0.6.23
+
+• Lazy Lists: Important Breaking Change
+
+All downnested portals now use Turbo's last list feature (frame with `src:` to load the subview via a separate request).
+The user sees "Loading" in the box as it is loading. (See `--downnest` and `--nested` sections.)
+
+Unfortunately, this is a partially breaking change in that a parent & child should be rebuilt together on this version. 
+
+Whereas before the parent's edit template included the list and passed it the records to render immediately (in the same request)
+
+```
+<%= render partial: "agent_rules/list", locals: {agent: @agent, rules: @agent.rules} %>
+
+```
+
+Now, we will render a new partial (from the child's build folder) at `lazy_list` (when the parent is rendering its children)
+
+```
+<%= render partial: "agent_rules/lazy_list", locals: {agent: @agent, ...
+```
+
+The `lazy_list` itself contains a turbo frame tag with an `src` set to the URL where the list can be loaded, appened with __lazy=1 to let the child controller know not to render the full layout.
+
+
+```
+<%= tag.turbo_frame id: "__agents-list" + ((('__' + nested_for) if defined?(nested_for)) || ""),
+                    src: account_crusade_agents_path(account,crusade) + "?__lazy",
+                    loading: "lazy" do %>
+
+```
+
+In the downnested controller, the children will now suppress the layout when loaded lazy
+
+```
+render layout: (params[:__lazy].present? ? false : true)
+```
+
+Just remember you must rebuild the parent if you rebuild a child, and you must rebuild ALL the children of any parent that is rebuilt.
+
+
+• Modify now has an `include_blank` option to add a blank option for associations
+
+
+`--modify-as=person_id{include_blank}`
+
+Make sure your `belongs_to` association has `optional: true` or else you will get validation errors when you try to save a record with an empty association. 
+
+
+• Fixes cancel button problems related to subviews (no longer necessary to load the edit of the parent in the lazy paradigm)
+
+• Fixes double-entry redisplay problem (second create action would be saved but not show up in UI) due to malformed nested_for
+
+
 
 
 #### 2025-07-28 v0.6.22
