@@ -6,6 +6,7 @@
 
   <%= @layout_strategy.page_begin %>
   <\%= render partial: '<%= list_path_partial %>',
-    locals: {<%= plural %>: @<%= plural %>}<%= @nested_set.collect{|arg| ".merge(@" + arg[:singular] + " ? {nested_for: \"" + arg[:singular] + "-\#{@" + arg[:singular] + ".id}\"" + ", " + arg[:singular] + ": @" + arg[:singular] + "} : {})"}.join()  %> \%>
+    locals: {<%= plural %>: @<%= plural %>  <% if @nested_set.any?  %>, nested_for: "<%= @nested_set.collect{|n| "#{n[:singular]}-\#{@#{n[:singular]}.id}"}.join("__") %>", <%= @nested_set.collect{|n| "#{n[:singular]}: @#{n[:singular]}"}.join(", ") %><% end %>
+  } \%>
   <%= @layout_strategy.page_end %>
 </div>
