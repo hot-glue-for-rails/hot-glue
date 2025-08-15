@@ -2148,12 +2148,13 @@ These automatic pickups for partials are detected at build time. This means that
 
 #### 2025-08-15 - v.0.6.23
 
+
 • Lazy Lists: Important Breaking Change
 
 All downnested portals now use Turbo's last list feature (frame with `src:` to load the subview via a separate request).
 The user sees "Loading" in the box as it is loading. (See `--downnest` and `--nested` sections.)
 
-Unfortunately, this is a partially breaking change in that a parent & child should be rebuilt together on this version. 
+Unfortunately, this is a partially breaking change in that a parent & child should be rebuilt together on this version.
 
 Whereas before the parent's edit template included the list and passed it the records to render immediately (in the same request)
 
@@ -2189,11 +2190,11 @@ Just remember you must rebuild the parent if you rebuild a child, and you must r
 
 • Modify now has an `include_blank` option to add a blank option for associations
 
+(Assuming the thing you are building has a `person_id` and `belongs_to :person, optional: true`)
 
-`--modify-as=person_id{include_blank}`
+`--modify=person_id{include_blank}`
 
-Make sure your `belongs_to` association has `optional: true` or else you will get validation errors when you try to save a record with an empty association. 
-
+Make sure your `belongs_to` association has `optional: true` or else you will get validation errors when you try to save a record with an empty association. Without this setting (by default), drop-downs show a blank line when the association is *not set*, but when the association is *set* no blank line is shown, making it impossible to unset or clear out an association once it has already been set.
 
 • Fixes cancel button problems related to subviews (no longer necessary to load the edit of the parent in the lazy paradigm)
 
@@ -2285,7 +2286,7 @@ probably want about 3 or 4 columns. When you have more than 5 it's difficult to 
 #### 2025-06-10 v0.6.19
 
 • Fixes magic button output behavior to correctly show the string returned by the bang menthod
-• Fixes internal syntax of modify_as for modified fields; note default is now 'Yes' and 'No' for radio buttons
+• Fixes internal syntax of modify for modified fields; note default is now 'Yes' and 'No' for radio buttons
 • fixes destroy behavior with explicit .destroy! and ActiveRecord::RecordNotDestroyed; documents previously undocumented 4th parameter for attachment input
 
 
