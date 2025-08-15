@@ -159,7 +159,7 @@ class AssociationField < Field
       end
 
       (is_owner ? "<% unless @#{assoc_name} %>\n" : "") +
-        "  <%= f.collection_select(:#{name}, #{hawked_association}, :id, :#{display_column}, { prompt: true, selected: #{singular}.#{name}#{include_blank}}, class: 'form-control'#{data_attr}) %>\n" +
+        "  <%= f.collection_select(:#{name}, #{hawked_association}, :id, :#{display_column}, { prompt: true, selected: #{singular}.#{name}#{include_blank} }, class: 'form-control'#{data_attr}) %>\n" +
         (is_owner ? "<% else %>\n <%= @#{assoc_name}.#{display_column} %>" : "") +
         (is_owner ? "\n<% end %>" : "")
     end
