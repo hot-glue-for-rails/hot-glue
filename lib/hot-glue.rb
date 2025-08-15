@@ -25,7 +25,7 @@ module HotGlue
   def self.optionalized_ternary(namespace: nil,
                                 target:,
                                 nested_set:,
-                                prefix: nil, # is this used
+                                prefix: "", # is this used
                                 modifier: "",
                                 with_params: false,
                                 top_level: false,
@@ -35,33 +35,33 @@ module HotGlue
 
 
     if nested_set.nil? || nested_set.empty?
-      return modifier + "#{(namespace + '_') if namespace}#{target}_path" + (("(#{instance_sym}#{target})" if put_form) || "")
-    elsif nested_set[0][:optional] == false
+      return modifier + "#{(namespace + '_') if namespace}#{prefix}#{target}_path" + (("(#{instance_sym}#{target})" if put_form) || "")
 
+    else
       res = modifier + ((namespace + "_" if namespace) || "") + nested_set.collect{|x|
         x[:singular] + "_"
-      }.join() + target + "_path" + (("(#{nested_set.collect{
+      }.join() + prefix + target + "_path" + (("(#{nested_set.collect{
         |x| instance_sym + x[:singular] }.join(",")
       }#{ put_form ? ',' + (instance_last_item ? "@" : instance_sym) + target : '' })") || "")
 
       res
-
-    else
+    # else
+    #   raise "optional nested set is deprecated"
       # copy the first item, make a ternery in this cycle, and recursively move to both the
       # is present path and the is optional path
 
-      nonoptional = nested_set[0].dup
-      nonoptional[:optional] = false
-      rest_of_nest = nested_set[1..-1]
-
-      is_present_path = HotGlue.optionalized_ternary(
-        namespace: namespace,
-        target: target,
-        modifier: modifier,
-        top_level: top_level,
-        with_params: with_params,
-        put_form: put_form,
-        nested_set: [nonoptional, *rest_of_nest])
+      # nonoptional = nested_set[0].dup
+      # nonoptional[:optional] = false
+      # rest_of_nest = nested_set[1..-1]
+      #
+      # is_present_path = HotGlue.optionalized_ternary(
+      #   namespace: namespace,
+      #   target: target,
+      #   modifier: modifier,
+      #   top_level: top_level,
+      #   with_params: with_params,
+      #   put_form: put_form,
+      #   nested_set: [nonoptional, *rest_of_nest])
 
       # is_missing_path = HotGlue.optionalized_ternary(
       #   namespace: namespace,
@@ -72,7 +72,7 @@ module HotGlue
       #   put_form: put_form,
       #   nested_set: rest_of_nest  )
       #
-      return "#{is_present_path}"
+      # return "#{is_present_path}"
     end
   end
 
