@@ -321,16 +321,7 @@ TitleCase class name of the thing you want to build a scaffolding for.
 
 (note: Your `Thing` object must `belong_to` an authenticated `User` or alternatively you must create a Gd controller, see below.)
 
-
-## FLAGS (Options with no values)
-These options (flags) also uses `--` syntax but do not take any values. (Notice no equal sign.) Everything is assumed (default) to be false unless specified.
-
-
-### `--stacked-downnesting`
-
-This puts the downnested portals on top of one another (stacked top to bottom) instead of side-by-side (left to right). This is useful if you have a lot of downnested portals and you want to keep the page from getting too wide.
-
-
+About these docs: The options (take an argument) flags (do not take an argument) have been merged together. Flags will be listed with no trailing `=`
 
 ### `--god` or `--gd`
 
@@ -345,145 +336,6 @@ def load_thing
 end
 
 ```
-
-### `--button-icons` (default is no icons)
-You can specify this either as builder flag or as a config setting (in `config/hot_glue.yml`)
-Use `font-awesome` for Font Awesome or `none` for no icons.
-
-
-### `--specs-only`
-
-Produces ONLY the controller spec file, nothing else.
-
-
-### `--no-specs`
-
-Produces all the files except the spec file.
-
-
-### `--no-paginate` (default: false)
-
-Omits pagination. (All list views have pagination by default.)
-
-### `--paginate-per-page-selector` (default: false)
-
-Show a small drop-down below the list to let the user choose 10, 25, or 100 results per page.
-
-
-### `--no-list`
-
-Omits list action. Only makes sense to use this if want to create a view where you only want the create button or to navigate to the update screen alternative ways. (The new/create still appears, as well the edit, update & destroy actions are still created even though there is no natural way to navigate to them.)
-
-
-
-### `--no-create`
-
-Omits new & create actions.
-
-### `--no-delete`
-
-Omits delete button & destroy action.
-
-### `--no-controller`
-
-Omits controller.
-
-### `--no-list`
-
-Omits list views.
-
-`--new-button-position` (above, below; default: above)
-Show the new button above or below the list.
-
-`--downnest-shows-headings` (default: false)
-Show headings above downnested portals.
-
-
-### `--big-edit`
-
-If you do not want inline editing of your list items but instead want to fallback to full-page style behavior for your edit views, use `--big-edit`.
-
-The user will be taken to a full-screen edit page instead of an edit-in-place interaction.
-
-When using `--big-edit`, any downnested portals will be displayed on the edit page instead of on the list page.
-
-Big edit makes all edit and magic button operations happen using `'data-turbo': false`, fully reloading the page and submitting HTML requests instead of TURBO_STREAM requests.
-
-Likewise, the controller's `update` action always redirects instead of using Turbo.
-
-
-### `--display-list-after-update`
-
-After an update-in-place normally only the edit view is swapped out for the show view of the record you just edited.
-
-Sometimes you might want to redisplay the entire list after you make an update (for example, if your action removes that record from the result set).
-
-To do this, use flag `--display-list-after-update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
-
-### `--with-turbo-streams`
-
-If and only if you specify `--with-turbo-streams`, your views will contain `turbo_stream_from` directives. Whereas your views will always contain `turbo_frame_tags` (whether or not this flag is specified) and will use the Turbo stream replacement mechanism for non-idempotent actions (create & update). This flag just brings the magic of live-reload to the scaffold interfaces themselves.
-
-**_To test_**: Open the same interface in two separate browser windows. Make an edit in one window and watch your edit appear in the other window instantly.
-
-This happens using two interconnected mechanisms:
-
-1) by default, all Hot Glue scaffold is wrapped in `turbo_frame_tag`s. The id of these tags is your namespace + the Rails dom_id(...). That means all Hot Glue scaffold is namespaced to the namespaces you use and won't collide with other turbo_frame_tag you might be using elsewhere
-
-2) by appending **model callbacks**, we can automatically broadcast updates to the users who are using the Hot Glue scaffold. The model callbacks (after_update_commit and after_destroy_commit) get appended automatically to the top of your model file. Each model callback targets the scaffold being built (so just this scaffold), using its namespace, and renders the line partial (or destroys the content in the case of delete) from the scaffolding.
-
-please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
-
-
-### `--no-list-label`
-Omits list LABEL itself above the list. (Do not confuse with the list heading which contains the field labels.)
-
-Note that list labels may  be automatically omitted on downnested scaffolds.
-
-
-### `--no-list-heading`
-
-Omits the heading of column names that appears above the 1st row of data.
-
-### `--include-object-names`
-
-When you are "Editing X" we specify that X is a ___ (author, book, room, etc)
-
-e.g. "Editing author Edgar Allan Poe" vs "Editing Edgar Allan Poe"
-
-Can also be specified globally in `config/hot_glue.yml`
-
-## Nav Templates and `--no-nav-menu`
-At the namespace level, you can have a file called `_nav.html.erb` to create tabbed bootstrap nav
-
-To create the file for the first time (at each namespace), start by running
-```
-bin/rails generate hot_glue:nav_template --namespace=xyz
-```
-
-This will append the file `_nav.html.erb` to the views folder at `views/xyz`. To begin, this file contains only the following:
-
-```
-<ul class='nav nav-tabs'>
-</ul>
-```
-
-Once the file is present, any further builds in this namespace will:
-
-1) Append to this `_nav.html.erb` file, adding a tab for the new built scaffold
-2) On the list view of the scaffold being built, it will include a render to the _nav partial, passing the name of the currently-viewed thing as the local variable `nav` (this is how the nav template knows which tab to make active).
-```
-<%= render partial: "owner/nav", locals: {nav: "things"} %>
-```
-(In this example `owner/` is the namespace and `things` is the name of the scaffold being built)
-
-To suppress this behavior, add `--no-nav-menu` to the build command and the _nav template will not be touched.
-
-
-
-## Options With Arguments
-
-All options begin with two dashes (`--`) and a followed by an `=` and a value
 
 ### `--namespace=`
 
@@ -507,101 +359,6 @@ class Dashboard::ThingsController < ApplicationController
 end
 
 ```
-
-### `--nested=`
-
-This object is nested within another tree of objects, and there is a nested route in your `routes.rb` file with the specified parent controllers above this controller. When specifying the parent(s), be sure to use **singular case**.
-
-#### Example #1: One-level Nesting
-Invoice `has_many :lines` and a Line `belongs_to :invoice`
-
-```
-resources :invoices do
-  resource :lines do
-end
-```
-
-`./bin/rails generate hot_glue:scaffold Invoice`
-
-`./bin/rails generate hot_glue:scaffold Line --nested=invoice`
-
-
-Remember, nested should match how the hierarchy of nesting is in your `routes.rb` file. (Which Hot Glue does not create or edit for you.)
-
-#### Example #2: Two-level Nesting
-
-Invoice `has_many :lines` and a Line `belongs_to :invoice`
-Line `has_many :charges` and Charge `belongs_to :line`
-
-**config/routes.rb**
-```
-resources :invoices do
-    resources :lines do
-        resources :charge
-    end    
-end
-```
-
-
-_For multi-level nesting use slashes to separate your levels of nesting._
-
-`./bin/rails generate hot_glue:scaffold Invoice`
-
-`./bin/rails generate hot_glue:scaffold Line --nested=invoice`
-
-`./bin/rails generate hot_glue:scaffold Charge --nested=invoice/line`
-
-
-
-For non-Gd controllers, your auth root will be used as the starting point when loading the objects from the URL if this object is nested.
-
-(For Gd controllers the root object will be loaded directly from the ActiveRecord object.)
-
-In the example above, @invoice will be loaded from
-
-`@invoice = current_user.invoices.find(params[:invoice_id])`
-
-Then, @line will be loaded
-
-`@line = @invoice.lines.find(params[:line_id])`
-
-Then, finally the @charge will be loaded
-
-`@charge = @line.charges.find(params[:id])`
-
-This is "starfish access control" or "poor man's access control."  It works when the current user has several things they can manage, and by extension can manage children of those things.  
-
-
-#### Example #3: Polymorphic Nesting
-Use `(` and `)` to specify a non-standard upwards relationship from the child, as in the case of a polymorphic belongs_to
-
-```
-class Blast
-  has_many :rules, as: :ruleable
-end
-
-class Rule
-  # ruleable_id
-  # ruleable_type
-
-  belongs_to :ruleable, polymorphic: true
-end
-```
-
-routes.rb
-```
-resources :blasts do
-  resources :rules 
-end
-```
-
-`rails generate hot_glue:scaffold Blast --downnest=rules`
-
-`rails generate hot_glue:scaffold Rules --nested='blast(ruleable)'`
-
-Notices the relationship from the parent to child is `rules` but from the child to parent, it is `ruleable` instead of `blast`
-
-
 
 ### `--auth=`
 
@@ -677,62 +434,198 @@ In this case a controller would be generated that would have NO before_action to
 Please note that this example would produce non-functional code, so you would need to manually fix your controllers to make sure `current_account` is available to the controller.
 
 
-### `--hawk=`
 
-Hawk a foreign key that is not the object's owner to within a specified scope. 
+### `--nested=`
 
-Assuming a Pet belong_to a :human, when building an Appointments scaffold,
-you can hawk the `pet_id` to the current human's pets. (Whoever is the authentication object.)
+This object is nested within another tree of objects, and there is a nested route in your `routes.rb` file with the specified parent controllers above this controller. When specifying the parent(s), be sure to use **singular case**.
 
-The hawk has two forms: a short-form (`--hawk=key`) and long form (`--hawk=key{scope})
+#### Example #1: One-level Nesting
+Invoice `has_many :lines` and a Line `belongs_to :invoice`
 
-The short form looks like this. It presumes there is a 'pets' association from `current_user`
-`--hawk=pet_id`
-
-(The long form equivalent of this would be `--hawk=pet_id{current_user.pets}`)
-
-This is covered in [Example #3 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
-
-To hawk to a scope that is not the currently authenticated user, use the long form with `{...}` 
-to specify the scope. Be sure to note to add the association name itself, like `users`: 
-
-`--hawk=user_id{current_user.family.users}`
-
-This would hawk the Appointment's `user_id` key to any users who are within the scope of the 
-current_user's has_many association (so, for any other "my" family, would be `current_user.family.users`). 
-
-This is covered in [Example #4 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
-
-
-### `--plural=`
-
-You don't need this if the pluralized version is just + "s" of the singular version.
-Only use for non-standard plurlizations, and be sure to pass it as TitleCase (as if you pluralized the model name which is non-standard for Rails)
-
-An better alternative is to define the non-standard plurlizations globally in your app, which Hot Glue will respect.
-
-Make a file at `config/initializers/inflections.rb`
- 
-Add new inflection rules using the following format:
 ```
-ActiveSupport::Inflector.inflections do |inflect|
-    inflect.irregular 'clothing', 'clothes'
-    inflect.irregular 'human', 'humans'  
+resources :invoices do
+  resource :lines do
+end
+```
+
+`./bin/rails generate hot_glue:scaffold Invoice`
+
+`./bin/rails generate hot_glue:scaffold Line --nested=invoice`
+
+
+Remember, nested should match how the hierarchy of nesting is in your `routes.rb` file. (Which Hot Glue does not create or edit for you.)
+
+#### Example #2: Two-level Nesting
+
+Invoice `has_many :lines` and a Line `belongs_to :invoice`
+Line `has_many :charges` and Charge `belongs_to :line`
+
+**config/routes.rb**
+```
+resources :invoices do
+    resources :lines do
+        resources :charge
+    end    
 end
 ```
 
 
+_For multi-level nesting use slashes to separate your levels of nesting._
+
+`./bin/rails generate hot_glue:scaffold Invoice`
+
+`./bin/rails generate hot_glue:scaffold Line --nested=invoice`
+
+`./bin/rails generate hot_glue:scaffold Charge --nested=invoice/line`
 
 
-### `--exclude=`
-(separate field names by COMMA)
 
-By default, all fields are included unless they are on the default exclude list. (The default exclude list is `id`, `created_at`, `updated_at`, `encrypted_password`, `reset_password_token`, `reset_password_sent_at`, `remember_created_at`, `confirmation_token`, `confirmed_at`, `confirmation_sent_at`, `unconfirmed_email`.)
+For non-Gd controllers, your auth root will be used as the starting point when loading the objects from the URL if this object is nested.
 
-If you specify any exclude list, those excluded **and** the default exclude list will be excluded. (If you need any of the fields on the default exclude list, you must use `--include` instead.)
+(For Gd controllers the root object will be loaded directly from the ActiveRecord object.)
+
+In the example above, @invoice will be loaded from
+
+`@invoice = current_user.invoices.find(params[:invoice_id])`
+
+Then, @line will be loaded
+
+`@line = @invoice.lines.find(params[:line_id])`
+
+Then, finally the @charge will be loaded
+
+`@charge = @line.charges.find(params[:id])`
+
+This is "starfish access control" or "poor man's access control."  It works when the current user has several things they can manage, and by extension can manage children of those things.
 
 
-`./bin/rails generate hot_glue:scaffold Account --exclude=password`
+#### Example #3: Polymorphic Nesting
+Use `(` and `)` to specify a non-standard upwards relationship from the child, as in the case of a polymorphic belongs_to
+
+```
+class Blast
+  has_many :rules, as: :ruleable
+end
+
+class Rule
+  # ruleable_id
+  # ruleable_type
+
+  belongs_to :ruleable, polymorphic: true
+end
+```
+
+routes.rb
+```
+resources :blasts do
+  resources :rules 
+end
+```
+
+`rails generate hot_glue:scaffold Blast --downnest=rules`
+
+`rails generate hot_glue:scaffold Rules --nested='blast(ruleable)'`
+
+Notices the relationship from the parent to child is `rules` but from the child to parent, it is `ruleable` instead of `blast`
+
+
+
+### `--downnest=`
+
+Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object.
+You will need to build scaffolding with the same name for the related object as well. On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line.
+
+The downnested child table (not to be confused with this object's `--nested` setting, where you are specifying this object's _parents_) is called a **child portal**. When you create a record in the child portal, the related record is automatically set to be owned by its parent (as specified by `--nested`). For an example, see the [v0.4.7 release notes](https://github.com/jasonfb/hot-glue/releases/tag/v0.4.7).
+
+Can now be created with more space (wider) by adding a `+` to the end of the downnest name
+- e.g. `--downnest=abc+,xyz`
+
+The 'Abcs' portal will display as 5 bootstrap columns instead of the typical 4. (You may use multiple ++ to keep making it wider but the inverse with minus is not supported
+
+If you are nesting from a controller that uses big edit, your child portals do not display on the list page.
+
+Instead, they display on the edit page, and they display below the record using a Bootstrap tab nav that is automatically built for you.
+
+
+
+#### Polymorphic Downnesting
+
+Here, a `Blast` `has_many :rules, as: :ruleable`
+
+The child object is named `Rule` but it can belong to a Blast or an Agent. (Agent also has a similar has_many for Rules)
+
+`belongs_to :ruleable, polymorphic: true`
+
+We build the blast & agent controllers like so:
+
+bin/rails generate hot_glue:scaffold Blast  --downnest='blast_rules(rules)'
+bin/rails generate hot_glue:scaffold Agent  --downnest='agent_rules(rules)'
+
+Notice that the relationship name is `rules` (not blast_rules), so what goes before the parenthesis is the controller name (with prefix)
+What goes inside the controller name is the real relationship name.
+
+For the children, we can't build one controller for the Rule, instead we build one for the `AgentRules` and another for the `BlastRules`
+
+bin/rails generate hot_glue:scaffold Rule  --nested='blast(ruleable)' --controller-prefix='Blast'
+bin/rails generate hot_glue:scaffold Rule  --nested='agent(ruleable)' --controller-prefix='Agent'
+
+(I realize building one child controller for each type of polymorph is tedius, but this is the best solution I could come up with.)
+
+As these are children, what goes into the `--netsed` setting inside the parentheses is the polymorphic name specified by `as:` when declaring the `belongs_to`
+
+routes.rb
+
+```
+        resources :agents do
+          resources :agent_rules
+        end
+
+        resources :blasts do
+          resources :blast_rules
+        end
+```
+
+### `--stacked-downnesting`
+
+This puts the downnested portals on top of one another (stacked top to bottom) instead of side-by-side (left to right). This is useful if you have a lot of downnested portals and you want to keep the page from getting too wide.
+
+
+
+### `--downnest-shows-headings` (default: false)
+Show headings (the label of the list) above downnested portals.
+
+
+
+
+### `--record-scope=`
+
+Record scope allows you to apply a model based scope for the controller being generated.
+This is applied on top of all other scopes, searches, and modifiers applied to the built controller.
+
+`bin/rails :generate hot_glue:scaffold Order --record-scope='.is_open'`
+
+Be sure to use single quotes (`'`) and don't forget the dot (`.`) before your scope(s).
+
+Make sure your Order model has a scope `is_open`, like so:
+
+```
+scope :is_open, -> {where(state == 'open')}
+```
+
+Now all records displayed through the generated controller_
+
+
+### `--big-edit`
+
+If you do not want inline editing of your list items but instead want to fallback to full-page style behavior for your edit views, use `--big-edit`.
+
+The user will be taken to a full-screen edit page instead of an edit-in-place interaction.
+
+When using `--big-edit`, any downnested portals will be displayed on the edit page instead of on the list page.
+
+Big edit makes all edit and magic button operations happen using `'data-turbo': false`, fully reloading the page and submitting HTML requests instead of TURBO_STREAM requests.
+
+Likewise, the controller's `update` action always redirects instead of using Turbo.
 
 
 ### `--include=`
@@ -747,7 +640,383 @@ You may not specify both include and exclude.
 Include setting is affected by both specified grouping mode and smart layouts, explained below.
 
 
-#### Specified Grouping Mode
+### `--exclude=`
+(separate field names by COMMA)
+
+By default, all fields are included unless they are on the default exclude list. (The default exclude list is `id`, `created_at`, `updated_at`, `encrypted_password`, `reset_password_token`, `reset_password_sent_at`, `remember_created_at`, `confirmation_token`, `confirmed_at`, `confirmation_sent_at`, `unconfirmed_email`.)
+
+If you specify any exclude list, those excluded **and** the default exclude list will be excluded. (If you need any of the fields on the default exclude list, you must use `--include` instead.)
+
+
+`./bin/rails generate hot_glue:scaffold Account --exclude=password`
+
+
+### `--display-list-after-update`
+
+After an update-in-place normally only the edit view is swapped out for the show view of the record you just edited.
+
+Sometimes you might want to redisplay the entire list after you make an update (for example, if your action removes that record from the result set).
+
+To do this, use flag `--display-list-after-update`. The update will behave like delete and re-fetch all the records in the result and tell Turbo to swap out the entire list.
+
+
+### `--hawk=`
+
+Hawk a foreign key that is not the object's owner to within a specified scope.
+
+Assuming a Pet belong_to a :human, when building an Appointments scaffold,
+you can hawk the `pet_id` to the current human's pets. (Whoever is the authentication object.)
+
+The hawk has two forms: a short-form (`--hawk=key`) and long form (`--hawk=key{scope})
+
+The short form looks like this. It presumes there is a 'pets' association from `current_user`
+`--hawk=pet_id`
+
+(The long form equivalent of this would be `--hawk=pet_id{current_user.pets}`)
+
+This is covered in [Example #3 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
+
+To hawk to a scope that is not the currently authenticated user, use the long form with `{...}`
+to specify the scope. Be sure to note to add the association name itself, like `users`:
+
+`--hawk=user_id{current_user.family.users}`
+
+This would hawk the Appointment's `user_id` key to any users who are within the scope of the
+current_user's has_many association (so, for any other "my" family, would be `current_user.family.users`).
+
+This is covered in [Example #4 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
+
+### `--with-turbo-streams`
+
+If and only if you specify `--with-turbo-streams`, your views will contain `turbo_stream_from` directives. Whereas your views will always contain `turbo_frame_tags` (whether or not this flag is specified) and will use the Turbo stream replacement mechanism for non-idempotent actions (create & update). This flag just brings the magic of live-reload to the scaffold interfaces themselves.
+
+**_To test_**: Open the same interface in two separate browser windows. Make an edit in one window and watch your edit appear in the other window instantly.
+
+This happens using two interconnected mechanisms:
+
+1) by default, all Hot Glue scaffold is wrapped in `turbo_frame_tag`s. The id of these tags is your namespace + the Rails dom_id(...). That means all Hot Glue scaffold is namespaced to the namespaces you use and won't collide with other turbo_frame_tag you might be using elsewhere
+
+2) by appending **model callbacks**, we can automatically broadcast updates to the users who are using the Hot Glue scaffold. The model callbacks (after_update_commit and after_destroy_commit) get appended automatically to the top of your model file. Each model callback targets the scaffold being built (so just this scaffold), using its namespace, and renders the line partial (or destroys the content in the case of delete) from the scaffolding.
+
+please note that *creating* and *deleting* do not yet have a full & complete implementation: Your pages won't re-render the pages being viewed cross-peer (that is, between two users using the app at the same time) if the insertion or deletion causes the pagination to be off for another user.
+
+
+
+
+### `--plural=`
+
+You don't need this if the pluralized version is just + "s" of the singular version.
+Only use for non-standard plurlizations, and be sure to pass it as TitleCase (as if you pluralized the model name which is non-standard for Rails)
+
+An better alternative is to define the non-standard plurlizations globally in your app, which Hot Glue will respect.
+
+Make a file at `config/initializers/inflections.rb`
+
+Add new inflection rules using the following format:
+```
+ActiveSupport::Inflector.inflections do |inflect|
+    inflect.irregular 'clothing', 'clothes'
+    inflect.irregular 'human', 'humans'  
+end
+```
+
+
+### `--ujs_syntax=true` (Default is set automatically based on whether you have turbo-rails installed)
+
+If you are pre-Turbo (UJS), your delete buttons will come out like this:
+`data: {'confirm': 'Are you sure you want to delete....?'}`
+
+If you are Turbo (Rails 7 or Rails 6 with proactive Turbo-Rails install), your delete button will be:
+`data: {'turbo-confirm': 'Are you sure you want to delete....?'}`
+
+If you specify the flag, you preference will be used. If you leave the flag off, Hot Glue will detect the presence of Turbo-Rails in your app.
+
+**WARNING**: If you created a new Rails app since October 2021 and you have the yanked turbo-rails Gems on your local machine,
+you will have some bugs with the delete buttons and also not be on the latest version of turbo-rails.
+
+Make sure to uninstall the yanked 7.1.0 and 7.1.1 from your machine with `gem uninstall turbo-rails`
+and also fix any Rails apps created since October 2021 by fixing the Gemfile. Details here:
+https://stackoverflow.com/questions/70671324/new-rails-7-turbo-app-doesnt-show-the-data-turbo-confirm-alert-messages-dont-f
+
+
+### `--magic-buttons=`
+If you pass a list of magic buttons (separated by commas), they will appear in the button area on your list.
+
+It will be assumed there will be corresponding bang methods on your models.
+
+The bang (`!`) methods can respond in one of four ways:
+
+• With true, in which case a generic success message will be shown in the flash notice (“Approved” or “Rejected” in this case)
+
+• With false, in which case a generic error message will be shown in the flash alert (“Could not approve…”)
+
+• With a string, which will be assumed to be a “success” case, and will be passed to the front-end in the alert notice.
+
+• Raise an ActiveRecord exception
+
+This means you can be a somewhat lazy about your bang methods, but keep in mind the truth operator compares boolean true NOT any object is truth. So your return object must either be actually true (boolean), or an object that is string or string-like (responds to .to_s). Want to just say it didn’t work? Return false. Want to just say it was OK? Return true. Want to say it was successful but provide a more detailed response? Return a string.
+
+Finally, you can raise an ActiveRecord error which will also get passed to the user in the flash alert area.
+
+For more information see [Example 6 in the Tutorial](https://school.jfbcodes.com/8188)
+
+You can also define methods on your model that have the same name as the button with `_able?` at the end.
+(Prior to v0.6.20, these methods expected names with `able?` but no underscore.)
+
+The button will be display as disabled if the method returns false.
+
+
+
+### `--related-sets=`
+
+Used to show a checkbox set of related records. The relationship should be a `has_and_belongs_to_many` or a `has_many through:` from the object being built.
+
+Consider the classic example of three tables: users, user_roles, and roles
+
+User `has_many :user_roles`; UserRole `belongs_to :user` and `belongs_to :role`; and Role `has_many :user_roles` and `has_many :user, through: :user_roles`
+
+We'll generate a scaffold to edit the users table. A checkbox set of related roles will also appear to allow editing of roles. (In this example, the only field to be edited is the email field.)
+
+```
+rails generate hot_glue:scaffold User --related-sets=roles --include=email,roles --gd
+```
+
+Note this leaves open a privileged escalation attack (a security vulnerability).
+
+To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see [Example #17 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
+
+
+
+### `--attachments=`
+
+#### ActiveStorage Quick Setup
+(For complete docs, refer to https://guides.rubyonrails.org/active_storage_overview.html)
+
+`brew install vips`
+(for videos `brew install ffmpeg`)
+
+```
+bundle add image_processing
+./bin/rails active_storage:install
+./bin/rails db:migrate
+```
+
+Generate an images model:
+
+`./bin/rails generate model Images name:string`
+
+add to `app/model/image.rb`, giving it a variant called thumb (Note: Hot Glue will fallback to using a variant called "thumb" if you use the shorthand syntax. If you use the long syntax, you can specify the variant to use for displaying the image)
+
+```
+has_one_attached :avatar do |attachable|
+  attachable.variant :thumb, resize_to_limit: [100, 100]
+end
+```
+Generate a Hot Glue scaffold with the attachment avatar appended to the field list (the shorthand syntax)
+
+`./bin/rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar'`
+
+(Attachments behave like fields and follow the same layout rules used for fields, except that, unlike fields, when NOT using an --include list, they do not get automatically added. Thus, attachments are opt-in. You do not need to specify an attachment on the attachments list as ALSO being on the include list, but you can for the purpose of using the layout tricks discussed in Specified Grouping Mode to make the attachment appear on the layout where you want it to)
+
+#### Caveats:
+• If thumbnails aren't showing up, make sure you have
+
+1) installed vips, and
+2) used an image that supports ActiveStorage "variable" mechanism. The supported types are png, gif, jpg, pjpeg, tiff, bmp, vnd.adobe.photoshop, vnd.microsoft.icon, webp. see https://stackoverflow.com/a/61971660/3163663
+   To debug, make sure the object responds true to the variable? method.
+
+If you use the shorthand syntax,  Hot Glue looks for a variant "thumb" (what you see in the example above).
+
+If it finds one, it will render thumbnails from the attachment variant `thumb`. To specify a variant name other than "thumb", use the first parameter below.
+
+If using the shortform syntax and Hot Glue does **not find a variant** called `thumb` at the code generation time, it will build scaffolding without thumbnails.
+
+#### `--attachments=` Long form syntax with 1 parameter
+
+**--attachments='_attachment name_{_variant name_}'**
+
+What if your variant is called something other than `thumb`
+
+Use the long-form syntax specifying a variant name other than `thumb`. For example, `thumbnail`
+
+`./bin/rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar{thumbnail}'`
+
+The model would look like this:
+```
+has_one_attached :avatar do |attachable|
+  attachable.variant :thumbnail, resize_to_limit: [100, 100]
+end
+```
+
+If using the long-form syntax with 1 parameter and Hot Glue does not find the specified variant declared in your attachment, it will stop and raise an error.
+
+
+### `--factory-creation={ ... }`
+
+The code you specify inside of `{` and `}` will be used to generate a new object. The factory should instantiate with any arguments (I suggest Ruby keyword arguments) and must provide a method that is the name of the thing.
+
+You may use semi-colons to separate multiple lines of code.
+
+For example, a user Factory might be called like so:
+
+`./bin/rails generate hot_glue:scaffold User --factory-creation={factory = UserFactory.new(params: user_params)} --gd`
+
+(Note we are relying on the `user_params` method provided by the controller.)
+
+You must do one of two things:
+
+1) In the code you specify, set an instance variable `@user` to be the newly created thing. (Your code should contain something like `@thing = ` to trigger this option.)
+2) Make a local variable called `factory` **and** have a method of the name of the object (`user`) on a local variable called `factory` that your code created
+
+(The code example above is the option for #2 because it does not contain `@user =`)
+
+If using number #2, Hot Glue will append this to the code specified:
+```
+@user = factory.user
+```
+
+
+Here's a sample UserFactory that will create a new user only if one with a matching email address doesn't exist. (Otherwise, it will update the existing record.)
+Your initialize method can take any params you need it to, and using this pattern your business logic is applied consistently throughout your app. (You must, of course, use your Factory everywhere else in your app too.)
+
+```
+class UserFactory
+    attr_reader :user
+    attr_accessor :email
+
+    def initialize(params: {})
+        user = User.find_or_create_by(email: params[:email])
+    
+        user.update(params)
+        if user.new_record?
+            # do special new user logic here, like sending an email
+        end
+    end
+end
+```
+
+
+be sure your factory code creates a local variable that follows this name
+
+**<downcase association name>**_factory.<downcase association name>
+
+Thus, your factory object must have a method of the same name as the factory being created which returns the thing that got created.
+(It can do the creation either on instantiation or when calling that method)
+
+For example, assuming the example from above, we are going to do the lookup ourselves inside of our own `AgentFactory` object.)
+
+```
+factory = AgentFactory.new(find_or_create_by_email: agent_company_params[:__lookup_email], 
+                            params: modified_params)
+```
+
+Here the new AgentFactory will receive any variables by keyword argument, and since you're specifying the calling code here, Hot Glue does not dictate your factory's setup.
+However, two special variables are in scope which you can use in your calling code.
+
+`*_params` (where * is the name of the thing you are building)
+`modified_params`
+
+Either one must be received by your factory for your factory to create data based off the inputted data.
+
+Remember, `*_params` has the input params passed only the through the sanitizer, and modified_params has it passed through the timezone aware mechanism and other Hot Glue-specific defaults.
+
+Always:
+• In your factory calling code, assign the variable `factory = ` (do not use a different variable name),
+• Write a factory object with a `new` method that received the paramters you are specifying in your calling code,
+• Be sure your factory has an _instance method_ a method with the **same name** of the built object, which hot glue will call next:
+
+`@agent = factory.agent`
+
+Don't include this last line in your factory code.
+
+
+
+## On/off switches
+
+### `--specs-only`
+
+Produces ONLY the controller spec file, nothing else.
+
+### `--no-specs`
+
+Produces all the files except the spec file.
+
+### `--no-paginate` (default: false)
+
+Omits pagination. (All list views have pagination by default.)
+
+### `--paginate-per-page-selector` (default: false)
+
+Show a small drop-down below the list to let the user choose 10, 25, or 100 results per page.
+
+
+### `--no-list`
+
+Omits list action. Only makes sense to use this if want to create a view where you only want the create button or to navigate to the update screen alternative ways. (The new/create still appears, as well the edit, update & destroy actions are still created even though there is no natural way to navigate to them.)
+
+### `--no-create`
+
+Omits new & create actions.
+
+### `--no-delete`
+
+Omits delete button & destroy action.
+
+### `--no-controller`
+
+Omits controller.
+
+### `--no-list`
+
+Omits list views.
+
+
+
+### `--no-list-label`
+Omits list LABEL itself above the list. (Do not confuse with the list heading which contains the field labels.)
+
+Note that list labels may  be automatically omitted on downnested scaffolds.
+
+
+### `--no-list-heading`
+
+Omits the heading of column names that appears above the 1st row of data.
+
+
+
+
+
+## Nav Templates and `--no-nav-menu`
+At the namespace level, you can have a file called `_nav.html.erb` to create tabbed bootstrap nav
+
+To create the file for the first time (at each namespace), start by running
+```
+bin/rails generate hot_glue:nav_template --namespace=xyz
+```
+
+This will append the file `_nav.html.erb` to the views folder at `views/xyz`. To begin, this file contains only the following:
+
+```
+<ul class='nav nav-tabs'>
+</ul>
+```
+
+Once the file is present, any further builds in this namespace will:
+
+1) Append to this `_nav.html.erb` file, adding a tab for the new built scaffold
+2) On the list view of the scaffold being built, it will include a render to the _nav partial, passing the name of the currently-viewed thing as the local variable `nav` (this is how the nav template knows which tab to make active).
+```
+<%= render partial: "owner/nav", locals: {nav: "things"} %>
+```
+(In this example `owner/` is the namespace and `things` is the name of the scaffold being built)
+
+### `--no-nav-menu`
+
+To suppress this behavior, add `--no-nav-menu` to the build command and the _nav template will not be touched.
+
+
+
+## Layout & Manipulation features
 
 To specify grouped columns, separate COLUMNS by a COLON, then separate fields with commas. Specified groupings work like smart layouts (see below), except you drive which groupings make up the columns. 
 
@@ -817,6 +1086,20 @@ This is what would happen if 9 fields, specified in the order A,B,C,D,E,F,G,H,I,
 
 (If you had a number of fields that wasn't easily divisible by the number of columns, it would leave the final column one or a few fields short of the others.)
 
+
+### `--new-button-position` (above, below; default: above)
+Show the new button above or below the list.
+
+
+
+### `--button-icons` (default is no icons)
+You can specify this either as builder flag or as a config setting (in `config/hot_glue.yml`)
+Use `font-awesome` for Font Awesome or `none` for no icons.
+
+### `--include-object-names`
+When you are "Editing X" we specify that X is a ___ (author, book, room, etc)
+e.g. "Editing author Edgar Allan Poe" vs "Editing Edgar Allan Poe"
+Can also be specified globally in `config/hot_glue.yml`
 
 
 ### `--modify=field1{...},field2{...}`
@@ -949,7 +1232,55 @@ When building a non-Gd controller with a `--alt-foreign-key-lookup`, if you don'
 
 To fix, either hawk the field or use with a factory creation pattern. This is because the associated object is on your graph but Hot Glue doesn't know how to securly load it without knowing its relationship to the current user. Use the `--hawk` mechanism to specify that relationship, and the lookup mechanism will integrate nicely. 
 
+## Labels
 
+### `--label=`
+
+The general name of the thing, will be applied as "New ___" for the new button & form. Will be *pluralized* for list label heading, so if the word has a non-standard pluralization, be sure to specify it in `config/inflictions.rb`
+
+If you specify anything explicitly, it will be used.
+If not, a specification that exists as `@@tabel_label_singular` from the Model will be used.
+If this does not exist, the Titleized (capitalized) version of the model name.
+
+### `--list-label-heading=`
+The plural of the list of things at the top of the list.
+If not, a specification that exists as `@@tabel_label_plural` from the Model will be used.
+If this does not exist, the UPCASE (all-uppercase) version of the model name.
+
+### `--new-button-label=`
+Overrides the button on the list that the user clicks onto to create a new record.
+(Default is to follow the same rules described in the `--label` option but with the word "New" prepended.)
+
+### `--new-form-heading=`
+The text at the top of the new form that appears when the new input entry is displayed.
+(Default follows the same rules described in the `--label` option but with the word "New" prepended.)
+
+
+
+### `--form-labels-position=` (default: `after`; options are **before**, **after**, and **omit**)
+By default form labels appear after the form inputs. To make them appear before or omit them, use this flag.
+
+See also `--form-placeholder-labels` to use placeolder labels.
+
+
+### `--form-placeholder-labels=` (default: false)
+
+When set to true, fields, numbers, and text areas will have placeholder labels.
+Will not apply to dates, times, datetimes, dropdowns (enums + foreign keys), or booleans.
+
+See also setting `--form-labels-position` to control position or omit normal labels.
+
+### `--inline-list-labels=` (before, after, omit; default: omit)
+
+Determines if field label will appear on the LIST VIEW. Note that because Hot Glue has no separate show route or page, this affects the `_show` template which is rendered as a partial from the LIST view.
+
+Because the labels are already in the heading, this is `omit` by default. (Use with `--no-list-heading` to omit the labels in the list heading.)
+
+Use `before` to make the labels come before or `after` to make them come after. See Version 0.5.1 release notes for an example.
+
+
+
+## Access Control & Field Visibility Features
 
 ### `--pundit`
 If you enable Pundit, your controllers will look for a Policy that matches the name of the thing being built.
@@ -1029,9 +1360,6 @@ If provided, the output code looks something like (in this example, showing the 
     skip_authorization
     raise Pundit::NotAuthorizedError if ! UniqueInvoicePolicy.edit?
 ```
-
-
-
 
 ### `--show-only=`
 (separate field names by COMMA)
@@ -1177,6 +1505,7 @@ Notice we are also using `--stimmify` to decorate the form with a Stimulus contr
 
 The code above uses Code Mirror to act as a code editor, which requires pulling the value off the hidden form element (putting it into the code mirror interface) and pushing it back into the hidden form element when the Submit button is clicked.
 
+
 ### `--invisible=` 
 ### `--create-invisible=`
 ### `--update-invisible=`
@@ -1251,187 +1580,8 @@ Remember, since the `_able?` methods are not otherwise called during Pundit's in
 
 
 
-### `--ujs_syntax=true` (Default is set automatically based on whether you have turbo-rails installed)
-
-If you are pre-Turbo (UJS), your delete buttons will come out like this:
-`data: {'confirm': 'Are you sure you want to delete....?'}`
-
-If you are Turbo (Rails 7 or Rails 6 with proactive Turbo-Rails install), your delete button will be:
-`data: {'turbo-confirm': 'Are you sure you want to delete....?'}`
-
-If you specify the flag, you preference will be used. If you leave the flag off, Hot Glue will detect the presence of Turbo-Rails in your app. 
-
-**WARNING**: If you created a new Rails app since October 2021 and you have the yanked turbo-rails Gems on your local machine, 
-you will have some bugs with the delete buttons and also not be on the latest version of turbo-rails.
-
-Make sure to uninstall the yanked 7.1.0 and 7.1.1 from your machine with `gem uninstall turbo-rails`
-and also fix any Rails apps created since October 2021 by fixing the Gemfile. Details here:
-https://stackoverflow.com/questions/70671324/new-rails-7-turbo-app-doesnt-show-the-data-turbo-confirm-alert-messages-dont-f
-
-
-### `--magic-buttons=` 
-If you pass a list of magic buttons (separated by commas), they will appear in the button area on your list.
-
-It will be assumed there will be corresponding bang methods on your models.
-
-The bang (`!`) methods can respond in one of four ways:
-
-• With true, in which case a generic success message will be shown in the flash notice (“Approved” or “Rejected” in this case)
-
-• With false, in which case a generic error message will be shown in the flash alert (“Could not approve…”)
-
-• With a string, which will be assumed to be a “success” case, and will be passed to the front-end in the alert notice.
-
-• Raise an ActiveRecord exception
-
-This means you can be a somewhat lazy about your bang methods, but keep in mind the truth operator compares boolean true NOT any object is truth. So your return object must either be actually true (boolean), or an object that is string or string-like (responds to .to_s). Want to just say it didn’t work? Return false. Want to just say it was OK? Return true. Want to say it was successful but provide a more detailed response? Return a string.
-
-Finally, you can raise an ActiveRecord error which will also get passed to the user in the flash alert area.
-
-For more information see [Example 6 in the Tutorial](https://school.jfbcodes.com/8188)
-
-You can also define methods on your model that have the same name as the button with `_able?` at the end.
-(Prior to v0.6.20, these methods expected names with `able?` but no underscore.)
-
-The button will be display as disabled if the method returns false.
-
-
-### `--downnest=`
-
-Automatically create subviews down your object tree. This should be the name of a has_many relationship based from the current object.
-You will need to build scaffolding with the same name for the related object as well. On the list view, the object you are currently building will be built with a sub-view list of the objects related from the given line.
-
-The downnested child table (not to be confused with this object's `--nested` setting, where you are specifying this object's _parents_) is called a **child portal**. When you create a record in the child portal, the related record is automatically set to be owned by its parent (as specified by `--nested`). For an example, see the [v0.4.7 release notes](https://github.com/jasonfb/hot-glue/releases/tag/v0.4.7).
-
-Can now be created with more space (wider) by adding a `+` to the end of the downnest name
-- e.g. `--downnest=abc+,xyz`
-
-The 'Abcs' portal will display as 5 bootstrap columns instead of the typical 4. (You may use multiple ++ to keep making it wider but the inverse with minus is not supported
-
-
-Polymorphic Downnesting
-
-Here, a `Blast` `has_many :rules, as: :ruleable`
-
-The child object is named `Rule` but it can belong to a Blast or an Agent. (Agent also has a similar has_many for Rules)
-
-`belongs_to :ruleable, polymorphic: true`
-
-We build the blast & agent controllers like so:
-
-bin/rails generate hot_glue:scaffold Blast  --downnest='blast_rules(rules)'
-bin/rails generate hot_glue:scaffold Agent  --downnest='agent_rules(rules)'
-
-Notice that the relationship name is `rules` (not blast_rules), so what goes before the parenthesis is the controller name (with prefix)
-What goes inside the controller name is the real relationship name.
-
-For the children, we can't build one controller for the Rule, instead we build one for the `AgentRules` and another for the `BlastRules`
-
-bin/rails generate hot_glue:scaffold Rule  --nested='blast(ruleable)' --controller-prefix='Blast'
-bin/rails generate hot_glue:scaffold Rule  --nested='agent(ruleable)' --controller-prefix='Agent'
-
-(I realize building one child controller for each type of polymorph is tedius, but this is the best solution I could come up with.)
-
-As these are children, what goes into the `--netsed` setting inside the parentheses is the polymorphic name specified by `as:` when declaring the `belongs_to`
-
-routes.rb
-
-```
-        resources :agents do
-          resources :agent_rules
-        end
-
-        resources :blasts do
-          resources :blast_rules
-        end
-```
-
-
-
-### `--record-scope=`
-
-Record scope allows you to apply a model based scope for the controller being generated.
-This is applied on top of all other scopes, searches, and modifiers applied to the built controller.
-
-`bin/rails :generate hot_glue:scaffold Order --record-scope='.is_open'`
-
-Be sure to use single quotes (`'`) and don't forget the dot (`.`) before your scope(s).
-
-Make sure your Order model has a scope `is_open`, like so:
-
-```
-scope :is_open, -> {where(state == 'open')}
-```
-
-Now all records displayed through the generated controller 
-
-
-
-### `--related-sets=`
-
-Used to show a checkbox set of related records. The relationship should be a `has_and_belongs_to_many` or a `has_many through:` from the object being built.
-
-Consider the classic example of three tables: users, user_roles, and roles
-
-User `has_many :user_roles`; UserRole `belongs_to :user` and `belongs_to :role`; and Role `has_many :user_roles` and `has_many :user, through: :user_roles`
-
-We'll generate a scaffold to edit the users table. A checkbox set of related roles will also appear to allow editing of roles. (In this example, the only field to be edited is the email field.)
-
-```
-rails generate hot_glue:scaffold User --related-sets=roles --include=email,roles --gd
-```
-
-Note this leaves open a privileged escalation attack (a security vulnerability).
-
-To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see [Example #17 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
-
-
-### `--label=`
-
-The general name of the thing, will be applied as "New ___" for the new button & form. Will be *pluralized* for list label heading, so if the word has a non-standard pluralization, be sure to specify it in `config/inflictions.rb`
-
-If you specify anything explicitly, it will be used.
-If not, a specification that exists as `@@tabel_label_singular` from the Model will be used.
-If this does not exist, the Titleized (capitalized) version of the model name.
-
-### `--list-label-heading=`
-The plural of the list of things at the top of the list.
-If not, a specification that exists as `@@tabel_label_plural` from the Model will be used.
-If this does not exist, the UPCASE (all-uppercase) version of the model name.
-
-### `--new-button-label=`
-Overrides the button on the list that the user clicks onto to create a new record.
-(Default is to follow the same rules described in the `--label` option but with the word "New" prepended.)
-
-### `--new-form-heading=`
-The text at the top of the new form that appears when the new input entry is displayed.
-(Default follows the same rules described in the `--label` option but with the word "New" prepended.)
-
-## Field Labels
-
-### `--form-labels-position=` (default: `after`; options are **before**, **after**, and **omit**)
-By default form labels appear after the form inputs. To make them appear before or omit them, use this flag.
-
-See also `--form-placeholder-labels` to use placeolder labels.
-
-
-### `--form-placeholder-labels=` (default: false)
-
-When set to true, fields, numbers, and text areas will have placeholder labels.
-Will not apply to dates, times, datetimes, dropdowns (enums + foreign keys), or booleans.
-
-See also setting `--form-labels-position` to control position or omit normal labels.
-
-### `--inline-list-labels=` (before, after, omit; default: omit)
-
-Determines if field label will appear on the LIST VIEW. Note that because Hot Glue has no separate show route or page, this affects the `_show` template which is rendered as a partial from the LIST view.
-
-Because the labels are already in the heading, this is `omit` by default. (Use with `--no-list-heading` to omit the labels in the list heading.)
-
-Use `before` to make the labels come before or `after` to make them come after. See Version 0.5.1 release notes for an example.
-
-
-### Code insertions
+## Code Insertion Features
+'
 Insert some code into the `new`, `create` or `update` action actions.
 
 Wrapped in quotation marks when specified in the command line, and use semicolons to separate multiple lines of code.
@@ -1485,7 +1635,6 @@ Notice that a separate hook for code-after-create is also available, but that ha
 Using both together `--code-after-new='@email_template.created_by_user = current_user' --code-after-create='@email_template.do_something'`
 
 
-
 ```
 def create
     ...
@@ -1500,13 +1649,13 @@ def create
       account.reload
       ...
 ```
+TODO: build a solution for inserting code only in the `new` action but NOT the create action
 
 
+
+## Searching
 
 ### `--search=` (options: simple, set, false predicate, default: false)
-
-
-#### Set Search
 If you specify `--search` to `set`, you will get a whole bar across the top of the list with search fields for each field.
 Within the set, the search query is **_combinative_** ("and"), so records matching all criteria are shown as the **result set.**
 For date pickers and time pickers, you need the additional Stimulus.
@@ -1559,69 +1708,60 @@ NOT IMPLEMENTED YET
 TODO: implement me
 
 
-### `--attachments=`
 
-#### ActiveStorage Quick Setup
-(For complete docs, refer to https://guides.rubyonrails.org/active_storage_overview.html)
+### `--stimmify` or `--stimmify=xyz`
 
-`brew install vips`
-(for videos `brew install ffmpeg`)
+Automatically build the new and edit form with `data-controller='xyz'` to attach stimulus
 
-```
-bundle add image_processing
-./bin/rails active_storage:install
-./bin/rails db:migrate
-```
+If you use the shorthand (specify no `=`) your stimulus controller's name will be inferred from the Singular form of the scaffolding being built, with dashes for underscores, and ending with `-form`
 
-Generate an images model:
 
-`./bin/rails generate model Images name:string`
+`@singular.gsub("_", "-") + "-form"`
 
-add to `app/model/image.rb`, giving it a variant called thumb (Note: Hot Glue will fallback to using a variant called "thumb" if you use the shorthand syntax. If you use the long syntax, you can specify the variant to use for displaying the image)
+(so a `BankAcccount` scaffold, with singular form `bank_account`, attaches Stimulus-to-html using
+`data-controller='bank-account-form'` using a Stimulis controller at `app/javascript/controllers/bank_account_form_controller.js` stimulus controller)
+
+
+For example, `rails g hot_glue:scaffold Thing --stimmify` generates a form that looks like
 
 ```
-has_one_attached :avatar do |attachable|
-  attachable.variant :thumb, resize_to_limit: [100, 100]
-end
-```
-Generate a Hot Glue scaffold with the attachment avatar appended to the field list (the shorthand syntax)
-
-`./bin/rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar'`
-
-(Attachments behave like fields and follow the same layout rules used for fields, except that, unlike fields, when NOT using an --include list, they do not get automatically added. Thus, attachments are opt-in. You do not need to specify an attachment on the attachments list as ALSO being on the include list, but you can for the purpose of using the layout tricks discussed in Specified Grouping Mode to make the attachment appear on the layout where you want it to)
-
-#### Caveats:
-• If thumbnails aren't showing up, make sure you have
-
-1) installed vips, and
-2) used an image that supports ActiveStorage "variable" mechanism. The supported types are png, gif, jpg, pjpeg, tiff, bmp, vnd.adobe.photoshop, vnd.microsoft.icon, webp. see https://stackoverflow.com/a/61971660/3163663
-To debug, make sure the object responds true to the variable? method.
-
-If you use the shorthand syntax,  Hot Glue looks for a variant "thumb" (what you see in the example above). 
-
-If it finds one, it will render thumbnails from the attachment variant `thumb`. To specify a variant name other than "thumb", use the first parameter below.
-
-If using the shortform syntax and Hot Glue does **not find a variant** called `thumb` at the code generation time, it will build scaffolding without thumbnails.
-
-#### `--attachments=` Long form syntax with 1 parameter
-
-**--attachments='_attachment name_{_variant name_}'** 
-
-What if your variant is called something other than `thumb`
-
-Use the long-form syntax specifying a variant name other than `thumb`. For example, `thumbnail`
-
-`./bin/rails generate hot_glue:scaffold Image --include='name:avatar' --gd --attachments='avatar{thumbnail}'`
-
-The model would look like this:
-```
-has_one_attached :avatar do |attachable|
-  attachable.variant :thumbnail, resize_to_limit: [100, 100]
-end
+    <%= form_with model: thing,
+                url: things_path,
+                  html: {
+                      'data-controller': "thing-form"
+                      }
+          %>
+          ...
 ```
 
-If using the long-form syntax with 1 parameter and Hot Glue does not find the specified variant declared in your attachment, it will stop and raise an error. 
+`rails g hot_glue:scaffold Thing --stimmify=xyz` generates a form that looks like
+```
+    <%= form_with model: thing,
+                url: things_path,
+                  html: {
+                      'data-controller': "xyz-form"
+                      }
+          %>
+          ...
+```
 
+Note that your fields also appended with `data-thing-target=abc` and also `data-thing-target=abcWrapper`
+
+For a crash course on Stimulus, see
+https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js-basics-with-importmap-rails/
+
+**You must make the stimulus controller yourself!!** 
+
+Create them with:
+
+`rails g stimulus thing_form`
+
+_Notice that Stimulus requires object registration when used in a Node environment._ For this reason, you should NOT create new files yourself by hand in the `app/javascript/controllers/` folder.
+
+Instead, use the generator and the registry will be updated for you automatically. 
+
+
+## Attachments
 
 #### `--attachments=` Long form syntax with 1st and 2nd parameters
 
@@ -1635,7 +1775,7 @@ Note: You must have a string field called `orig_filename`. It does not need to b
 
 Note that the `orig_filename` is not part of the inputted parameters,  it simply gets appended to the model **bypassing the Rails strong parameters mechanism**, which is why it is irrelevant if it is included in the field list and recommended that if you do include it, you make it show-only so as not to allow your users to edit or modify it.
 
-Note: The 1st and 2nd parameters may be left empty (use `||`) but the 3rd and 4th parameters must either be specified or the parameter must be left off. 
+Note: The 1st and 2nd parameters may be left empty (use `||`) but the 3rd and 4th parameters must either be specified or the parameter must be left off.
 
 #### `--attachments=` Long form syntax with 1st, 2nd, and 3rd parameters
 
@@ -1691,16 +1831,16 @@ config.active_storage.service = :amazon
 
 
 #### For Direct Upload Support
-1. 
+1.
 ```
 yarn add @rails/activestorage
 ```
 
-2. You need a job runner like sidekiq or delayed_job. I recommend sidekiq. Make sure to have it 
+2. You need a job runner like sidekiq or delayed_job. I recommend sidekiq. Make sure to have it
 
 - Start sidekiq with `bundle exec sidekiq` while you are testing
 
-3. Install ActiveStorage JS using: 
+3. Install ActiveStorage JS using:
 
 `./bin/rails generate hot_glue:direct_upload_install`
 
@@ -1727,7 +1867,7 @@ This will 1) copy the dropzone_controller.js file into your app and 2) add the d
 
 ### Attach Stimulus JS Controllers to Your Forms with `--stimmify` or `--stimmify=xyz`
 
-Automatically build the new and edit form with `data-controller='xyz'` to attach cooresponding stimulus controllers. 
+Automatically build the new and edit form with `data-controller='xyz'` to attach cooresponding stimulus controllers.
 
 If you use the shorthand (specify no `=`) your stimulus controller's name will be inferred from the Singular form of the scaffolding beild built, with dashes for underscores, and ending with `-form`
 
@@ -1775,91 +1915,13 @@ https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js
 
 
 
-### `--factory-creation={ ... }`
-
-The code you specify inside of `{` and `}` will be used to generate a new object. The factory should instantiate with any arguments (I suggest Ruby keyword arguments) and must provide a method that is the name of the thing.
-
-You may use semi-colons to separate multiple lines of code.
-
-For example, a user Factory might be called like so:
-
-`./bin/rails generate hot_glue:scaffold User --factory-creation={factory = UserFactory.new(params: user_params)} --gd`
-
-(Note we are relying on the `user_params` method provided by the controller.)
-
-You must do one of two things:
-
-1) In the code you specify, set an instance variable `@user` to be the newly created thing. (Your code should contain something like `@thing = ` to trigger this option.)
-2) Make a local variable called `factory` **and** have a method of the name of the object (`user`) on a local variable called `factory` that your code created
-
-(The code example above is the option for #2 because it does not contain `@user =`)
-
-If using number #2, Hot Glue will append this to the code specified:
-```
-@user = factory.user
-```
-
-
-Here's a sample UserFactory that will create a new user only if one with a matching email address doesn't exist. (Otherwise, it will update the existing record.)
-Your initialize method can take any params you need it to, and using this pattern your business logic is applied consistently throughout your app. (You must, of course, use your Factory everywhere else in your app too.)
-
-```
-class UserFactory
-    attr_reader :user
-    attr_accessor :email
-
-    def initialize(params: {})
-        user = User.find_or_create_by(email: params[:email])
-    
-        user.update(params)
-        if user.new_record?
-            # do special new user logic here, like sending an email
-        end
-    end
-end
-```
-
-
-be sure your factory code creates a local variable that follows this name
-
-**<downcase association name>**_factory.<downcase association name>
-
-Thus, your factory object must have a method of the same name as the factory being created which returns the thing that got created.
-(It can do the creation either on instantiation or when calling that method)
-
-For example, assuming the example from above, we are going to do the lookup ourselves inside of our own `AgentFactory` object.)
-
-```
-factory = AgentFactory.new(find_or_create_by_email: agent_company_params[:__lookup_email], 
-                            params: modified_params)
-```
-
-Here the new AgentFactory will receive any variables by keyword argument, and since you're specifying the calling code here, Hot Glue does not dictate your factory's setup.
-However, two special variables are in scope which you can use in your calling code.
-
-`*_params` (where * is the name of the thing you are building)
-`modified_params`
-
-Either one must be received by your factory for your factory to create data based off the inputted data. 
-
-Remember, `*_params` has the input params passed only the through the sanitizer, and modified_params has it passed through the timezone aware mechanism and other Hot Glue-specific defaults.
-
-Always: 
-• In your factory calling code, assign the variable `factory = ` (do not use a different variable name),
-• Write a factory object with a `new` method that received the paramters you are specifying in your calling code,
-• Be sure your factory has an _instance method_ a method with the **same name** of the built object, which hot glue will call next: 
-
-`@agent = factory.agent`
-
-Don't include this last line in your factory code. 
-
-
-# SPECIAL FEATURES
+# SPECIAL FEATURES DISCUSSION
+This section discusses features that don't correspond to a single option or flag.  
 
 
 ## "Thing" Label
 
-Note that on a per model basis, you can also globally omit the label or set a unique label value using
+Note that on a per-model basis, you can also globally omit the label or set a unique label value using
 `@@table_label_singular` and `@@table_label_plural` on your model objects.
 
 You have three options to specify labels explicitly with a string, and 1 option to specify a global name for which the words "Delete ___" and "New ___" will be added.
@@ -2323,7 +2385,10 @@ Automatically build the new and edit form with `data-controller='xyz'` to attach
 
 If you use the shorthand (specify no `=`) your stimulus controller's name will be inferred from the Singular form of the scaffolding beild built, with dashes for underscores, and ending with `-form`
 
-(For example, `rails g hot_glue:scaffold Thing --stimmy` generates a form that looks like
+Notice that under the hood we are doing this `@singular.gsub("_", "-") + "-form"` so a scaffold built for `bank_account` will become a `BankAccountForm` stimulus controller
+
+
+For example, `rails g hot_glue:scaffold Thing --stimmy` generates a form that looks like.
 
 ```
     <%= form_with model: thing,
@@ -2338,7 +2403,7 @@ If you use the shorthand (specify no `=`) your stimulus controller's name will b
 
 Note that your fields also appended with `data-thing-target=abc` and also `data-thing-target=abcWrapper`
 
-See section "Attach Stimulus JS Controllers to Your Forms with `--stimmify` or `--stimmify=xyz`"
+
 
 For a crash course on Stimulus, see
 https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js-basics-with-importmap-rails/
