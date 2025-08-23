@@ -773,7 +773,9 @@ Used to show a checkbox set of related records. The relationship should be a `ha
 
 Consider the classic example of three tables: users, user_roles, and roles
 
-User `has_many :user_roles`; UserRole `belongs_to :user` and `belongs_to :role`; and Role `has_many :user_roles` and `has_many :user, through: :user_roles`
+User `has_many :user_roles` and `has_many :roles, through: :user_roles`
+UserRole `belongs_to :user` and `belongs_to :role`
+and Role `has_many :user_roles` and `has_many :user, through: :user_roles`
 
 We'll generate a scaffold to edit the users table. A checkbox set of related roles will also appear to allow editing of roles. (In this example, the only field to be edited is the email field.)
 
@@ -784,6 +786,25 @@ rails generate hot_glue:scaffold User --related-sets=roles --include=email,roles
 Note this leaves open a privileged escalation attack (a security vulnerability).
 
 To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see [Example #17 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
+
+• Remember you model should have `accepts_nested_attributes_for :roles, allow_destroy: true`
+
+• If you are using an --include list (not auto-detect or smart layout), be sure to treat the tags as-if it was one field on your layout and insert it according to where you want it. 
+
+• Each related set can take two additional parameters: specify the label to use as the related label using curly braces `{`...`}`, and specify any hawk scope to be applied to the displayed list of associated objects 
+(like the --hawk, with the need to explicitly call `--hawk`) using `[`...`]`
+Both parameters are optional. If the label field is unspecified, it will default to `label`.
+If the 2nd parameter is unspecified, it will display all records in the related table, with the base class + `.all`
+
+If the 1st parameter is left off, still use square braces `[...]` for the hawk.
+
+Example:
+`rails generate hot_glue:scaffold User --nested=company --related-sets=roles{name}[company.roles] --include=email,roles --gd`
+
+This shows the related set of `roles` using the field named `name` on the role object to display its name. Only the roles associated with the current company via the `company.roles` association.
+Notice that here `company` must be in scope, which can either be supplied by you in the base class, or in this example we have nested User within Company (so its nest path would be different than the example above), which would put `company` in the scope of the build. 
+
+
 ### `--factory-creation={ ... }`
 
 The code you specify inside of `{` and `}` will be used to generate a new object. The factory should instantiate with any arguments (I suggest Ruby keyword arguments) and must provide a method that is the name of the thing.
@@ -2140,6 +2161,25 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+#### 2025-08-22 - v0.6.24
+`--related-sets` fixes issue with related sets due to ruby syntax
+
+• Each related set can take two additional parameters: specify the label to use as the related label using curly braces `{`...`}`, and specify any hawk scope to be applied to the displayed list of associated objects
+(like the --hawk, with the need to explicitly call `--hawk`) using `[`...`]`
+Both parameters are optional. If the label field `{...}` is unspecified, it will default to `label`.
+If the 2nd parameter `[...]` (hawk) is unspecified, the widget will display all records in the related table, using the base class + `.all`
+If the 1st parameter `{...}` is left off, still use square braces `[...]` for the hawk.
+
+
+Example:
+`rails generate hot_glue:scaffold User --nested=company --related-sets=roles{name}[company.roles] --include=email,roles --gd`
+
+This shows the related set of `roles` using the field named `name` on the role object to display its name. 
+
+Only displays the roles associated with the current company via the `company.roles` association.
+
+Notice that here `company` must be in scope, which can either be supplied by you in the base class, or in this example we have nested User within Company (so its nest path would be different than the example above), which would put `company` in the scope of the build.
+
 
 #### 2025-08-15 - v.0.6.23
 

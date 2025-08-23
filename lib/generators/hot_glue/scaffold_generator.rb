@@ -517,13 +517,30 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     related_set_input = options['related_sets'].split(",")
     @related_sets = {}
     related_set_input.each do |setting|
-      name = setting.to_sym
-      association_ids_method = eval("#{singular_class}.reflect_on_association(:#{setting.to_sym})").class_name.underscore + "_ids"
-      class_name = eval("#{singular_class}.reflect_on_association(:#{setting.to_sym})").class_name
 
-      @related_sets[setting.to_sym] =   { name: setting.to_sym,
+      if setting.include?("{") && setting.include?("[")
+        setting =~ /(.*){(.*)}\[(.*)\]/
+        key, label, hawk = $1, $2 , $3
+      elsif setting.include?("{") && !setting.include?("[")
+        setting =~ /(.*){(.*)}/
+        key, label = $1, $2 , $3
+      elsif setting.include?("[") && !setting.include?("{")
+        setting =~ /(.*)\[(.*)\]/
+        key, hawk = $1, $2
+      else
+
+        key = setting
+        label = "label"
+      end
+
+      association_ids_method = eval("#{singular_class}.reflect_on_association(:#{key.to_sym})").class_name.underscore + "_ids"
+      class_name = eval("#{singular_class}.reflect_on_association(:#{key.to_sym})").class_name
+
+      @related_sets[key.to_sym] =   { name: key.to_sym,
                           association_ids_method: association_ids_method,
-                          class_name: class_name }
+                          class_name: class_name,
+                          label_field: label,
+                          hawk: hawk }
     end
 
     if @related_sets.any?
