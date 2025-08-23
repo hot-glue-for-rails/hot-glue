@@ -521,10 +521,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       if setting.include?("{") && setting.include?("[")
         setting =~ /(.*){(.*)}\[(.*)\]/
         key, label, hawk = $1, $2 , $3
-      elsif setting.include?("{")
-      setting =~ /(.*){(.*)}/
+      elsif setting.include?("{") && !setting.include?("[")
+        setting =~ /(.*){(.*)}/
         key, label = $1, $2 , $3
+      elsif setting.include?("[") && !setting.include?("{")
+        setting =~ /(.*)\[(.*)\]/
+        key, hawk = $1, $2
       else
+
         key = setting
         label = "label"
       end

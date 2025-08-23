@@ -791,6 +791,18 @@ To fix this, you'll need to use Pundit with special syntax designed for this pur
 
 • If you are using an --include list (not auto-detect or smart layout), be sure to treat the tags as-if it was one field on your layout and insert it according to where you want it. 
 
+• Each related set can take two additional parameters: specify the label to use as the related label using curly braces `{`...`}`, and specify any hawk scope to be applied to the displayed list of associated objects 
+(like the --hawk, with the need to explicitly call `--hawk`) using `[`...`]`
+Both parameters are optional. If the label field is unspecified, it will default to `label`.
+If the 2nd parameter is unspecified, it will display all records in the related table, with the base class + `.all`
+
+If the 1st parameter is left off, still use square braces `[...]` for the hawk.
+
+Example:
+`rails generate hot_glue:scaffold User --nested=company --related-sets=roles{name}[company.roles] --include=email,roles --gd`
+
+This shows the related set of `roles` using the field named `name` on the role object to display its name. Only the roles associated with the current company via the `company.roles` association.
+Notice that here `company` must be in scope, which can either be supplied by you in the base class, or in this example we have nested User within Company (so its nest path would be different than the example above), which would put `company` in the scope of the build. 
 
 
 ### `--factory-creation={ ... }`
