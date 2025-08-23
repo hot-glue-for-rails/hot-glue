@@ -2161,6 +2161,25 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+#### 2025-08-22 - v0.6.24
+`--related-sets` fixes issue with related sets due to ruby syntax
+
+• Each related set can take two additional parameters: specify the label to use as the related label using curly braces `{`...`}`, and specify any hawk scope to be applied to the displayed list of associated objects
+(like the --hawk, with the need to explicitly call `--hawk`) using `[`...`]`
+Both parameters are optional. If the label field `{...}` is unspecified, it will default to `label`.
+If the 2nd parameter `[...]` (hawk) is unspecified, the widget will display all records in the related table, using the base class + `.all`
+If the 1st parameter `{...}` is left off, still use square braces `[...]` for the hawk.
+
+
+Example:
+`rails generate hot_glue:scaffold User --nested=company --related-sets=roles{name}[company.roles] --include=email,roles --gd`
+
+This shows the related set of `roles` using the field named `name` on the role object to display its name. 
+
+Only displays the roles associated with the current company via the `company.roles` association.
+
+Notice that here `company` must be in scope, which can either be supplied by you in the base class, or in this example we have nested User within Company (so its nest path would be different than the example above), which would put `company` in the scope of the build.
+
 
 #### 2025-08-15 - v.0.6.23
 
