@@ -773,7 +773,9 @@ Used to show a checkbox set of related records. The relationship should be a `ha
 
 Consider the classic example of three tables: users, user_roles, and roles
 
-User `has_many :user_roles`; UserRole `belongs_to :user` and `belongs_to :role`; and Role `has_many :user_roles` and `has_many :user, through: :user_roles`
+User `has_many :user_roles` and `has_many :roles, through: :user_roles`
+UserRole `belongs_to :user` and `belongs_to :role`
+and Role `has_many :user_roles` and `has_many :user, through: :user_roles`
 
 We'll generate a scaffold to edit the users table. A checkbox set of related roles will also appear to allow editing of roles. (In this example, the only field to be edited is the email field.)
 
@@ -784,6 +786,13 @@ rails generate hot_glue:scaffold User --related-sets=roles --include=email,roles
 Note this leaves open a privileged escalation attack (a security vulnerability).
 
 To fix this, you'll need to use Pundit with special syntax designed for this purpose. Please see [Example #17 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
+
+• Remember you model should have `accepts_nested_attributes_for :roles, allow_destroy: true`
+
+• If you are using an --include list (not auto-detect or smart layout), be sure to treat the tags as-if it was one field on your layout and insert it according to where you want it. 
+
+
+
 ### `--factory-creation={ ... }`
 
 The code you specify inside of `{` and `}` will be used to generate a new object. The factory should instantiate with any arguments (I suggest Ruby keyword arguments) and must provide a method that is the name of the thing.
