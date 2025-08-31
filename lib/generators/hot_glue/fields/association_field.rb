@@ -100,6 +100,7 @@ class AssociationField < Field
       parts = name.split('_')
       "<%= f.text_field :__lookup_#{assoc}_#{lookup_field}, value: @#{singular}.#{assoc_name}&.#{lookup_field}, placeholder: \"#{lookup_field}\" " + (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "")  + "%>"
     elsif modify_as && modify_as[:typeahead]
+
       search_url  = "#{namespace ? namespace + "_" : ""}" +
         modify_as[:nested].join("_") + ( modify_as[:nested].any? ? "_" : "") +
         + "#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
