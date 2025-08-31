@@ -14,7 +14,7 @@ class <%= ((@namespace.titleize.gsub(" ", "") + "::" if @namespace) || "") + @pl
   <% nest_chain = [] %>
   <% @nested_set.each { |arg|
       if @auth_identifier == arg[:singular]
-        this_scope = auth_object
+        this_scope =  auth_object
       elsif nest_chain.empty?
         this_scope = "#{@auth ? @auth : class_name}.#{arg[:plural]}"
       else

@@ -103,6 +103,10 @@ module HotGlue
     end
 
 
+    def auth_object
+      "#{@auth}_id"
+    end
+
     def namespace_with_dash
       if @namespace
         "/#{@namespace}"

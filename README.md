@@ -2042,6 +2042,11 @@ has_many :users, through: :account_users
 ```
 
 
+Notice that from the table of things referencing the typeahead thing,
+the `--modify` takes a 3rd parameter in `[...]` to specify the nested set if the typeahead itself is nested.
+
+As with this example, this means that the object referencing the typeahead object must be in the same namespace, but does not need to be at the same nest level.
+
 `bin/rails generate hot_glue:scaffold Member --auth='current_user' --auth-identifier='user' --auth-identifier=user --modify='user_id{typeahead}[account]'`
 
 in our routes.rb file, we have
