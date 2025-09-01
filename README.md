@@ -2166,6 +2166,11 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+#### 2025-08-31 - v0.6.25
+- very small fix to typeahead controller supporting typeaheads and nested routes
+- updates documentation for typeaheads
+
+
 #### 2025-08-22 - v0.6.24
 `--related-sets` fixes issue with related sets due to ruby syntax
 

@@ -134,6 +134,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   # TDB
 
 
+  class_option :phantom_search, default: nil
+
+
+
   def initialize(*meta_args)
     super
 
@@ -449,6 +453,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
 
+
+
     @include_object_names = options['include_object_names'] || get_default_from_config(key: :include_object_names)
 
 
@@ -726,7 +732,47 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     elsif @search == 'predicate'
 
+
+
     end
+
+
+    if options['phantom_search']
+      ps_input = options['phantom_search']
+
+      ps_input =~ /(.*)\[(.*)\]/
+      type_and_label, settings = $1, $2
+
+
+      type = type_and_label.split("_")[0]
+      label = type_and_label.split("_")[1]
+
+      @phantom_search = {}
+      choices = settings.split("|")
+
+
+      @phantom_search[label.to_sym] = {
+        type: type,
+        name: name,
+        choices: []
+      }
+
+      choices.each do |choice|
+        choice_label = choice.split(":")[0]
+        choice_scope = choice.split(":")[1]
+        if choice_scope.nil?
+          choice_scope = "all"
+        end
+
+        choice_scope = ".#{choice_scope}" if !choice_scope.start_with?(".")
+        @phantom_search[label.to_sym][:choices] << {
+          label: choice_label,
+          scope: choice_scope,
+        }
+      end
+    end
+
+    puts "phantom search #{@phantom_search}"
 
     builder = HotGlue::Layout::Builder.new(generator: self,
                                            include_setting: options['include'],
