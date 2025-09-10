@@ -705,37 +705,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
     end
 
-    # search
-    @search = options['search']
-    if @search == 'set'
-      if options['search_fields'].nil?
-        @search_fields = @columns
-      else
-        @search_fields = options['search_fields'].split(',')
-      end
-
-      # within the set search we will take out any fields on the query list
-      # or the field
-      @search_query_fields = options['search_query_fields'].split(',') || []
-      @search_position = options['search_position'] || 'vertical'
-
-      @search_fields = @search_fields - @search_query_fields
-
-      @search_fields.each do |field|
-        if !@columns.include?(field.to_sym)
-          raise "You specified a search field for #{field} but that field is not in the list of columns"
-        end
-      end
-
-      @search_clear_button = !!options['search_clear_button']
-      @search_autosearch = !!options['search_autosearch']
-
-    elsif @search == 'predicate'
-
-
-
-    end
-
 
     if options['phantom_search']
       ps_input = options['phantom_search']
@@ -753,7 +722,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
       @phantom_search[label.to_sym] = {
         type: type,
-        name: name,
+        name: label.humanize,
         choices: []
       }
 
@@ -770,9 +739,43 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           scope: choice_scope,
         }
       end
+      puts "phantom search #{@phantom_search}"
     end
 
-    puts "phantom search #{@phantom_search}"
+    # search
+    @search = options['search']
+
+    if @search == 'set'
+      if options['search_fields'].nil?
+        if  !@phantom_search
+          puts "Since you did not specify search fields or phantom search fields I am including all columns in search"
+          @search_fields = @columns
+        else
+          @search_fields = []
+        end
+      else
+        @search_fields = options['search_fields'].split(',')
+      end
+
+      # within the set search we will take out any fields on the query list
+      # or the field
+      @search_query_fields = options['search_query_fields'].split(',') || []
+      @search_position = options['search_position'] || 'vertical'
+
+      @search_fields = @search_fields - @search_query_fields
+
+      @search_clear_button = !!options['search_clear_button']
+      @search_autosearch = !!options['search_autosearch']
+
+    elsif @search == 'predicate'
+
+    end
+
+    @search_fields.each do |field|
+      if !@columns.include?(field.to_sym) && !@phantom_search.include?(field.to_sym)
+        raise "You specified a search field for #{field} but that field is not in the list of columns"
+      end
+    end
 
     builder = HotGlue::Layout::Builder.new(generator: self,
                                            include_setting: options['include'],
@@ -780,15 +783,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     @layout_object = builder.construct
 
-
-
     # syntax should be xyz_id{xyz_email},abc_id{abc_email}
     # instead of a drop-down for the foreign entity, a text field will be presented
     # You must ALSO use a factory that contains a parameter of the same name as the 'value' (for example, `xyz_email`)
-
-
-
-
 
     # create the template object
 
@@ -826,6 +823,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         hidden_update: @hidden_update,
         invisible_create: @invisible_create,
         invisible_update: @invisible_update,
+        phantom_search: @phantom_search
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")
@@ -1806,7 +1804,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
             end
           }.compact.join
         end
-        res << ".page(params[:page])#{ '.per(per)' if @paginate_per_page_selector }"
+
+        @phantom_search.each do |phantom_key, phantom_data|
+          phantom_data[:choices].each do |choice|
+            unless choice[:scope] == ".all"
+              res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label]}\""
+            end
+          end
+        end
+
+        res << "\n    @#{plural} = @#{plural}.page(params[:page])#{ '.per(per)' if @paginate_per_page_selector }"
 
       elsif @nested_set[0] && @nested_set[0][:optional]
         res << "@#{ plural_name } = #{ class_name }.#{record_scope}.all"
@@ -1875,5 +1882,23 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
       res
     }.join("\n")
+  end
+
+
+  def search_default
+    default_fields = @search_fields.collect{ |foo|
+      { "#{foo}_match".to_sym =>
+            (@columns_map[foo.to_sym].modify_as && @columns_map[foo.to_sym].modify_as[:binary]) ? "-1" : "", "#{foo}_search".to_sym => ""
+      }
+    }.reduce({}, :merge)
+
+    phantom_search_fields = @phantom_search.collect{| k,v|
+      default = v[:choices][0]
+      {
+        "#{k}_match".to_sym => "",
+        "#{k}_search".to_sym => "#{default[:label]}"
+      }
+    }.reduce({}, :merge)
+    return {"0" => (default_fields.merge(phantom_search_fields))}
   end
 end

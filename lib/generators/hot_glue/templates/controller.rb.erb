@@ -75,7 +75,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
   <% unless @no_list %>
   def load_all_<%= plural %><% if @search == "set" %>
-    @q = params[:q] ||  <%= {"0" => @search_fields.collect{|foo| {"#{foo}_match".to_sym => ((@columns_map[foo.to_sym].modify_as && @columns_map[foo.to_sym].modify_as[:binary]) ? "-1" : ""), "#{foo}_search".to_sym => ""}}.reduce({}, :merge)  } %> <% end %>
+    @q = params[:q] || <%= search_default %> <% end %>
   <%= load_all_code %>
   end
 
