@@ -1835,6 +1835,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label]}\""
         end
       end
+      res << "\n"
     end
 
     res << "    @#{plural} = @#{plural}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"

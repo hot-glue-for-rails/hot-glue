@@ -1620,20 +1620,20 @@ bin/rails generate hot_glue:set_search_interface_install
 ```
 
 _Additional search option for Set Search_
-##### `--search-fields=aaa,bbb,ccc,ddd,eee` 
+### `--search-fields=aaa,bbb,ccc,ddd,eee` 
 to specify which fields you want to be searchable.
 
 
-##### `--search-query-fields=aaa,ddd` 
+### `--search-query-fields=aaa,ddd` 
 to specify a list of strings only which will be taken out of the search set and presented in a singular query box (allowing search across multiple string fields)
 
-##### `--search-position=vertical` 
+### `--search-position=vertical` 
 to specify vertical or horizontal (default: horizontal)
 
-##### `--search-clear-button` (no option) 
+### `--search-clear-button` (no option) 
 to specify whether to show a clear button to clear the whole search form at once (default: false)
 
-##### `--search-autosearch` (no option) 
+### `--search-autosearch` (no option) 
 to specify whether to automatically search when the user exit or changes any field (default: false)
 
 examples:
@@ -1657,8 +1657,7 @@ Here's how you would add a search interface to Example #1 in the [Hot Glue Tutor
 bin/rails generate Book --include=name,author_id --search=set --search-fields=name,author_id
 ```
 
-
-`--phantom-search='{type}_{name}[All|choice A:scope_a|choice B:scope_b],radio_yyyy[choice C:scope_c|]`
+### `--phantom-search='{type}_{name}[All|choice A:scope_a|choice B:scope_b]`
 
 A phantom search is a search we are doing on this result set that doesn't correspond to a single field. Currently, the only available implementation is for scopes with no arguments, as in the example below. It is called 'phantom' because it could be (probably is) querying fields within the scope, but the search doesn't match up with a single field on your model. (So it's like creating 'phantom' criteria.). Only RADIO type is implemented, dropdown & checkboxes an a way to input a search value passed into the scope as an argument is TBD.
 
@@ -1666,13 +1665,24 @@ A phantom search is a search we are doing on this result set that doesn't corres
 
 {name} is a designation for this phantom search. Should NOT match any field name on your table. This should describe the kind of categorization we are performing.
 
-
 Your phantom search selector will be appended to the search fields and will be treated like a first-class search input, able to be combined with any of the other fields specified in a set search.
 
-After the type & name, comes a block marked by square braces [ ... ] . Within the square  braces, each search option is separated by a pipe (|) character. Within each option is a label &  ruby scope, separated by a colon (:). The label comes before the colon the ruby scope. The scope should be specified here without a dot should be defined on your model. If there is scope specified, we assume "all", but we still need to specify a label for "All", which is why in the example above "All" has no colon after it.
+Note that multiple phantom searched can be specified by separating them by comma (`,`), like so:
 
+`--phantom-search='radio_xxxx[All|choice A:scope_a|choice B:scope_b],radio_yyyy[All|choice W:scope_w|choice Z:scope_z|]`
+(this creates two phantom searches: `xxxx` and `yyyy` both radio selection lists)
 
-### `--phantom-search='radio_status[Pending:pending|Rejected:rejected|Accepted:accepted]|All'`
+After the type & name, comes a block marked by square braces [ ... ] 
+
+Within the square  braces, each search option is separated by a pipe (|) character. 
+
+Within each option is a label and ruby scope, separated by a colon (:).
+
+The label comes before the colon the ruby scope. The ruby scope should be specified here without a dot. Each ruby scope must be defined on your model. If there is no scope specified, we assume "all", but we still need to specify a label for "All", which is why in the example above "All" has no colon after it.
+
+example
+
+`--phantom-search='radio_status[Pending:pending|Rejected:rejected|Accepted:accepted|All]'`
 
 On my model, I have these scopes defined:
 
@@ -1681,7 +1691,6 @@ scope :approved, -> { where.not(approved_at: nil) }
 scope :rejected, -> { where.not(rejected_at: nil) }
 scope :not_rejected, -> { where(rejected_at: nil) }
 scope :not_approved, -> { where(approved_at: nil) }
-
 
 This produces a search interface with four options listed as radio buttons:
 ° Pending
@@ -1693,11 +1702,9 @@ This produces a search interface with four options listed as radio buttons:
 
 The pending, approved, and rejected options will return search results with the corresponding scopes applied. The 'All' option will behave as a no-op, leaving the root search intact (giving all of the other modifications that Hot glue provides in different functionality).
 
-
 #### Predicate Search
 NOT IMPLEMENTED YET
 TODO: implement me
-
 
 
 ### `--stimmify` or `--stimmify=xyz`
