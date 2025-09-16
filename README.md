@@ -1657,6 +1657,43 @@ Here's how you would add a search interface to Example #1 in the [Hot Glue Tutor
 bin/rails generate Book --include=name,author_id --search=set --search-fields=name,author_id
 ```
 
+
+`--phantom-search='{type}_{name}[All|choice A:scope_a|choice B:scope_b],radio_yyyy[choice C:scope_c|]`
+
+A phantom search is a search we are doing on this result set that doesn't correspond to a single field. Currently, the only available implementation is for scopes with no arguments, as in the example below. It is called 'phantom' because it could be (probably is) querying fields within the scope, but the search doesn't match up with a single field on your model. (So it's like creating 'phantom' criteria.). Only RADIO type is implemented, dropdown & checkboxes an a way to input a search value passed into the scope as an argument is TBD.
+
+{type} is any of: radio, dropdown, checkboxes
+
+{name} is a designation for this phantom search. Should NOT match any field name on your table. This should describe the kind of categorization we are performing.
+
+
+Your phantom search selector will be appended to the search fields and will be treated like a first-class search input, able to be combined with any of the other fields specified in a set search.
+
+After the type & name, comes a block marked by square braces [ ... ] . Within the square  braces, each search option is separated by a pipe (|) character. Within each option is a label &  ruby scope, separated by a colon (:). The label comes before the colon the ruby scope. The scope should be specified here without a dot should be defined on your model. If there is scope specified, we assume "all", but we still need to specify a label for "All", which is why in the example above "All" has no colon after it.
+
+
+### `--phantom-search='radio_status[Pending:pending|Rejected:rejected|Accepted:accepted]|All'`
+
+On my model, I have these scopes defined:
+
+scope :pending_review, -> { not_approved.not_rejected }
+scope :approved, -> { where.not(approved_at: nil) }
+scope :rejected, -> { where.not(rejected_at: nil) }
+scope :not_rejected, -> { where(rejected_at: nil) }
+scope :not_approved, -> { where(approved_at: nil) }
+
+
+This produces a search interface with four options listed as radio buttons:
+° Pending
+° Approved
+° Rejected
+° All
+
+(Notice that my search options are called 'approved' and 'rejected' but the field names are slightly different: approved_at, rejected_at)
+
+The pending, approved, and rejected options will return search results with the corresponding scopes applied. The 'All' option will behave as a no-op, leaving the root search intact (giving all of the other modifications that Hot glue provides in different functionality).
+
+
 #### Predicate Search
 NOT IMPLEMENTED YET
 TODO: implement me
@@ -2166,6 +2203,25 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+#### 2025-09-16 - v0.6.27
+• Phantom Searching
+`--phantom-search='{type}_{name}[All|choice A:scope_a|choice B:scope_b],radio_yyyy[choice C:scope_c|]`
+
+A phantom search is a search we are doing on this result set that doesn't correspond to a single field. Currently, the only available implementation is for scopes with no arguments, as in the example below. It is called 'phantom' because it could be (probably is) querying fields within the scope, but the search doesn't match up with a single field on your model. (So it's like creating 'phantom' criteria.). Only RADIO type is implemented, dropdown & checkboxes an a way to input a search value passed into the scope as an argument is TBD.
+
+{type} is any of: radio, dropdown, checkboxes
+
+{name} is a designation for this phantom search. Should NOT match any field name on your table. This should describe the kind of categorization we are performing.
+see `--phantom-search` above for details.
+
+• Fixing duplicitous creation of Stimulus JS files when installing the search features
+
+
+#### 2025-08-31 - v0.6.25
+- very small fix to typeahead controller supporting typeaheads and nested routes
+- updates documentation for typeaheads
+
+
 #### 2025-08-22 - v0.6.24
 `--related-sets` fixes issue with related sets due to ruby syntax
 

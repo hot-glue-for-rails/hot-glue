@@ -12,7 +12,7 @@ module  HotGlue
                   :search, :search_fields, :search_query_fields, :search_position,
                   :form_path, :layout_object, :search_clear_button, :search_autosearch,
                   :stimmify, :stimmify_camel, :hidden_create, :hidden_update, :invisible_create,
-                  :invisible_update, :plural
+                  :invisible_update, :plural, :phantom_search
 
 
     def initialize(singular:, singular_class: ,
@@ -25,7 +25,7 @@ module  HotGlue
                  search:, search_fields:, search_query_fields: , search_position:,
                  search_clear_button:, search_autosearch:, layout_object:,
                  form_path: , stimmify: , stimmify_camel:, hidden_create:, hidden_update: ,
-                 invisible_create:, invisible_update: , plural: )
+                 invisible_create:, invisible_update: , plural: , phantom_search:)
 
 
       @form_path = form_path
@@ -65,6 +65,7 @@ module  HotGlue
       @update_show_only = update_show_only
       @attachments = attachments
       @related_sets = related_sets
+      @phantom_search = phantom_search
     end
 
     def add_spaces_each_line(text, num_spaces)
@@ -130,18 +131,43 @@ module  HotGlue
             search_field_result =  columns_map[col].search_field_output
 
             add_spaces_each_line( "\n  <span class='' >\n" +
-                                    add_spaces_each_line( (form_labels_position == 'before' ? the_label || "" : "") +
-                                                            +  " <br />\n" + search_field_result +
-                                                            (form_labels_position == 'after' ? the_label : "")   , 4) +
+                                add_spaces_each_line( (form_labels_position == 'before' ? the_label || "" : "") +
+                                  +  " <br />\n" + search_field_result +
+                                  (form_labels_position == 'after' ? the_label : "")   , 4) +
                                     "\n  </span>\n  <br />", 2)
           end
         }.compact.join("\n")
+
+
 
         size = layout_object[:columns][:bootstrap_column_width][columns.index(column)]
         "  <div class='#{layout_strategy.column_classes_for_form_fields(size)} search-cell--#{singular}--#{column.join("-")}' >" +
           cols_result + "</div>"
 
       }.join("\n")
+
+      # phantom searches
+      @phantom_search.each_key do |search_field|
+        data = @phantom_search[search_field]
+        if data[:type] == "radio"
+          res << "<div>"
+
+          res << "<label>#{data[:name]}</label><br />"
+
+          data[:choices].each do |choice|
+            res << "\n<input type='radio'
+                            id='#{search_field}_search__#{choice[:label]}'
+                            name='q[0][#{search_field}_search]' value='#{choice[:label]}'
+           <%= 'checked' if  @q['0'][:#{search_field}_search] == \"#{choice[:label]}\" %> />"
+            res << "\n<label for='#{search_field}_search__#{choice[:label]}'>#{choice[:label]}</label> <br/>"
+          end
+
+          res << "</div>"
+
+        end
+      end
+
+
       res << "</div>"
       res << "<div class='#{layout_strategy.column_classes_for_form_fields(nil)}'>"
       if @search_clear_button

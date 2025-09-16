@@ -1074,8 +1074,8 @@ describe "HotGlue::ScaffoldGenerator" do
       expect(res).to include("def load_visit
     @visit = current_user.family.visits.find(params[:id])
   end")
-
-      expect(res).to include("@visits = current_user.family.visits.includes(:user).page(params[:page])")
+      expect(res).to include("@visits = current_user.family.visits.includes(:user)")
+      expect(res).to include("@visits = @visits.page(params[:page])")
     end
   end
 
