@@ -740,6 +740,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         }
       end
       puts "phantom search #{@phantom_search}"
+    else
+      @phantom_search = {}
     end
 
     # search
@@ -771,9 +773,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     end
 
-    @search_fields.each do |field|
-      if !@columns.include?(field.to_sym) && !@phantom_search.include?(field.to_sym)
-        raise "You specified a search field for #{field} but that field is not in the list of columns"
+    if @search_fields
+      @search_fields.each do |field|
+        if !@columns.include?(field.to_sym) && !@phantom_search.include?(field.to_sym)
+          raise "You specified a search field for #{field} but that field is not in the list of columns"
+        end
       end
     end
 
@@ -1785,12 +1789,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         if !@columns_map[field.to_sym].load_all_query_statement.empty?
           @columns_map[field.to_sym].load_all_query_statement
         end
-      }.compact.join("\n" + spaces(4))
-      res << "\n"
+      }.compact.join("\n" + spaces(4)) + "\n"
     end
 
     if pundit
-      res << "    @#{ plural_name } = policy_scope(#{ object_scope })#{record_scope}"
+      res << "    @#{ plural_name } = policy_scope(#{ object_scope })#{record_scope}\n"
     else
       if !@self_auth
 
@@ -1816,12 +1819,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
         # res << "#{record_scope}"
       end
+      res << "\n"
+
     end
-    res << "\n"
     if @search_fields
+      res << "\n"
       res << @search_fields.collect{ |field|
         spaces(4) + "@#{plural_name} = @#{plural_name}" + @columns_map[field.to_sym].where_query_statement + " if #{field}_query"
-      }.join("\n")
+      }.join("\n") + "\n"
     end
 
     @phantom_search.each do |phantom_key, phantom_data|
@@ -1832,7 +1837,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
     end
 
-    res << "\n    @#{plural} = @#{plural}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
+    res << "    @#{plural} = @#{plural}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
     res
   end
 

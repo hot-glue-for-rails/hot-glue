@@ -76,7 +76,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   <% unless @no_list %>
   def load_all_<%= plural %><% if @search == "set" %>
     @q = params[:q] || <%= search_default %> <% end %>
-  <%= load_all_code %>
+<%= load_all_code %>
   end
 
   def index
