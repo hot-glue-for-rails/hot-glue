@@ -1790,7 +1790,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     if pundit
-      res << "    @#{ plural_name } = policy_scope(#{ object_scope })#{record_scope}.page(params[:page])#{ n_plus_one_includes }#{ ".per(per)" if @paginate_per_page_selector }"
+      res << "    @#{ plural_name } = policy_scope(#{ object_scope })#{record_scope}"
     else
       if !@self_auth
 
@@ -1805,22 +1805,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           }.compact.join
         end
 
-        @phantom_search.each do |phantom_key, phantom_data|
-          phantom_data[:choices].each do |choice|
-            unless choice[:scope] == ".all"
-              res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label]}\""
-            end
-          end
-        end
 
-        res << "\n    @#{plural} = @#{plural}.page(params[:page])#{ '.per(per)' if @paginate_per_page_selector }"
+
+        # res << "\n    @#{plural} = @#{plural}.page(params[:page])#{ '.per(per)' if @paginate_per_page_selector }"
 
       elsif @nested_set[0] && @nested_set[0][:optional]
         res << "@#{ plural_name } = #{ class_name }.#{record_scope}.all"
       else
         res << "@#{ plural_name } = #{ class_name }.#{record_scope}.where(id: #{ auth_object.gsub("@",'') }.id)#{ n_plus_one_includes }"
 
-        res << "#{record_scope}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
+        # res << "#{record_scope}"
       end
     end
     res << "\n"
@@ -1829,6 +1823,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         spaces(4) + "@#{plural_name} = @#{plural_name}" + @columns_map[field.to_sym].where_query_statement + " if #{field}_query"
       }.join("\n")
     end
+
+    @phantom_search.each do |phantom_key, phantom_data|
+      phantom_data[:choices].each do |choice|
+        unless choice[:scope] == ".all"
+          res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label]}\""
+        end
+      end
+    end
+
+    res << "\n    @#{plural} = @#{plural}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
     res
   end
 
