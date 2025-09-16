@@ -2203,7 +2203,7 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
-#### 2025-09-16 - v0.6.27
+#### 2025-09-16 - v0.6.26
 • Phantom Searching
 `--phantom-search='{type}_{name}[All|choice A:scope_a|choice B:scope_b],radio_yyyy[choice C:scope_c|]`
 
