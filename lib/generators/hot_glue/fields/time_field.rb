@@ -5,15 +5,15 @@ class TimeField < Field
   end
 
   def form_field_output
-    "<%= time_field_localized(f, :#{name}, #{singular}.#{name}&.in_time_zone(current_user.timezone)&.strftime('%H:%M'), label: '#{ name.to_s.humanize  }') %>"
+    "<%= time_field_localized(f, :#{name}, formatted_time_field(#{singular}, :#{name}, current_user), label: \"#{ name.to_s.humanize } \#{ current_user.timezone }\") %>"
   end
 
   def line_field_output
-    "<% unless #{singular}.#{name}.nil? %>
-      <%= #{singular}.#{name}.in_time_zone(current_timezone).strftime('%l:%M %p %Z') %>
-     <% else %>
-    <span class=''>MISSING</span>
-    <% end %>"
+    "\n    <% unless #{singular}.#{name}.nil? %>
+      <%= formatted_time_display(#{singular}, :#{name}, current_user) %>
+    <% else %>
+      <span class=''>MISSING</span>
+    <% end %>\n"
   end
 
   def spec_setup_and_change_act(which_partial = nil)
