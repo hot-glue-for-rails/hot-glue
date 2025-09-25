@@ -2210,6 +2210,12 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+#### 2025-09-24 - v0.6.27
+- Fixes to namespaced models (this is when the model file has a namespace); it now correctly does not namespace the route (fix to plurality)
+- Changes time fields to now be timezone aware; your current_user must have a timezone (string) object
+  (this is not native to Rails because time fields are natively stored without any tiemzone information. here, they aren't stored with timezone information, but inputting & outputting them converts them to the user's local timezone)
+
+
 #### 2025-09-16 - v0.6.26
 • Phantom Searching
 `--phantom-search='{type}_{name}[All|choice A:scope_a|choice B:scope_b],radio_yyyy[choice C:scope_c|]`
