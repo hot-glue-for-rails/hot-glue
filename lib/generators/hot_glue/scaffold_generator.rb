@@ -202,17 +202,21 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
 
     args = meta_args[0]
+
+
     @singular =   args.first.tableize.singularize # should be in form hello_world
 
     if @singular.include?("/")
       @singular = @singular.split("/").last
     end
 
-    @plural = (options['plural'] ||  args.first.tableize.singularize.pluralize) # respects what you set in inflections.rb, to override, use plural option
-
+    @plural = (options['plural'] || args.first.tableize.singularize.pluralize)
+    if @plural.include?("/")
+      @plural = @plural.split("/").last
+    end
+    # respects what you set in inflections.rb, to override, use plural option
     puts "SINGULAR: #{@singular}"
     puts "PLURAL: #{@plural}"
-
 
     @namespace = options['namespace'] || nil
     @namespace_value = @namespace

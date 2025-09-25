@@ -711,14 +711,14 @@ describe "HotGlue::ScaffoldGenerator" do
       # this table has a field named _a_show_only_field
 
       expect(
-        File.read("spec/dummy/app/views/fruits/cantelopes/_form.erb") =~ /f\.text_field :_a_show_only_field/
+        File.read("spec/dummy/app/views/cantelopes/_form.erb") =~ /f\.text_field :_a_show_only_field/
       ).to be(nil)
 
-      res = File.read("spec/dummy/app/views/fruits/cantelopes/_form.erb")
+      res = File.read("spec/dummy/app/views/cantelopes/_form.erb")
 
       expect(res).to include("<%= cantelope._a_show_only_field %>")
 
-      res2 = File.read("spec/dummy/app/controllers/fruits/cantelopes_controller.rb")
+      res2 = File.read("spec/dummy/app/controllers/cantelopes_controller.rb")
       expect(res2).to include(":_a_show_only_field")
     end
 
