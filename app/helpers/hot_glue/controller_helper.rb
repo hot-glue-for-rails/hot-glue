@@ -45,9 +45,7 @@ module HotGlue
       # returns a TimeZone (https://apidock.com/rails/TimeZone) object
       if defined?(current_user)
         if current_user.try(:timezone)
-          current_user.timezone
-
-          # Time.now.in_time_zone(current_user.timezone.to_i).zone
+          ActiveSupport::TimeZone[current_user.timezone]
         else
           Rails.application.config.time_zone
           # Time.zone.name
@@ -56,6 +54,49 @@ module HotGlue
         Rails.application.config.time_zone
         # Time.zone.name
       end
+    end
+
+    def formatted_time_display(object, method, current_user)
+      tz = ActiveSupport::TimeZone[current_user.timezone]
+
+      t = object.public_send(method)
+
+      # Build UTC datetime for today + stored time
+      utc_datetime = Time.utc(
+        Time.now.year,
+        Time.now.month,
+        Time.now.day,
+        t.hour,
+        t.min,
+        t.sec
+      )
+
+      # Convert to user's timezone (DST-aware)
+      local_time = utc_datetime.in_time_zone(tz)
+
+      local_time.strftime('%-l:%M %p %Z')
+    end
+
+    def formatted_time_field(object, method, current_user)
+      tz = ActiveSupport::TimeZone[current_user.timezone]
+
+      t = object.public_send(method)
+
+      # Build UTC datetime from the stored time
+      utc_datetime = Time.utc(
+        Time.now.year,
+        Time.now.month,
+        Time.now.day,
+        t.hour,
+        t.min,
+        t.sec
+      )
+
+      # Convert to user's timezone (DST-aware)
+      local_time = utc_datetime.in_time_zone(tz)
+
+      # Format for HTML5 <input type="time"> (24h clock, HH:MM)
+      local_time.strftime('%H:%M')
     end
 
     def date_to_current_timezone(date, timezone = nil)
@@ -79,71 +120,112 @@ module HotGlue
       "#{sign}#{hour_abs}#{minute_str}"
     end
 
+    # def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = {})
+    #
+    #   use_timezone = if current_user_object.try(:timezone)
+    #                    (ActiveSupport::TimeZone[current_user_object.timezone])
+    #                  else
+    #                    Time.zone
+    #                  end
+    #
+    #
+    #   uses_dst = (current_user_object.try(:locale_uses_dst)) || false
+    #
+    #   modified_params = modified_params.tap do |params|
+    #     params.keys.each{|k|
+    #       if field_list.is_a?(Hash)
+    #         include_me = field_list[k.to_sym].present?
+    #       elsif field_list.is_a?(Array)
+    #         field_list.include?(k.to_sym)
+    #       end
+    #
+    #       parsables =  {
+    #         datetime: "%Y-%m-%d %H:%M %z",
+    #         time: "%H:%M %z"
+    #       }
+    #
+    #
+    #       if include_me && params[k].present?
+    #         input_value = params[k].gsub("T", " ") # e.g. "2025-09-24 14:00" or "14:00"
+    #
+    #         if field_list.is_a?(Array)
+    #           # Datetime inputs (e.g. datetime-local)
+    #           parsed_time = Time.strptime(input_value, "%Y-%m-%d %H:%M")
+    #           parsed_time = parsed_time.utc.change(sec: 0)
+    #         else
+    #           case field_list[k.to_sym]
+    #           when :datetime
+    #             parsed_time = Time.strptime(input_value, "%Y-%m-%d %H:%M")
+    #             parsed_time = parsed_time.utc.change(sec: 0)
+    #           when :time
+    #
+    #             Rails.logger.info("input_value: #{input_value}")
+    #             # Parse as hour/minute only, no zone
+    #             t = Time.strptime(input_value, "%H:%M")
+    #
+    #             # Build a UTC time with today's date
+    #             parsed_time = Time.utc(Time.now.year, Time.now.month, Time.now.day, t.hour, t.min, 0)
+    #             # Convert back to a plain "time of day" (for DB `time` column)
+    #             parsed_time = parsed_time.to_time.change(sec: 0)
+    #             Rails.logger.info("parsed_time: #{parsed_time}")
+    #
+    #           else
+    #             raise "Unsupported field type: #{field_list[k.to_sym]}"
+    #           end
+    #         end
+    #
+    #         Rails.logger.info "parsed_time #{parsed_time}"
+    #         params[k] = parsed_time
+    #       end
+    #     }
+    #   end
+    #   modified_params
+    # end
+
     def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = {})
+      use_timezone =
+        if current_user_object.try(:timezone)
+          ActiveSupport::TimeZone[current_user_object.timezone]
+        else
+          Time.zone
+        end
 
-      use_timezone = if current_user_object.try(:timezone)
-                       (ActiveSupport::TimeZone[current_user_object.timezone])
-                     else
-                       Time.zone
-                     end
-
-
-      uses_dst = (current_user_object.try(:locale_uses_dst)) || false
-
-      modified_params = modified_params.tap do |params|
-        params.keys.each{|k|
-          if field_list.is_a?(Hash)
-            include_me = field_list[k.to_sym].present?
-          elsif field_list.is_a?(Array)
-            field_list.include?(k.to_sym)
-          end
-
-          parsables =  {
-            datetime: "%Y-%m-%d %H:%M %z",
-            time: "%H:%M %z"
-          }
-
-
-          if include_me && params[k].present?
-            if use_timezone
-              natural_offset = use_timezone.formatted_offset
-              hour = natural_offset.split(":").first.to_i
-              min  = natural_offset.split(":").last.to_i
-
-              hour = hour + 1 if uses_dst && is_dst_now?
-
-              use_offset = format_timezone_offset(hour, min)
-              parse_date = "#{params[k].gsub("T", " ")} #{use_offset}"
-
-
-              Rails.logger.info("use_offset: #{use_offset}")
-
-              Rails.logger.info("parse_date: #{parse_date}")
-
-              # note: as according to https://stackoverflow.com/questions/20111413/html5-datetime-local-control-how-to-hide-seconds
-              # there is no way to set the seconds to 00 in the datetime-local input field
-              # as I have implemented a "seconds don't matter" solution,
-              # the only solution is to avoid setting any non-00 datetime values into the database
-              # if they already exist in your database, you should zero them out
-              # or apply .change(sec: 0) when displaying them as output in the form
-              # this will prevent seconds from being added by the browser
-              if  field_list.is_a?(Array)
-                parsed_time = Time.strptime(parse_date, "%Y-%m-%d %H:%M %z")
-              else
-                parsed_time = Time.strptime(parse_date, parsables[field_list[k.to_sym]])
-              end
-              Rails.logger.info "parsed_time #{parsed_time}"
-              Rails.logger.info "Timezone: #{use_timezone.name}"
-              Rails.logger.info "Offset: #{use_timezone.formatted_offset}"
-              Rails.logger.info "DST? #{uses_dst} | is_dst_now? => #{is_dst_now?}"
-              Rails.logger.info "Final offset used: #{use_offset}"
-
-              params[k] = parsed_time
+      modified_params.tap do |params|
+        params.keys.each do |k|
+          include_me =
+            if field_list.is_a?(Hash)
+              field_list[k.to_sym].present?
+            elsif field_list.is_a?(Array)
+              field_list.include?(k.to_sym)
             end
+
+          next unless include_me && params[k].present?
+
+          input_value = params[k].gsub("T", " ") # "13:00" or "2025-09-24 13:00"
+
+          case field_list[k.to_sym]
+          when :datetime
+            # Interpret input as in user's local time zone
+            local_time = use_timezone.strptime(input_value, "%Y-%m-%d %H:%M")
+            # Convert to UTC for storage
+            parsed_time = local_time.utc.change(sec: 0)
+          when :time
+            # Parse as HH:MM (local wall clock time)
+            t = Time.strptime(input_value, "%H:%M")
+            # Interpret in user's timezone, with today's date
+            local_time = use_timezone.local(Time.now.year, Time.now.month, Time.now.day, t.hour, t.min, 0)
+            # Convert to UTC for storage
+            parsed_time = local_time.utc
+          else
+            next
           end
-        }
+
+          Rails.logger.info "input_value: #{input_value}"
+          Rails.logger.info "parsed_time: #{parsed_time} (#{parsed_time.zone})"
+
+          params[k] = parsed_time
+        end
       end
-      modified_params
     end
 
     def hawk_params(hawk_schema, modified_params)
