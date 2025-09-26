@@ -1658,12 +1658,17 @@ bin/rails generate Book --include=name,author_id --search=set --search-fields=na
 ```
 
 ### `--phantom-search='{type}_{name}[All|choice A:scope_a|choice B:scope_b]`
+`--phantom-search='radio_{name}[All|choice A:scope_a|choice B:scope_b]`
+`--phantom-search='checkboxes_{name}[All|choice A:off_scope_a:on_scope_a|choice B:off_scope_b:on_scope_b]`
+
 
 A phantom search is a search we are doing on this result set that doesn't correspond to a single field. Currently, the only available implementation is for scopes with no arguments, as in the example below. It is called 'phantom' because it could be (probably is) querying fields within the scope, but the search doesn't match up with a single field on your model. (So it's like creating 'phantom' criteria.). Only RADIO type is implemented, dropdown & checkboxes an a way to input a search value passed into the scope as an argument is TBD.
 
-{type} is any of: radio, dropdown, checkboxes
+{type} is any of: radio, checkboxes (showing one of each type above)
 
-{name} is a designation for this phantom search. Should NOT match any field name on your table. This should describe the kind of categorization we are performing.
+{name} is a designation for this phantom search. 
+Should NOT match any field name on your table. 
+This should describe the kind of categorization we are performing. Name is used for radio only; not shown to the user for checkboxes
 
 Your phantom search selector will be appended to the search fields and will be treated like a first-class search input, able to be combined with any of the other fields specified in a set search.
 
@@ -1676,9 +1681,14 @@ After the type & name, comes a block marked by square braces [ ... ]
 
 Within the square  braces, each search option is separated by a pipe (|) character. 
 
-Within each option is a label and ruby scope, separated by a colon (:).
+Within each option is a label and either one ruby scope (for radios) or an OFF scope and ON scope (for checkboxes), separated by a colon (:).
 
-The label comes before the colon the ruby scope. The ruby scope should be specified here without a dot. Each ruby scope must be defined on your model. If there is no scope specified, we assume "all", but we still need to specify a label for "All", which is why in the example above "All" has no colon after it.
+The label comes before the first colon the ruby scope. For checkboxes, you will have two colons followed by an "off" and "on scope'
+label:off scope:on scope
+
+The ruby scope can be specified with or without a dot.
+
+Each ruby scope must be defined on your model. If there is no scope specified (empty), we assume "all", but we still need to specify a label for "All", which is why in the example above "All" has no colon after it.
 
 #### Radio Example
 
