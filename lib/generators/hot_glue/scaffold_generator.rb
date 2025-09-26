@@ -731,16 +731,30 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       }
 
       choices.each do |choice|
-        choice_label = choice.split(":")[0]
-        choice_scope = choice.split(":")[1]
-        if choice_scope.nil?
+        if type == "radio"
+          choice_label = choice.split(":")[0]
+          choice_scope = choice.split(":")[1]
+        elsif type == "checkboxes"
+          choice_label = choice.split(":")[0]
+          choice_scope_negative = choice.split(":")[1]
+          choice_scope  = choice.split(":")[2]
+        end
+
+        if choice_scope.nil? || choice_scope.strip.empty?
           choice_scope = "all"
         end
 
+        if choice_scope_negative.nil? || choice_scope_negative.strip.empty?
+          choice_scope_negative = "all"
+        end
+
         choice_scope = ".#{choice_scope}" if !choice_scope.start_with?(".")
+        choice_scope_negative = ".#{choice_scope_negative}" if !choice_scope_negative.start_with?(".")
+
         @phantom_search[label.to_sym][:choices] << {
           label: choice_label,
           scope: choice_scope,
+          scope_negative: choice_scope_negative,
         }
       end
       puts "phantom search #{@phantom_search}"
@@ -1834,11 +1848,25 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     @phantom_search.each do |phantom_key, phantom_data|
-      phantom_data[:choices].each do |choice|
-        unless choice[:scope] == ".all"
-          res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label]}\""
+      if phantom_data[:type] == "radio"
+        phantom_data[:choices].each do |choice|
+          unless choice[:scope] == ".all"
+            res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label]}\""
+          end
+        end
+      elsif phantom_data[:type] == "checkboxes"
+        phantom_data[:choices].each do |choice|
+
+          # positive case
+          unless choice[:scope] == ".all"
+            res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search__#{choice[:label].gsub(" ", "_").downcase}] == \"1\""
+          end
+          unless choice[:scope_negative] == ".all"
+            res << "\n    @#{plural} = @#{plural}#{choice[:scope_negative]} if @q['0'][:#{phantom_key}_search___#{choice[:label].gsub(" ", "_").downcase}] != \"1\""
+          end
         end
       end
+
       res << "\n"
     end
 
@@ -1907,12 +1935,24 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     }.reduce({}, :merge)
 
     phantom_search_fields = @phantom_search.collect{| k,v|
-      default = v[:choices][0]
-      {
-        "#{k}_match".to_sym => "",
-        "#{k}_search".to_sym => "#{default[:label]}"
-      }
-    }.reduce({}, :merge)
+      if v[:type] == "radio"
+        default = v[:choices][0]
+        {
+          "#{k}_match".to_sym => "",
+          "#{k}_search".to_sym => "#{default[:label]}"
+        }
+      elsif v[:type] == "checkboxes"
+        v[:choices].collect{ |c|
+          {
+            "#{k}_#{c[:label].gsub(" ", "_").downcase}".to_sym => ""
+          }
+        }
+      end
+    }
+
+    phantom_search_fields.flatten!
+    phantom_search_fields = phantom_search_fields.reduce({}, :merge)
+
     return {"0" => (default_fields.merge(phantom_search_fields))}
   end
 end
