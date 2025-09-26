@@ -1680,7 +1680,7 @@ Within each option is a label and ruby scope, separated by a colon (:).
 
 The label comes before the colon the ruby scope. The ruby scope should be specified here without a dot. Each ruby scope must be defined on your model. If there is no scope specified, we assume "all", but we still need to specify a label for "All", which is why in the example above "All" has no colon after it.
 
-example
+#### Radio Example
 
 `--phantom-search='radio_status[Pending:pending|Rejected:rejected|Accepted:accepted|All]'`
 
@@ -1702,10 +1702,33 @@ This produces a search interface with four options listed as radio buttons:
 
 The pending, approved, and rejected options will return search results with the corresponding scopes applied. The 'All' option will behave as a no-op, leaving the root search intact (giving all of the other modifications that Hot glue provides in different functionality).
 
-#### Predicate Search
-NOT IMPLEMENTED YET
-TODO: implement me
+##### Checkboxes example
 
+`rails generate hot_glue:scaffold Invoice --gd --phantom-search='checkboxes_AAA[With Paid:not_paid:|Hide free accounts::without_free_accounts]'`
+
+
+The syntax is similiar to the radio buttons except that each choice (within `[...]`, separated by `|`) is required to have THREE options, separated by colons `:`
+1) the label
+2) the OFF case (checkbox is unchecked)
+3) the ON case (checkbox is checked)
+
+The scope definition between the `:` characters **may be empty**, in which case this is interprested as "all"
+
+Since checkboxes start as off (unchecked) by default, you can create layouts that show the normal case with the checkboxes off, but show special cases with the checkboxes on.
+(This can either exclude or include depending on your preference.)
+
+In this Invoice scaffold, we have two scopes, searching for fields on our invoice model:
+
+`scope :not_paid, -> {where(paid_at: nil)}`
+`scope :without_free_accounts, -> {where(free_account: false)}`
+
+In the checkboxes phantom search we build above, notice by default:
+
+- the PAID invoices do not appear in the search result (the scope `.not_paid` is applied as the OFF scope for the "With Paid" choice. So when you load the page, you see only unpaid invoices. If you check "With Paid" checkbox, there is no scope specified "all" is used indicating not modification is applied and all records are shown. 
+- both free & non-free accounts (which are simply tracked by a boolean `free_account`) are shown by default, but when you use the "Hide free accounts" checkbox, the scope `.without_free_accounts` is applied, thus hiding the free accounts. 
+
+Remember, unlike radio choices which apply exclusively (since the user can select only 1 radio choice at time), checkboxes create 
+combined search criteria. These combine with all of the other search criteria within the search set, making one big "AND ... AND ... AND" query.
 
 ### `--stimmify` or `--stimmify=xyz`
 
@@ -2210,6 +2233,11 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+#### 2025-09-26 - v.0.6.28
+- Checkboxes option for Phantom Search (previously phantom searches only supported radio).
+See "Checkboxes example" under the docs for `--phantom-search` above
+
 #### 2025-09-24 - v0.6.27
 - Fixes to namespaced models (this is when the model file has a namespace); it now correctly does not namespace the route (fix to plurality)
 
