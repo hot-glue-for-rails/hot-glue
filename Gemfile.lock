@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hot-glue (0.6.26.1)
+    hot-glue (0.6.27)
       ffaker (~> 2.16)
       kaminari (~> 1.2)
       rails (> 5.1)

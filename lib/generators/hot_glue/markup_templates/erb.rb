@@ -149,22 +149,29 @@ module  HotGlue
       # phantom searches
       @phantom_search.each_key do |search_field|
         data = @phantom_search[search_field]
-        if data[:type] == "radio"
-          res << "<div>"
+        res << "<div>"
+        res << "<label>#{data[:name]}</label><br />"
 
-          res << "<label>#{data[:name]}</label><br />"
-
-          data[:choices].each do |choice|
+        data[:choices].each do |choice|
+          dom_label = choice[:label].downcase.gsub(" ","_")
+          if data[:type] == "radio"
             res << "\n<input type='radio'
-                            id='#{search_field}_search__#{choice[:label]}'
-                            name='q[0][#{search_field}_search]' value='#{choice[:label]}'
-           <%= 'checked' if  @q['0'][:#{search_field}_search] == \"#{choice[:label]}\" %> />"
-            res << "\n<label for='#{search_field}_search__#{choice[:label]}'>#{choice[:label]}</label> <br/>"
+                            id='#{search_field}_search__#{dom_label}}'
+                            name='q[0][#{search_field}_search]' value='#{dom_label}'
+           <%= 'checked' if  @q['0'][:#{search_field}_search] == \"#{dom_label}\" %> />"
+          elsif data[:type] == "checkboxes"
+            res << "\n<input type='checkbox'
+                            id='#{search_field}_search__#{dom_label}'
+                            name='q[0][#{search_field}_search__#{dom_label}]'
+                            value='1'
+           <%= 'checked' if  @q['0'][:#{search_field}_search__#{dom_label}]  %> />"
+
           end
-
-          res << "</div>"
-
+          res << "\n<label for='#{search_field}_search__#{dom_label}'>#{choice[:label]}</label> <br/>"
         end
+
+        res << "</div>"
+
       end
 
 
