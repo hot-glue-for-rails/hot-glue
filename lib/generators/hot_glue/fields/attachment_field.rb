@@ -42,7 +42,16 @@ def spec_setup_and_change_act(which_partial = nil)
 
   def line_field_output
     thumbnail = attachment_data[:thumbnail]
-
-    (thumbnail ? "<%= #{singular}.#{name}.attached? ? image_tag(#{singular}.#{name}.variant(:#{thumbnail})) : '' %>" : "")
+    if thumbnail
+      "<% if #{singular}.#{name}.attached? %>
+    <% if !#{singular}.#{name}.variable? %>
+      <span class=\"badge bg-secondary\"><%= #{singular}.#{name}.blob.content_type.split('/')[1] %></span>
+    <% else %>
+      <%= image_tag(#{singular}.#{name}.variant(:thumb)) %>
+    <% end %>
+    <% end %>"
+    else
+      ""
+    end
   end
 end
