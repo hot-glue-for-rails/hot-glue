@@ -166,6 +166,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @stimulus_syntax = true
     end
 
+
+    if Gem::Specification.find_all_by_name('pagy').any?
+      @pagination_style = 'pagy'
+    elsif Gem::Specification.find_all_by_name('will_paginate').any?
+      raise "not implemented"
+      @pagination_style = 'will_paginate'
+    elsif Gem::Specification.find_all_by_name('kaminari').any?
+      @pagination_style = 'kaminari'
+    end
+
     if !options['markup'].nil?
       message = "Using --markup flag in the generator is deprecated; instead, use a file at config/hot_glue.yml with a key markup set to `erb` or `haml`"
       raise(HotGlue::Error, message)
@@ -845,7 +855,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         hidden_update: @hidden_update,
         invisible_create: @invisible_create,
         invisible_update: @invisible_update,
-        phantom_search: @phantom_search
+        phantom_search: @phantom_search,
+        pagination_style: @pagination_style
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")
@@ -1448,10 +1459,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def any_nested?
     @nested_set.any?
   end
-
-  def all_objects_variable
-    all_objects_root + ".page(params[:page])"
-  end
+  #
+  # def all_objects_variable
+  #   all_objects_root + ".page(params[:page])"
+  # end
 
   def auth_object
     @auth
@@ -1815,7 +1826,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     else
       if !@self_auth
 
-        res << spaces(4) + "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }#{record_scope}"
+        res << spaces(4) + "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }#{record_scope}#{".all" if n_plus_one_includes.blank? && record_scope.blank? }"
 
         if @search_fields
           res << @search_fields.collect{ |field|
@@ -1870,7 +1881,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       res << "\n"
     end
 
-    res << "    @#{plural} = @#{plural}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
+
+    if @pagination_style == "kaminari"
+      res << "    @#{plural} = @#{plural}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
+    elsif @pagination_style == "will_paginate"
+
+    elsif @pagination_style == "pagy"
+      res << "    @pagy, @#{plural} = pagy(@#{plural})"
+    end
     res
   end
 

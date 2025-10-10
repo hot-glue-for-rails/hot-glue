@@ -119,6 +119,7 @@ describe HotGlue::ErbTemplate do
 
 
     @template_builder = HotGlue::ErbTemplate.new(
+      pagination_style: nil,
       show_only: [],
       columns_map: columns_map_sample(generator: generator, options: options),
       singular_class: "Jkl",
