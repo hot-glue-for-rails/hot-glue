@@ -273,7 +273,11 @@ module  HotGlue
       elsif @pagination_style == "will_paginate"
         raise "will_paginate not implemented"
       elsif @pagination_style == "pagy"
-        "<%== pagy_nav(@pagy, anchor_string: 'data-turbo-action=\"advance\"') %>"
+        if !@layout_strategy == "bootstrap"
+          "<%== pagy_nav(@pagy, anchor_string: 'data-turbo-action=\"advance\"') %>"
+        else 
+          "<%== pagy_bootstrap_nav(@pagy, anchor_string: 'data-turbo-action=\"advance\"') %>"
+        end
       end
     end
 
