@@ -2244,7 +2244,33 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
-#### 2025-09-26 - v.0.6.28
+#### 2025-10-11 - v0.6.39
+
+• When specifying  a alt lookup in non-Gd mode, we treat this a security concern because alt lookups can get any related record from the database; if you use a factory when creating your object, you can pass the lookup to the factory and scope your lookup in there; fix to not raise exception when specified an alt lookup in non-Gd mode if you are also using a factory
+
+• Attachments now have a graceful fail if the attachment is invariable (cannot be made into a thumbnail), and so there is no thumbnail to display. Instead, a small box with the file type ("pdf" or "msword") is shown in place where the thumbnail would display
+
+• Adds a 'tripple' implementation for newer pagination gems: will_paginate and pagy. HG will auto detect which pagination gem you have in your Gemfile, and pick ONE of the three based on this preference order: Pagy over will_paginate; will_paginate over Kaminari, no pagination if none of the three are installed.
+
+Kaminari is barely workable with newer Rails and seems somewhat abandoned; will_paginate is officially in maintenance mode, so Pagy is the way to go. I have implemented all three for the widest legacy support. On my Rails Cookbook pages, I have replaced Kaminari with Pagy.
+
+Migrating a large app from Kaminari to Pagy:
+
+- If you rip out Kaminari right away, it will be necessary to rebuild all of your Hot Glue controllers & views. On a large or customized app, this will be too tedious to do at once. Instead, contrary to the Pagy documentation, which encourages you to aggressively rip out the old gem (Kaminari),  you can leave both gems in place, operating side-by-side. As you rebuild each scaffold controller by controller, newly built scaffolds will use Pagy, replacing the older Kaminari syntax.
+
+• Hot Glue is now _OFFICIALLY dependency-free_! I've been building and working with Rails gems for years and years, and one of the interesting challenges that Rails 7 & 8 posed is that when the JavaScript and CSS delivery paradigms shift, it caused a massive atrophy of several old Rails gems. Codebases that relied on, for example, the old jquery-rails gem suddenly found themselves pantless. JS tool-only Gems are now discouraged, in favor of importmaps, propshaft, or JSBundling.
+
+When you build a gem, the naive gem builder thinks to themselves: Let me pull in other people's tools to make my tool stand on the shoulders of giants. 
+
+But when paradigms shift, those gems the gem depends on become a blocker for your Gem moving forward.
+
+I already had very few dependencies in Hot Glue — really just Rspec, Kaminari, and Rails itself. Although you need Turbo (and by extension JS), bootstrap is optional (but recommended), and Rspec is optional (but default). 
+
+The ONLY remaining dependency is ffaker (sorry!), which is necessary for the specs.
+
+Hot Glue is a companion tool to Turbo itself. Where Turbo Rails goes, we go. Although this gem is primarily built for Bootstrap, Bootstrap remains officially optional. Although you need Turbo for it to work, how you bring Turbo is up to you (bundling, pinning, propshafting, etc). With the removal of Kaminari and new support for will_paginate and Pagy, I hope this Gem can be integrated into more apps who may already have chosen their pagination system.
+
+#### 2025-09-26 - v0.6.28
 - Checkboxes option for Phantom Search (previously phantom searches only supported radio).
 See "Checkboxes example" under the docs for `--phantom-search` above
 
