@@ -25,11 +25,7 @@ Gem::Specification.new do |spec|
                        "homepage" => "https://heliosdev.shop/hot-glue",
                        "funding" => "https://school.jfbcodes.com/8188" }
 
-  spec.add_runtime_dependency('kaminari', '~> 1.2')
-  # spec.add_runtime_dependency('sass-rails')
-
   spec.add_dependency 'ffaker', "~> 2.16"
-  # spec.add_runtime_dependency "turbo-rails"
 
   spec.post_install_message = <<~MSG
     ---------------------------------------------

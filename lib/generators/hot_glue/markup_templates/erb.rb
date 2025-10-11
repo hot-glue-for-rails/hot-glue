@@ -12,7 +12,7 @@ module  HotGlue
                   :search, :search_fields, :search_query_fields, :search_position,
                   :form_path, :layout_object, :search_clear_button, :search_autosearch,
                   :stimmify, :stimmify_camel, :hidden_create, :hidden_update, :invisible_create,
-                  :invisible_update, :plural, :phantom_search
+                  :invisible_update, :plural, :phantom_search, :pagination_style
 
 
     def initialize(singular:, singular_class: ,
@@ -25,7 +25,8 @@ module  HotGlue
                  search:, search_fields:, search_query_fields: , search_position:,
                  search_clear_button:, search_autosearch:, layout_object:,
                  form_path: , stimmify: , stimmify_camel:, hidden_create:, hidden_update: ,
-                 invisible_create:, invisible_update: , plural: , phantom_search:)
+                 invisible_create:, invisible_update: , plural: , phantom_search:,
+                   pagination_style: )
 
 
       @form_path = form_path
@@ -66,6 +67,7 @@ module  HotGlue
       @attachments = attachments
       @related_sets = related_sets
       @phantom_search = phantom_search
+      @pagination_style = pagination_style
     end
 
     def add_spaces_each_line(text, num_spaces)
@@ -266,7 +268,17 @@ module  HotGlue
     def paginate(*args)
       plural = args[0][:plural]
 
-      "<% if #{plural}.respond_to?(:total_pages) %><%= paginate(#{plural}) %> <% end %>"
+      if @pagination_style == "kaminari"
+        "<% if #{plural}.respond_to?(:total_pages) %><%= paginate(#{plural}) %> <% end %>"
+      elsif @pagination_style == "will_paginate"
+        "<% if #{plural}.respond_to?(:total_pages) %><%= will_paginate(#{plural}) %> <% end %>"
+      elsif @pagination_style == "pagy"
+        if !@layout_strategy == "bootstrap"
+          "<%== pagy_nav(@pagy, anchor_string: 'data-turbo-action=\"advance\"') %>"
+        else
+          "<%== pagy_bootstrap_nav(@pagy, anchor_string: 'data-turbo-action=\"advance\"') %>"
+        end
+      end
     end
 
 

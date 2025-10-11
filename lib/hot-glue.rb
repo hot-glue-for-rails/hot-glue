@@ -1,5 +1,4 @@
 require "hotglue/engine"
-require 'kaminari'
 
 module HotGlue
   module TemplateBuilders
@@ -9,7 +8,6 @@ module HotGlue
 
   class Error < StandardError
   end
-
 
   def self.to_camel_case(str)
     words = str.split(/[^a-zA-Z0-9]/) # split by non-alphanumeric characters
