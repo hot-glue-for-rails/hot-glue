@@ -713,7 +713,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         raise "You specified an alt-lookup for #{key} but that field is not an association field"
       elsif !@columns_map[key.to_sym]
         raise "You specified an alt-lookup for #{key} but that field does not exist in the list of columns"
-      elsif !@god && !@hawk_keys.include?(key.to_sym)
+      elsif !@god && !@hawk_keys.include?(key.to_sym) && !@factory_creation
         raise "You specified an alt-lookup for #{key} in non-Gd mode but this would leave the lookup unprotected. To fix, use with --hawk or with --factory-creation "
       end
     end
