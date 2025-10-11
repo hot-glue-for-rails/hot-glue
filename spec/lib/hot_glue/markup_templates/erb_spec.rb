@@ -80,7 +80,9 @@ describe HotGlue::ErbTemplate do
       invisible_create: [],
       invisible_update: [],
       plural: [],
-      phantom_search: {})
+      phantom_search: {},
+      pagination_style: nil
+    )
 
     @template_builder.all_form_fields( layout_strategy: layout_strategy)
 

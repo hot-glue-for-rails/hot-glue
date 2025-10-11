@@ -275,7 +275,7 @@ module  HotGlue
       elsif @pagination_style == "pagy"
         if !@layout_strategy == "bootstrap"
           "<%== pagy_nav(@pagy, anchor_string: 'data-turbo-action=\"advance\"') %>"
-        else 
+        else
           "<%== pagy_bootstrap_nav(@pagy, anchor_string: 'data-turbo-action=\"advance\"') %>"
         end
       end
