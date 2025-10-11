@@ -271,7 +271,7 @@ module  HotGlue
       if @pagination_style == "kaminari"
         "<% if #{plural}.respond_to?(:total_pages) %><%= paginate(#{plural}) %> <% end %>"
       elsif @pagination_style == "will_paginate"
-        raise "will_paginate not implemented"
+        "<% if #{plural}.respond_to?(:total_pages) %><%= will_paginate(#{plural}) %> <% end %>"
       elsif @pagination_style == "pagy"
         if !@layout_strategy == "bootstrap"
           "<%== pagy_nav(@pagy, anchor_string: 'data-turbo-action=\"advance\"') %>"

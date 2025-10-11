@@ -170,7 +170,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if Gem::Specification.find_all_by_name('pagy').any?
       @pagination_style = 'pagy'
     elsif Gem::Specification.find_all_by_name('will_paginate').any?
-      raise "not implemented"
       @pagination_style = 'will_paginate'
     elsif Gem::Specification.find_all_by_name('kaminari').any?
       @pagination_style = 'kaminari'
@@ -1885,7 +1884,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if @pagination_style == "kaminari"
       res << "    @#{plural} = @#{plural}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
     elsif @pagination_style == "will_paginate"
-
+      res << "    @#{plural} = @#{plural}.paginate(page: params[:page], #{ ", per_page: per" if @paginate_per_page_selector })"
     elsif @pagination_style == "pagy"
       res << "    @pagy, @#{plural} = pagy(@#{plural})"
     end
