@@ -456,11 +456,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
         child_name.gsub!("+","")
 
-
-        @downnest_object[child] = {
+        @downnest_object[child_name] = {
           name: child_name,
           extra_size: extra_size,
-          polymorph_as: polymorph_as
+          polymorph_as: polymorph_as,
         }
       end
     end
@@ -512,17 +511,27 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     if !@nested.nil?
       @nested_set = @nested.split("/").collect { |arg|
-        if arg.include?("(")
+        if arg.include?("[") && arg.include?("(")
+          arg =~ /(.*)\((.*)\)\[(.*)\]/
+          singular, polymorph_as, parent_name = $1, $2, $3
+
+        elsif arg.include?("(")
           arg =~ /(.*)\((.*)\)/
           singular, polymorph_as = $1, $2
+          parent_name = singular
+        elsif arg.include?("[")
+          arg =~ /(.*)\[(.*)\]/
+          singular, parent_name = $1, $2
         else
           singular = arg
+          parent_name = singular
         end
 
         {
           singular: singular,
           plural: singular.pluralize,
-          polymorph_as: polymorph_as
+          polymorph_as: polymorph_as,
+          parent_name: parent_name
         }
       }
       puts "NESTING: #{@nested_set}"
@@ -1426,17 +1435,34 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def object_scope
+    if @nested_set.last[:parent_name]
+      last_parent = @nested_set.last[:parent_name]
+      foreign_key =  eval("Following.reflect_on_association(:#{last_parent})").foreign_key
+      association = eval(singular_class).reflect_on_association(@nested_set.last[:parent_name].to_sym)
+                                        .klass.reflect_on_all_associations(:has_many)
+                                        .to_a.find{|x|
+
+          if x.source_reflection
+            x.foreign_key == foreign_key
+
+            # raise "#{singular_class} class declaration is missing source reflection for the `has_many :#{x.name}` association"
+          end
+      }.plural_name
+    else
+      association = plural
+    end
+
     if @auth && !@god
       if @nested_set.none?
-        @auth + ".#{plural}"
+        @auth + ".#{association}"
       else
-        "@" + @nested_set.last[:singular] + ".#{plural}"
+        "@" + @nested_set.last[:singular] + ".#{association}"
       end
     else
       if @nested_set.none?
         @singular_class
       else
-        "@" + @nested_set.last[:singular] + ".#{plural}"
+        "@" + @nested_set.last[:singular] + ".#{association}"
       end
     end
   end
