@@ -1437,7 +1437,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def object_scope
     if @nested_set.any? && @nested_set.last[:parent_name]
       last_parent = @nested_set.last[:parent_name]
-      foreign_key =  eval("Following.reflect_on_association(:#{last_parent})").foreign_key
+      foreign_key =  eval("#{singular_class}.reflect_on_association(:#{last_parent})").foreign_key
       association = eval(singular_class).reflect_on_association(@nested_set.last[:parent_name].to_sym)
                                         .klass.reflect_on_all_associations(:has_many)
                                         .to_a.find{|x|
