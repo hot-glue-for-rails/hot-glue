@@ -24,15 +24,15 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   before_action :<%= arg[:singular] %><%= ", if: -> { params.include?(:#{arg[:singular]}_id) }" if arg[:optional] %><% } %><% end %>
   before_action :load_<%= singular_name %>, only: %i[<%= "show edit update" unless @no_edit %> <%= "destroy" unless @no_delete %>]
   after_action -> { flash.discard }, if: -> { request.format.symbol == :turbo_stream }<% if @nested_set.any? %>
-    def <%= @nested_set[0][:singular] %><% if @god
+
+  def <%= @nested_set[0][:singular] %><% if @god
        next_object = nil
        collect_objects = @nested_set.reverse.collect {|x|
-           if eval("#{next_object || class_name}.reflect_on_association(:#{x[:singular]})").nil? #&& eval("! #{next_object || class_name}.instance_methods.include?(:#{x[:singular]})")
-             raise "***** Unable to find the association `#{x[:singular]}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{x[:singular]}` to the #{next_object || class_name} object?"
-           end
-           # if  eval("#{next_object || class_name}.reflect_on_association(:#{x[:singular]})")
-           next_object = eval("#{next_object || class_name}.reflect_on_association(:#{x[:singular]})").class_name
+           assoc_name = x[:parent_name] || x[:singular]
+           # if eval("#{next_object || class_name}.reflect_on_association(:#{assoc_name})").nil?
+           #   raise "***** Unable to find the association `#{assoc_name}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{assoc_name}` to the #{next_object || class_name} object?"
            # end
+           next_object = eval("#{next_object || class_name}.reflect_on_association(:#{assoc_name})").class_name
        }
        root_object = collect_objects.last
      else
@@ -42,6 +42,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
          root_object = @auth + "." + @nested_set[0][:plural]
        end
      end
+
  %><% if !@god && @nested_set[0][:singular] == @auth_identifier %>
     @<%= @nested_set[0][:singular] %> ||= <%= root_object %>
  <% else %>
@@ -63,7 +64,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   def load_<%= singular_name %>
     <% if @nested_set[0] && @nested_set[0][:optional] %>if params.include?(:<%= @nested_set.last[:singular] %>_id)
       @<%= singular_name %> = <%= object_scope.gsub("@",'') %>.find(params[:id])
-    else <% end %>@<%= singular_name %> = <%= object_scope %>.find(params[:id])<% if @nested_set[0] && @nested_set[0][:optional]  %>
+    else <% end %>@<%= singular_name %> = <%= object_scope.gsub("@",'') %>.find(params[:id])<% if @nested_set[0] && @nested_set[0][:optional]  %>
     end<% end %>
   end
   <% else %>

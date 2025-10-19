@@ -558,22 +558,24 @@ The child object is named `Rule` but it can belong to a Blast or an Agent. (Agen
 
 We build the blast & agent controllers like so:
 
-bin/rails generate hot_glue:scaffold Blast  --downnest='blast_rules(rules)'
-bin/rails generate hot_glue:scaffold Agent  --downnest='agent_rules(rules)'
+
+`bin/rails generate hot_glue:scaffold Blast  --downnest='blast_rules(rules)'`
+
+`bin/rails generate hot_glue:scaffold Agent  --downnest='agent_rules(rules)'`
 
 Notice that the relationship name is `rules` (not blast_rules), so what goes before the parenthesis is the controller name (with prefix)
 What goes inside the controller name is the real relationship name.
 
 For the children, we can't build one controller for the Rule, instead we build one for the `AgentRules` and another for the `BlastRules`
 
-bin/rails generate hot_glue:scaffold Rule  --nested='blast(ruleable)' --controller-prefix='Blast'
-bin/rails generate hot_glue:scaffold Rule  --nested='agent(ruleable)' --controller-prefix='Agent'
+`bin/rails generate hot_glue:scaffold Rule  --nested='blast(ruleable)' --controller-prefix='Blast'`
+`bin/rails generate hot_glue:scaffold Rule  --nested='agent(ruleable)' --controller-prefix='Agent'`
 
 (I realize building one child controller for each type of polymorph is tedius, but this is the best solution I could come up with.)
 
 As these are children, what goes into the `--netsed` setting inside the parentheses is the polymorphic name specified by `as:` when declaring the `belongs_to`
 
-routes.rb
+config/routes.rb
 
 ```
         resources :agents do
@@ -584,6 +586,22 @@ routes.rb
           resources :blast_rules
         end
 ```
+
+Outside a polymorphic relationship, you sometimes have children with `belongs_to` that uses a custom name instead of the name of the class (using class_name on the belongs to)
+
+Imagine a `followings` table with two foreign keys: follower_id and follows_id (both pointing to a BskyUser)
+
+
+`belongs_to :follower, class_name: "BskyUser", foreign_key: :follower_id`
+`belongs_to :follows, class_name: "BskyUser", foreign_key: :follows_id`
+
+
+Here, specify nested using square braces for the non-standard parent name
+
+`--nested='bsky_users[follower]'` and `--nested='bsky_users[follows]'`
+
+
+
 
 ### `--stacked-downnesting`
 
