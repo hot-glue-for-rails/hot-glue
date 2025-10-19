@@ -2284,13 +2284,19 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
-#### 2025-10-11 - v0.6.39
+#### 2025-10-19 - v0.6.30
+- fixes references from search typeaheads to a typeahead controller which is nested
+- `--nested` can now take square braces if the relationship from child to parent (belongs_to) uses a non-standard association name; @downnest_object fix for data array; changes to object_scope to accomodate new paradigm
+
+
+
+#### 2025-10-11 - v0.6.29
 
 • When specifying  a alt lookup in non-Gd mode, we treat this a security concern because alt lookups can get any related record from the database; if you use a factory when creating your object, you can pass the lookup to the factory and scope your lookup in there; fix to not raise exception when specified an alt lookup in non-Gd mode if you are also using a factory
 
 • Attachments now have a graceful fail if the attachment is invariable (cannot be made into a thumbnail), and so there is no thumbnail to display. Instead, a small box with the file type ("pdf" or "msword") is shown in place where the thumbnail would display
 
-• Adds a 'tripple' implementation for newer pagination gems: will_paginate and pagy. HG will auto detect which pagination gem you have in your Gemfile, and pick ONE of the three based on this preference order: Pagy over will_paginate; will_paginate over Kaminari, no pagination if none of the three are installed.
+• Adds a 'triple' implementation for newer pagination gems: will_paginate and pagy. HG will auto detect which pagination gem you have in your Gemfile, and pick ONE of the three based on this preference order: Pagy over will_paginate; will_paginate over Kaminari, no pagination if none of the three are installed.
 
 Kaminari is barely workable with newer Rails and seems somewhat abandoned; will_paginate is officially in maintenance mode, so Pagy is the way to go. I have implemented all three for the widest legacy support. On my Rails Cookbook pages, I have replaced Kaminari with Pagy.
 
