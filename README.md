@@ -2161,7 +2161,29 @@ This means that to find users within the search, the essential piece of informat
   end
 ```
 
+If you want your typeahead to accept an input for a non-matched field, you need to use a factory (see `--factory-creation`)
 
+Here, we assume that Authors are nested within a library (an arbitrary abstraction to demonstrate a typeahead at a nested route)
+
+```
+      factory = AuthorsFactory.new(
+        library: library,
+        query: params[:authors_query],
+        author_params: modified_params)
+```
+
+Your authors factory will need to check the params for `author_params[:author_id].empty?`
+
+
+When the factory is passed an empty string here, it is from a non-matched lookup. You will either lookup the author_id if provided, or create a new one if not
+```
+      if !author_params[:author_id].empty?
+        author = Author.find(author_params[:author_id])
+      else
+        author = Target.find_or_create_by!(library: library,  name: query)
+      end
+```
+Notice this is creating a new author by the `name` field, which should be same field you are searching by in the typeahead.
 
 --
 
