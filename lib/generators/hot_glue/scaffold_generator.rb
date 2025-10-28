@@ -300,6 +300,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           setting =~ /(.*){(.*)}/
           key, lookup_as = $1, $2
         end
+
         if ["$"].include?($2)
           @modify_as[key.to_sym] =  {cast: $2, badges: $3}
         elsif $2.include?("|")
@@ -322,6 +323,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           @modify_as[key.to_sym] =  {timezone: 1, badges: $3}
         elsif $2 == "include_blank"
           @modify_as[key.to_sym] =  {include_blank: true}
+        elsif $2 == "urlwrap"
+          helper_method = $3
+          @modify_as[key.to_sym] = { urlwrap: true,
+                                     helper_method: helper_method }
         elsif $2 == "none"
           @modify_as[key.to_sym] =  {none: 1, badges: $3}
         else

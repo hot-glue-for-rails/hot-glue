@@ -146,7 +146,13 @@ class Field
 
     elsif modify_as[:timezone]
       res += "<%= #{singular}.#{name} %>"
+    elsif modify_as[:urlwrap]
+      # helper_method =  modify_as[:helper_method].split(" ")[0]
+      # param = modify_as[:helper_method].split(" ")[1]
+
+      res += "<%= #{modify_as[:helper_method]}(#{singular}.#{name}, #{singular})  %>"
     elsif modify_as[:enum]
+
     elsif modify_as[:none]
         field_view_output
       # res += "<%= render partial: #{singular}.#{name}, locals: {#{singular}: #{singular}} %>"
