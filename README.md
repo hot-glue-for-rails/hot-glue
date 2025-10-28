@@ -2284,6 +2284,43 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
+#### 2025-10-28 - v0.6.31
+- new modification directive: `urlwrap`: use to wrap the field contents in a clickable link.
+
+`rails generate hot_glue:scaffold BskyUser --gd --modify='handle{urlwrap}[bsky_url]'`
+
+Here, we are telling Hot Glue that we want to modify the field called `handle` to be wrapped in a URL.
+We form that URL but calling the helper method `bsky_url` (must be defined in your helpers)
+
+When we do make that call, notice that we pass two arguments to bsky_url (not seen):
+1) the field we are modifying
+2) the object
+
+
+`bsky_url(bsky_user.handle, bsky_user)`
+
+(`bsky_user.handle` is the field to be modified, what will become the link text. `bsky_user` is the instance of the model 
+object as it is displayed to the screen)
+
+its implementation might look like this:
+
+```
+module BskyUserHelper
+
+  def bsky_url(link_text, bsky_user)
+    link_to link_text, "https://#{bsky_user.handle}", target: "_blank"
+  end
+end
+```
+In this case I happen to be turning piece of text _that is the link itself_ into a link, 
+which is why you see `"https://#{bsky_user.handle}"` in the URL being generated, but this is arbitrary.
+You can make any piece of text into a link, the helper method is only used to construct the link. 
+
+
+- Fixes for typeaheads: corrects search url when the typeahead is built against a two-word model name
+
+- Fixes for source reflection on has_many associations
+
 #### 2025-10-19 - v0.6.30
 - fixes references from search typeaheads to a typeahead controller which is nested
 - `--nested` can now take square braces if the relationship from child to parent (belongs_to) uses a non-standard association name; @downnest_object fix for data array; changes to object_scope to accomodate new paradigm
