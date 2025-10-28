@@ -219,9 +219,9 @@ describe "HotGlue::ScaffoldGenerator" do
       expect(res).to eq( "display_name")
     end
 
-    it "should refer to a table with email if there is no name field" do
+    it "should refer to a table using the to_label method if there is no name field" do
       res = hot_glue.derrive_reference_name("User")
-      expect(res).to eq( "email")
+      expect(res).to eq( "to_label")
     end
   end
 
