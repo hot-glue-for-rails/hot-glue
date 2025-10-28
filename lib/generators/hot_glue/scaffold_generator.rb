@@ -1443,14 +1443,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                         .to_a.find{|x|
 
           if x.source_reflection
-            x.foreign_key == foreign_key
-
-            # raise "#{singular_class} class declaration is missing source reflection for the `has_many :#{x.name}` association"
+            x.table_name == plural
           end
       }.plural_name
+
     else
       association = plural
     end
+
 
     if @auth && !@god
       if @nested_set.none?
@@ -1851,7 +1851,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     else
       if !@self_auth
 
-        res << spaces(4) + "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{ n_plus_one_includes }#{record_scope}#{".all" if n_plus_one_includes.blank? && record_scope.blank? }"
+        res << spaces(4) + "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{record_scope}#{ n_plus_one_includes }#{".all" if n_plus_one_includes.blank? && record_scope.blank? }"
 
         if @search_fields
           res << @search_fields.collect{ |field|

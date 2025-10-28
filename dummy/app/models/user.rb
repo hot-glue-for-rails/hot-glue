@@ -10,4 +10,8 @@ class User < ApplicationRecord
   has_many :ghis, through: :dfgs
 
   belongs_to :family
+
+  def to_label
+    email
+  end
 end
