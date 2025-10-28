@@ -1086,9 +1086,11 @@ Here, the `cost` and `price` fields will be displayed as wrapped in `number_to_c
 You can also use a binary modifier, which can apply to booleans, datetimes, times, dates or anything else. When using the binary modify, a specific value is displayed if the field is truthy and another one is display if the field is falsy.
 You specify it using a pipe | character like so:
 
+Example binary modification: 
+
 `--modify=paid_at{paid|unpaid}`
 
-here, even though `paid_at` is a datetime field, it will display as-if it is a binary -- showing either the truthy 
+Here, even though `paid_at` is a datetime field, it will display as-if it is a binary -- showing either the truthy 
 label or the falsy label depending on if `paid_at` is or is not null in the database.  
 For all fields except booleans, this affects only the viewable output — 
 what you see on the list page and on the edit page for show-only fields.  
@@ -1099,20 +1101,25 @@ You will need to separately specify them as show-only if you want them to be non
 
 Notice that each modifiers can be used with specific field types. 
 
-| user modifier                 | what it does                                                                                                                                                         | Field types                       |   |   |
-|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|---|---|
-| $                             | wraps output in `number_to_currency()`                                                                                                                               | floats and integers               |   |   |
+| user modifier                 | what it does                                                                                                                                                         | Field types                       |   |    |
+|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|---|----|
+| $                             | wraps output in `number_to_currency()`                                                                                                                               | floats and integers               |   |    |
 | (truthy label)\|(falsy label) | specify a binary switch with a pipe (\|) character if the value is truthy, it will display as "truthy label" if the value is falsy, it will display as "falsy label" | booleans, datetimes, dates, times |   |    |
-| partials                      | applies to enums only, you must have a partial whose name matches each enum type                                                                                     | enums only                        |   |   |
-| tinymce                       | applies to text fields only, be sure to setup TineMCE globally                                                                                                       | text fields only                  |    |   |
-| typeahead                     | turns a foreign key (only) into a searchable typeahead field                                                                                                         | foreign keys only                 |   |   |
-| timezone                      | turns a string (varchar) into a drop down of timezones                                                                                                               | foreign keys only                 |   |   |
-| include_blank                 | special modifier for association fields, adds include_blank to the created dropdown                                                                                   |                                   |
+| partials                      | applies to enums only, you must have a partial whose name matches each enum type                                                                                     | enums only                        |   |    |
+| tinymce                       | applies to text fields only, be sure to setup TineMCE globally                                                                                                       | text fields only                  |   |    |
+| typeahead                     | turns a foreign key (only) into a searchable typeahead field                                                                                                         | foreign keys only                 |   |    |
+| timezone                      | turns a string (varchar) into a drop down of timezones                                                                                                               | foreign keys only                 |   |    |
+| include_blank                 | special modifier for association fields, adds include_blank to the created dropdown                                                                                  |                                   |
+| urlwrap                       | wrap this field in a URL                                                                                                                                             | any printable field               |   |    |
 | none                          | special modifier for using badges                                                                                                                                    |
 
 Except for "(truthy label)" and "(falsy label)" which use the special syntax, use the modifier _exactly_ as it is named.
 
-apply badge behavior using `[` and `]` markers after the modification marker. 
+Some modifiers take a 3rd parameter in `[` and `]` markers after the modification marker. The 3rd parameters function depends on which modifier you are using. 
+
+
+#### Binary (use | to separate "true value" from "false value")
+Can take a bootstrap badge name as 3rd parameter
 
 `--modify=opened_at{opened|closed}[bg-primary|bg-secondary]`
 Applies a badge `bg-primary` to rows with opened_at truthy and `bg-secondary` to rows with opened_at falsy.
@@ -1120,9 +1127,49 @@ Applies a badge `bg-primary` to rows with opened_at truthy and `bg-secondary` to
 to display a badge on everything, use the `none` modifier with the
 `--modify=opened_at{none}[bg-dark]`
 
+#### $
 For the `$` modifier only, if the field name ends with `_cents`, the modifier will automatically divide the field by 100 before displaying it.
-
 (This is consistent with Stripe'e paradigm to always store money in cents, and this way I force myself to put `_cents` on the end of my field names to remind myself that they are in cents.)
+
+
+#### Typeahead
+3rd parameter (in `[...]`) used to specify the nested set IF the typeahead itself is nested (optional)
+- see the typeahead section for details
+
+#### urlwrap
+
+Use to wrap the field contents in a clickable link.
+
+`rails generate hot_glue:scaffold BskyUser --gd --modify='handle{urlwrap}[bsky_url]'`
+
+Here, we are telling Hot Glue that we want to modify the field called `handle` to be wrapped in a URL.
+We form that URL but calling the helper method `bsky_url` (must be defined in your helpers)
+
+When we do make that call, notice that we pass two arguments to bsky_url (not seen):
+1) the field we are modifying
+2) the object
+
+
+`bsky_url(bsky_user.handle, bsky_user)`
+
+(`bsky_user.handle` is the field to be modified, what will become the link text. `bsky_user` is the instance of the model
+object as it is displayed to the screen)
+
+its implementation might look like this:
+
+```
+module BskyUserHelper
+
+  def bsky_url(link_text, bsky_user)
+    link_to link_text, "https://#{bsky_user.handle}", target: "_blank"
+  end
+end
+```
+In this case I happen to be turning piece of text _that is the link itself_ into a link,
+which is why you see `"https://#{bsky_user.handle}"` in the URL being generated, but this is arbitrary.
+You can make any piece of text into a link, the helper method is only used to construct the link.
+
+
 
 ### `--alt-foreign-key-lookup=`
 
@@ -2285,37 +2332,9 @@ These automatic pickups for partials are detected at build time. This means that
 # VERSION HISTORY
 
 #### 2025-10-28 - v0.6.31
+
 - new modification directive: `urlwrap`: use to wrap the field contents in a clickable link.
-
-`rails generate hot_glue:scaffold BskyUser --gd --modify='handle{urlwrap}[bsky_url]'`
-
-Here, we are telling Hot Glue that we want to modify the field called `handle` to be wrapped in a URL.
-We form that URL but calling the helper method `bsky_url` (must be defined in your helpers)
-
-When we do make that call, notice that we pass two arguments to bsky_url (not seen):
-1) the field we are modifying
-2) the object
-
-
-`bsky_url(bsky_user.handle, bsky_user)`
-
-(`bsky_user.handle` is the field to be modified, what will become the link text. `bsky_user` is the instance of the model 
-object as it is displayed to the screen)
-
-its implementation might look like this:
-
-```
-module BskyUserHelper
-
-  def bsky_url(link_text, bsky_user)
-    link_to link_text, "https://#{bsky_user.handle}", target: "_blank"
-  end
-end
-```
-In this case I happen to be turning piece of text _that is the link itself_ into a link, 
-which is why you see `"https://#{bsky_user.handle}"` in the URL being generated, but this is arbitrary.
-You can make any piece of text into a link, the helper method is only used to construct the link. 
-
+See docs for "urlwrap" in the `--modify=` section above
 
 - Fixes for typeaheads: corrects search url when the typeahead is built against a two-word model name
 
