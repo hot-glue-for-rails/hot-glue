@@ -103,8 +103,7 @@ class AssociationField < Field
 
       search_url  = "#{namespace ? namespace + "_" : ""}" +
         modify_as[:nested].join("_") + ( modify_as[:nested].any? ? "_" : "") +
-        + "#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
-
+        + "#{assoc.name.to_s.pluralize}_typeahead_index_url"
 
       if @modify_as[:nested].any?
         search_url  << "(" + modify_as[:nested].collect{|x| "#{x}"}.join(",") + ")"
@@ -204,7 +203,10 @@ class AssociationField < Field
     assoc_name = name.to_s.gsub("_id","")
     assoc = eval("#{class_name}.reflect_on_association(:#{assoc_name})")
     if modify_as && modify_as[:typeahead]
-      search_url  = "#{namespace ? namespace + "_" : ""}#{modify_as[:nested] ? modify_as[:nested][0] + "_" : ""}#{assoc.class_name.downcase.pluralize}_typeahead_index_url"
+
+
+      search_url  = "#{namespace ? namespace + "_" : ""}#{ modify_as[:nested][0] ? modify_as[:nested][0] + "_" : ""}#{assoc.name.to_s.pluralize}_typeahead_index_url"
+
 
       # \"q[0][#{name}_search]\"
       # @q['0']['#{name}_search']
