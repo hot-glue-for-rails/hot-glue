@@ -1892,7 +1892,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       if phantom_data[:type] == "radio"
         phantom_data[:choices].each do |choice|
           unless choice[:scope] == ".all"
-            res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label]}\""
+            res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label].downcase.gsub(" ","_")}\""
           end
         end
       elsif phantom_data[:type] == "checkboxes"

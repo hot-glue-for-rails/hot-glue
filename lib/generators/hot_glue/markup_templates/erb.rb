@@ -158,7 +158,7 @@ module  HotGlue
           dom_label = choice[:label].downcase.gsub(" ","_")
           if data[:type] == "radio"
             res << "\n<input type='radio'
-                            id='#{search_field}_search__#{dom_label}}'
+                            id='#{search_field}_search__#{dom_label}'
                             name='q[0][#{search_field}_search]' value='#{dom_label}'
            <%= 'checked' if  @q['0'][:#{search_field}_search] == \"#{dom_label}\" %> />"
           elsif data[:type] == "checkboxes"
