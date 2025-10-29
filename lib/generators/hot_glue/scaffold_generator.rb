@@ -256,7 +256,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @include_fields = []
 
       # semicolon to denote layout columns; commas separate fields
-      @include_fields += options['include'].split(":").collect { |x| x.split(",") }.flatten.collect(&:to_sym)
+      @include_fields += options['include'].split(":").collect { |x|
+        x.split(",").collect do |x|
+          x =~ /(.*)\((.*)\)/
+          $1
+        end
+      }.flatten.collect(&:to_sym)
     end
 
 

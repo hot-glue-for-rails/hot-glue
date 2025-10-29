@@ -121,16 +121,22 @@ module HotGlue
           # input control
 
           user_layout_columns = @include_setting.split(":")
+          fixed_widths = {}
+
+          user_layout_columns.each_with_index do |column_data,i |
+            if column_data.include?("(")
+              column_data =~ /(.*)\((.*)\)/
+              column_fields = $1
+              fixed_col_width = $2
+              fixed_widths[i] = fixed_col_width
+            else
+              column_fields = column_data
+            end
+            user_layout_columns[i] = column_fields
+          end
+
 
           extra_columns = available_columns - user_layout_columns.size
-          # size_each = (bootstrap_columns / user_layout_columns.count).floor # this is the bootstrap size
-          #
-          # layout_object[:columns][:size_each] = size_each
-
-          # if user_layout_columns.size > available_columns
-          #   raise "Your include statement #{@include_setting } has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
-          # end
-
 
           columns_to_work_with =  (12 - @buttons_width)
 
@@ -142,10 +148,12 @@ module HotGlue
           extra_columns = columns_to_work_with % user_layout_columns.size
 
 
-          user_layout_columns.each_with_index  do |column,i|
+          user_layout_columns.each_with_index  do |column, i|
+
             layout_object[:columns][:container][i] = column.split(",").collect(&:to_sym)
-            layout_object[:columns][:bootstrap_column_width][i] = target_col_size
-            if i < extra_columns
+            layout_object[:columns][:bootstrap_column_width][i] = fixed_widths[i] || target_col_size
+
+            if i < extra_columns && ! fixed_widths[i]
               layout_object[:columns][:bootstrap_column_width][i] += 1
             end
           end
