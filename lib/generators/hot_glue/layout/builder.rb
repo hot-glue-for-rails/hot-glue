@@ -111,7 +111,7 @@ module HotGlue
 
           layout_object[:columns][:container] = columns.collect{|col| [col]}
 
-        else # specified grouping mode -- the builder is given control
+        else # specified grouping mode -- the builder is given control unless a column width is explicitly set using (..)
           layout_object[:columns][:button_columns] = bootstrap_column_width
 
           (0..available_columns-1).each do |int|
