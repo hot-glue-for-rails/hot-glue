@@ -258,11 +258,18 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       # semicolon to denote layout columns; commas separate fields
       @include_fields += options['include'].split(":").collect { |x|
         x.split(",").collect do |x|
-          x =~ /(.*)\((.*)\)/
-          $1
+          if x.include?("(")
+            x =~ /(.*)\((.*)\)/
+            $1
+          else
+            x
+          end
+
         end
-      }.flatten.collect(&:to_sym)
+      }.flatten.compact.collect(&:to_sym)
+      puts "INCLUDED FIELDS: #{@include_fields}"
     end
+
 
 
 
