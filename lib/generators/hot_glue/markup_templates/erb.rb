@@ -196,65 +196,71 @@ module  HotGlue
 
         "  <div class='#{layout_strategy.column_classes_for_form_fields(size)} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
+            if col.to_s.starts_with?("**")
 
-            field_error_name = columns_map[col].field_error_name
+              the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
 
-            label_class = columns_map[col].label_class
-            label_for = columns_map[col].label_for
+            else
 
-            the_label = "\n<label class='#{label_class}' for='#{label_for}'>#{col.to_s.humanize}</label>"
+              field_error_name = columns_map[col].field_error_name
+
+              label_class = columns_map[col].label_class
+              label_for = columns_map[col].label_for
+
+              the_label = "\n<label class='#{label_class}' for='#{label_for}'>#{col.to_s.humanize}</label>"
 
 
-            field_result =
-              if show_only.include?(col)
-                columns_map[col].form_show_only_output
-              elsif update_show_only.include?(col) && !@pundit
-                "<% if @action == 'edit' %>" + columns_map[col].form_show_only_output + "<% else %>" + columns_map[col].form_field_output + "<% end %>"
-              elsif update_show_only.include?(col) && @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
-                "<% if @action == 'new' && policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output + "<% end %>"
-                 # show only on the update action overrides any pundit policy
-              elsif @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
-                "<% if policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output  + "<% end %>"
-              elsif update_show_only.include?(col)
-                "<% if @action == 'edit' %>" + columns_map[col].form_show_only_output + "<% else %>" + columns_map[col].form_field_output + "<% end %>"
-              else
-                columns_map[col].form_field_output
+              field_result =
+                if show_only.include?(col)
+                  columns_map[col].form_show_only_output
+                elsif update_show_only.include?(col) && !@pundit
+                  "<% if @action == 'edit' %>" + columns_map[col].form_show_only_output + "<% else %>" + columns_map[col].form_field_output + "<% end %>"
+                elsif update_show_only.include?(col) && @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
+                  "<% if @action == 'new' && policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output + "<% end %>"
+                   # show only on the update action overrides any pundit policy
+                elsif @pundit && eval("defined? #{singular_class}Policy") && eval("#{singular_class}Policy").instance_methods.include?("#{col}_able?".to_sym)
+                  "<% if policy(@#{singular}).#{col}_able? %>" + columns_map[col].form_field_output + "<% else %>" + columns_map[col].form_show_only_output  + "<% end %>"
+                elsif update_show_only.include?(col)
+                  "<% if @action == 'edit' %>" + columns_map[col].form_show_only_output + "<% else %>" + columns_map[col].form_field_output + "<% end %>"
+                else
+                  columns_map[col].form_field_output
+                end
+
+
+              @tinymce_stimulus_controller = (columns_map[col].modify_as == {tinymce: 1} ?  "data-controller='tiny-mce' " : "")
+
+              if @stimmify
+                col_target = HotGlue.to_camel_case(col.to_s.gsub("_", " "))
+                data_attr = " data-#{@stimmify}-target='#{col_target}Wrapper'"
               end
 
 
-            @tinymce_stimulus_controller = (columns_map[col].modify_as == {tinymce: 1} ?  "data-controller='tiny-mce' " : "")
-
-            if @stimmify
-              col_target = HotGlue.to_camel_case(col.to_s.gsub("_", " "))
-              data_attr = " data-#{@stimmify}-target='#{col_target}Wrapper'"
-            end
-
-
-            the_output =   add_spaces_each_line( "\n  <div #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>' #{data_attr} >\n" +
-                                                             add_spaces_each_line( (form_labels_position == 'before' ? (the_label || "") + "<br />\n"  : "") +
-                                                                                     +  field_result +
-                                                                                     (form_labels_position == 'after' ? (  columns_map[col].newline_after_field? ? "<br />\n" : "") + (the_label || "") : "")  , 4) +
-                                                             "\n  </div>\n ", 2)
+              the_output =   add_spaces_each_line( "\n  <div #{@tinymce_stimulus_controller}class='<%= \"alert alert-danger\" if #{singular}.errors.details.keys.include?(:#{field_error_name}) %>' #{data_attr} >\n" +
+                                                               add_spaces_each_line( (form_labels_position == 'before' ? (the_label || "") + "<br />\n"  : "") +
+                                                                                       +  field_result +
+                                                                                       (form_labels_position == 'after' ? (  columns_map[col].newline_after_field? ? "<br />\n" : "") + (the_label || "") : "")  , 4) +
+                                                               "\n  </div>\n ", 2)
 
 
-            if hidden_create.include?(col.to_sym) || hidden_update.include?(col.to_sym)
-              if_statements = []
-              if_statements << "@action == 'edit'" if hidden_update.include?(col.to_sym)
-              if_statements << "@action == 'new'" if hidden_create.include?(col.to_sym)
+              if hidden_create.include?(col.to_sym) || hidden_update.include?(col.to_sym)
+                if_statements = []
+                if_statements << "@action == 'edit'" if hidden_update.include?(col.to_sym)
+                if_statements << "@action == 'new'" if hidden_create.include?(col.to_sym)
 
-              the_output = "<% if " + if_statements.join(" || ") + " %>" +
-                columns_map[col].hidden_output + "<% else %>" +  the_output + "<% end %>"
-            end
+                the_output = "<% if " + if_statements.join(" || ") + " %>" +
+                  columns_map[col].hidden_output + "<% else %>" +  the_output + "<% end %>"
+              end
 
-            if invisible_create.include?(col) || invisible_update.include?(col)
-              if_statements = []
-              if_statements << "@action == 'edit'" if invisible_update.include?(col.to_sym)
-              if_statements << "@action == 'new'" if invisible_create.include?(col.to_sym)
+              if invisible_create.include?(col) || invisible_update.include?(col)
+                if_statements = []
+                if_statements << "@action == 'edit'" if invisible_update.include?(col.to_sym)
+                if_statements << "@action == 'new'" if invisible_create.include?(col.to_sym)
 
-              the_output = "<% if !(" + if_statements.join(" || ") + ") || policy(@#{singular}).#{col}_able? %>" +
-                +  the_output + "<% end %>"
-            end
+                the_output = "<% if !(" + if_statements.join(" || ") + ") || policy(@#{singular}).#{col}_able? %>" +
+                  +  the_output + "<% end %>"
+              end
 
+            end # end of if col.to_s.starts_with?("**")
 
 
             the_output
@@ -303,30 +309,36 @@ module  HotGlue
 
         "<div class='hg-col #{layout_strategy.column_classes_for_line_fields(size)} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
         column.map { |col|
-          if eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)
+          if col.starts_with?("**")
+
+            ## TODO: dyanmic partials can be ** for both show & edit, **= only SHOW or **- for only EDIT
+
+            the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
+          elsif eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
-          end
+          else
 
-          field_output = columns_map[col].line_field_output
-          
-          label = "<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+            field_output = columns_map[col].line_field_output
 
-          the_output = "#{inline_list_labels == 'before' ? label + "<br/>" : ''}#{field_output}#{inline_list_labels == 'after' ? "<br/>" + label : ''}"
-          if invisible_create.include?(col) || invisible_update.include?(col)
-            if_statements = []
-            if invisible_update.include?(col.to_sym) && invisible_create.include?(col.to_sym)
-            # elsif invisible_create.include?(col.to_sym)
-            #   if_statements << "!(@action == 'new')"
-            else
-              if_statements << "@action == 'edit'"
+            label = "<label class='small form-text text-muted'>#{col.to_s.humanize}</label>"
+
+            the_output = "#{inline_list_labels == 'before' ? label + "<br/>" : ''}#{field_output}#{inline_list_labels == 'after' ? "<br/>" + label : ''}"
+            the_output += "\n"
+            if invisible_create.include?(col) || invisible_update.include?(col)
+              if_statements = []
+              if invisible_update.include?(col.to_sym) && invisible_create.include?(col.to_sym)
+              else
+                if_statements << "@action == 'edit'"
+              end
+
+              if_statements << " policy(#{singular}).#{col}_able?"
+              the_output = "<% if  " +  if_statements.join(" || ") + " %>" +
+                +  the_output + "<% end %>"
             end
-
-            if_statements << " policy(#{singular}).#{col}_able?"
-            the_output = "<% if  " +  if_statements.join(" || ") + " %>" +
-              +  the_output + "<% end %>"
           end
+
           the_output
-        }.join(  "<br />") + "</div>"
+        }.join(  "<br />\n") + "</div>"
       }.join("\n")
       return result
 
