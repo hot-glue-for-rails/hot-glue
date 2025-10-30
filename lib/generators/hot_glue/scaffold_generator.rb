@@ -1915,7 +1915,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
             res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search__#{choice[:label].gsub(" ", "_").downcase}] == \"1\""
           end
           unless choice[:scope_negative] == ".all"
-            res << "\n    @#{plural} = @#{plural}#{choice[:scope_negative]} if @q['0'][:#{phantom_key}_search___#{choice[:label].gsub(" ", "_").downcase}] != \"1\""
+            res << "\n    @#{plural} = @#{plural}#{choice[:scope_negative]} if @q['0'][:#{phantom_key}_search__#{choice[:label].gsub(" ", "_").downcase}] != \"1\""
           end
         end
       end

@@ -219,7 +219,7 @@ class AssociationField < Field
                      autofocus: true,
                      autocomplete: 'off',
                      value: @q['0']['#{name}'].present? ? #{assoc.class_name}.find(@q['0']['#{name}']).try(:name) : \"\"  %>
-      <%= f.hidden_field \'q[0][#{name}]\', value: @q['0']['#{name}_search'].try(:id), 'data-typeahead-target': 'hiddenFormValue' %>
+      <%= f.hidden_field \'q[0][#{name}]\', value: @q['0']['#{name}'], 'data-typeahead-target': 'hiddenFormValue' %>
       <div data-typeahead-target='results'></div>
       <div data-typeahead-target='classIdentifier' data-id=\"typeahead--q_0_#{name}_search\"></div>
       </div>"
