@@ -256,8 +256,20 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @include_fields = []
 
       # semicolon to denote layout columns; commas separate fields
-      @include_fields += options['include'].split(":").collect { |x| x.split(",") }.flatten.collect(&:to_sym)
+      @include_fields += options['include'].split(":").collect { |x|
+        if x.include?("(")
+          x =~ /(.*)\((.*)\)/
+          list = $1
+        else
+          list = x
+        end
+        list.split(",").collect do |x|
+          x.starts_with?("**") ? nil : x
+        end
+      }.flatten.compact.collect(&:to_sym)
+      puts "INCLUDED FIELDS: #{@include_fields}"
     end
+
 
 
 
@@ -1892,7 +1904,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       if phantom_data[:type] == "radio"
         phantom_data[:choices].each do |choice|
           unless choice[:scope] == ".all"
-            res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label]}\""
+            res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label].downcase.gsub(" ","_")}\""
           end
         end
       elsif phantom_data[:type] == "checkboxes"
@@ -1903,7 +1915,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
             res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search__#{choice[:label].gsub(" ", "_").downcase}] == \"1\""
           end
           unless choice[:scope_negative] == ".all"
-            res << "\n    @#{plural} = @#{plural}#{choice[:scope_negative]} if @q['0'][:#{phantom_key}_search___#{choice[:label].gsub(" ", "_").downcase}] != \"1\""
+            res << "\n    @#{plural} = @#{plural}#{choice[:scope_negative]} if @q['0'][:#{phantom_key}_search__#{choice[:label].gsub(" ", "_").downcase}] != \"1\""
           end
         end
       end
