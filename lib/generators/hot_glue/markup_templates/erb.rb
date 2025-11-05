@@ -198,6 +198,7 @@ module  HotGlue
           column.map { |col|
             if col.to_s.starts_with?("**")
               the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
+
             elsif ! layout_object[:columns][:fields][col][:form]
               # omit from show action
 
@@ -312,10 +313,10 @@ module  HotGlue
           if col.starts_with?("**")
             ## TODO: dyanmic partials can be ** for both show & edit, **= only SHOW or **- for only EDIT
             the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
+          elsif !  layout_object[:columns][:fields][col][:show]
+            the_output = ""
           elsif eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
-          elsif ! layout_object[:columns][:fields][col][:show]
-            the_output = ""
             # omit from show action
           else
 
