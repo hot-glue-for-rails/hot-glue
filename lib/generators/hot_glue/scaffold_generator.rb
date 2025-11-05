@@ -1107,7 +1107,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   # end
 
   def omit_fields_form
-    layout_object[:columns][:fields].collect { |key, value| value[:form] == false ?  key : nil }.compact.reject!{|x| x.starts_with?("**")}
+    layout_object[:columns][:fields].collect { |key, value| value[:form] == false ?  key : nil }.compact.reject!{|x| x.starts_with?("**")} || []
   end
 
 

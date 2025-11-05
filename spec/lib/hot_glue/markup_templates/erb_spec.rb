@@ -394,4 +394,7 @@ describe HotGlue::ErbTemplate do
       expect(res).to include("<%= f.collection_select(:hgi_id, current_user.hgis,")
     end
   end
+
+
+
 end

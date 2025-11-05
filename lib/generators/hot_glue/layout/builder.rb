@@ -180,7 +180,9 @@ module HotGlue
 
         # go through the columns and build the split visibility (show / form)
 
-
+        columns.each do |col|
+          layout_object[:columns][:fields][col] = {show: true, form: true}
+        end
 
         @include_setting.split(":").collect { |column_list|
           column_list.split(",").collect do |field|

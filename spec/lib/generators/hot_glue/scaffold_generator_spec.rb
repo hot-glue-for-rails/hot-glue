@@ -701,8 +701,41 @@ describe "HotGlue::ScaffoldGenerator" do
           expect(res).to include("def update_dfg_params\n    fields = :cantelope_id")
         end
       end
-    end
 
+
+      describe "omitted fields" do
+        it "should omit a field on list if prefixed with `-`" do
+          skip
+        end
+
+        it "should omit a field on form fi prefixed with `=`" do
+          skip
+        end
+      end
+
+      describe "dynamic blocks" do
+        it "should pull a dynamic partial in place of a field if it begins with **" do
+          skip
+        end
+      end
+
+
+      describe "omitted dynamic blocks" do
+        it "omit a dynamic partial from the list in place of a field if it begins with **-" do
+          skip
+        end
+
+        it "omit a dynamic partial from the form in place of a field if it begins with **=" do
+          skip
+        end
+      end
+
+      describe "set column widths" do
+        it "should allow me to specify fixed bootstrap widths using specified grouping mode" do
+          skip
+        end
+      end
+    end
 
 
     it "should automatically add fields that begin with underscore (_) as show only" do

@@ -202,7 +202,6 @@ module  HotGlue
           column.map { |col|
             if col.to_s.starts_with?("**")
               the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
-
             elsif ! layout_object[:columns][:fields][col][:form]
               # omit from show action
 
