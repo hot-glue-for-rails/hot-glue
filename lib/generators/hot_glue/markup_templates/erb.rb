@@ -200,11 +200,10 @@ module  HotGlue
 
         "  <div class='#{layout_strategy.column_classes_for_form_fields(size)} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
-            if col.to_s.starts_with?("**")
+            if col.to_s.starts_with?("**") && layout_object[:columns][:fields][col][:form]
               the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
             elsif ! layout_object[:columns][:fields][col][:form]
               # omit from show action
-
             else
 
               field_error_name = columns_map[col].field_error_name
@@ -312,11 +311,9 @@ module  HotGlue
         size = layout_object[:columns][:bootstrap_column_width][i]
         "<div class='hg-col #{layout_strategy.column_classes_for_line_fields(size)} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
         column.map { |col|
-
-          if col.starts_with?("**")
-            ## TODO: dyanmic partials can be ** for both show & edit, **= only SHOW or **- for only EDIT
+          if col.starts_with?("**") && layout_object[:columns][:fields][col][:show]
             the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
-          elsif !  layout_object[:columns][:fields][col][:show]
+          elsif ! layout_object[:columns][:fields][col][:show]
             the_output = ""
           elsif eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"

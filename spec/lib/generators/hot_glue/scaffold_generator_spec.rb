@@ -705,34 +705,73 @@ describe "HotGlue::ScaffoldGenerator" do
 
       describe "omitted fields" do
         it "should omit a field on list if prefixed with `-`" do
-          skip
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--include='-name'"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_show.erb")
+          expect(res).to_not include("<%= dfg.name %>")
+
+          res2 = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res2).to_not include("<%= dfg.name %>")
+
         end
 
-        it "should omit a field on form fi prefixed with `=`" do
-          skip
+        it "should omit a field on form when prefixed with `=`" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--include='=name'"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res).to_not include("<%= f.text_field :name,")
         end
       end
 
       describe "dynamic blocks" do
         it "should pull a dynamic partial in place of a field if it begins with **" do
-          skip
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--include=**my_parial:name"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res).to include("<%= render partial: 'my_parial', locals: {dfg: dfg } %>")
         end
       end
 
 
       describe "omitted dynamic blocks" do
         it "omit a dynamic partial from the list in place of a field if it begins with **-" do
-          skip
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--include=**-my_parial:name"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res).to include("<%= render partial: 'my_parial', locals: {dfg: dfg } %>")
+
+          res2 = File.read("spec/dummy/app/views/dfgs/_show.erb")
+          expect(res2).to_not include("<%= render partial: 'my_parial',")
         end
 
         it "omit a dynamic partial from the form in place of a field if it begins with **=" do
-          skip
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--include=**=my_parial:name"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res).to_not include("<%= render partial: 'my_parial', locals: {dfg: dfg } %>")
+
+          res2 = File.read("spec/dummy/app/views/dfgs/_show.erb")
+          expect(res2).to include("<%= render partial: 'my_parial',")
+
         end
       end
 
       describe "set column widths" do
         it "should allow me to specify fixed bootstrap widths using specified grouping mode" do
-          skip
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg",
+                                               "--layout=bootstrap",
+                                               "--include=**my_parial(4):name(2):cantelope_id(1)"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_show.erb")
+          expect(res).to include("<div class='hg-col col-sm-4 dfg--**my_parial'>")
+          expect(res).to include("<div class='hg-col col-sm-2 dfg--name'>")
+          expect(res).to include("<div class='hg-col col-sm-1 dfg--cantelope_id'>")
         end
       end
     end
