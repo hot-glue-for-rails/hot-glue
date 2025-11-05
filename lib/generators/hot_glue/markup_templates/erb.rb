@@ -197,8 +197,9 @@ module  HotGlue
         "  <div class='#{layout_strategy.column_classes_for_form_fields(size)} cell--#{singular}--#{column.join("-")}' >" +
           column.map { |col|
             if col.to_s.starts_with?("**")
-
               the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
+            elsif ! layout_object[:columns][:fields][col][:form]
+              # omit from show action
 
             else
 
@@ -304,9 +305,7 @@ module  HotGlue
       style_with_flex_basis = layout_strategy.style_with_flex_basis(perc_width)
 
       result = columns.map.with_index{ |column,i|
-
         size = layout_object[:columns][:bootstrap_column_width][i]
-
         "<div class='hg-col #{layout_strategy.column_classes_for_line_fields(size)} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
         column.map { |col|
           if col.starts_with?("**")
@@ -316,6 +315,9 @@ module  HotGlue
             the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
           elsif eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
+          elsif ! layout_object[:columns][:fields][col][:show]
+            the_output = ""
+            # omit from show action
           else
 
             field_output = columns_map[col].line_field_output
