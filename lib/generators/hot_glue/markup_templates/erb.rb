@@ -98,11 +98,15 @@ module  HotGlue
         size = layout_object[:columns][:bootstrap_column_width][i]
         "<div class='#{layout_strategy.column_classes_for_column_headings(size)} hg-heading-row heading--#{singular}--#{column.join("-")}' " + col_style + ">" +
           column.map(&:to_s).map{|col_name|
-            the_output = "#{col_name.humanize}"
+            unless col_name.starts_with?("**")
+              the_output = "#{col_name.humanize}"
+            else
+              the_output = ""
+            end
             if invisible_update.include?(col_name.to_sym)
               if_statements = []
               if_statements << "false" if invisible_update.include?(col_name.to_sym)
-              # if_statements << "@action == 'new'" if invisible_create.include?(col_name.to_sym)
+
               the_output = "<% if ( " +  if_statements.join(" || ") + " || policy(#{@plural}).#{col_name}_able? ) %>" +
                 +  the_output + "<% end %>"
 

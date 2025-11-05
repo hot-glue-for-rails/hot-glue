@@ -276,9 +276,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
 
-
-
-
     @show_only = options['show_only'].split(",").collect(&:to_sym)
     if @show_only.any?
       puts "show only field #{@show_only}}"
@@ -1101,6 +1098,19 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       end
     end
   end
+
+  # def omit_fields_show
+  #
+  #   layout_object[:columns][:fields].each { |key, value|
+  #     value[:show] == false
+  #   }.reduce(:&)
+  # end
+
+  def omit_fields_form
+    layout_object[:columns][:fields].collect { |key, value| value[:form] == false ?  key : nil }.compact.reject!{|x| x.starts_with?("**")}
+  end
+
+
 
   def check_if_sample_file_is_present
     if sample_file_path.nil?
