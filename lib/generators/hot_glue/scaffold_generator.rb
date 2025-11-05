@@ -256,9 +256,24 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @include_fields = []
 
       # semicolon to denote layout columns; commas separate fields
-      @include_fields += options['include'].split(":").collect { |x| x.split(",") }.flatten.collect(&:to_sym)
+      #
+      @include_fields += options['include'].split(":").collect { |column_list|
+        column_list.split(",").collect do |field|
+          if field.include?("(")
+            field =~ /(.*)\((.*)\)/
+            field_short = $1
+          else
+            field_short = field
+          end
+          if field_short.starts_with?("**")
+            nil
+          else
+            field_short.gsub("-", "").gsub("=", "")
+          end
+        end
+      }.flatten.compact.collect(&:to_sym)
+      puts "INCLUDED FIELDS: #{@include_fields}"
     end
-
 
 
     @show_only = options['show_only'].split(",").collect(&:to_sym)
@@ -1084,6 +1099,19 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
   end
 
+  # def omit_fields_show
+  #
+  #   layout_object[:columns][:fields].each { |key, value|
+  #     value[:show] == false
+  #   }.reduce(:&)
+  # end
+
+  def omit_fields_form
+    layout_object[:columns][:fields].collect { |key, value| value[:form] == false ?  key : nil }.compact.reject!{|x| x.starts_with?("**")} || []
+  end
+
+
+
   def check_if_sample_file_is_present
     if sample_file_path.nil?
       puts "you have no sample file path set in config/hot_glue.yml"
@@ -1892,7 +1920,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       if phantom_data[:type] == "radio"
         phantom_data[:choices].each do |choice|
           unless choice[:scope] == ".all"
-            res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label]}\""
+            res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search] == \"#{choice[:label].downcase.gsub(" ","_")}\""
           end
         end
       elsif phantom_data[:type] == "checkboxes"
@@ -1903,7 +1931,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
             res << "\n    @#{plural} = @#{plural}#{choice[:scope]} if @q['0'][:#{phantom_key}_search__#{choice[:label].gsub(" ", "_").downcase}] == \"1\""
           end
           unless choice[:scope_negative] == ".all"
-            res << "\n    @#{plural} = @#{plural}#{choice[:scope_negative]} if @q['0'][:#{phantom_key}_search___#{choice[:label].gsub(" ", "_").downcase}] != \"1\""
+            res << "\n    @#{plural} = @#{plural}#{choice[:scope_negative]} if @q['0'][:#{phantom_key}_search__#{choice[:label].gsub(" ", "_").downcase}] != \"1\""
           end
         end
       end

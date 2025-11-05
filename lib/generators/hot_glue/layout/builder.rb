@@ -11,8 +11,8 @@ module HotGlue
                   :stacked_downnesting, :bootstrap_column_width
 
       def initialize(generator: ,
-                     include_setting: ,
-                     buttons_width:  )
+                     include_setting:,
+                     buttons_width: )
 
 
         @generator = generator
@@ -41,7 +41,11 @@ module HotGlue
           columns: {
             size_each: smart_layout ? bootstrap_column_width : (specified_grouping_mode ? nil : 1),
             container: [] , # array of arrays,
-            bootstrap_column_width: []
+            bootstrap_column_width: [],
+            column_custom_widths: [],
+            fields: {
+
+            }, # hash of fields
           },
           portals:  {
 
@@ -103,15 +107,21 @@ module HotGlue
             }
             layout_object[:columns][:container] = (0..available_columns-1).collect { |x|  [columns[x]] }
             layout_object[:columns][:container].reject!{|x| x == [nil]}
-            # layout_object[:columns][:size_each] = bootstrap_column_width
+
           end
+
         elsif ! specified_grouping_mode
           # not smart and no specified grouping
           layout_object[:columns][:button_columns] = bootstrap_column_width
 
           layout_object[:columns][:container] = columns.collect{|col| [col]}
 
-        else # specified grouping mode -- the builder is given control
+          if include_setting.split(",").any?{|col| col.include?("(")}
+            raise "Your include list has a ( character; to specify a column width, use specified grouping mode only"
+          end
+
+
+        else # specified grouping mode -- the builder is given control unless a column width is explicitly set using (..)
           layout_object[:columns][:button_columns] = bootstrap_column_width
 
           (0..available_columns-1).each do |int|
@@ -121,16 +131,22 @@ module HotGlue
           # input control
 
           user_layout_columns = @include_setting.split(":")
+          fixed_widths = {}
+
+          user_layout_columns.each_with_index do |column_data,i |
+            if column_data.include?("(")
+              column_data =~ /(.*)\((.*)\)/
+              column_fields = $1
+              fixed_col_width = $2
+              fixed_widths[i] = fixed_col_width
+            else
+              column_fields = column_data
+            end
+            user_layout_columns[i] = column_fields
+          end
+
 
           extra_columns = available_columns - user_layout_columns.size
-          # size_each = (bootstrap_columns / user_layout_columns.count).floor # this is the bootstrap size
-          #
-          # layout_object[:columns][:size_each] = size_each
-
-          # if user_layout_columns.size > available_columns
-          #   raise "Your include statement #{@include_setting } has #{user_layout_columns.size} columns, but I can only construct up to #{available_columns}"
-          # end
-
 
           columns_to_work_with =  (12 - @buttons_width)
 
@@ -142,10 +158,17 @@ module HotGlue
           extra_columns = columns_to_work_with % user_layout_columns.size
 
 
-          user_layout_columns.each_with_index  do |column,i|
-            layout_object[:columns][:container][i] = column.split(",").collect(&:to_sym)
-            layout_object[:columns][:bootstrap_column_width][i] = target_col_size
-            if i < extra_columns
+          user_layout_columns.each_with_index  do |column, i|
+
+            layout_object[:columns][:container][i] = column.split(",").collect{|x|
+              x.gsub("-","").gsub("=","")
+            }.collect(&:to_sym)
+
+
+
+            layout_object[:columns][:bootstrap_column_width][i] = fixed_widths[i] || target_col_size
+
+            if i < extra_columns && ! fixed_widths[i]
               layout_object[:columns][:bootstrap_column_width][i] += 1
             end
           end
@@ -153,14 +176,46 @@ module HotGlue
           if user_layout_columns.size < layout_object[:columns][:container].size
             layout_object[:columns][:container].reject!{|x| x == []}
           end
-
         end
 
+        # go through the columns and build the split visibility (show / form)
 
-        puts "*** constructed smart layout columns #{layout_object.inspect}"
+        columns.each do |col|
+          layout_object[:columns][:fields][col] = {show: true, form: true}
+        end
+
+        @include_setting.split(":").collect { |column_list|
+          column_list.split(",").collect do |field|
+            if field.include?("(")
+              field =~ /(.*)\((.*)\)/
+              field_short = $1
+            else
+              field_short = field
+            end
+
+            field_short =  field_short.gsub("-", "").gsub("=", "")
+
+            layout_object[:columns][:fields][field_short.to_sym] = {
+              show: true,
+              form: true
+            }
+
+            if field.starts_with?("**")
+              nil
+            end
+
+            if field.include?("-")
+              layout_object[:columns][:fields][field_short.to_sym][:show] = false;
+            end
+            if field.include?("=")
+              layout_object[:columns][:fields][field_short.to_sym][:form] = false;
+            end
+
+          end
+        }
+        puts "*** SPECIFIED GROUPING SETTINGS: #{layout_object.inspect}"
         layout_object
       end
-
     end
   end
 end

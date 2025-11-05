@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hot-glue (0.6.30)
+    hot-glue (0.7)
       ffaker (~> 2.16)
       rails (> 5.1)
 

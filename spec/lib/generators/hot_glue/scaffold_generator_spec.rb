@@ -448,8 +448,8 @@ describe "HotGlue::ScaffoldGenerator" do
 
 
               file = File.read("spec/dummy/app/views/users/_show.erb")
-              expect(file).to include("<div class='hg-col col-sm-2 user--email'> <%= user.email %></div>")
-              expect(file).to include("<div class='hg-col col-sm-2 user--family_id'> <%= user.family.try(:name) || '<span class=\"content \">MISSING</span>'.html_safe %></div>")
+              expect(file).to include("<div class='hg-col col-sm-2 user--email'> <%= user.email %>\n</div>")
+              expect(file).to include("<div class='hg-col col-sm-2 user--family_id'> <%= user.family.try(:name) || '<span class=\"content \">MISSING</span>'.html_safe %>\n</div>")
             end
           end
 
@@ -701,8 +701,80 @@ describe "HotGlue::ScaffoldGenerator" do
           expect(res).to include("def update_dfg_params\n    fields = :cantelope_id")
         end
       end
-    end
 
+
+      describe "omitted fields" do
+        it "should omit a field on list if prefixed with `-`" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--include='-name'"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_show.erb")
+          expect(res).to_not include("<%= dfg.name %>")
+
+          res2 = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res2).to_not include("<%= dfg.name %>")
+
+        end
+
+        it "should omit a field on form when prefixed with `=`" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--include='=name'"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res).to_not include("<%= f.text_field :name,")
+        end
+      end
+
+      describe "dynamic blocks" do
+        it "should pull a dynamic partial in place of a field if it begins with **" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--include=**my_parial:name"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res).to include("<%= render partial: 'my_parial', locals: {dfg: dfg } %>")
+        end
+      end
+
+
+      describe "omitted dynamic blocks" do
+        it "omit a dynamic partial from the list in place of a field if it begins with **-" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--include=**-my_parial:name"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res).to include("<%= render partial: 'my_parial', locals: {dfg: dfg } %>")
+
+          res2 = File.read("spec/dummy/app/views/dfgs/_show.erb")
+          expect(res2).to_not include("<%= render partial: 'my_parial',")
+        end
+
+        it "omit a dynamic partial from the form in place of a field if it begins with **=" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg","--include=**=my_parial:name"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_form.erb")
+          expect(res).to_not include("<%= render partial: 'my_parial', locals: {dfg: dfg } %>")
+
+          res2 = File.read("spec/dummy/app/views/dfgs/_show.erb")
+          expect(res2).to include("<%= render partial: 'my_parial',")
+
+        end
+      end
+
+      describe "set column widths" do
+        it "should allow me to specify fixed bootstrap widths using specified grouping mode" do
+          response = Rails::Generators.invoke("hot_glue:scaffold",
+                                              ["Dfg",
+                                               "--layout=bootstrap",
+                                               "--include=**my_parial(4):name(2):cantelope_id(1)"])
+
+          res = File.read("spec/dummy/app/views/dfgs/_show.erb")
+          expect(res).to include("<div class='hg-col col-sm-4 dfg--**my_parial'>")
+          expect(res).to include("<div class='hg-col col-sm-2 dfg--name'>")
+          expect(res).to include("<div class='hg-col col-sm-1 dfg--cantelope_id'>")
+        end
+      end
+    end
 
 
     it "should automatically add fields that begin with underscore (_) as show only" do

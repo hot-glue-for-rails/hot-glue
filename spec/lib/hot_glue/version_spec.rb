@@ -16,10 +16,10 @@ describe HotGlue::Version do
     expect(split[1]).to be_kind_of(Numeric)
   end
 
-  it "should be a minor- syntax" do
-    split  = @version.split(".").collect(&:to_i)
-    expect(split[2]).to be_kind_of(Numeric)
-  end
+  # it "should be a minor- syntax" do
+  #   split  = @version.split(".").collect(&:to_i)
+  #   expect(split[2]).to be_kind_of(Numeric)
+  # end
 
   it "should be before version 1 " do
     split  = @version.split(".").collect(&:to_i)

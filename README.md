@@ -655,7 +655,16 @@ If you specify an include list, it will be treated as a whitelist: no fields wil
 
 You may not specify both include and exclude.
 
-Include setting is affected by both specified grouping mode and smart layouts, explained below.
+Many options allow you to specify fields in multiple modes:
+• Standard
+• Smart layout
+• Specified grouping
+
+see "Layout & Manipulation features" for details on how to build your `--include` statement, including how to use `:` and `,` 
+
+Also review Omitted Fields (`-` and `=`), Dynamic Blocks (`**`), Omitted Dynamic Blocks (`**-` and `**=`)
+
+Also see Set Column Widths ( `(` ... `)` ) to set the column widths explicitly in your `--include`
 
 
 ### `--exclude=`
@@ -664,7 +673,6 @@ Include setting is affected by both specified grouping mode and smart layouts, e
 By default, all fields are included unless they are on the default exclude list. (The default exclude list is `id`, `created_at`, `updated_at`, `encrypted_password`, `reset_password_token`, `reset_password_sent_at`, `remember_created_at`, `confirmation_token`, `confirmed_at`, `confirmation_sent_at`, `unconfirmed_email`.)
 
 If you specify any exclude list, those excluded **and** the default exclude list will be excluded. (If you need any of the fields on the default exclude list, you must use `--include` instead.)
-
 
 `./bin/rails generate hot_glue:scaffold Account --exclude=password`
 
@@ -1059,10 +1067,72 @@ This is what would happen if 9 fields, specified in the order A,B,C,D,E,F,G,H,I,
 (If you had a number of fields that wasn't easily divisible by the number of columns, it would leave the final column one or a few fields short of the others.)
 
 
+
+### Omitted fields
+
+Note that these additions all affect how you write your `--include` setting, but they operate in addition to all of the field visibility rules above. Notice that omitting a form means we by design omit it on both the new and edit actions. If you want to determine if it shows up on new vs. edit granularly, use a different approach.
+
+Generally, you will only omit a field in special cases. To omit a field, prefix either `-` (omit on list) or `=` to omit on form (new & edit), like so :
+
+`--include=-abd,=dfg`
+
+Here, the abc field will be omitted on the list and the dfg will be omitted on the form (new & edit)
+
+
+This works for any include setting type, whether the grouping mode is specified or not.
+
+`--include=-abd,=dfg`  
+`--include=-abd:=dfg` # same as above but builder will use specified grouping mode
+
+### Dynamic Blocks
+
+Next, you can now dynamically pull any partials from the view folder (of the name of your choosing) into your object's field display- before, between, or after any part of the column groupings using the `:` and `,` characters. (Review specified grouping mode in "Layout & Manipulation Features.")
+
+You simply make up any partial name, treat it as if it is one of the fields in the field list, and prefix it with `**`. (When specified, don't use `_` but remember to use the `_` in the file name.)
+
+It looks like this (let's assume I've made an arbitrary partial called `_jello.erb` in my build folder, which expects to be passed a `thing` local variable)
+
+`rails generate hot_glue:scaffold Thing --include='**jello:name:birthday:gender'`
+
+Here, you'll get four columns:
+
+The first column will pull a partial from the same folder being built. You build this partial, not Hot Glue.
+
+```
+<%= render partial: 'jello', locals: {thing: thing } %>
+```
+
+(Remember, the partial file name begins with `_` but is referenced without the underscore)
+
+Because you separated that first column using `:` from the other three, the partial will take up the whole column.
+The next 3 columns will contain name, birthday & gender, respectively.
+
+If you specify it this way:
+rails generate hot_glue:scaffold Thing --include='**jello,name:birthday:gender'
+
+Notice that between **jello and name is now a comma, putting the jello partial and name into the  same column. Now the partial will be displayed before the name in that column.
+
+You can mix & match any number of partials inserted anywhere into the field layout.
+
+
+### Omitted Dynamic Blocks
+
+Dynamic blocks respond to the new `-` and `=` settings for omitting fields the same way fields do. Prefixing a dynamic partial with `**-` will mean it will be omitted from the list, and `**=` will omit it from the form (new & edit)
+
+This way, the omitted syntax is parallel to the dynamic block structure. No other tye-in is made with the other field visibility settings.
+
+
+### Set Column Widths
+
+In other modes, Hot Glue decides how many bootstrap columns each column should span, defaulting to 2 unless using `--smart-layout`, in which case it ranges from 2 to 5 depending on how many fields you have. Generally, I start my scaffolds using either standard or smart, but soon, I'm often upgrading to specified grouping mode for fine-grained control.
+
+When using specified group mode (activated when a `:` character appears in the `--include` list), you can append to the end of EACH COLUMN (not each field) a parenthetical setting for the number of bootstrap columns.
+
+(When the setting includes this special character, you'll need  `'` to wrap the entire setting for `--include` on the command line.)
+
+
 ### `--new-button-position` (above, below; default: above)
 Show the new button above or below the list.
-
-
 
 ### `--button-icons` (default is no icons)
 You can specify this either as builder flag or as a config setting (in `config/hot_glue.yml`)
@@ -1075,8 +1145,6 @@ Can also be specified globally in `config/hot_glue.yml`
 
 
 ### `--modify=field1{...},field2{...}`
-
-
 You can apply modification to the viewable (non-edit) display of field using the `--modify` switch.
 
 The syntax is `--modify=cost{$},price{$}`
@@ -1179,7 +1247,7 @@ In these contexts, the lookup must be exact match to the text entered (no partia
 
 Use `+` to map to the `find_or_create_by` method. (Without `+` it will use `find_by`.)
 
-This is accomlished using a little magic of a lookup field called `__lookup_X_Y` passed in the form parameters.
+This is accomplished using a little magic of a lookup field called `__lookup_X_Y` passed in the form parameters.
 
 The lookup field is used to look up the associated record, then deleted from the params.
 
@@ -1443,10 +1511,15 @@ As shown in the method `name_able?` of the example ThingPolicy above, if this fi
 ### `--hidden=` (affects both create + update actions)
 ### `--create-hidden=`
 ### `--update-hidden=`
-TODO: RENAME ME TO INVISIBLE 
 Separate list of fields. 
 
-These fields will exist on the create or update form exist as hidden_field, and so the update will still work._
+These fields will exist on the create or update form exist as `<input type='hidden'>` (html) field and so the *actual update or create action will continue to expect data from the front end.**
+
+(The data, being in a hidden field, is not visible to the user but it is in the browser's form, available to a hacker, and passed to the back-end for updating.)
+
+You do your own javascript here to insert/set the value programmatically. The example below uses a library called EditorView to create a HTML editor. 
+
+The dynamic interface's value from the edited html gets stuffed back into the form by Javascript before the form is updated
 
 
 EXAMPLE:
@@ -1539,10 +1612,9 @@ Like show only, these will check for `*_able?` methods on the object or Policy a
 
 It will also block the field from being updated on the backend, so don't use this if you want to create a hidden_field tag but still allow the controller to update it. (For that, see `--hidden=`.)
 
-
 Like show-only, note special behavior with pundit.
 
-A field can be marked invisible and show-only, in which case the invisible rule take prescedence when the access control is denied (field removed from form) but th show-only rule takes prescedance when the access control is granted,
+A field can be marked invisible and show-only, in which case the invisible rule take precedence when the access control is denied (field removed from form) but the show-only rule takes precedence when the access control is granted.
 
 Hidden can be used with invisible. In this case, the access control will be applied to the field. When editable, the hidden field output will be used.
 
@@ -1596,6 +1668,12 @@ Here, for all CRUD actions, the object is a thing, and so the editablility of cc
 If thing is not a Thing, then it is active relation (so this applies to the column headings) and we show it only to admins. 
 
 Remember, since the `_able?` methods are not otherwise called during Pundit's index cycle, this applies only to the list column headings and has no bearing on create, update, read, delete for which the access control can be anything you want that is available to the Poilcy. 
+
+
+###
+
+
+
 
 
 
@@ -2330,6 +2408,48 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+####
+Hot Glue already has a robust set of tools to provide field-by-field access control, hiding or turning visible-only fields by multiple methods, described under Access Control & Field Visibility Features.
+
+Remember that Hot Glue's opinionated design has two ways a field is displayed: show (which appears on the list view and is always just viewable), and form (which is usees by both the new and edit actions to display a form). Within the `form` output, the form might be used for either new or edit, and further refinements can be applied to new or edit.
+
+Let's review those methods now:
+
+
+--pundit 	
+• No distinction is made between the new and edit contexts
+• If policy says not able (_able? method returns false), the field is shown as viewable-only. That is, a user with access to the controller but not the field-level access granted by Pundit will see the field's value but cannot edit it. If you want instead the Policy to determine if the field is editable or completely invisible (not shown to the user), use invible below
+
+--show-only=
+• Turns fields on this list viewable only for both create & edit actions
+• overrides what's on the policy, but asks the policy if not on this list
+
+--update-show-only=
+• Turns fields on this list viewable only for the edit action
+• overrides what's on the policy, but asks the policy if not on this list
+
+
+--hidden=,  --create-hidden=,  --update-hidden=
+• Creates <input type='hidden'> fields on the form, not seen by the user but available to a hacker in the browser, and submitted to the back end.
+
+--invisible=,  --create-invisible=,  --update-invisible=
+• Must be used with Pundit.
+• If policy returns true, the field is viewable on list & editable as normal.
+• If the policy return false, the field is taken away (invisible) for that user
+
+
+
+Today, I'm introducing three.
+
+• Omitted fields:  using `-` is omit on list & show;  use  `=` to omit the field on the form (new & edit)
+
+• Dynamic blocks (which can also be omitted using
+
+• Set column widths when using specified grouping made (--include contains `:`)
+
+
+
 
 #### 2025-10-28 - v0.6.31
 
