@@ -184,15 +184,15 @@ module HotGlue
 
         @include_setting.split(":").collect { |column_list|
           column_list.split(",").collect do |field|
-
             if field.include?("(")
-              column_list =~ /(.*)\((.*)\)/
+              field =~ /(.*)\((.*)\)/
               field_short = $1
             else
               field_short = field
             end
 
             field_short =  field_short.gsub("-", "").gsub("=", "")
+
             layout_object[:columns][:fields][field_short.to_sym] = {
               show: true,
               form: true

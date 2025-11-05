@@ -260,7 +260,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @include_fields += options['include'].split(":").collect { |column_list|
         column_list.split(",").collect do |field|
           if field.include?("(")
-            column_list =~ /(.*)\((.*)\)/
+            field =~ /(.*)\((.*)\)/
             field_short = $1
           else
             field_short = field

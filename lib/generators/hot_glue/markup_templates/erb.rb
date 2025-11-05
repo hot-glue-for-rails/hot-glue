@@ -308,10 +308,9 @@ module  HotGlue
         size = layout_object[:columns][:bootstrap_column_width][i]
         "<div class='hg-col #{layout_strategy.column_classes_for_line_fields(size)} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
         column.map { |col|
+
           if col.starts_with?("**")
-
             ## TODO: dyanmic partials can be ** for both show & edit, **= only SHOW or **- for only EDIT
-
             the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
           elsif eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)
             raise "Can't find column '#{col}' on #{singular_class}, are you sure that is the column name?"
