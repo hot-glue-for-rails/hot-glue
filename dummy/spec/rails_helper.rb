@@ -86,4 +86,19 @@ RSpec.configure do |config|
 
 end
 
-Capybara.default_driver = :selenium_chrome_headless
+
+Capybara.register_driver :selenium do |app|
+  options = Selenium::WebDriver::Chrome::Options.new(
+    # It's the headlese arg that make Chrome headless
+    # + you also need the disable-gpu arg due to a bug
+    args: [ 'headless' , 'disable-gpu window-size=1366,1200'],
+    )
+
+  Capybara::Selenium::Driver.new(
+    app,
+    browser: :chrome,
+    options: options
+  )
+end
+
+Capybara.default_driver = :selenium
