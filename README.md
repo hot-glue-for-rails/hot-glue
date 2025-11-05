@@ -1066,11 +1066,13 @@ This is what would happen if 9 fields, specified in the order A,B,C,D,E,F,G,H,I,
 
 (If you had a number of fields that wasn't easily divisible by the number of columns, it would leave the final column one or a few fields short of the others.)
 
+
+
 ### Omitted fields
 
 Note that these additions all affect how you write your `--include` setting, but they operate in addition to all of the field visibility rules above. Notice that omitting a form means we by design omit it on both the new and edit actions. If you want to determine if it shows up on new vs. edit granularly, use a different approach.
 
-Generally you will only omit a field in special cases. To omit a field, prefix either `-` (omit on list) or `=` to omit on form (new & edit), like so :
+Generally, you will only omit a field in special cases. To omit a field, prefix either `-` (omit on list) or `=` to omit on form (new & edit), like so :
 
 `--include=-abd,=dfg`
 
@@ -1084,62 +1086,53 @@ This works for any include setting type, whether the grouping mode is specified 
 
 ### Dynamic Blocks
 
-Next, you can now add dynamically pull partials, of the name of your choosing, into your object's field display- before, between, or after any part of the column groupings using the `:` and `,` characters. (Review specified grouping mode here.)
+Next, you can now dynamically pull any partials from the view folder (of the name of your choosing) into your object's field display- before, between, or after any part of the column groupings using the `:` and `,` characters. (Review specified grouping mode in "Layout & Manipulation Features.")
 
-You simply make-up a partial name (any name), treat it as-if it is one of the feilds in the field list, and prefix it with `**`.
+You simply make up any partial name, treat it as if it is one of the fields in the field list, and prefix it with `**`. (When specified, don't use `_` but remember to use the `_` in the file name.)
 
-It looks like this:
+It looks like this (let's assume I've made an arbitrary partial called `_jello.erb` in my build folder, which expects to be passed a `thing` local variable)
 
-rails generate hot_glue:scaffold Thing --include='**jello:name:birthday:gender'
+`rails generate hot_glue:scaffold Thing --include='**jello:name:birthday:gender'`
 
-Here, you'll get 4 columns:
+Here, you'll get four columns:
 
-The first column will pull a partial from the same folder being built. You build this partial, not Hot Glue
+The first column will pull a partial from the same folder being built. You build this partial, not Hot Glue.
 
+```
 <%= render partial: 'jello', locals: {thing: thing } %>
+```
 
-(Remember, the partial file name begins with `_` but referenced without the underscore)
+(Remember, the partial file name begins with `_` but is referenced without the underscore)
 
-Becuase you sparated that first column using `:` from the other three, the partial will take up the whole column.
-THe next 3 columns will contain name, birthday & gender respectively.
+Because you separated that first column using `:` from the other three, the partial will take up the whole column.
+The next 3 columns will contain name, birthday & gender, respectively.
 
 If you specify it this way:
 rails generate hot_glue:scaffold Thing --include='**jello,name:birthday:gender'
 
-Notice that between **jello and name is now a comma, putting the jello partial and name into the  same column. Now the partail will be displayed before name in that column.
+Notice that between **jello and name is now a comma, putting the jello partial and name into the  same column. Now the partial will be displayed before the name in that column.
 
 You can mix & match any number of partials inserted anywhere into the field layout.
 
 
 ### Omitted Dynamic Blocks
 
-Dynamic blocks respond to the new `-` and `=` settings for omitting fields the same way fields do. Prefixing a dynamic partial with `**-` will mean it will omit from the list and `**=` will omit it from the form (new & edit)
+Dynamic blocks respond to the new `-` and `=` settings for omitting fields the same way fields do. Prefixing a dynamic partial with `**-` will mean it will be omitted from the list, and `**=` will omit it from the form (new & edit)
 
 This way, the omitted syntax is parallel to the dynamic block structure. No other tye-in is made with the other field visibility settings.
 
 
 ### Set Column Widths
 
-In other modes, Hot Glue decides how many bootstrap column each column should take up, defaulting to 2 unless using `--smart-layout`, in which case it will be anywhere from 2 to 5 depending on how many feilds you have. Generally, I start my scaffolds using either standard or smart, but pretty soon I'm always upgrading to specified grouping mode for fine-grained control.
+In other modes, Hot Glue decides how many bootstrap columns each column should span, defaulting to 2 unless using `--smart-layout`, in which case it ranges from 2 to 5 depending on how many fields you have. Generally, I start my scaffolds using either standard or smart, but soon, I'm often upgrading to specified grouping mode for fine-grained control.
 
-When using specified group mode (activated when a `:` character appears in the `--include` list), you can append to the end of EACH COLUMN (not each feild) a parenthetical setting for number of bootstrap columns.
+When using specified group mode (activated when a `:` character appears in the `--include` list), you can append to the end of EACH COLUMN (not each field) a parenthetical setting for the number of bootstrap columns.
 
 (When the setting includes this special character, you'll need  `'` to wrap the entire setting for `--include` on the command line.)
-
-`rails generate hot_glue:scaffold Thing --include='first_name,last_name,birthday(2):gender,affiliation_id,roles(3):is_pledged'`
-
-
-Noitce that the `(`...`)` must come at the end of a column, never inside of it. It applies to the column it ends, not the field. So the frist column (first_name,last_name,birthday) will use Bootstrap column width of 2, the second column gender,affiliation_id will use a Bootstrap column width of 3, and the final column, without specifying the column width directly, will use the default (which is 2).
-
-
-Bootstrap layouts always should add up to the magic 12 columns. Remember, your rightmost column with the edit & delete buttons takes up the Bootstrap width of 2 columns, leaving usually 10 to play with.
-
 
 
 ### `--new-button-position` (above, below; default: above)
 Show the new button above or below the list.
-
-
 
 ### `--button-icons` (default is no icons)
 You can specify this either as builder flag or as a config setting (in `config/hot_glue.yml`)
@@ -1152,8 +1145,6 @@ Can also be specified globally in `config/hot_glue.yml`
 
 
 ### `--modify=field1{...},field2{...}`
-
-
 You can apply modification to the viewable (non-edit) display of field using the `--modify` switch.
 
 The syntax is `--modify=cost{$},price{$}`
@@ -1256,7 +1247,7 @@ In these contexts, the lookup must be exact match to the text entered (no partia
 
 Use `+` to map to the `find_or_create_by` method. (Without `+` it will use `find_by`.)
 
-This is accomlished using a little magic of a lookup field called `__lookup_X_Y` passed in the form parameters.
+This is accomplished using a little magic of a lookup field called `__lookup_X_Y` passed in the form parameters.
 
 The lookup field is used to look up the associated record, then deleted from the params.
 
