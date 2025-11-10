@@ -687,6 +687,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # build a new polymorphic object
     @associations = []
     @columns_map = {}
+
     @columns.each do |col|
       # if !(@the_object.columns_hash.keys.include?(col.to_s) || @attachments.keys.include?(col))
       #   raise "couldn't find #{col} in either field list or attachments list"
@@ -1076,6 +1077,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     else
       @columns = @the_object.columns.map(&:name).map(&:to_sym).reject { |field| !@include_fields.include?(field) }
     end
+
 
     @columns = @columns - @nested_set.collect { |set| (set[:singular] + "_id").to_sym  }
 

@@ -162,8 +162,13 @@ module HotGlue
 
             layout_object[:columns][:container][i] = column.split(",").collect{|x|
               x.gsub("-","").gsub("=","")
-            }.collect(&:to_sym)
+              if x.include?("(")
+                x =~ /(.*)\((.*)\)/
+                x = $1
 
+              end
+              x
+            }.collect(&:to_sym)
 
 
             layout_object[:columns][:bootstrap_column_width][i] = fixed_widths[i] || target_col_size

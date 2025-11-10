@@ -310,7 +310,11 @@ module  HotGlue
       result = columns.map.with_index{ |column,i|
         size = layout_object[:columns][:bootstrap_column_width][i]
         "<div class='hg-col #{layout_strategy.column_classes_for_line_fields(size)} #{singular}--#{column.join("-")}'#{style_with_flex_basis}> " +
+
         column.map { |col|
+          if layout_object[:columns][:fields][col].nil?
+            raise "column #{col} not found on the layout data"
+          end
           if col.starts_with?("**") && layout_object[:columns][:fields][col][:show]
             the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
           elsif ! layout_object[:columns][:fields][col][:show]
