@@ -31,8 +31,8 @@ class TextField < Field
 
 
   def search_field_output
-    "<%= f.select 'q[0][#{name}_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is_exactly'], ['starts with', 'starts_with'], ['ends with', 'ends_with']], @q[\'0\']['#{name}_match'] ), {} , { class: 'form-control match' } %>"+
-      "<%= f.text_field 'q[0][#{name}_search]', value: @q[\'0\'][:#{name}_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>"
+    "<%= f.select 'q[0][#{name}_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is_exactly'], ['starts with', 'starts_with'], ['ends with', 'ends_with']], @q[\'0\']['#{name}_match'] ), {} , { class: 'form-control match', 'data-search-form-target': \"textMatch\" } %>"+
+      "<%= f.text_field 'q[0][#{name}_search]', value: @q[\'0\'][:#{name}_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text', 'data-search-form-target': \"textSearch\" %>"
   end
 
 
@@ -45,7 +45,7 @@ class TextField < Field
   end
 
   def code_to_reset_match_if_search_is_blank
-    "    @q['0'][:#{name}_match] = '' if @q['0'][:#{name}_search] == ''"
+    # "    @q['0'][:#{name}_match] = '' if @q['0'][:#{name}_search] == ''"
   end
 
 end
