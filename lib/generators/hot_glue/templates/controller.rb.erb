@@ -8,6 +8,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   helper :hot_glue
   include HotGlue::ControllerHelper
+  <%= @code_in_controller.gsub(";", "\n") %>
 
   <% unless @god %>before_action :<%= "authenticate_" + @auth_identifier.split(".")[0] + "!" %><% end %><% if any_nested? %>
     <% nest_chain = [] %> <% @nested_set.each { |arg|

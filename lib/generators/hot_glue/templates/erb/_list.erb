@@ -8,7 +8,14 @@
     <% end %>
 
     <% if @new_button_position == 'above' %>
-    <% unless @no_create %><%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +  @controller_build_folder + '/new_button", locals: {}' + @nested_set.collect{|arg| ".merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join()  + ' %\>'.gsub('\\',"")  %><br /><% end %>
+    <% unless @no_create %>
+      <%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +
+              @controller_build_folder +
+              "/new_button\", locals: {
+    #{@nested_set.collect{|arg| arg[:singular] + ": " + arg[:singular]}.join(",\n    ")} }" +
+              ' %\>'.gsub('\\',"")  %>
+        <br />
+    <% end %>
     <% end %>
 
     <% unless @no_list %>
@@ -58,10 +65,8 @@
     </div>
       <\% end %>
       <\% <%= plural %>.each do |<%= singular %>| %>
-        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %>}
-            .merge(defined?(nested_for) ? {nested_for: nested_for} : {})
-      <%= @nested_set.collect{|arg| "      .merge(defined?(#{arg[:singular]}) ? {#{arg[:singular]}: #{arg[:singular]}} : {})"}.join("\n") %>
-        %>
+        <\%= render partial: '<%= line_path_partial %>', locals: {<%= singular %>: <%= singular %>,
+      <% if @nested_set.any? %>nested_for: nested_for, <%= @nested_set.collect{|arg| "#{arg[:singular]}: #{arg[:singular]}" }.join(", ") %><% end %> } \%>
       <\% end %>
       <% if @paginate_per_page_selector %>
         <\%= form_with url: '<%= path_helper_plural(top_level: false) %>', method: :get do |f| %>

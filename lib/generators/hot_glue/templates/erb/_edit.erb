@@ -7,7 +7,11 @@
   <\%= form_with model: <%= singular %>,
    <% if @stimmify %> data: {controller: '<%= @stimmify %>' },
    <% end %>url: <%= form_path_edit_helper %><%= ", html: {'data-turbo': false}" if @big_edit %> do |f| %>
-    <\%=  render partial: "<%= namespace_with_trailing_dash + @controller_build_folder + "/" %>form", locals: {:<%=  singular  %> => <%= singular %>, f: f}<%= @nested_set.collect{|arg| ".merge(#{arg[:singular]} ? {#{arg[:singular]}: #{arg[:singular]}} : {})" }.join %> \%>
+    <\%=  render partial: "<%= namespace_with_trailing_dash + @controller_build_folder + "/" %>form", locals: {
+      <%=  singular  %>: <%= singular %>,
+      f: f,
+      <%= @nested_set.collect{|arg| "#{arg[:singular]}: #{arg[:singular]}" }.join(",\n    ") %>
+  } \%>
   <% if @edit_within_form_partial %><\%= render partial: "edit_within_form", locals: {f: f, <%=  singular  %>: <%= singular %>}<%= @nested_set.collect{|arg| ".merge(#{arg[:singular]} ? {#{arg[:singular]}: #{arg[:singular]}} : {})" }.join %> %><% end %>
   <\% end %>
   <% if @edit_after_form_partial %><\%= render partial: "edit_after_form", locals: {<%=  singular  %>: <%= singular %>}<%= @nested_set.collect{|arg| ".merge(#{arg[:singular]} ? {#{arg[:singular]}: #{arg[:singular]}} : {})" }.join %> %><% end %>

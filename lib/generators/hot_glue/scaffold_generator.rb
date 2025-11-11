@@ -117,6 +117,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :phantom_create_params, type: :string, default: nil
   class_option :phantom_update_params, type: :string, default: nil
   class_option :controller_prefix, type: :string, default: nil
+  class_option :code_in_controller, type: :string, default: nil
 
   # SEARCH OPTIONS
   class_option :search, default: nil # set or predicate
@@ -439,6 +440,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @phantom_create_params = options['phantom_create_params'] || ""
     @phantom_update_params = options['phantom_update_params'] || ""
 
+
     if get_default_from_config(key: :pundit_default)
       raise "please note the config setting `pundit_default` has been renamed `pundit`. please update your hot_glue.yml file"
     end
@@ -645,6 +647,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @code_before_update = options['code_before_update']
     @code_after_update = options['code_after_update']
     @code_after_new = options['code_after_new']
+    @code_in_controller = options['code_in_controller'] || ""
 
     buttons_width = ((!@no_edit && 1) || 0) + ((!@no_delete && 1) || 0) + (@magic_buttons.any? ? 1 : 0)
 
@@ -687,6 +690,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # build a new polymorphic object
     @associations = []
     @columns_map = {}
+
     @columns.each do |col|
       # if !(@the_object.columns_hash.keys.include?(col.to_s) || @attachments.keys.include?(col))
       #   raise "couldn't find #{col} in either field list or attachments list"
@@ -1076,6 +1080,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     else
       @columns = @the_object.columns.map(&:name).map(&:to_sym).reject { |field| !@include_fields.include?(field) }
     end
+
 
     @columns = @columns - @nested_set.collect { |set| (set[:singular] + "_id").to_sym  }
 
@@ -1644,12 +1649,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       append_text = "  <li class='nav-item'>
     <%= link_to '#{@list_label_heading.humanize}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
   </li>"
-      alt_append_text = "  <li class='nav-item'>
-    <%= link_to '#{@list_label_heading.humanize.upcase}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>
-  </li>"
+      alt_append_text = "<%= link_to '#{@list_label_heading.humanize.upcase}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>"
+
+      check_for_existing_append = "<%= link_to '#{@list_label_heading.humanize}', #{path_helper_plural(@nested_set.any? ? true: false)}, class: \"nav-link \#{'active' if nav == '#{plural_name}'}\" %>"
 
       text = File.read(nav_file)
-      if text.include?(append_text) || text.include?(alt_append_text)
+      if text.include?(check_for_existing_append) || text.include?(alt_append_text)
         puts "SKIPPING: Nav link for #{singular_name} already exists in #{nav_file}"
       else
         puts "APPENDING: nav link for #{singular_name} #{nav_file}"

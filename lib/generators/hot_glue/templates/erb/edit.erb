@@ -1,5 +1,7 @@
 <% if @big_edit %>
-<div class="container">
+  <% if include_nav_template %><%= @layout_strategy.page_begin %><\%= render partial: "<%= nav_template %>", locals: {nav: "<%= @plural %>"} %><%= @layout_strategy.page_end %><% end %>
+
+  <div class="container">
   <div class="row">
     <div class="col-md-12">
       <\%= link_to "<% if @button_icons == 'font-awesome' %><i class='fa fa-arrow-circle-left  2x'></i><% end %> Back to list".html_safe, <%= path_helper_plural(true) %> %>
@@ -9,8 +11,6 @@
     </div>
   </div>
 </div>
-
-
 
 <% if @downnest_children.any? && @big_edit %>
 <div class="container" data-controller="bootstrap-tabbed-nav">
