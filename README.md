@@ -1717,6 +1717,7 @@ This is a good place to set your created_by user id, like so
 
 
 
+
 ```
 def new
     @email_template = EmailTemplate.new(crusade: crusade)
@@ -1747,6 +1748,16 @@ def create
       ...
 ```
 TODO: build a solution for inserting code only in the `new` action but NOT the create action
+
+#### `--code-in-controller=''` (escape newlines with `;` )
+
+This code will be inserted directly into your controller (as a class-level definition)
+
+
+```
+--code-in-controller="before_action -> { @thing = 'abc' }"
+```
+A one-liner hook works well for these. if you define an entire method, be sure to use `;` to separate line breaks
 
 
 
@@ -2408,6 +2419,16 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+#### 2025-11-12 - v0.7.1
+- in set searches, automatically sets the match field if the search text is input, removes match field (back to default) when search text is removed; 
+- 
+- also removes search text if you change the match selector back to empty 
+- 
+- removes vestiges of `.merge` from old implementation (#236)
+   
+- `--code-in-controller` option for inserting controller code directly into your controller
+
 
 #### 2025-11-05 - v0.7
 
