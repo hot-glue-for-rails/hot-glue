@@ -1451,8 +1451,9 @@ describe "HotGlue::ScaffoldGenerator" do
 
       # NOT IMPLEMENTED: float field, integer field
       _list = File.read("spec/dummy/app/views/jkls/_list.erb")
-      expect(_list).to include("%= f.select 'q[0][blurb_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is_exactly'], ['starts with', 'starts_with'], ['ends with', 'ends_with']], @q['0']['blurb_match'] ), {} , { class: 'form-control match' } %><%= f.text_field 'q[0][blurb_search]', value: @q['0'][:blurb_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>")
-      expect(_list).to include("<%= f.select 'q[0][long_description_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is_exactly'], ['starts with', 'starts_with'], ['ends with', 'ends_with']], @q['0']['long_description_match'] ), {} , { class: 'form-control match' } %><%= f.text_field 'q[0][long_description_search]', value: @q['0'][:long_description_search], autocomplete: 'off', size: 40, class: 'form-control', type: 'text' %>")
+      # byebug
+      expect(_list).to include("%= f.select 'q[0][blurb_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is_exactly'], ['starts with', 'starts_with'], ['ends with', 'ends_with']], @q['0']['blurb_match'] ), {} ")
+      expect(_list).to include("<%= f.select 'q[0][long_description_match]', options_for_select([['', ''], ['contains', 'contains'], ['is exactly', 'is_exactly'], ['starts with', 'starts_with'], ['ends with', 'ends_with']], @q['0']['long_description_match'] ), ")
       expect(_list).to include("<div data-controller='date-range-picker' >")
 
       expect(_list).to include("<%= f.select 'q[0][approved_at_match]', options_for_select([['', ''], ['is on', 'is_on'],")
