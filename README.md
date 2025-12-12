@@ -2464,7 +2464,7 @@ These automatic pickups for partials are detected at build time. This means that
 # VERSION HISTORY
 
 
-#### 2025-12-12
+#### 2025-12-12 - v0.7.2
 - Using the object (of the scaffold being built) inside of the hawk now adds `@` to a variable named as the singular name of the scaffold;
   see "Using the object inside of the hawk"
 - error catching for missing parent relationships
