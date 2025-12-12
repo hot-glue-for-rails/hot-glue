@@ -2485,7 +2485,7 @@ These automatic pickups for partials are detected at build time. This means that
 
 Hot Glue already has a robust set of tools to provide field-by-field access control, hiding or turning visible-only fields by multiple methods, described under Access Control & Field Visibility Features.
 
-Remember that Hot Glue's opinionated design has two ways a field is displayed: show (which appears on the list view and is always just viewable), and form (which is usees by both the new and edit actions to display a form). Within the `form` output, the form might be used for either new or edit, and further refinements can be applied to new or edit.
+Remember that Hot Glue's opinionated design has two ways a field is displayed: show (which appears on the list view and is always just viewable), and form (which is used by both the new and edit actions to display a form). Within the `form` output, the form might be used for either new or edit, and further refinements can be applied to new or edit.
 
 Here's a quick review those methods now:
 
@@ -2515,10 +2515,13 @@ Here's a quick review those methods now:
 Today, with v0.7 of this gem, I'm introducing three more features that are all available from within the `--include` setting.
 
 • Omitted fields:  using `-` is omit on list & show;  use  `=` to omit the field on the form (new & edit)
+
 • Dynamic blocks (which can also be omitted using
+
 • Set column widths when using specified grouping made (--include contains `:`)
 
-For details, see "Layout & Manipulation Features"
+For details, see "Omitted fields", "Dynamic Blocks", and "Omitted Dynamic Blocks" in the "Layout & Manipulation Features"
+(those three features were introduced in v0.7)
 
 
 
