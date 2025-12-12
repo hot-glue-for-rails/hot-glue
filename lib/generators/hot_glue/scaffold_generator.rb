@@ -912,7 +912,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def controller_prefix_snake
-    @controller_prefix.underscore
+    @controller_prefix&.underscore
   end
 
 
