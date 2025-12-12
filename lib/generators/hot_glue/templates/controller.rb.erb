@@ -30,9 +30,12 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
        next_object = nil
        collect_objects = @nested_set.reverse.collect {|x|
            assoc_name = x[:parent_name] || x[:singular]
-           # if eval("#{next_object || class_name}.reflect_on_association(:#{assoc_name})").nil?
-           #   raise "***** Unable to find the association `#{assoc_name}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{assoc_name}` to the #{next_object || class_name} object?"
-           # end
+           if eval("#{next_object || class_name}.reflect_on_association(:#{assoc_name})").nil?
+             raise "***** Unable to find the association `#{assoc_name}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{assoc_name}` to the #{next_object || class_name} object?"
+           end
+
+
+
            next_object = eval("#{next_object || class_name}.reflect_on_association(:#{assoc_name})").class_name
        }
        root_object = collect_objects.last
@@ -119,7 +122,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
     <%= controller_attachment_orig_filename_pickup_syntax %>
     <%= creation_syntax %>
-    <%=  @code_after_new ?  @code_after_new.gsub(";","\n") + "\n" : "" %>
+    <%= @code_after_new ?  @code_after_new.gsub(";","\n") + "\n" : "" %>
+    <% if @hawk_keys.any? %> modified_params = hawk_params({<%= hawk_to_ruby(in_controller: true) %>}, modified_params)<% end %>
 
       <% if @pundit %><% @related_sets.each do |key, related_set| %>
     check_<%= related_set[:association_ids_method].to_s %>_permissions(modified_params, :create)<% end %><% end %>
@@ -219,7 +223,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       "#{field_name}: #{field_name}" unless @update_show_only.include?(lookup.to_sym)
     }.join(",") %>)
     <% end %>
-   <% if @hawk_keys.any? %> modified_params = hawk_params({<%= hawk_to_ruby %>}, modified_params)<% end %>
+   <% if @hawk_keys.any? %> modified_params = hawk_params({<%= hawk_to_ruby(in_controller: true) %>}, modified_params)<% end %>
     <%= controller_attachment_orig_filename_pickup_syntax %>
     @<%= singular_name %>.assign_attributes(modified_params)
       <% if @pundit && !@pundit_policy_override %>
