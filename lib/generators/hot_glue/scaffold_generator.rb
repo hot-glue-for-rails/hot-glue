@@ -754,51 +754,56 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     if options['phantom_search']
       ps_input = options['phantom_search']
-
-      ps_input =~ /(.*)\[(.*)\]/
-      type_and_label, settings = $1, $2
-
-
-      type = type_and_label.split("_")[0]
-      label = type_and_label.split("_")[1]
-
       @phantom_search = {}
-      choices = settings.split("|")
 
 
-      @phantom_search[label.to_sym] = {
-        type: type,
-        name: label.humanize,
-        choices: []
-      }
+      ps_input.split(",").each do |input_setting|
+        input_setting =~ /(.*)\[(.*)\]/
+        type_and_label, settings = $1, $2
 
-      choices.each do |choice|
-        if type == "radio"
-          choice_label = choice.split(":")[0]
-          choice_scope = choice.split(":")[1]
-        elsif type == "checkboxes"
-          choice_label = choice.split(":")[0]
-          choice_scope_negative = choice.split(":")[1]
-          choice_scope  = choice.split(":")[2]
-        end
 
-        if choice_scope.nil? || choice_scope.strip.empty?
-          choice_scope = "all"
-        end
+        type = type_and_label.split("_")[0]
+        label = type_and_label.split("_")[1]
 
-        if choice_scope_negative.nil? || choice_scope_negative.strip.empty?
-          choice_scope_negative = "all"
-        end
+        choices = settings.split("|")
 
-        choice_scope = ".#{choice_scope}" if !choice_scope.start_with?(".")
-        choice_scope_negative = ".#{choice_scope_negative}" if !choice_scope_negative.start_with?(".")
 
-        @phantom_search[label.to_sym][:choices] << {
-          label: choice_label,
-          scope: choice_scope,
-          scope_negative: choice_scope_negative,
+        @phantom_search[label.to_sym] = {
+          type: type,
+          name: label.humanize,
+          choices: []
         }
+
+        choices.each do |choice|
+          if type == "radio"
+            choice_label = choice.split(":")[0]
+            choice_scope = choice.split(":")[1]
+          elsif type == "checkboxes"
+            choice_label = choice.split(":")[0]
+            choice_scope_negative = choice.split(":")[1]
+            choice_scope  = choice.split(":")[2]
+          end
+
+          if choice_scope.nil? || choice_scope.strip.empty?
+            choice_scope = "all"
+          end
+
+          if choice_scope_negative.nil? || choice_scope_negative.strip.empty?
+            choice_scope_negative = "all"
+          end
+
+          choice_scope = ".#{choice_scope}" if !choice_scope.start_with?(".")
+          choice_scope_negative = ".#{choice_scope_negative}" if !choice_scope_negative.start_with?(".")
+
+          @phantom_search[label.to_sym][:choices] << {
+            label: choice_label,
+            scope: choice_scope,
+            scope_negative: choice_scope_negative,
+          }
+        end
       end
+
+
       puts "phantom search #{@phantom_search}"
     else
       @phantom_search = {}
@@ -1394,12 +1399,13 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def delete_path_helper
-    HotGlue.optionalized_ternary(namespace: @namespace,
+    res = HotGlue.optionalized_ternary(namespace: @namespace,
                                  prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
                                  target: @singular,
                                  nested_set: @nested_set,
                                  with_params: false,
                                  put_form: true)
+    res
   end
 
   def edit_path_helper
@@ -1476,14 +1482,23 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if @nested_set.any? && @nested_set.last[:parent_name]
       last_parent = @nested_set.last[:parent_name]
       foreign_key =  eval("#{singular_class}.reflect_on_association(:#{last_parent})").foreign_key
-      association = eval(singular_class).reflect_on_association(@nested_set.last[:parent_name].to_sym)
+      possible_associations = eval(singular_class).reflect_on_association(@nested_set.last[:parent_name].to_sym)
                                         .klass.reflect_on_all_associations(:has_many)
-                                        .to_a.find{|x|
+                                        .to_a
 
+
+      association = possible_associations.find{|x|
           if x.source_reflection
             x.table_name == plural
           end
-      }.plural_name
+      }
+
+      if !association
+        klass = eval(singular_class).reflect_on_association(@nested_set.last[:parent_name].to_sym)
+                                    .klass.to_s
+        raise "Could not find relation #{plural} on #{klass}; maybe add `has_many :#{plural}` "
+      end
+      association = association.plural_name
 
     else
       association = plural
@@ -1552,16 +1567,25 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def magic_button_output
+
+    # HotGlue.optionalized_ternary(namespace: @namespace,
+    #                              prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
+    #                              target: @singular,
+    #                              nested_set: @nested_set,
+    #                              modifier: "edit_",
+    #                              with_params: false,
+    #                              put_form: true)
     @template_builder.magic_button_output(
       path: HotGlue.optionalized_ternary( namespace: @namespace,
+                                          prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
                                           target: @singular,
                                           nested_set: @nested_set,
                                           with_params: false,
                                           put_form: true),
-                                          big_edit: @big_edit,
-                                          singular: singular,
-                                          magic_buttons: @magic_buttons,
-                                          small_buttons: @small_buttons
+      big_edit: @big_edit,
+      singular: singular,
+      magic_buttons: @magic_buttons,
+      small_buttons: @small_buttons
     )
   end
 

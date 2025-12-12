@@ -30,9 +30,12 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
        next_object = nil
        collect_objects = @nested_set.reverse.collect {|x|
            assoc_name = x[:parent_name] || x[:singular]
-           # if eval("#{next_object || class_name}.reflect_on_association(:#{assoc_name})").nil?
-           #   raise "***** Unable to find the association `#{assoc_name}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{assoc_name}` to the #{next_object || class_name} object?"
-           # end
+           if eval("#{next_object || class_name}.reflect_on_association(:#{assoc_name})").nil?
+             raise "***** Unable to find the association `#{assoc_name}` on the class #{next_object || class_name} ..... you probably want to add `belongs_to :#{assoc_name}` to the #{next_object || class_name} object?"
+           end
+
+
+
            next_object = eval("#{next_object || class_name}.reflect_on_association(:#{assoc_name})").class_name
        }
        root_object = collect_objects.last
