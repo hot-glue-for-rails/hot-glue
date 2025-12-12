@@ -712,6 +712,49 @@ current_user's has_many association (so, for any other "my" family, would be `cu
 
 This is covered in [Example #4 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
 
+
+##### Using the object inside of the hawk
+In the example above, we aren't using the name of the scaffold within the hawk.
+
+However, if you are using the object's name in the hawk (for example `thing` for a `ThingsController`), the view will need this as a local variable `thing` and
+the controller will need this as an instsance variable `@thing`
+
+In this special case, Hot Glue converts the local variable `thing` used within your hawk code into instance variable `@thing`
+
+For example, if we were building a Job scaffold, here we want restrict follow_up_target_id to a list 
+of eligible targets (in our case, with an email address that matches the company's website), we could use a view helper.
+
+Notice that `targets_by_company` is defined in the helper below, and we pass it a relation from the current object which is `job`
+
+`hot_glue:scaffold Job --hawk='follow_up_target_id{targets_by_company(job.company)}' --code-in-controller='include JobHelper;`
+(notice that it is `job` not `@job`)
+
+// app/helpers/job_helper.rb
+```
+module JobHelper
+  def targets_by_company(company)
+    domain = company.website
+    Target.where("email LIKE ?", "%#{domain}%" )
+  end
+end
+```
+
+The generated controller code looks like:
+```
+modified_params = hawk_params({follow_up_target_id: [targets_by_company(@job.company)]}, modified_params)
+```
+(`hawk_param` is defined in Hot Glue itself. Notice that the `@` was appended to the front of `job`)
+
+The edit form will look like this:
+```
+<%= f.collection_select(:follow_up_target_id, targets_by_company(job.company), :id, :name, { prompt: true, selected: job.follow_up_target_id }) %>
+```
+(In the _form view, the `job` is a local variable as we do not rely on the instance variables in subviews.)
+
+
+
+
+
 ### `--with-turbo-streams`
 
 If and only if you specify `--with-turbo-streams`, your views will contain `turbo_stream_from` directives. Whereas your views will always contain `turbo_frame_tags` (whether or not this flag is specified) and will use the Turbo stream replacement mechanism for non-idempotent actions (create & update). This flag just brings the magic of live-reload to the scaffold interfaces themselves.
@@ -2419,6 +2462,14 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+#### 2025-12-12 
+- Using the object (of the scaffold being built) inside of the hawk now adds `@` to a variable named as the singular name of the scaffold;
+see "Using the object inside of the hawk"
+- error catching for missing parent relationships
+- fixes path for magic button when the controller has a prefix
+- fix nav active target for a controller with a prefix (the nav template uses the snake_case of the full controller name including prefix) 
+
 
 #### 2025-11-12 - v0.7.1
 - in set searches, automatically sets the match field if the search text is input, removes match field (back to default) when search text is removed; 

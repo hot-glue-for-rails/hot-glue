@@ -1,5 +1,6 @@
 <% if @big_edit %>
-  <% if include_nav_template %><%= @layout_strategy.page_begin %><\%= render partial: "<%= nav_template %>", locals: {nav: "<%= @plural %>"} %><%= @layout_strategy.page_end %><% end %>
+  <% if include_nav_template %><%= @layout_strategy.page_begin %>
+    <\%= render partial: "<%= nav_template %>", locals: {nav: "<%= "#{@controller_prefix ? controller_prefix_snake + "_": ""}#{@plural}" %>"} %><%= @layout_strategy.page_end %><% end %>
 
   <div class="container">
   <div class="row">

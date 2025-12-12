@@ -911,6 +911,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   end
 
+  def controller_prefix_snake
+    @controller_prefix.underscore
+  end
+
+
   def setup_hawk_keys
     @hawk_keys = {}
 
@@ -1391,7 +1396,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def form_path_edit_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target:  @singular,
-                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
+                                 prefix: (@controller_prefix ? controller_prefix_snake + "_" : ""),
                                  nested_set: @nested_set,
                                  with_params: false,
                                  put_form: true,
@@ -1400,7 +1405,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def delete_path_helper
     res = HotGlue.optionalized_ternary(namespace: @namespace,
-                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
+                                 prefix: (@controller_prefix ? controller_prefix_snake + "_" : ""),
                                  target: @singular,
                                  nested_set: @nested_set,
                                  with_params: false,
@@ -1410,7 +1415,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def edit_path_helper
     HotGlue.optionalized_ternary(namespace: @namespace,
-                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
+                                 prefix: (@controller_prefix ? controller_prefix_snake + "_" : ""),
                                  target: @singular,
                                  nested_set: @nested_set,
                                  modifier: "edit_",
@@ -1421,7 +1426,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   def new_path_name
     HotGlue.optionalized_ternary(namespace: @namespace,
                                  target: singular,
-                                 prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
+                                 prefix: (@controller_prefix ? controller_prefix_snake + "_" : ""),
                                  nested_set: @nested_set,
                                  modifier: "new_",
                                  with_params: false)
@@ -1568,16 +1573,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def magic_button_output
 
-    # HotGlue.optionalized_ternary(namespace: @namespace,
-    #                              prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
-    #                              target: @singular,
-    #                              nested_set: @nested_set,
-    #                              modifier: "edit_",
-    #                              with_params: false,
-    #                              put_form: true)
+
     @template_builder.magic_button_output(
       path: HotGlue.optionalized_ternary( namespace: @namespace,
-                                          prefix: (@controller_prefix ? @controller_prefix.downcase + "_" : ""),
+                                          prefix: (@controller_prefix ? controller_prefix_snake + "_" : ""),
                                           target: @singular,
                                           nested_set: @nested_set,
                                           with_params: false,
@@ -1991,9 +1990,18 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     [name, file_format].compact.join(".")
   end
 
-  def hawk_to_ruby
+  def hawk_to_ruby(in_controller: false) # false for views; true for controller
+
+
     res = @hawk_keys.collect { |k, v|
-      "#{k.to_s}: [#{v[:bind_to].join(".")}]"
+      bind_to_array = v[:bind_to]
+
+      bind_to = bind_to_array.collect{|bt|
+        bt.gsub!(singular, "@#{singular}") if in_controller
+        bt
+      }
+
+      "#{k.to_s}: [#{bind_to.join(".")}]"
     }.join(", ")
     res
   end
