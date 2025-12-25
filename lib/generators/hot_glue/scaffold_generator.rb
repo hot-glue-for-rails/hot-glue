@@ -31,7 +31,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :search_clear_button, :search_autosearch, :include_object_names,
                 :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
                 :invisible_create, :invisible_update, :phantom_create_params,
-                :phantom_update_params, :lazy
+                :phantom_update_params, :lazy, :list_back_link_to_parent
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -130,6 +130,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :search_position, default: 'vertical' # choices are vertical or horizontal
   class_option :search_clear_button, default: false
   class_option :search_autosearch, default: false
+  class_option :list_back_link_to_parent, default: nil
+
 
   # FOR THE PREDICATE SEARCH
   # TDB
@@ -492,6 +494,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @include_object_names = options['include_object_names'] || get_default_from_config(key: :include_object_names)
 
 
+    @list_back_link_to_parent = options['list_back_link_to_parent'] || false
 
     if @god
       # @auth = nil
@@ -1056,6 +1059,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     if @object_owner_sym && !@self_auth
       auth_assoc_field = auth_assoc + "_id" unless @god
+
       assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
 
       if assoc
@@ -1362,15 +1366,19 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                                  top_level: top_level)
   end
 
-  def edit_parent_path_helper
+  def edit_parent_path_helper(top_level = false)
     # the path to the edit route of the PARENT
     if @nested_set.any? && @nested
       "edit_#{@namespace + "_" if @namespace}#{(@nested_set.collect { |x| x[:singular] }.join("_") + "_" if @nested_set.any?)}path(" +
-      "#{@nested_set.collect { |x| x[:singular] }.join(", ")}" + ")"
+      "#{@nested_set.collect { |x| (top_level ? "@": "" ) + x[:singular] }.join(", ")}" + ")"
 
     else
       "edit_#{@namespace + "_" if @namespace}path"
     end
+  end
+
+  def parent_object_name
+    @nested_set.last[:singular]
   end
 
   def datetime_fields_list

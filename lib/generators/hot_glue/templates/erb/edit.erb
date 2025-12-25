@@ -5,7 +5,12 @@
   <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <\%= link_to "<% if @button_icons == 'font-awesome' %><i class='fa fa-arrow-circle-left  2x'></i><% end %> Back to list".html_safe, <%= path_helper_plural(true) %> %>
+
+      <% if @list_back_link_to_parent %>
+      <\%= link_to "&#11013;&#65039; Back to <%= parent_object_name %>".html_safe, <%= edit_parent_path_helper(true) %> %>
+      <% else %>
+      <\%= link_to "&#11013;&#65039; Back to list".html_safe, <%= path_helper_plural(true) %> %>
+      <% end %>
 <% end %>
 <\%= render partial: "edit", locals: {<%= singular %>: @<%= singular %><%= @nested_set.any? ? ", " + (@nested_set.collect{|x| "#{x[:singular]}: @#{x[:singular]}"}.join(", ") ) : "" %>}  %>
 <% if @big_edit %>
