@@ -22,13 +22,13 @@ Hot Glue generates quick and dirty functionality. It lets you be crafty. However
 * Automatically reads your models (make them, add relationships, **and** migrate your database before building your scaffolding!)
 * Excellent for CREATE-READ-UPDATE-DELETE (CRUD), lists with pagination
 * Great for prototyping, but you should learn Rails fundamentals first.
-* 'Packaged' with Devise, Kaminari, Rspec
+* Defaults to Devise & Rspec, but these are optional
+* Use Pagy for pagination
 * Create system specs automatically along with the generated code.
 * Nest your routes model-by-model for built-in poor man's authentication.
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
 How is it different than Rails scaffolding?
-77
 Although inspired by the Rails scaffold generators (built-in to Rails), Hot Glue does something similiar but has made opinionated decisions that deviate from the normal Rails scaffold: 
 
 1. The Hot Glue scaffolds are complete packages and are pre-optimized for 'edit-in-place' so that new and edit operations happen in-page smoothly. 
@@ -2146,6 +2146,18 @@ https://jasonfleetwoodboldt.com/courses/rails-7-crash-course/rails-7-stimulus-js
 # SPECIAL FEATURES DISCUSSION
 This section discusses features that don't correspond to a single option or flag.  
 
+## PAGINATION
+- Although legacy support Kaminari and will_paginate exist, I recommend Pagy.
+
+For Pagy version 9 or below
+1. include the gem
+2. in `config/initializers/pagy.rb` add `require 'pagy/extras/bootstrap'`
+3. add `include Pagy::Backend` to ApplicationController
+4. add `include Pagy::Frontend` to ApplicationHelper
+
+For Pagy version 43 (there was a version jump)
+*NOT YET COMPATIBLE WITH PAGY 43*
+TODO: implement pagy 43
 
 ## "Thing" Label
 
@@ -2459,6 +2471,9 @@ If you have a partial in your view folder called `_list_after_each_row_heading`,
 The `within` partials should do operations within the form (like hidden fields), and the `after` partials should do entirely unrelated operations, like a different form entirely.
 
 These automatic pickups for partials are detected at build time. This means that if you add these partials later, you must rebuild your scaffold.
+
+
+
 
 
 # VERSION HISTORY

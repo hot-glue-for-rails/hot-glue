@@ -7,7 +7,7 @@
     <div class="col-md-12">
 
       <% if @list_back_link_to_parent %>
-      <\%= link_to "&#11013;&#65039; Back to <%= parent_object_name %>".html_safe, <%= edit_parent_path_helper(true) %> %>
+      <\%= link_to "&#11013;&#65039; Back to <%= parent_resource_name %>".html_safe, <%= edit_parent_path_helper(true) %> %>
       <% else %>
       <\%= link_to "&#11013;&#65039; Back to list".html_safe, <%= path_helper_plural(true) %> %>
       <% end %>

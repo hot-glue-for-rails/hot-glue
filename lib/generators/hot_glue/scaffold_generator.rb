@@ -10,9 +10,12 @@ require_relative './layout_strategy/base'
 require_relative './layout_strategy/bootstrap'
 require_relative './layout_strategy/hot_glue'
 require_relative './layout_strategy/tailwind'
+require_relative './helpers/generator_helpers'
+
 
 class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   include DefaultConfigLoader
+  include GeneratorHelpers
   hook_for :form_builder, :as => :scaffold
 
   source_root File.expand_path('templates', __dir__)
@@ -171,7 +174,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
     if Gem::Specification.find_all_by_name('pagy').any?
-      @pagination_style = 'pagy'
+      if Gem::Specification.find_all_by_name('pagy').first.version.to_s.split(".").first.to_i <= 9
+        @pagination_style = 'pagy9'
+      else
+        raise "Pagy version 43 not yet compatible"
+        @pagination_style = 'pagy43'
+      end
     elsif Gem::Specification.find_all_by_name('will_paginate').any?
       @pagination_style = 'will_paginate'
     elsif Gem::Specification.find_all_by_name('kaminari').any?
@@ -1377,9 +1385,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
   end
 
-  def parent_object_name
-    @nested_set.last[:singular]
-  end
+
 
   def datetime_fields_list
     @columns.each_with_object({}) do |col, hash|
