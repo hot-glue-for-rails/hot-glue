@@ -34,7 +34,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :search_clear_button, :search_autosearch, :include_object_names,
                 :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
                 :invisible_create, :invisible_update, :phantom_create_params,
-                :phantom_update_params, :lazy, :list_back_link_to_parent
+                :phantom_update_params, :lazy, :back_link_to_parent
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -133,7 +133,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :search_position, default: 'vertical' # choices are vertical or horizontal
   class_option :search_clear_button, default: false
   class_option :search_autosearch, default: false
-  class_option :list_back_link_to_parent, default: nil
+  class_option :back_link_to_parent, default: nil
 
 
   # FOR THE PREDICATE SEARCH
@@ -502,7 +502,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @include_object_names = options['include_object_names'] || get_default_from_config(key: :include_object_names)
 
 
-    @list_back_link_to_parent = options['list_back_link_to_parent'] || false
+    @back_link_to_parent = options['back_link_to_parent'] || false
 
     if @god
       # @auth = nil

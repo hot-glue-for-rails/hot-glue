@@ -2480,7 +2480,7 @@ These automatic pickups for partials are detected at build time. This means that
 
 #### 2025-12-24 - v0.7.3
 
-`--list-back-link-to-parent` (default: false)
+`--back-link-to-parent` (default: false)
 
 If the parent is itself a big edit, and we got to the nested edit (also a big edit) through a tab showing subview list (loaded lazily via Turbo's built-in mechanism),
 then we don't typically want the "back to" link at the top of the edit page to take us back to the list of the current object.
@@ -2489,7 +2489,7 @@ That's because although the list of the current object exists as its own page, i
 
 The user came to _this_ edit page from the parent's edit page, so we should go back to the parent's edit page. 
 
-Use `--list-back-link-to-parent` to tell this build to use a "Back to ____" link at the top of the edit page (where ____ is the name of the parent)
+Use `--back-link-to-parent` to tell this build to use a "Back to ____" link at the top of the edit page (where ____ is the name of the parent)
 
 Otherwise, the link at the top of the edit page will read "Back to list" and take the user back to the list view of the current build. 
 
