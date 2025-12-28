@@ -2478,8 +2478,15 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
-#### 2025-12-24 - v0.7.3
 
+#### 2025-12-28 - v0.7.4
+• `--list-back-link-to-parent` has been renamed `--back-link-to-parent`
+• something was wrong with non-nested scaffolder calling `parent_resource_name` — thor invoked this method even when it wasn't called; it has been moved into a helper to prevent this
+• Check to only support Pagy version 9 or below; Pagy 43 has breaking changes and cannot yet be used (coming soon)
+
+
+#### 2025-12-24 - v0.7.3
+(previously `--list-back-link-to-parent`; release notes retroactively edited)
 `--back-link-to-parent` (default: false)
 
 If the parent is itself a big edit, and we got to the nested edit (also a big edit) through a tab showing subview list (loaded lazily via Turbo's built-in mechanism),
