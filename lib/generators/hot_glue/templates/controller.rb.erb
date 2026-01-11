@@ -123,7 +123,6 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     <%= controller_attachment_orig_filename_pickup_syntax %>
     <%= creation_syntax %>
     <%= @code_after_new ?  @code_after_new.gsub(";","\n") + "\n" : "" %>
-    <% if @hawk_keys.any? %> modified_params = hawk_params({<%= hawk_to_ruby(in_controller: true) %>}, modified_params)<% end %>
 
       <% if @pundit %><% @related_sets.each do |key, related_set| %>
     check_<%= related_set[:association_ids_method].to_s %>_permissions(modified_params, :create)<% end %><% end %>

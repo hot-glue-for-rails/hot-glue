@@ -1162,7 +1162,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def creation_syntax
     if @factory_creation.nil? && ! @alt_lookups.any?
-      (      @hawk_keys.any? ?   "modified_params = hawk_params({#{ hawk_to_ruby }}, modified_params)\n    " : "")  + "@#{singular } = #{ class_name }.new(modified_params)"
+      (@hawk_keys.any? ?   "modified_params = hawk_params({#{ hawk_to_ruby(in_controller: true) }}, modified_params)\n    " : "")  + "@#{singular } = #{ class_name }.new(modified_params)"
     elsif @factory_creation.nil? && @alt_lookups.any?
 
       prelookup_syntax = @alt_lookups.collect{|lookup, data|
@@ -2004,19 +2004,21 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     [name, file_format].compact.join(".")
   end
 
-  def hawk_to_ruby(in_controller: false) # false for views; true for controller
-
+  def hawk_to_ruby(in_controller: false)
+    # false for views; true for controller
 
     res = @hawk_keys.collect { |k, v|
-      bind_to_array = v[:bind_to]
-
+      bind_to_array = v[:bind_to].dup
       bind_to = bind_to_array.collect{|bt|
-        bt.gsub!(singular, "@#{singular}") if in_controller
-        bt
+        if in_controller
+          bt.gsub(singular, "@#{singular}")
+        else
+          bt
+        end
       }
 
       "#{k.to_s}: [#{bind_to.join(".")}]"
-    }.join(", ")
+    }.compact.join(", ")
     res
   end
 
