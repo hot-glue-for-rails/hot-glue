@@ -2478,6 +2478,12 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
+#### 2026-01-11 - v0.7.5
+This is mostly a maintenance release to address these two issues related to the hawk:
+- removes the hawk in the create action because we are alrady doing it in the creation_syntax
+- fixes variable mutation problem affecting when the singular hawk contains the name of the object itself, was duplicitiously adding @ to local variables, now fixed for to produce correct instance var for the controller code
+- when using the hawk, don't add @ in your syntax; a local variable the same name of the thing being built will automatically get @ appended to the front in controller code
+
 
 #### 2025-12-28 - v0.7.4
 • `--list-back-link-to-parent` has been renamed `--back-link-to-parent`
