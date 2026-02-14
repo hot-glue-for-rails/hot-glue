@@ -6,6 +6,7 @@ require_relative '../config/environment'
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails' 
 require 'support/capybara_login.rb'
+require 'support/wait_helpers.rb'
 
 puts "reloading app..."
 def reload!(print = true)
@@ -91,8 +92,15 @@ Capybara.register_driver :selenium do |app|
   options = Selenium::WebDriver::Chrome::Options.new(
     # It's the headlese arg that make Chrome headless
     # + you also need the disable-gpu arg due to a bug
-    args: [ 'headless' , 'disable-gpu window-size=1366,1200'],
-    )
+    args: [
+      'headless',
+      'disable-gpu',
+      'window-size=1366,1200',
+      'no-sandbox'
+    ]
+  )
+
+  Capybara.default_max_wait_time = 10
 
   Capybara::Selenium::Driver.new(
     app,
