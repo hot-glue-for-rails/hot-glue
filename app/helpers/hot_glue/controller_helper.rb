@@ -169,31 +169,27 @@ module HotGlue
     def hawk_params(hawk_schema, modified_params)
       @hawk_alarm = +""
       hawk_schema.each do |hawk_key, hawk_definition|
-        if hawk_definition.is_a?(Hash) && hawk_definition[:polymorphic]
-          type_field = hawk_definition[:polymorphic].to_s
-          parent_type = modified_params[type_field]
-          parent_id = modified_params[hawk_key.to_s]
+        if hawk_definition[0].to_s.start_with?("[") # the hawk is polymorphic
+          # hawk_definition[0] is like "[account.companies,account.vc_firms]"
+          scopes = hawk_definition[0].to_s.gsub(/^\[|\]$/, "").split(",").map(&:strip)
 
-          unless parent_id.blank?
-            scope = hawk_definition[parent_type]
-            if scope.nil?
-              @hawk_alarm << "Invalid #{type_field} '#{parent_type}'. "
-              modified_params.tap { |hs| hs.delete(hawk_key.to_s); hs.delete(type_field) }
-            else
-              begin
-                resolved_scope = scope.is_a?(String) ? eval(scope) : scope
-                resolved_scope.find(parent_id)
-              rescue ActiveRecord::RecordNotFound
-                @hawk_alarm << "You aren't allowed to set #{hawk_key} to #{parent_type} ##{parent_id}. "
-                modified_params.tap { |hs| hs.delete(hawk_key.to_s); hs.delete(type_field) }
-              end
+          unless modified_params[hawk_key.to_s].blank?
+            passed = scopes.any? do |scope_str|
+              relation = scope_str.split(".").inject(self) { |obj, method_name| obj.send(method_name) }
+              relation.where(id: modified_params[hawk_key.to_s]).exists?
+            end
+
+            unless passed
+              @hawk_alarm << "You aren't allowed to set #{hawk_key.to_s} to #{modified_params[hawk_key.to_s]}. "
+              modified_params.tap { |hs| hs.delete(hawk_key.to_s) }
             end
           end
         else
           hawk_root = hawk_definition[0]
           unless modified_params[hawk_key.to_s].blank?
             begin
-              eval("hawk_root").find(modified_params[hawk_key.to_s])
+
+              hawk_definition.where(modified_params[hawk_key.to_s])
             rescue ActiveRecord::RecordNotFound => e
               @hawk_alarm << "You aren't allowed to set #{hawk_key.to_s} to #{modified_params[hawk_key.to_s]}. "
               modified_params.tap { |hs| hs.delete(hawk_key.to_s) }

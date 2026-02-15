@@ -712,6 +712,17 @@ current_user's has_many association (so, for any other "my" family, would be `cu
 
 This is covered in [Example #4 in the Hot Glue Tutorial](https://school.jfbcodes.com/8188)
 
+##### Polymoprhism with the Hawk
+
+If the field (foreign key) being hawked is a polymorphic foreign key, you need to list multiple objects which define the allowed scopes (one for each kind of parent type).
+
+In this case, you will use **spaces** to separate scopes (NOT commas)
+
+for example, if we have a `thing` that can belong (via parent_id and parent_type) to either people or places, we could restrict this thing to only people and places associated from the `account` object (which would be in-scope based on, for example, the nesting arrangement or a logged in-user, or the account currently being managed)
+
+`--hawk=parent_id{account.people account.places}`
+
+Hot glue wil convert the spaces to commas when writing the controller code. 
 
 ##### Using the object inside of the hawk
 In the example above, we aren't using the name of the scaffold within the hawk.
