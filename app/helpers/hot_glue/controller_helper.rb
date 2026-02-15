@@ -120,68 +120,6 @@ module HotGlue
       "#{sign}#{hour_abs}#{minute_str}"
     end
 
-    # def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = {})
-    #
-    #   use_timezone = if current_user_object.try(:timezone)
-    #                    (ActiveSupport::TimeZone[current_user_object.timezone])
-    #                  else
-    #                    Time.zone
-    #                  end
-    #
-    #
-    #   uses_dst = (current_user_object.try(:locale_uses_dst)) || false
-    #
-    #   modified_params = modified_params.tap do |params|
-    #     params.keys.each{|k|
-    #       if field_list.is_a?(Hash)
-    #         include_me = field_list[k.to_sym].present?
-    #       elsif field_list.is_a?(Array)
-    #         field_list.include?(k.to_sym)
-    #       end
-    #
-    #       parsables =  {
-    #         datetime: "%Y-%m-%d %H:%M %z",
-    #         time: "%H:%M %z"
-    #       }
-    #
-    #
-    #       if include_me && params[k].present?
-    #         input_value = params[k].gsub("T", " ") # e.g. "2025-09-24 14:00" or "14:00"
-    #
-    #         if field_list.is_a?(Array)
-    #           # Datetime inputs (e.g. datetime-local)
-    #           parsed_time = Time.strptime(input_value, "%Y-%m-%d %H:%M")
-    #           parsed_time = parsed_time.utc.change(sec: 0)
-    #         else
-    #           case field_list[k.to_sym]
-    #           when :datetime
-    #             parsed_time = Time.strptime(input_value, "%Y-%m-%d %H:%M")
-    #             parsed_time = parsed_time.utc.change(sec: 0)
-    #           when :time
-    #
-    #             Rails.logger.info("input_value: #{input_value}")
-    #             # Parse as hour/minute only, no zone
-    #             t = Time.strptime(input_value, "%H:%M")
-    #
-    #             # Build a UTC time with today's date
-    #             parsed_time = Time.utc(Time.now.year, Time.now.month, Time.now.day, t.hour, t.min, 0)
-    #             # Convert back to a plain "time of day" (for DB `time` column)
-    #             parsed_time = parsed_time.to_time.change(sec: 0)
-    #             Rails.logger.info("parsed_time: #{parsed_time}")
-    #
-    #           else
-    #             raise "Unsupported field type: #{field_list[k.to_sym]}"
-    #           end
-    #         end
-    #
-    #         Rails.logger.info "parsed_time #{parsed_time}"
-    #         params[k] = parsed_time
-    #       end
-    #     }
-    #   end
-    #   modified_params
-    # end
-
     def modify_date_inputs_on_params(modified_params, current_user_object = nil, field_list = {})
       use_timezone =
         if current_user_object.try(:timezone)
@@ -229,17 +167,37 @@ module HotGlue
     end
 
     def hawk_params(hawk_schema, modified_params)
-      @hawk_alarm = ""
-      hawk_schema.each do |hawk_key,hawk_definition|
-        hawk_root = hawk_definition[0]
-        # hawk_scope = hawk_definition[1]
+      @hawk_alarm = +""
+      hawk_schema.each do |hawk_key, hawk_definition|
+        if hawk_definition.is_a?(Hash) && hawk_definition[:polymorphic]
+          type_field = hawk_definition[:polymorphic].to_s
+          parent_type = modified_params[type_field]
+          parent_id = modified_params[hawk_key.to_s]
 
-        unless modified_params[hawk_key.to_s].blank?
-          begin
-            eval("hawk_root").find(modified_params[hawk_key.to_s])
-          rescue ActiveRecord::RecordNotFound => e
-            @hawk_alarm << "You aren't allowed to set #{hawk_key.to_s} to #{modified_params[hawk_key.to_s]}. "
-            modified_params.tap { |hs| hs.delete(hawk_key.to_s) }
+          unless parent_id.blank?
+            scope = hawk_definition[parent_type]
+            if scope.nil?
+              @hawk_alarm << "Invalid #{type_field} '#{parent_type}'. "
+              modified_params.tap { |hs| hs.delete(hawk_key.to_s); hs.delete(type_field) }
+            else
+              begin
+                resolved_scope = scope.is_a?(String) ? eval(scope) : scope
+                resolved_scope.find(parent_id)
+              rescue ActiveRecord::RecordNotFound
+                @hawk_alarm << "You aren't allowed to set #{hawk_key} to #{parent_type} ##{parent_id}. "
+                modified_params.tap { |hs| hs.delete(hawk_key.to_s); hs.delete(type_field) }
+              end
+            end
+          end
+        else
+          hawk_root = hawk_definition[0]
+          unless modified_params[hawk_key.to_s].blank?
+            begin
+              eval("hawk_root").find(modified_params[hawk_key.to_s])
+            rescue ActiveRecord::RecordNotFound => e
+              @hawk_alarm << "You aren't allowed to set #{hawk_key.to_s} to #{modified_params[hawk_key.to_s]}. "
+              modified_params.tap { |hs| hs.delete(hawk_key.to_s) }
+            end
           end
         end
       end

@@ -3,7 +3,7 @@ require_relative './field.rb'
 
 class AssociationField < Field
 
-  attr_accessor :assoc_name, :assoc_class, :assoc, :alt_lookup
+  attr_accessor :assoc_name, :assoc_class, :assoc, :alt_lookup, :polymorphic_parents
 
   def initialize(scaffold: , name: )
     super
@@ -118,8 +118,11 @@ class AssociationField < Field
                      autofocus: true,
                      autocomplete: 'off',
                      value: #{singular}.try(:#{assoc.name}).try(:name) %>
-      <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.try(:#{assoc.name}).try(:id), 'data-typeahead-target': 'hiddenFormValue' %>
-      <div data-typeahead-target='results'></div>
+      <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.try(:#{assoc.name}).try(:id), 'data-typeahead-target': 'hiddenFormValue' %>" + 
+      ( @polymorphic_parents.keys.include?( (assoc.name.to_s + "_id").to_sym) ? 
+"\n     <%= f.hidden_field :#{assoc.name}_type, value: #{singular}.try(:#{assoc.name}_type), 'data-typeahead-target': 'hiddenFormType' %>"
+      : "") + 
+      "\n      <div data-typeahead-target='results'></div>
       <div data-typeahead-target='classIdentifier' data-id=\"typeahead--#{assoc_name}_id\"></div>
       </div>"
     else

@@ -34,7 +34,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :search_clear_button, :search_autosearch, :include_object_names,
                 :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
                 :invisible_create, :invisible_update, :phantom_create_params,
-                :phantom_update_params, :lazy, :back_link_to_parent
+                :phantom_update_params, :lazy, :back_link_to_parent, :polymorphic_parents
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -121,6 +121,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :phantom_update_params, type: :string, default: nil
   class_option :controller_prefix, type: :string, default: nil
   class_option :code_in_controller, type: :string, default: nil
+  class_option :polymorphic_parent, type: :string, default: nil
 
   # SEARCH OPTIONS
   class_option :search, default: nil # set or predicate
@@ -260,6 +261,23 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     setup_attachments
 
+
+    # polymorphic parents
+    input = options["polymorphic_parent"]
+    # "parent_id[company|vc_firm|press_outlet],thing_id[apple|banana]"
+
+    @polymorphic_parents =
+    input.split(",").each_with_object({}) do |parent_data, h|
+      m = parent_data.strip.match(/\A(.*?)\[(.*?)\]\z/)
+      next unless m
+
+      key   = m[1].to_sym
+      types = m[2].split("|")               # or .map(&:to_sym) if you want symbols
+
+      h[key] = types
+    end
+    puts "polymhic_parents: #{@polymorphic_parents}"
+
     @exclude_fields = []
     @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
 
@@ -283,6 +301,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           end
         end
       }.flatten.compact.collect(&:to_sym)
+
+      @include_fields += @polymorphic_parents.keys.collect{|x| x.to_s.gsub("_id","_type").to_sym}
+
       puts "INCLUDED FIELDS: #{@include_fields}"
     end
 
@@ -932,6 +953,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     if options["hawk"]
       options['hawk'].split(",").each do |hawk_entry|
+
+      
         # format is: abc_id[thing]
         if hawk_entry.include?("{")
           hawk_entry =~ /(.*){(.*)}/
@@ -941,6 +964,18 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           hawk_to = @auth
         end
 
+        # check for polymorphism in the hawk_to
+        if hawk_to.include?("|")
+          type_arg = key.gsub("_id","_type")
+          hawk_to =  hawk_to.split("|").each_with_object({ polymorphic: type_arg.to_sym }) do |pair, hash|
+            name, expr = pair.split(":", 2)
+
+            # Evaluate the right-hand side expression in current binding
+            hash[name] = expr
+          end
+        end
+        
+        
         hawk_scope = key.gsub("_id", "").pluralize
 
         if eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})").nil?
@@ -1498,13 +1533,19 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def object_scope
-    if @nested_set.any? && @nested_set.last[:parent_name]
-      last_parent = @nested_set.last[:parent_name]
-      foreign_key =  eval("#{singular_class}.reflect_on_association(:#{last_parent})").foreign_key
-      possible_associations = eval(singular_class).reflect_on_association(@nested_set.last[:parent_name].to_sym)
-                                        .klass.reflect_on_all_associations(:has_many)
-                                        .to_a
+    if @nested_set.any? && @nested_set.last[:parent_name] && !@nested_set.last[:polymorph_as]
 
+      # last_parent = @nested_set.last[:parent_name]
+      # byebug
+
+      # foreign_key =  eval("#{singular_class}.reflect_on_association(:#{last_parent})").foreign_key
+      if @nested_set.last[:polymorph_as]
+        possible_associations = [@nested_set.last[:parent_name].pluralize]
+      else
+        possible_associations = eval(singular_class).reflect_on_association(( @nested_set.last[:parent_name]).to_sym)
+                                                    .klass.reflect_on_all_associations(:has_many)
+                                                    .to_a
+      end
 
       association = possible_associations.find{|x|
           if x.source_reflection
@@ -2010,14 +2051,15 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     res = @hawk_keys.collect { |k, v|
       bind_to_array = v[:bind_to].dup
       bind_to = bind_to_array.collect{|bt|
-        if in_controller
-          bt.gsub(singular, "@#{singular}")
-        else
+
+        if bt.is_a?(String) 
+          in_controller ? bt.gsub(singular, "@#{singular}") : bt
+        else # is a hash 
           bt
         end
       }
 
-      "#{k.to_s}: [#{bind_to.join(".")}]"
+      "#{k.to_s}: #{bind_to.join(".")}"
     }.compact.join(", ")
     res
   end
