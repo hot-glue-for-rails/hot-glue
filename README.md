@@ -882,7 +882,7 @@ You may use semi-colons to separate multiple lines of code.
 
 For example, a user Factory might be called like so:
 
-`./bin/rails generate hot_glue:scaffold User --factory-creation={factory = UserFactory.new(params: user_params)} --gd`
+`./bin/rails generate hot_glue:scaffold User --factory-creation='factory = UserFactory.new(params: user_params)' --gd`
 
 (Note we are relying on the `user_params` method provided by the controller.)
 
