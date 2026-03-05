@@ -119,7 +119,7 @@ class AssociationField < Field
                      autocomplete: 'off',
                      value: #{singular}.try(:#{assoc.name}).try(:name) %>
       <%= f.hidden_field :#{assoc.name}_id, value: #{singular}.try(:#{assoc.name}).try(:id), 'data-typeahead-target': 'hiddenFormValue' %>" + 
-      ( @polymorphic_parents.keys.include?( (assoc.name.to_s + "_id").to_sym) ? 
+      ( @polymorphic_parents.include?( (assoc.name.to_s + "_id")) ? 
 "\n     <%= f.hidden_field :#{assoc.name}_type, value: #{singular}.try(:#{assoc.name}_type), 'data-typeahead-target': 'hiddenFormType' %>"
       : "") + 
       "\n      <div data-typeahead-target='results'></div>

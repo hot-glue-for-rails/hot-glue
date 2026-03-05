@@ -266,16 +266,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     input = options["polymorphic_parent"]
     # "parent_id[company|vc_firm|press_outlet],thing_id[apple|banana]"
 
-    @polymorphic_parents =
-    input.split(",").each_with_object({}) do |parent_data, h|
-      m = parent_data.strip.match(/\A(.*?)\[(.*?)\]\z/)
-      next unless m
-
-      key   = m[1].to_sym
-      types = m[2].split("|")               # or .map(&:to_sym) if you want symbols
-
-      h[key] = types
-    end
+    @polymorphic_parents = input.split(",")
+    
     puts "polymhic_parents: #{@polymorphic_parents}"
 
     @exclude_fields = []
@@ -302,7 +294,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         end
       }.flatten.compact.collect(&:to_sym)
 
-      @include_fields += @polymorphic_parents.keys.collect{|x| x.to_s.gsub("_id","_type").to_sym}
+      @include_fields += @polymorphic_parents.collect{|x| x.to_s.gsub("_id","_type").to_sym}
 
       puts "INCLUDED FIELDS: #{@include_fields}"
     end
