@@ -178,7 +178,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       if Gem::Specification.find_all_by_name('pagy').first.version.to_s.split(".").first.to_i <= 9
         @pagination_style = 'pagy9'
       else
-        raise "Pagy version 43 not yet compatible"
+        # warn "Pagy version 43 not yet compatible"
         @pagination_style = 'pagy43'
       end
     elsif Gem::Specification.find_all_by_name('will_paginate').any?
@@ -2027,7 +2027,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       res << "    @#{plural} = @#{plural}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
     elsif @pagination_style == "will_paginate"
       res << "    @#{plural} = @#{plural}.paginate(page: params[:page], #{ ", per_page: per" if @paginate_per_page_selector })"
-    elsif @pagination_style == "pagy"
+    elsif @pagination_style == "pagy9" || @pagination_style == "pagy43"
       res << "    @pagy, @#{plural} = pagy(@#{plural})"
     end
     res

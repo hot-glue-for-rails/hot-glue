@@ -285,11 +285,17 @@ module  HotGlue
         "<% if #{plural}.respond_to?(:total_pages) %><%= paginate(#{plural}) %> <% end %>"
       elsif @pagination_style == "will_paginate"
         "<% if #{plural}.respond_to?(:total_pages) %><%= will_paginate(#{plural}) %> <% end %>"
-      elsif @pagination_style == "pagy"
+      elsif @pagination_style == "pagy9"
         if !@layout_strategy == "bootstrap"
           "<%== pagy_nav(@pagy, anchor_string: 'data-turbo-action=\"advance\"') %>"
         else
           "<%== pagy_bootstrap_nav(@pagy, anchor_string: 'data-turbo-action=\"advance\"') %>"
+        end
+      elsif @pagination_style == "pagy43"
+        if @layout_strategy.is_a?(LayoutStrategy::Bootstrap)
+          "<%== @pagy.series_nav(:bootstrap) if @pagy && @pagy.pages > 1 %>"
+        else
+          "<%== @pagy.series_nav if @pagy && @pagy.pages > 1 %>"
         end
       end
     end
