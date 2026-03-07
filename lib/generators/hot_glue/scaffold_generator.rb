@@ -34,7 +34,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :search_clear_button, :search_autosearch, :include_object_names,
                 :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
                 :invisible_create, :invisible_update, :phantom_create_params,
-                :phantom_update_params, :lazy, :back_link_to_parent, :polymorphic_parents
+                :phantom_update_params, :lazy, :back_link_to_parent
+                #, :polymorphic_parents
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -121,7 +122,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   class_option :phantom_update_params, type: :string, default: nil
   class_option :controller_prefix, type: :string, default: nil
   class_option :code_in_controller, type: :string, default: nil
-  class_option :polymorphic_parent, type: :string, default: nil
+  # class_option :polymorphic_parent, type: :string, default: nil
 
   # SEARCH OPTIONS
   class_option :search, default: nil # set or predicate
@@ -263,12 +264,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
     # polymorphic parents
-    input = options["polymorphic_parent"]
+    # input = options["polymorphic_parent"]
     # "parent_id[company|vc_firm|press_outlet],thing_id[apple|banana]"
 
-    @polymorphic_parents = input.split(",")
+    # @polymorphic_parents = input.split(",")
     
-    puts "polymhic_parents: #{@polymorphic_parents}"
+    # puts "polymhic_parents: #{@polymorphic_parents}"
 
     @exclude_fields = []
     @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
@@ -294,7 +295,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         end
       }.flatten.compact.collect(&:to_sym)
 
-      @include_fields += @polymorphic_parents.collect{|x| x.to_s.gsub("_id","_type").to_sym}
+      # @include_fields += @polymorphic_parents.collect{|x| x.to_s.gsub("_id","_type").to_sym}
 
       puts "INCLUDED FIELDS: #{@include_fields}"
     end
@@ -946,7 +947,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     if options["hawk"]
       options['hawk'].split(",").each do |hawk_entry|
 
-      
         # format is: abc_id[thing]
         if hawk_entry.include?("{")
           hawk_entry =~ /(.*){(.*)}/
@@ -956,32 +956,44 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           hawk_to = @auth
         end
 
-        # check for polymorphism in the hawk_to
-        if hawk_to.include?("|")
-          type_arg = key.gsub("_id","_type")
-          hawk_to =  hawk_to.split("|").each_with_object({ polymorphic: type_arg.to_sym }) do |pair, hash|
-            name, expr = pair.split(":", 2)
 
-            # Evaluate the right-hand side expression in current binding
-            hash[name] = expr
-          end
-        end
-        
-        
         hawk_scope = key.gsub("_id", "").pluralize
 
-        if eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})").nil?
-          raise "Could not find `#{key.gsub('_id', '')}` association; add this to the #{singular_class} class: \nbelongs_to :#{key.gsub('_id', '')} "
+        reflection = eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})")
+        raise "Could not find `#{key.gsub('_id', '')}` association; add this to the #{singular_class} class: \nbelongs_to :#{key.gsub('_id', '')} " if reflection.nil?
+
+        optional = reflection.options[:optional]
+
+        # if hawk_to.include?(" ")
+        #   @hawk_keys[key.to_sym] = { bind_to: [hawk_to.gsub(" ", ",")], 
+        #   polymorphic: true,
+        #   optional: optional }
+
+        #   # hawk_to.start_with?("[")
+        #   # # Polymorphic hawk: space-separated scopes inside brackets
+        #   # # e.g. [account.companies account.vc_firms]
+        #   # raise "#{key} is not a polymorphic association; add `polymorphic: true` to belongs_to :#{key.gsub('_id', '')} in #{singular_class}" unless reflection.options[:polymorphic]
+        #   # scopes = hawk_to.gsub(/^\[|\]$/, "").split(" ")
+        #   # @hawk_keys[key.to_sym] = { bind_to: scopes, polymorphic: true, optional: optional }
+        # else
+        # 
+        if hawk_to.include?(" ")
+          hawk_to.gsub!(" ", ",")
+          polymorphic = true
+        else
+          polymorphic = false
         end
 
-        optional = eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})").options[:optional]
-
-        @hawk_keys[key.to_sym] = { bind_to: [hawk_to], optional: optional }
+        @hawk_keys[key.to_sym] = { bind_to: [hawk_to],
+          optional: optional , 
+          polymorphic: polymorphic}
+        
+        
         use_shorthand = !options["hawk"].include?("{")
-
         if use_shorthand # only include the hawk scope if using the shorthand
           @hawk_keys[key.to_sym][:bind_to] << hawk_scope
         end
+        # end
 
       end
 
@@ -1189,7 +1201,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def creation_syntax
     if @factory_creation.nil? && ! @alt_lookups.any?
-      (@hawk_keys.any? ?   "modified_params = hawk_params({#{ hawk_to_ruby(in_controller: true) }}, modified_params)\n    " : "")  + "@#{singular } = #{ class_name }.new(modified_params)"
+
+      res = (@hawk_keys.any? ?   "modified_params = hawk_params({#{ hawk_to_ruby(in_controller: true) }}, modified_params)\n    " : "")  + "@#{singular } = #{ class_name }.new(modified_params)"
     elsif @factory_creation.nil? && @alt_lookups.any?
 
       prelookup_syntax = @alt_lookups.collect{|lookup, data|
@@ -1208,13 +1221,14 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       #{@factory_creation}
       "
       res << "\n      " + "@#{singular} = factory.#{singular}" unless res.include?("@#{singular} = factory.#{singular}")
-      res << "\n    rescue ActiveRecord::RecordInvalid
-      @#{singular} = factory.#{singular}
-      @action = 'new'
-    end"
-      res
+      res << "\n    rescue ActiveRecord::RecordInvalid"
+      res << "\n    @#{singular} = factory.#{singular}"
+      res << "\n     @action = 'new'"
     end
+    byebug
+    res
   end
+    
 
   def formats
     [format]
@@ -2041,18 +2055,19 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # false for views; true for controller
 
     res = @hawk_keys.collect { |k, v|
-      bind_to_array = v[:bind_to].dup
-      bind_to = bind_to_array.collect{|bt|
-
-        if bt.is_a?(String) 
+      if v[:polymorphic]
+        bt = v[:bind_to][0]
+        bt = in_controller ? bt.gsub(/(?<=\[|,)([a-z_]\w*)/, '@\1') : bt
+        "#{k}: #{bt}"
+      else
+        bind_to = v[:bind_to].dup.collect { |bt|
           in_controller ? bt.gsub(singular, "@#{singular}") : bt
-        else # is a hash 
-          bt
-        end
-      }
-
-      "#{k.to_s}: #{bind_to.join(".")}"
+        }
+        "#{k}: #{bind_to.join(".")}"
+      end
+    
     }.compact.join(", ")
+
     res
   end
 
