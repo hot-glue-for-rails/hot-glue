@@ -1225,7 +1225,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       res << "\n    @#{singular} = factory.#{singular}"
       res << "\n     @action = 'new'"
     end
-    byebug
     res
   end
     
@@ -1540,11 +1539,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def object_scope
     if @nested_set.any? && @nested_set.last[:parent_name] && !@nested_set.last[:polymorph_as]
-
-      # last_parent = @nested_set.last[:parent_name]
-      # byebug
-
-      # foreign_key =  eval("#{singular_class}.reflect_on_association(:#{last_parent})").foreign_key
       if @nested_set.last[:polymorph_as]
         possible_associations = [@nested_set.last[:parent_name].pluralize]
       else
@@ -2053,19 +2047,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   def hawk_to_ruby(in_controller: false)
     # false for views; true for controller
-
     res = @hawk_keys.collect { |k, v|
-      if v[:polymorphic]
-        bt = v[:bind_to][0]
-        bt = in_controller ? bt.gsub(/(?<=\[|,)([a-z_]\w*)/, '@\1') : bt
-        "#{k}: #{bt}"
-      else
-        bind_to = v[:bind_to].dup.collect { |bt|
-          in_controller ? bt.gsub(singular, "@#{singular}") : bt
-        }
-        "#{k}: #{bind_to.join(".")}"
-      end
-    
+      "#{k}: #{v[:bind_to]}"
     }.compact.join(", ")
 
     res
