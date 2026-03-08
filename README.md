@@ -2489,6 +2489,41 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
+#### 2026-03-08 - v0.7.6
+- Makes hawk polymorphic aware. As well, a child controller with a polymorphic parent is also aware (the last item in the nest list should be specified using `(`...`)`)
+
+Using the hawk with a polymorphic foreign key:
+
+If the field (foreign key) being hawked is a polymorphic foreign key, you need to list multiple objects which define the allowed scopes (one for each kind of parent type).
+
+In this case, you will use **spaces** to separate scopes (NOT commas)
+
+for example, if we have a `thing` that can belong (via parent_id and parent_type) to either people or places, we could restrict this thing to only people and places associated from the `account` object (which would be in-scope based on, for example, the nesting arrangement or a logged in-user, or the account currently being managed)
+
+`--hawk=parent_id{account.people account.places}`
+
+Hot glue wil convert the spaces to commas when writing the controller code. 
+
+A child controller to with a polymorphic parent:
+- This special case assume that that the parent being build is not actually a polymoprh, it is a real object, but its children have foreign keys to it which are polymorphic. 
+
+`--nested=abc(parent) `
+
+Example: In my data model, targets have a polymorphic parent (parent_id and parent_type) and can belong to either Companies or Schools. Here, we are building the Companies view with a child to Targets, but notice for these targets we are using polymorphism and also using a controller prefix, so tha this child controller will be built as CompanyTargets. In the companies build, we downnest `company_targets(targets)` (`company_targets` is the name of the child controller, but it is acting on an object called `targets`, as seen in the downnest specification.)
+
+```
+bin/rails generate hot_glue:scaffold Company --namespace='account_dashboard' --nested='account'  --downnest='company_targets(targets)'
+```
+
+When building Targets, notice that the nested chain ends with `company(parent)`. This means our routes behave like normal routes (account/company), but this tells Hot Glue that the relationship from Target to Company is via the polymorphic parent_id & parent_type key. 
+
+```
+bin/rails generate hot_glue:scaffold Target --namespace='account_dashboard' --nested='account/company(parent)'  --controller-prefix='Company'
+```
+
+- Pagy support for Pagy 42 + 43. Breaking changes bewteen Pagy version 9 and version 42 force you to rebuild everything (every view) when upgrading Pagy. Hot Glue now detects which version of Pagy is installed and outputs the syntax for that version. (You will still need to rebuild all controllers when upgrading past Pagy 9)
+
+
 #### 2026-01-11 - v0.7.5
 This is mostly a maintenance release to address these two issues related to the hawk:
 - removes the hawk in the create action because we are alrady doing it in the creation_syntax
