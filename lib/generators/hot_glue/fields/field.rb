@@ -38,7 +38,7 @@ class Field
     @hidden_update = scaffold.hidden_update
     @attachment_data = scaffold.attachments[name.to_sym]
     @god = scaffold.god
-    # @polymorphic_parents = scaffold.polymorphic_parents
+    @polymorphic_parents = scaffold.polymorphic_parents
 
 
     # TODO: remove knowledge of subclasses from Field

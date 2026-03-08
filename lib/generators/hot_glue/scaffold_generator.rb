@@ -34,8 +34,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :search_clear_button, :search_autosearch, :include_object_names,
                 :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
                 :invisible_create, :invisible_update, :phantom_create_params,
-                :phantom_update_params, :lazy, :back_link_to_parent
-                #, :polymorphic_parents
+                :phantom_update_params, :lazy, :back_link_to_parent, :polymorphic_parents
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -267,9 +266,18 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # input = options["polymorphic_parent"]
     # "parent_id[company|vc_firm|press_outlet],thing_id[apple|banana]"
 
-    # @polymorphic_parents = input.split(",")
+    if @nested.split("/").last.include?("(")
+      @polymorphic_parents = [@nested.split("/").last[/\(([^)]+)\)/, 1] + "_id"]
     
-    # puts "polymhic_parents: #{@polymorphic_parents}"
+    else
+      @polymorphic_parents = []
+      # do we need to be able to set these via a config?
+      # the use case I've implemented only supports a polymorphic parent in
+      # how you build the nest structure (last nested parent)
+      # what if there are two or more fields which are polymorphic on the object 
+    end
+
+    puts "polymhic_parents: #{@polymorphic_parents}"
 
     @exclude_fields = []
     @exclude_fields += options['exclude'].split(",").collect(&:to_sym)
@@ -294,9 +302,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
           end
         end
       }.flatten.compact.collect(&:to_sym)
-
-      # @include_fields += @polymorphic_parents.collect{|x| x.to_s.gsub("_id","_type").to_sym}
-
+      @include_fields += @polymorphic_parents.collect{ |x|
+        [x.to_sym, x.to_s.gsub("_id","_type").to_sym]
+    }.flatten
       puts "INCLUDED FIELDS: #{@include_fields}"
     end
 
@@ -958,7 +966,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
         hawk_scope = key.gsub("_id", "").pluralize
-
         reflection = eval(singular_class + ".reflect_on_association(:#{key.gsub('_id', '')})")
         raise "Could not find `#{key.gsub('_id', '')}` association; add this to the #{singular_class} class: \nbelongs_to :#{key.gsub('_id', '')} " if reflection.nil?
 
