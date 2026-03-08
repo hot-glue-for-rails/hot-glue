@@ -3,7 +3,7 @@ require_relative './field.rb'
 
 class AssociationField < Field
 
-  attr_accessor :assoc_name, :assoc_class, :assoc, :alt_lookup #, :polymorphic_parents
+  attr_accessor :assoc_name, :assoc_class, :assoc, :alt_lookup , :polymorphic_parents
 
   def initialize(scaffold: , name: )
     super
