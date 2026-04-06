@@ -35,7 +35,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
                 :invisible_create, :invisible_update, :phantom_create_params,
                 :phantom_update_params, :lazy, :back_link_to_parent, :polymorphic_parents
-                :phantom_update_params, :lazy, :back_link_to_parent, :polymorphic_parents
+
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
 
@@ -262,12 +262,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     setup_attachments
 
-
     # polymorphic parents
     # input = options["polymorphic_parent"]
     # "parent_id[company|vc_firm|press_outlet],thing_id[apple|banana]"
 
-    if @nested.split("/").last.include?("(")
+    if @nested && nested.split("/").last.include?("(")
       @polymorphic_parents = [@nested.split("/").last[/\(([^)]+)\)/, 1] + "_id"]
     
     else
