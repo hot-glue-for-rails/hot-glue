@@ -266,7 +266,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # input = options["polymorphic_parent"]
     # "parent_id[company|vc_firm|press_outlet],thing_id[apple|banana]"
 
-    if @nested && nested.split("/").last.include?("(")
+    if @nested && @nested.split("/").last.include?("(")
       @polymorphic_parents = [@nested.split("/").last[/\(([^)]+)\)/, 1] + "_id"]
     
     else

@@ -2489,6 +2489,9 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
+#### 2026-04-08 - v0.7.6.2
+- Syntax fix in code, no functional changes
+
 #### 2026-04-06 - v0.7.6.1
 - Syntax fix in code, no functional changes
 
