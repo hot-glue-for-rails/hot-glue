@@ -2489,6 +2489,9 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
+#### 2026-06-01 - v0.7.7
+- pickup partials (denoted with **) now use fully namespaced paths when rendering, this avoid out of scope issues when an action was used accross controllers
+
 #### 2026-04-08 - v0.7.6.2
 - Syntax fix in code, no functional changes
 
