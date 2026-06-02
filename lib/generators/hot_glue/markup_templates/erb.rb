@@ -12,7 +12,8 @@ module  HotGlue
                   :search, :search_fields, :search_query_fields, :search_position,
                   :form_path, :layout_object, :search_clear_button, :search_autosearch,
                   :stimmify, :stimmify_camel, :hidden_create, :hidden_update, :invisible_create,
-                  :invisible_update, :plural, :phantom_search, :pagination_style
+                  :invisible_update, :plural, :phantom_search, :pagination_style,
+                  :namespace, :controller_build_folder
 
 
     def initialize(singular:, singular_class: ,
@@ -26,7 +27,7 @@ module  HotGlue
                  search_clear_button:, search_autosearch:, layout_object:,
                  form_path: , stimmify: , stimmify_camel:, hidden_create:, hidden_update: ,
                  invisible_create:, invisible_update: , plural: , phantom_search:,
-                   pagination_style: )
+                   pagination_style:, namespace: nil, controller_build_folder: nil )
 
 
       @form_path = form_path
@@ -68,6 +69,12 @@ module  HotGlue
       @related_sets = related_sets
       @phantom_search = phantom_search
       @pagination_style = pagination_style
+      @namespace = namespace
+      @controller_build_folder = controller_build_folder
+    end
+
+    def pickup_partial_path(partial_name)
+      "#{@namespace + "/" if @namespace}#{@controller_build_folder}/#{partial_name}"
     end
 
     def add_spaces_each_line(text, num_spaces)
@@ -204,7 +211,7 @@ module  HotGlue
             col = full_col.to_s.gsub("=", "").gsub("-", "").to_sym
 
             if col.to_s.starts_with?("**") && layout_object[:columns][:fields][col][:form]
-              the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
+              the_output = "<%= render partial: '#{pickup_partial_path(col.to_s.gsub!("**",""))}', locals: {#{singular}: #{singular} } %>"
             elsif ! layout_object[:columns][:fields][col][:form]
               # omit from show action
             else
@@ -327,7 +334,7 @@ module  HotGlue
             raise "column #{col} not found on the layout data"
           end
           if col.starts_with?("**") && layout_object[:columns][:fields][col][:show]
-            the_output = "<%= render partial: '#{col.to_s.gsub!("**","")}', locals: {#{singular}: #{singular} } %>"
+            the_output = "<%= render partial: '#{pickup_partial_path(col.to_s.gsub!("**",""))}', locals: {#{singular}: #{singular} } %>"
           elsif ! layout_object[:columns][:fields][col][:show]
             the_output = ""
           elsif eval("#{singular_class}.columns_hash['#{col}']").nil? && !attachments.keys.include?(col) && !related_sets.include?(col)

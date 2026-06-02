@@ -731,7 +731,7 @@ describe "HotGlue::ScaffoldGenerator" do
                                               ["Dfg","--include=**my_parial:name"])
 
           res = File.read("spec/dummy/app/views/dfgs/_form.erb")
-          expect(res).to include("<%= render partial: 'my_parial', locals: {dfg: dfg } %>")
+          expect(res).to include("<%= render partial: 'dfgs/my_parial', locals: {dfg: dfg } %>")
         end
       end
 
@@ -742,10 +742,10 @@ describe "HotGlue::ScaffoldGenerator" do
                                               ["Dfg","--include=**-my_parial:name"])
 
           res = File.read("spec/dummy/app/views/dfgs/_form.erb")
-          expect(res).to include("<%= render partial: 'my_parial', locals: {dfg: dfg } %>")
+          expect(res).to include("<%= render partial: 'dfgs/my_parial', locals: {dfg: dfg } %>")
 
           res2 = File.read("spec/dummy/app/views/dfgs/_show.erb")
-          expect(res2).to_not include("<%= render partial: 'my_parial',")
+          expect(res2).to_not include("<%= render partial: 'dfgs/my_parial',")
         end
 
         it "omit a dynamic partial from the form in place of a field if it begins with **=" do
@@ -753,10 +753,10 @@ describe "HotGlue::ScaffoldGenerator" do
                                               ["Dfg","--include=**=my_parial:name"])
 
           res = File.read("spec/dummy/app/views/dfgs/_form.erb")
-          expect(res).to_not include("<%= render partial: 'my_parial', locals: {dfg: dfg } %>")
+          expect(res).to_not include("<%= render partial: 'dfgs/my_parial', locals: {dfg: dfg } %>")
 
           res2 = File.read("spec/dummy/app/views/dfgs/_show.erb")
-          expect(res2).to include("<%= render partial: 'my_parial',")
+          expect(res2).to include("<%= render partial: 'dfgs/my_parial',")
 
         end
       end

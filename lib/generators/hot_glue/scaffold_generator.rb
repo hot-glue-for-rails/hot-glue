@@ -926,7 +926,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         invisible_create: @invisible_create,
         invisible_update: @invisible_update,
         phantom_search: @phantom_search,
-        pagination_style: @pagination_style
+        pagination_style: @pagination_style,
+        namespace: @namespace,
+        controller_build_folder: @controller_build_folder
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")
