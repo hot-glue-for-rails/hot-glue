@@ -1126,7 +1126,7 @@ describe "HotGlue::ScaffoldGenerator" do
                                              "--hawk=dfg_id,xyz_id"])
 
       res = File.read("spec/dummy/app/controllers/ghis_controller.rb")
-      expect(res).to include("hawk_params({dfg_id: [current_user.dfgs], xyz_id: [current_user.xyzs]}, modified_params)")
+      expect(res).to include("hawk_params({dfg_id: [\"current_user\", \"dfgs\"], xyz_id: [\"current_user\", \"xyzs\"]}, modified_params)")
 
     end
 
@@ -1141,7 +1141,7 @@ describe "HotGlue::ScaffoldGenerator" do
 
       expect(res).to include("@visit = current_user.family.visits.find(params[:id])")
 
-      expect(res).to include("modified_params = hawk_params({user_id: [current_user.family]}, modified_params)")
+      expect(res).to include("modified_params = hawk_params({user_id: [\"current_user.family\"]}, modified_params)")
 
       expect(res).to include("def load_visit
     @visit = current_user.family.visits.find(params[:id])
