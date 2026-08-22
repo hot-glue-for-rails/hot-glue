@@ -45,7 +45,7 @@ class AssociationField < Field
     if which_partial == :update_show_only && update_show_only.include?(name)
 
     else
-      "      #{name}_selector = find(\"[name='#{singular}[#{name}]']\").click \n" +
+      "      #{name}_selector = find(\"[name='#{singular}[#{name}]']\")\n" +
       "      #{name}_selector.first('option', text: #{assoc}1.name).select_option"
     end
   end

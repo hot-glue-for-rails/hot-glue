@@ -69,7 +69,7 @@ describe 'interaction for <%= controller_class_name %>' do
       expect(page).to have_content("Editing #{<%= factory_testing_name %>.<%= @display_class %>.squish || "(no name)"}")
 <%= capybara_make_updates(:update) %>
       click_button "Save"
-      within("turbo-frame#<%= @namespace %>__#{dom_id(<%= factory_testing_name %>)} ") do
+      within("turbo-frame#<%= @namespace %>__#{dom_id(<%= factory_testing_name %>)}") do
 <%= "        " + @columns_map.map{ |col, col_object|
   if @attachments.keys.collect(&:to_sym).include?(col)
   elsif @show_only.include?(col)

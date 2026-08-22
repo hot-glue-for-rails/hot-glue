@@ -5,4 +5,6 @@ def login_as(user)
     fill_in 'Password', with: 'password'
   end
   click_button 'Log in'
+  expect(page).to have_content("Signed in successfully") # or assert on a known post-login element
+
 end
