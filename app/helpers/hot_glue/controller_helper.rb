@@ -57,7 +57,7 @@ module HotGlue
     end
 
     def formatted_time_display(object, method, current_user)
-      tz = ActiveSupport::TimeZone[current_user.timezone]
+      tz = current_user.try(:timezone) ? ActiveSupport::TimeZone[current_user.timezone] : ActiveSupport::TimeZone['UTC']
 
       t = object.public_send(method)
 
@@ -78,9 +78,10 @@ module HotGlue
     end
 
     def formatted_time_field(object, method, current_user)
-      tz = ActiveSupport::TimeZone[current_user.timezone]
+      tz = current_user.try(:timezone) ? ActiveSupport::TimeZone[current_user.timezone] : ActiveSupport::TimeZone['UTC']
 
       t = object.public_send(method)
+      return nil if t.nil?
 
       # Build UTC datetime from the stored time
       utc_datetime = Time.utc(
