@@ -1,0 +1,3 @@
+<\%= turbo_stream.replace "<%= @namespace %>__<%= singular %>-new" do %>
+  <\%= render partial: "new_form", locals: { <%= singular %>: @<%= singular %><%= @nested_set.collect{|arg| ", #{arg[:singular]}: @#{arg[:singular]}" }.join %> } %>
+<\% end %>

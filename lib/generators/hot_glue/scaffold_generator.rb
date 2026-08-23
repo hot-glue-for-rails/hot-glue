@@ -1437,12 +1437,16 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
   def datetime_fields_list
-    @columns.each_with_object({}) do |col, hash|
+    # build the hash literal as a string explicitly rather than interpolating a
+    # live Ruby Hash into the template: Hash#inspect renders symbol keys as
+    # `:k=>v` on Ruby <= 3.3 but `k: v` on Ruby 3.4+, so relying on it made the
+    # generated controller's syntax depend on the host app's Ruby version.
+    pairs = @columns.filter_map do |col|
       column = @the_object.columns_hash[col.to_s]
-      if column && [:datetime, :time].include?(column.type)
-        hash[col.to_sym] = column.type
-      end
+      next unless column && [:datetime, :time].include?(column.type)
+      "#{col}: :#{column.type}"
     end
+    "{#{pairs.join(', ')}}"
   end
 
 
@@ -1699,6 +1703,28 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
       end
     end
+
+    remove_stale_html_new_edit_views
+  end
+
+  # When new/edit are served as turbo_stream we no longer generate the classic
+  # html new.erb / edit.erb pages. A host app previously built by an older Hot
+  # Glue would still have those stale files on disk; clean them out on
+  # re-generation so the app doesn't keep serving (or fall back to) them.
+  def remove_stale_html_new_edit_views
+    return if @specs_only
+    return unless turbo_stream_new_and_edit?
+
+    stale_views = []
+    stale_views << 'new' unless @no_create
+    stale_views << 'edit' unless @no_edit
+
+    stale_views.each do |view|
+      dest_filename = cc_filename_with_extensions("#{view}", "#{@markup}")
+      dest_filepath = File.join("#{filepath_prefix}app/views#{namespace_with_dash}",
+                                @controller_build_folder, dest_filename)
+      remove_file dest_filepath if File.exist?(dest_filepath)
+    end
   end
 
   def append_model_callbacks
@@ -1767,15 +1793,25 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     @namespace ? "#{@namespace}/" : ""
   end
 
+  # new & edit are served as turbo_stream (frame replace) rather than as
+  # standalone html pages, EXCEPT in --big-edit mode (edit is a full page)
+  # and --display-edit-after-create mode (create redirects to the html edit
+  # page). In those modes we keep the classic html new.erb / edit.erb views.
+  def turbo_stream_new_and_edit?
+    !@big_edit && !@display_edit_after_create
+  end
+
   def all_views
     res = %w(index  _line _list _show)
 
     unless @no_create
-      res += %w(new _new_form _new_button)
+      res += %w(_new_form _new_button)
+      res << 'new' unless turbo_stream_new_and_edit?
     end
 
     unless @no_edit
-      res += %w{edit _edit}
+      res << '_edit'
+      res << 'edit' unless turbo_stream_new_and_edit?
     end
 
     if !(@no_edit && @no_create)
@@ -1801,6 +1837,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
     unless @no_create
       res << 'create'
+      res << 'new' if turbo_stream_new_and_edit?
     end
 
     unless @no_edit
