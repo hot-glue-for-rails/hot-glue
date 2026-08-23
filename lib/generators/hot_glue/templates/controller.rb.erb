@@ -105,7 +105,10 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     authorize @<%= singular %><% elsif @pundit && @pundit_policy_override %>
     skip_authorization
     raise Pundit::NotAuthorizedError if ! <%= @pundit_policy_override %>.new?<% end %>
-    @action = 'new' <% if @pundit %>
+    @action = 'new'<% if turbo_stream_new_and_edit? %>
+    respond_to do |format|
+      format.turbo_stream
+    end<% else %> <% end %><% if @pundit %>
   rescue Pundit::NotAuthorizedError
     flash[:alert] = 'You are not authorized to perform this action.'
     load_all_<%= plural %>
@@ -181,7 +184,9 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     skip_authorization
     raise Pundit::NotAuthorizedError if ! <%= @pundit_policy_override %>.edit?<% end %>
     @action = 'edit'
-    render :edit<% if @pundit %>
+    <% if turbo_stream_new_and_edit? %>respond_to do |format|
+      format.turbo_stream
+    end<% else %>render :edit<% end %><% if @pundit %>
   rescue Pundit::NotAuthorizedError
     flash[:notice] = "Editing <%= singular + ' ' if @include_object_names %>#{@<%= singular %>.<%= display_class %>} not authorized."
     render :index <% end %>

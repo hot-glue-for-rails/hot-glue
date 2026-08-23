@@ -229,9 +229,11 @@ describe "HotGlue::ScaffoldGenerator" do
     it "should create with a namespace" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Dfg","--namespace=hello"])
-      expect(File.exist?("spec/dummy/app/views/hello/dfgs/edit.erb")).to be(true)
+      # new/edit are served as turbo_stream now, so the classic html
+      # new.erb / edit.erb pages are no longer generated (see turbo_stream_new_and_edit?)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/edit.erb")).to be(false)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/new.erb")).to be(false)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/index.erb")).to be(true)
-      expect(File.exist?("spec/dummy/app/views/hello/dfgs/new.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/_form.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/_new_form.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/_line.erb")).to be(true)
@@ -241,6 +243,7 @@ describe "HotGlue::ScaffoldGenerator" do
       expect(File.exist?("spec/dummy/app/controllers/hello/dfgs_controller.rb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/create.turbo_stream.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/destroy.turbo_stream.erb")).to be(true)
+      expect(File.exist?("spec/dummy/app/views/hello/dfgs/new.turbo_stream.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/edit.turbo_stream.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/update.turbo_stream.erb")).to be(true)
       expect(File.exist?("spec/dummy/spec/features/hello/dfgs_behavior_spec.rb")).to be(true)
