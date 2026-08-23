@@ -10,7 +10,10 @@ class DateTimeField < Field
 
 
   def spec_setup_and_change_act(which_partial = nil)
-    "      " + "new_#{name} = DateTime.current + 1.year \n" +
+    # beginning_of_minute: an html5 datetime-local input rejects (as invalid,
+    # silently blocking form submit) a value whose seconds don't match the
+    # field's precision, so keep the test value minute-aligned.
+    "      " + "new_#{name} = DateTime.current.beginning_of_minute + 1.year \n" +
     '      ' + "find(\"[name='#{testing_name}[#{ name.to_s }]']\").fill_in(with: new_#{name.to_s})"
 
   end
@@ -24,7 +27,9 @@ class DateTimeField < Field
   end
 
   def spec_setup_let_arg
-    "#{name}: DateTime.current + 1.day"
+    # minute-aligned so the rendered datetime-local edit field is valid when
+    # the spec fills it (see spec_setup_and_change_act)
+    "#{name}: DateTime.current.beginning_of_minute + 1.day"
   end
 
   def spec_list_view_assertion
