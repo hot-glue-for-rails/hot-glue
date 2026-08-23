@@ -2489,6 +2489,11 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
+#### 2026-08-22 - v0.7.8
+- fix for time field output when no user is present (in gd mode)
+- in new builds, create and edit will now interact as turbo-stream interactions (except for big edit); this is to remove a race condition in the capy spec; note that your old edit.erb and new.erb will get deleted if you rebuild
+
+
 #### 2026-06-01 - v0.7.7
 - Dynamic blocks (denoted with **) now use fully namespaced paths when rendering, this avoid out of scope issues when an action was used accross controllers
 
