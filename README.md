@@ -2489,6 +2489,11 @@ These automatic pickups for partials are detected at build time. This means that
 
 # VERSION HISTORY
 
+#### 2026-08-29 - v0.7.9
+-  Render float fields as type="number" step="any" for HTML5 validation; float fields should not be correctly validated on input
+
+- switching 'feature' specs to be 'system' specs, switch to spec/system with shared DB connection, headless=new Chrome, and whole-example retry via rspec-retry; should address race conditions in specs
+
 #### 2026-08-22 - v0.7.8
 - fix for time field output when no user is present (in gd mode)
 - in new builds, create and edit will now interact as turbo-stream interactions (except for big edit); this is to remove a race condition in the capy spec; note that your old edit.erb and new.erb will get deleted if you rebuild

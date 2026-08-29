@@ -48,7 +48,7 @@ describe "HotGlue::ScaffoldGenerator" do
     remove_file("spec/dummy/app/controllers/jkls_controller.rb")
 
     remove_dir_with_namespace('spec/dummy/app/views/users')
-    remove_dir_with_namespace('spec/dummy/spec/features')
+    remove_dir_with_namespace('spec/dummy/spec/system')
 
     remove_dir_with_namespace('spec/dummy/app/views/ghis')
     remove_dir_with_namespace('spec/dummy/app/views/abcs')
@@ -113,7 +113,7 @@ describe "HotGlue::ScaffoldGenerator" do
       response = Rails::Generators.invoke("hot_glue:scaffold",
                                           ["Dfg","--specs-only"])
       expect(File.exist?("spec/dummy/spec/controller/dfgs_controller.rb")).to be(false)
-      expect(File.exist?("spec/dummy/spec/features/dfgs_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/dfgs_behavior_spec.rb")).to be(true)
     end
   end
 
@@ -246,7 +246,7 @@ describe "HotGlue::ScaffoldGenerator" do
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/new.turbo_stream.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/edit.turbo_stream.erb")).to be(true)
       expect(File.exist?("spec/dummy/app/views/hello/dfgs/update.turbo_stream.erb")).to be(true)
-      expect(File.exist?("spec/dummy/spec/features/hello/dfgs_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/hello/dfgs_behavior_spec.rb")).to be(true)
     end
   end
 
@@ -256,7 +256,7 @@ describe "HotGlue::ScaffoldGenerator" do
                                           ["Ghi","--nested=dfg"])
 
       expect(File.exist?("spec/dummy/app/controllers/ghis_controller.rb")).to be(true)
-      expect(File.exist?("spec/dummy/spec/features/ghis_behavior_spec.rb")).to be(true)
+      expect(File.exist?("spec/dummy/spec/system/ghis_behavior_spec.rb")).to be(true)
     end
 
 

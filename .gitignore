@@ -30,6 +30,5 @@ spec/dummy/app/controllers/
 spec/dummy/app/views/
 spec/dummy/app/javascript/application.js
 dummy/spec/features/
-dummy/spec/system/
 
 spec/dummy/app/javascript/controllers/dropzone_controller.js
