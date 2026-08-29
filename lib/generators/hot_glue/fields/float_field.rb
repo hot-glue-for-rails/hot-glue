@@ -11,7 +11,7 @@ class FloatField < Field
   end
 
   def form_field_output
-    field_output(nil, 5)
+    field_output('number', 5, step: 'any')
   end
 
   # def line_field_output
