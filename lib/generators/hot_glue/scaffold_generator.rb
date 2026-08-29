@@ -1265,7 +1265,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     unless @no_specs
-      dest_file = File.join("#{filepath_prefix}spec/features#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
+      dest_file = File.join("#{filepath_prefix}spec/system#{namespace_with_dash}", "#{plural}_behavior_spec.rb")
 
       if File.exist?(dest_file)
         existing_file = File.open(dest_file)

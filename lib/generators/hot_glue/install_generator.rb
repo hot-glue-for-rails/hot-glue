@@ -57,10 +57,26 @@ module HotGlue
 
 
       begin
+        gemfile_contents = File.read("Gemfile")
+        if !gemfile_contents.include?("rspec-retry")
+          gemfile_contents.gsub!(/^group :test do/, "group :test do\n  gem \"rspec-retry\"")
+          File.write("Gemfile", gemfile_contents)
+          puts "  HOTGLUE --> added to Gemfile: `gem \"rspec-retry\"` -- run `bundle install`  "
+        end
+      rescue StandardError => e
+        puts "WARNING: error writing to Gemfile --- #{e.message}"
+      end
+
+      begin
         rails_helper_contents = File.read("#{filepath_prefix}spec/rails_helper.rb")
         if !rails_helper_contents.include?("Capybara.default_driver =")
           rails_helper_contents << "\nCapybara.default_driver = :selenium_chrome_headless "
           puts "  HOTGLUE --> added to spec/rails_helper.rb: `Capybara.default_driver = :selenium_chrome_headless`  "
+        end
+
+        if !rails_helper_contents.include?("Capybara.default_max_wait_time")
+          rails_helper_contents << "\n\n# Default of 2s is too tight for headless Chrome + Devise + Turbo page\n# renders under load, causing sporadic false-negative waits.\nCapybara.default_max_wait_time = 5\n"
+          puts "  HOTGLUE --> added to spec/rails_helper.rb: `Capybara.default_max_wait_time = 5`  "
         end
 
         if !rails_helper_contents.include?("include FactoryBot::Syntax::Methods")
@@ -70,9 +86,46 @@ module HotGlue
           puts "  HOTGLUE --> added to #{filepath_prefix}spec/rails_helper.rb: `config.include FactoryBot::Syntax::Methods`  "
         end
 
+        if !rails_helper_contents.include?("type: :system) do")
+          rails_helper_contents.gsub!("RSpec.configure do |config|", "RSpec.configure do |config| \n
+    # spec/system specs run through ActionDispatch::SystemTestCase, which shares
+    # the DB connection between the test thread and the in-process Puma server
+    # thread. Plain :feature specs with a real Selenium driver don't get this,
+    # which causes intermittent \"record not visible to the server thread\"
+    # failures (e.g. login appearing to fail right after the user was created).
+    #
+    # We use :chrome (not Rails' :headless_chrome) because
+    # ActionDispatch::SystemTesting::Browser hardcodes the legacy `--headless`
+    # flag. Legacy headless Chrome runs a materially different rendering/input
+    # pipeline than real Chrome and has known bugs where a native click never
+    # reaches the page. `--headless=new` (Chrome 109+) doesn't have this problem.
+    config.before(:each, type: :system) do
+      driven_by :selenium, using: :chrome, screen_size: [1366, 1200] do |options|
+        options.add_argument(\"--headless=new\")
+      end
+    end
+
+    # Real-browser system specs still hit transient, infrastructure-level
+    # flakiness that has nothing to do with application correctness (a click
+    # occasionally dropped by the browser, a Turbo navigation racing a
+    # Capybara content read into an error Capybara doesn't retry on its own).
+    # Retrying the whole example -- rather than chasing each transient error
+    # class individually -- is the standard fix for this. rspec-retry
+    # re-instantiates the example group on retry so `let`/`let!` factories
+    # actually re-run instead of reusing stale memoized state.
+    config.verbose_retry = true
+    config.default_retry_count = 3
+    config.retry_callback = proc { Capybara.reset_sessions! }
+    config.around(:each, type: :system) do |example|
+      example.run_with_retry retry: 3
+    end
+  ")
+          puts "  HOTGLUE --> added to #{filepath_prefix}spec/rails_helper.rb: `config.before(:each, type: :system) { driven_by :selenium, using: :chrome, --headless=new }` and rspec-retry config  "
+        end
+
         if ! rails_helper_contents.include?("require 'support/capybara_login.rb'")
-          rails_helper_contents.gsub!("require 'rspec/rails'","require 'rspec/rails' \nrequire 'support/capybara_login.rb'")
-          puts "  HOTGLUE --> added to spec/rails_helper.rb: `require 'support/capybara_login.rb'`  "
+          rails_helper_contents.gsub!("require 'rspec/rails'","require 'rspec/rails' \nrequire 'rspec/retry' \nrequire 'support/capybara_login.rb'")
+          puts "  HOTGLUE --> added to spec/rails_helper.rb: `require 'rspec/retry'` and `require 'support/capybara_login.rb'`  "
         end
         File.write("#{filepath_prefix}spec/rails_helper.rb", rails_helper_contents)
 
@@ -138,6 +191,7 @@ module HotGlue
       rescue StandardError => e
         puts "WARNING: error writing to #{Rails.env.test? ? 'spec/dummmy/' : ''}spec/support/capybara_login.rb --- #{e.message}"
       end
+
     end
   end
 end

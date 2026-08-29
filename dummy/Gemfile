@@ -43,8 +43,13 @@ end
 
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
-  gem "capybara"
-  gem "selenium-webdriver"
+  # selenium-webdriver >= 4.10 changed how ActionDispatch::SystemTestCase builds
+  # the driver (Selenium Manager, capabilities kwarg) in ways actionpack 7.0.4's
+  # driver setup doesn't support, breaking session boot entirely. Pin below that
+  # until the app is on a newer Rails.
+  gem "capybara", "< 3.40"
+  gem "selenium-webdriver", "< 4.10"
+  gem "rspec-retry"
 end
 
 # Use Redis for Action Cable

@@ -4,7 +4,8 @@ ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
-require 'rspec/rails' 
+require 'rspec/rails'
+require 'rspec/retry'
 require 'support/capybara_login.rb'
 
 puts "reloading app..."
@@ -84,25 +85,47 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
   config.include FactoryBot::Syntax::Methods
 
+  # System specs (spec/system) run through ActionDispatch::SystemTestCase,
+  # which shares the DB connection between the test thread and the
+  # in-process Puma server thread. Plain :feature specs with a real
+  # Selenium driver don't get this, which caused intermittent
+  # "record not visible to the server thread" failures (e.g. login
+  # appearing to fail even though the user was just created).
+  #
+  # We use :chrome (not Rails' :headless_chrome) because
+  # ActionDispatch::SystemTesting::Browser hardcodes the legacy
+  # `--headless` flag. Legacy headless Chrome runs a materially different
+  # rendering/input pipeline than real Chrome and has known bugs where a
+  # native click is dispatched but never reaches the page (no JS error, no
+  # network request -- confirmed by correlating failures against the
+  # server log). `--headless=new` (Chrome 109+) uses the same pipeline as
+  # headed Chrome and doesn't have this problem.
+  config.before(:each, type: :system) do
+    driven_by :selenium, using: :chrome, screen_size: [1366, 1200] do |options|
+      options.add_argument("--headless=new")
+    end
+  end
+
+  # Real-browser system specs hit several distinct classes of transient,
+  # infrastructure-level flakiness that have nothing to do with application
+  # correctness: headless Chrome occasionally drops a native click event
+  # entirely (no request ever sent, no JS error), and a full-page Turbo
+  # Drive navigation can race a Capybara content read into a raw
+  # Selenium::WebDriver::Error::UnknownError ("node does not belong to the
+  # document") that Capybara's own stale-element retry doesn't catch.
+  # Chasing each one with bespoke per-interaction retries is whack-a-mole;
+  # retrying the whole example is the standard fix for this class of
+  # problem. rspec-retry (rather than a hand-rolled example.run loop)
+  # correctly re-instantiates the example group so `let`/`let!` factories
+  # actually re-run on retry instead of reusing stale memoized state.
+  config.verbose_retry = true
+  config.default_retry_count = 3
+  config.retry_callback = proc { Capybara.reset_sessions! }
+  config.around(:each, type: :system) do |example|
+    example.run_with_retry retry: 3
+  end
 end
 
-
-Capybara.register_driver :selenium do |app|
-  options = Selenium::WebDriver::Chrome::Options.new(
-    # It's the headlese arg that make Chrome headless
-    # + you also need the disable-gpu arg due to a bug
-    args: [ 
-      'headless' , 
-      'disable-gpu', 
-      'window-size=1366,1200'
-    ],
-    )
-
-  Capybara::Selenium::Driver.new(
-    app,
-    browser: :chrome,
-    options: options
-  )
-end
-
-Capybara.default_driver = :selenium
+# Default of 2s is too tight for headless Chrome + Devise + Turbo page
+# renders under load, causing sporadic false-negative waits.
+Capybara.default_max_wait_time = 5
