@@ -171,13 +171,13 @@ class Field
     res
   end
 
-  def field_output(type = nil, width )
+  def field_output(type = nil, width, step: nil)
     if modify_as && modify_as[:timezone]
       "<%= f.time_zone_select :#{name}, ActiveSupport::TimeZone.all, {}, {class: 'form-control'} %>"
     else
       parts = name.split('_')
       camelcase_name = parts.first + parts[1..].map(&:capitalize).join
-      "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  + (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "")  +  " %>\n " + "\n"
+      "  <%= f.text_field :#{name}, value: #{singular}.#{name}, autocomplete: 'off', size: #{width}, class: 'form-control', type: '#{type}'"  + (step ? ", step: '#{step}'" : "") + (form_placeholder_labels ? ", placeholder: '#{name.to_s.humanize}'" : "")  + (stimmify ? ", 'data-#{@stimmify}-target': '#{camelcase_name}' " : "")  +  " %>\n " + "\n"
     end
   end
 
