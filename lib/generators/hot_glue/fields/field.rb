@@ -52,6 +52,10 @@ class Field
     @name
   end
 
+  def sortable?
+    true
+  end
+
   def form_field_output
     raise "superclass must implement"
   end

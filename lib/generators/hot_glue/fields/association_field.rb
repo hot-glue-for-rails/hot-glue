@@ -33,6 +33,10 @@ class AssociationField < Field
 
   end
 
+  def sortable?
+    false
+  end
+
   def assoc_name
     assoc
   end

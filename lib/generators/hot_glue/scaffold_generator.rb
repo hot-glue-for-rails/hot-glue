@@ -34,7 +34,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :search_clear_button, :search_autosearch, :include_object_names,
                 :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
                 :invisible_create, :invisible_update, :phantom_create_params,
-                :phantom_update_params, :lazy, :back_link_to_parent, :polymorphic_parents
+                :phantom_update_params, :lazy, :back_link_to_parent, :polymorphic_parents,
+                :sortable, :sortable_fields
 
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
@@ -143,6 +144,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
 
   class_option :phantom_search, default: nil
+
+  # SORT OPTIONS
+  class_option :sortable, type: :boolean, default: false
+  class_option :sort_fields, default: nil # comma separated whitelist; defaults to all sortable-type fields
 
 
 
@@ -752,6 +757,27 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @columns_map[col] = this_column_object.field
     end
 
+    @sortable = options['sortable']
+
+    if @sortable
+      if options['sort_fields']
+        @sortable_fields = options['sort_fields'].split(',').collect(&:to_sym)
+        @sortable_fields.each do |field|
+          if !@columns_map[field]
+            raise "You specified a sort field for #{field} but that field is not in the list of columns"
+          elsif !@columns_map[field].sortable?
+            raise "You specified a sort field for #{field} but that field type cannot be sorted (e.g. an association or a UUID)"
+          end
+        end
+      else
+        @sortable_fields = @columns_map.select { |col, field| field.sortable? }.keys
+      end
+
+      warn_about_unindexed_sortable_fields
+    else
+      @sortable_fields = []
+    end
+
 
     @columns_map.each do |key, field|
       if field.is_a?(AssociationField)
@@ -928,7 +954,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         phantom_search: @phantom_search,
         pagination_style: @pagination_style,
         namespace: @namespace,
-        controller_build_folder: @controller_build_folder
+        controller_build_folder: @controller_build_folder,
+        sortable: @sortable,
+        sortable_fields: @sortable_fields
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")
@@ -1997,6 +2025,17 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
 
+  def warn_about_unindexed_sortable_fields
+    indexed_columns = @the_object.connection.indexes(@the_object.table_name).collect { |index| index.columns.first }
+    unindexed = @sortable_fields.reject { |field| indexed_columns.include?(field.to_s) }
+    return if unindexed.empty?
+
+    puts "********************"
+    puts "WARNING: The following fields are sortable but have no database index, which may cause slow queries as the table grows: #{unindexed.join(', ')}"
+    puts "Consider adding indexes, e.g.: " + unindexed.collect { |field| "add_index :#{plural}, :#{field}" }.join("; ")
+    puts "********************"
+  end
+
   def load_all_code
     # the inner method definition of the load_all_* method
     res = +""
@@ -2068,6 +2107,12 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       res << "\n"
     end
 
+    if @sortable
+      res << "\n"
+      res << "    if SORTABLE_FIELDS.include?(params[:sort]) && %w[asc desc].include?(params[:direction])\n"
+      res << "      @#{plural} = @#{plural}.order(params[:sort] => params[:direction].to_sym)\n"
+      res << "    end"
+    end
 
     if @pagination_style == "kaminari"
       res << "    @#{plural} = @#{plural}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"

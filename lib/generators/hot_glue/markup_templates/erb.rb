@@ -13,7 +13,7 @@ module  HotGlue
                   :form_path, :layout_object, :search_clear_button, :search_autosearch,
                   :stimmify, :stimmify_camel, :hidden_create, :hidden_update, :invisible_create,
                   :invisible_update, :plural, :phantom_search, :pagination_style,
-                  :namespace, :controller_build_folder
+                  :namespace, :controller_build_folder, :sortable, :sortable_fields
 
 
     def initialize(singular:, singular_class: ,
@@ -27,9 +27,12 @@ module  HotGlue
                  search_clear_button:, search_autosearch:, layout_object:,
                  form_path: , stimmify: , stimmify_camel:, hidden_create:, hidden_update: ,
                  invisible_create:, invisible_update: , plural: , phantom_search:,
-                   pagination_style:, namespace: nil, controller_build_folder: nil )
+                   pagination_style:, namespace: nil, controller_build_folder: nil,
+                   sortable: false, sortable_fields: [] )
 
 
+      @sortable = sortable
+      @sortable_fields = sortable_fields
       @form_path = form_path
       @search = search
       @search_fields = search_fields
@@ -106,7 +109,11 @@ module  HotGlue
         "<div class='#{layout_strategy.column_classes_for_column_headings(size)} hg-heading-row heading--#{singular}--#{column.join("-")}' " + col_style + ">" +
           column.map(&:to_s).map{|col_name|
             unless col_name.starts_with?("**")
-              the_output = "#{col_name.humanize}"
+              if @sortable && @sortable_fields.collect(&:to_s).include?(col_name)
+                the_output = "<%= sort_link(:#{col_name}, '#{col_name.humanize}') %>"
+              else
+                the_output = "#{col_name.humanize}"
+              end
             else
               the_output = ""
             end
