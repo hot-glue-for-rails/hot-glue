@@ -2523,12 +2523,13 @@ for example, if we have a `thing` that can belong (via parent_id and parent_type
 
 Hot glue wil convert the spaces to commas when writing the controller code. 
 
-A child controller to with a polymorphic parent:
-- This special case assume that that the parent being build is not actually a polymoprh, it is a real object, but its children have foreign keys to it which are polymorphic. 
+A child controller with a polymorphic parent:
 
-`--nested=abc(parent) `
+- This special case assumes that that the parent being build is not actually a polymoprh, it is a real object, but its children have foreign keys to it which are polymorphic. 
 
-Example: In my data model, targets have a polymorphic parent (parent_id and parent_type) and can belong to either Companies or Schools. Here, we are building the Companies view with a child to Targets, but notice for these targets we are using polymorphism and also using a controller prefix, so tha this child controller will be built as CompanyTargets. In the companies build, we downnest `company_targets(targets)` (`company_targets` is the name of the child controller, but it is acting on an object called `targets`, as seen in the downnest specification.)
+`--nested=abc(parent)`
+
+Example: In my data model, targets have a polymorphic parent (parent_id and parent_type) and can belong to either Companies or Schools. Here, we are building the Companies view with a child to Targets, but notice for these targets we are using polymorphism and also using a controller prefix, so that this child controller will be built as CompanyTargets. In the companies build, we downnest `company_targets(targets)` (`company_targets` is the name of the child controller, but it is acting on an object called `targets`, as seen in the downnest specification.)
 
 ```
 bin/rails generate hot_glue:scaffold Company --namespace='account_dashboard' --nested='account'  --downnest='company_targets(targets)'
