@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hot-glue (0.7.8)
+    hot-glue (0.7.9)
       ffaker (~> 2.16)
       rails (> 5.1)
 
@@ -134,7 +134,7 @@ GEM
       net-protocol
     net-pop (0.1.2)
       net-protocol
-    net-protocol (0.2.2)
+    net-protocol (0.3.0)
       timeout
     net-smtp (0.5.1)
       net-protocol
