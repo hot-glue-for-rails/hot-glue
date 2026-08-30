@@ -1096,8 +1096,6 @@ The effect will be that the fields will be stacked together into nicely fit colu
 
 **If your customer is used to Excel, this feature will confuse them.**
 
-Also, this feature will **probably not** be supported by the SORTING (not yet implemented). (You will be forced to choose between the two which I think makes sense.)
-
 The layout builder works from right-to-left and starts with 12, the number of Bootstrap's columns.
 
 It reserves 2 columns for the default buttons. Then +1 additional column for **each magic button** you have specified.
@@ -2000,6 +1998,17 @@ _Notice that Stimulus requires object registration when used in a Node environme
 Instead, use the generator and the registry will be updated for you automatically. 
 
 
+## Sorting
+
+#### `--sortable` (true of flagged; false otherwise; does not take an argument)
+To add sorting to your columns add `--sortable` to your build
+sortable fields are integers, floats, string, text, datetime, time, dates excluding anything that is a foreign key, not UUIDs
+
+#### `--sort-fields=` 
+List of field names (separated by commas) 
+Leave off (do not specify) to sort by all sort-eligible fields
+
+
 ## Attachments
 
 #### `--attachments=` Long form syntax with 1st and 2nd parameters
@@ -2488,6 +2497,15 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+#### 2026-08-30 - v0.8
+- `--sortable` (true of flagged; false otherwise; does not take an argument)
+To add sorting to your columns add `--sortable` to your build
+sortable fields are integers, floats, string, text, datetime, time, dates excluding anything that is a foreign key, not UUIDs
+- `--sort-fields=` 
+List of field names (separated by commas) 
+Leave off (do not specify) to sort by all sort-eligible fields
+
 
 #### 2026-08-29 - v0.7.9
 -  Render float fields as type="number" step="any" for HTML5 validation; float fields should not be correctly validated on input
