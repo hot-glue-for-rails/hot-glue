@@ -77,6 +77,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     params[:per] || 10
   end<% end %>
   <% unless @no_list %>
+<% if @sortable %>  SORTABLE_FIELDS = %w[<%= @sortable_fields.join(' ') %>].freeze
+<% end %>
   def load_all_<%= plural %><% if @search == "set" %>
     @q = params[:q] || <%= search_default %> <% end %>
 <%= load_all_code %>
