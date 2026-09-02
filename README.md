@@ -2176,8 +2176,10 @@ For Pagy version 9 or below
 4. add `include Pagy::Frontend` to ApplicationHelper
 
 For Pagy version 43 (there was a version jump)
-*NOT YET COMPATIBLE WITH PAGY 43*
-TODO: implement pagy 43
+Include pagy in your code (usually application_controller.rb)
+`include Pagy::Method`
+
+Breaking changes bewteen Pagy version 9 and version 42 force you to rebuild everything (every view) when upgrading Pagy. Hot Glue now detects which version of Pagy is installed and outputs the syntax for that version.
 
 ## "Thing" Label
 

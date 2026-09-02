@@ -35,7 +35,8 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
                 :stimmify, :stimmify_camel, :hidden_create, :hidden_update,
                 :invisible_create, :invisible_update, :phantom_create_params,
                 :phantom_update_params, :lazy, :back_link_to_parent, :polymorphic_parents,
-                :sortable, :sortable_fields
+                :sortable, :sortable_fields,
+                :csv, :csv_fields
 
   # important: using an attr_accessor called :namespace indirectly causes a conflict with Rails class_name method
   # so we use namespace_value instead
@@ -148,6 +149,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   # SORT OPTIONS
   class_option :sortable, type: :boolean, default: false
   class_option :sort_fields, default: nil # comma separated whitelist; defaults to all sortable-type fields
+
+  # CSV/EXCEL EXPORT OPTIONS
+  # requires a one-time `rails generate hot_glue:csv_export_install`
+  class_option :csv, type: :boolean, default: true # build the CSV/Excel exporter into this controller
+  class_option :csv_fields, default: nil # comma separated whitelist; defaults to all included fields
 
 
 
@@ -778,6 +784,23 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       @sortable_fields = []
     end
 
+    @csv = options['csv']
+
+    if @csv
+      if options['csv_fields']
+        @csv_fields = options['csv_fields'].split(',').collect(&:to_sym)
+        @csv_fields.each do |field|
+          if !@columns_map[field]
+            raise "You specified a csv field for #{field} but that field is not in the list of columns"
+          end
+        end
+      else
+        @csv_fields = @columns
+      end
+    else
+      @csv_fields = []
+    end
+
 
     @columns_map.each do |key, field|
       if field.is_a?(AssociationField)
@@ -956,7 +979,9 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
         namespace: @namespace,
         controller_build_folder: @controller_build_folder,
         sortable: @sortable,
-        sortable_fields: @sortable_fields
+        sortable_fields: @sortable_fields,
+        csv: @csv,
+        csv_fields: @csv_fields
       )
     elsif @markup == "slim"
       raise(HotGlue::Error, "SLIM IS NOT IMPLEMENTED")
@@ -1854,6 +1879,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       res << '_lazy_list'
     end
 
+    if @csv && !@no_list
+      res << '_export_button'
+    end
+
     res
   end
 
@@ -2037,7 +2066,22 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
   end
 
   def load_all_code
-    # the inner method definition of the load_all_* method
+    # the inner method definition of the load_all_* method (non-CSV path):
+    # query-building followed immediately by pagination (unchanged behavior)
+    load_all_query_code + load_all_pagination_code
+  end
+
+  def load_all_query_class_method_code
+    # the same query-building code but rewritten to use LOCAL variables so it
+    # can live in the class-level load_all_<plural>_query method that the CSV
+    # exporter shares with the controller. (no pagination — the exporter needs
+    # the full result set; pagination stays in the instance load_all_ method)
+    load_all_query_code.gsub("@#{plural}", plural).gsub("@q", "q")
+  end
+
+  def load_all_query_code
+    # the query-building portion of load_all (search where-clauses, phantom
+    # search, and sort) — WITHOUT pagination
     res = +""
     if @search_fields
       res << @search_fields.collect{ |field|
@@ -2053,19 +2097,6 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       if !@self_auth
 
         res << spaces(4) + "@#{ plural_name } = #{ object_scope.gsub("@",'') }#{record_scope}#{ n_plus_one_includes }#{".all" if n_plus_one_includes.blank? && record_scope.blank? }"
-
-        if @search_fields
-          res << @search_fields.collect{ |field|
-            wqs = @columns_map[field.to_sym].where_query_statement
-            if !wqs.empty?
-              "\n" + spaces(4) +  "@#{ plural_name } = @#{ plural_name }#{ wqs } if #{field}_query"
-            end
-          }.compact.join
-        end
-
-
-
-        # res << "\n    @#{plural} = @#{plural}.page(params[:page])#{ '.per(per)' if @paginate_per_page_selector }"
 
       elsif @nested_set[0] && @nested_set[0][:optional]
         res << "@#{ plural_name } = #{ class_name }.#{record_scope}.all"
@@ -2113,7 +2144,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
       res << "      @#{plural} = @#{plural}.order(params[:sort] => params[:direction].to_sym)\n"
       res << "    end"
     end
+    res
+  end
 
+  def load_all_pagination_code
+    res = +""
     if @pagination_style == "kaminari"
       res << "    @#{plural} = @#{plural}.page(params[:page])#{ ".per(per)" if @paginate_per_page_selector }"
     elsif @pagination_style == "will_paginate"
