@@ -24,6 +24,12 @@ module HotGlue
       copy_file "csv_export/_ready.erb", "#{filepath_prefix}app/views/csv_requests/_ready.erb"
       copy_file "csv_export/_failed.erb", "#{filepath_prefix}app/views/csv_requests/_failed.erb"
 
+      # Stimulus controller that auto-triggers the download when the background
+      # export's "ready" Turbo Stream arrives (registers it in the manifest,
+      # then overwrites the stub with the real implementation)
+      system("./bin/rails generate stimulus AutoDownload")
+      copy_file "csv_export/auto_download_controller.js", "#{filepath_prefix}app/javascript/controllers/auto_download_controller.js"
+
       timestamp = Time.now.utc.strftime("%Y%m%d%H%M%S")
       migration_version = ActiveRecord::Migration.current_version
       create_file "#{filepath_prefix}db/migrate/#{timestamp}_create_csv_requests.rb", <<~RUBY
@@ -53,8 +59,9 @@ module HotGlue
 
         Finish setup with these one-time steps:
 
-        1. Add the caxlsx gem to your Gemfile (for .xlsx / Excel export):
-             gem "caxlsx"
+        1. Add these gems to your Gemfile:
+             gem "caxlsx"   # .xlsx / Excel export
+             gem "csv"      # required on Ruby 3.4+ (csv is no longer default)
 
         2. Install Active Storage (the export file is stored as an attachment):
              bin/rails active_storage:install
@@ -74,6 +81,17 @@ module HotGlue
                 resources :things do
                   collection { post :export }
                 end
+
+        5. IMPORTANT — Action Cable must be CROSS-PROCESS.
+           When an export is too large it runs in a background job and, on
+           completion, broadcasts a Turbo Stream to the browser. The job and the
+           web server are separate processes in any real deployment (and in dev
+           if you run a separate worker), so your Action Cable adapter must be
+           shared across processes -- solid_cable, or redis. The `async` adapter
+           (Rails' dev default) only works in-process and will make the export
+           appear to hang on "Preparing...". If you use the redis adapter, note
+           that Action Cable requires the redis gem < 6:
+                gem "redis", "~> 5.0"
         ============================================================
 
       MSG

@@ -81,7 +81,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 <% if @sortable %>  SORTABLE_FIELDS = %w[<%= @sortable_fields.join(' ') %>].freeze
 <% end %><% if @csv %>  EXPORTABLE_FIELDS = %w[<%= @csv_fields.join(' ') %>].freeze
 <% end %>
-<% if @csv %>  def self.load_all_<%= plural %>_query(params:)
+<% if @csv %>  def self.load_all_<%= plural %>_query(params:<% unless @god %>, scope: <%= class_name %>.all<% end %>)
     q = params[:q]<% if @search == "set" %> || <%= search_default %><% end %>
 <%= load_all_query_class_method_code %>
 
@@ -89,7 +89,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
   def load_all_<%= plural %>
-    @q, @<%= plural %> = self.class.load_all_<%= plural %>_query(params: params)
+    @q, @<%= plural %> = self.class.load_all_<%= plural %>_query(params: params<% unless @god %>, scope: <%= load_all_base_scope %><% end %>)
 <%= load_all_pagination_code %>
   end<% else %>  def load_all_<%= plural %><% if @search == "set" %>
     @q = params[:q] || <%= search_default %> <% end %>

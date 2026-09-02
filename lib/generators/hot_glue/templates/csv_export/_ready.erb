@@ -1,6 +1,6 @@
 <%= turbo_frame_tag "csv_request_#{csv_request.id}" do %>
   <div class="alert alert-success">
     Your <%= csv_request.format.upcase %> export is ready.
-    <%= link_to "Download", download_csv_request_path(csv_request), class: "btn btn-sm btn-primary", data: { turbo: false } %>
+    <%= link_to "Download", download_csv_request_path(csv_request), class: "btn btn-sm btn-primary", data: { turbo: false, controller: "auto-download" } %>
   </div>
 <% end %>

@@ -3,7 +3,7 @@
     Export
   </button>
   <ul class="dropdown-menu">
-    <li><\%= button_to "as CSV", export_<%= plural %>_path(request.query_parameters.merge(format_type: "csv")), class: "dropdown-item", form: { data: { turbo: false } } %\></li>
-    <li><\%= button_to "as Excel", export_<%= plural %>_path(request.query_parameters.merge(format_type: "xlsx")), class: "dropdown-item", form: { data: { turbo: false } } %\></li>
+    <li><\%= button_to "as CSV", export_<%= "#{@namespace}_" if @namespace %><%= plural %>_path(request.query_parameters.merge(format_type: "csv")), class: "dropdown-item", form: { data: { turbo: false } } %></li>
+    <li><\%= button_to "as Excel", export_<%= "#{@namespace}_" if @namespace %><%= plural %>_path(request.query_parameters.merge(format_type: "xlsx")), class: "dropdown-item", form: { data: { turbo: false } } %></li>
   </ul>
 </div>

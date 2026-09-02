@@ -2076,22 +2076,50 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # can live in the class-level load_all_<plural>_query method that the CSV
     # exporter shares with the controller. (no pagination — the exporter needs
     # the full result set; pagination stays in the instance load_all_ method)
-    load_all_query_code.gsub("@#{plural}", plural).gsub("@q", "q")
+    #
+    # For non-god controllers the base relation depends on controller context
+    # (current_user, policy_scope, etc.) which does not exist in a class method,
+    # so it is injected as `scope`. God controllers have a context-free base
+    # (Model.all) and keep it inline.
+    base = @god ? nil : "scope"
+    load_all_query_code(base_override: base).gsub("@#{plural}", plural).gsub("@q", "q")
   end
 
-  def load_all_query_code
+  def load_all_base_scope
+    # the base relation expression used by the instance load_all_ method; for
+    # non-god controllers it is passed into the class-level query method as
+    # `scope:` (it may reference current_user / policy_scope, which only exist
+    # in controller-instance context)
+    if pundit
+      "policy_scope(#{ object_scope })#{record_scope}"
+    elsif !@self_auth
+      "#{ object_scope.gsub("@",'') }#{record_scope}#{ n_plus_one_includes }#{".all" if n_plus_one_includes.blank? && record_scope.blank? }"
+    elsif @nested_set[0] && @nested_set[0][:optional]
+      "#{ class_name }.#{record_scope}.all"
+    else
+      "#{ class_name }.#{record_scope}.where(id: #{ auth_object.gsub("@",'') }.id)#{ n_plus_one_includes }"
+    end
+  end
+
+  def load_all_query_code(base_override: nil)
     # the query-building portion of load_all (search where-clauses, phantom
-    # search, and sort) — WITHOUT pagination
+    # search, and sort) — WITHOUT pagination. When base_override is given (the
+    # class-level query method), the base relation is that expression (e.g. an
+    # injected `scope`) instead of the controller-context object scope.
     res = +""
     if @search_fields
-      res << @search_fields.collect{ |field|
+      search_field_assignments = @search_fields.collect{ |field|
         if !@columns_map[field.to_sym].load_all_query_statement.empty?
           @columns_map[field.to_sym].load_all_query_statement
         end
-      }.compact.join("\n" + spaces(4)) + "\n"
+      }.compact
+      res << spaces(4) + search_field_assignments.join("\n" + spaces(4)) + "\n" if search_field_assignments.any?
     end
 
-    if pundit
+    if base_override
+      res << spaces(4) + "@#{ plural_name } = #{ base_override }"
+      res << "\n"
+    elsif pundit
       res << "    @#{ plural_name } = policy_scope(#{ object_scope })#{record_scope}\n"
     else
       if !@self_auth
