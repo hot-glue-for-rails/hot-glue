@@ -7,7 +7,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   # rubocop:enable Layout/LineLength <% end %>
 
   helper :hot_glue
-  include HotGlue::ControllerHelper
+  include HotGlue::ControllerHelper<% if @csv %>
+  extend HotGlue::ControllerHelper<% end %>
   <%= @code_in_controller.gsub(";", "\n") %>
 
   <% unless @god %>before_action :<%= "authenticate_" + @auth_identifier.split(".")[0] + "!" %><% end %><% if any_nested? %>
@@ -78,15 +79,32 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end<% end %>
   <% unless @no_list %>
 <% if @sortable %>  SORTABLE_FIELDS = %w[<%= @sortable_fields.join(' ') %>].freeze
+<% end %><% if @csv %>  EXPORTABLE_FIELDS = %w[<%= @csv_fields.join(' ') %>].freeze
 <% end %>
-  def load_all_<%= plural %><% if @search == "set" %>
+<% if @csv %>  def self.load_all_<%= plural %>_query(params:<% if !@god || @pundit %>, scope: <%= class_name %>.all<% end %>)
+    q = params[:q]<% if @search == "set" %> || <%= search_default %><% end %>
+<%= load_all_query_class_method_code %>
+
+    [q, <%= plural %>]
+  end
+<% if @pundit %>
+  def self.csv_export_scope(owner)
+    Pundit.policy_scope!(owner, <%= class_name %>)
+  end
+<% end %>
+  def load_all_<%= plural %>
+    @q, @<%= plural %> = self.class.load_all_<%= plural %>_query(params: params<% if !@god || @pundit %>, scope: <%= load_all_base_scope %><% end %>)
+<%= load_all_pagination_code %>
+  end<% else %>  def load_all_<%= plural %><% if @search == "set" %>
     @q = params[:q] || <%= search_default %> <% end %>
 <%= load_all_code %>
-  end
+  end<% end %>
 
   def index
     load_all_<%= plural %><% if @search_fields %>
-<%= @search_fields.collect{|field_name| @columns_map[field_name.to_sym].code_to_reset_match_if_search_is_blank}.compact.join("     \n") %><% end %>
+<%= @search_fields.collect{|field_name| @columns_map[field_name.to_sym].code_to_reset_match_if_search_is_blank}.compact.join("     \n") %><% end %><% if @csv %>
+
+    @pending_csv_request = CsvRequest.find_by(id: flash[:pending_csv_request_id])<% end %>
     <% if @pundit %><% if @pundit && !@pundit_policy_override %>
     authorize @<%= plural_name %><% elsif @pundit && @pundit_policy_override %>
     skip_authorization
@@ -96,7 +114,29 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     flash[:alert] = 'You are not authorized to perform this action.'
     render 'layouts/error'<% end %>
   end<% end %>
+<% if @csv %>
+  def export
+    format_type = %w[csv xlsx].include?(params[:format_type]) ? params[:format_type] : "csv"
+    constructor = CsvConstructor.new(controller_name: "<%= controller_class_name %>", params: params<% if @pundit %>, owner: pundit_user<% end %>)
 
+    if constructor.count <= 100
+      send_data constructor.build(format_type),
+        filename: "<%= plural %>.#{format_type}",
+        type: mime_for_export(format_type),
+        disposition: "attachment"
+    else
+      csv_request = CsvRequest.create!(
+        controller_name: "<%= controller_class_name %>",
+        format: format_type,
+        query_params: params.slice(:sort, :direction, :q).to_unsafe_h<% if @pundit %>,
+        owner: pundit_user<% end %>
+      )
+      BuildCsvJob.perform_later(csv_request.id)
+      flash[:pending_csv_request_id] = csv_request.id
+      redirect_back fallback_location: <%= path_helper_plural %>
+    end
+  end
+<% end %>
 <% if create_action %>  def new<% if @object_owner_sym %>
     @<%= singular_name %> = <%= class_name %>.new<% if eval("#{class_name}.reflect_on_association(:#{@object_owner_sym})").class == ActiveRecord::Reflection::BelongsToReflection  %>(<%= @object_owner_sym %>: <%= @object_owner_eval %>)<% end %><% elsif @object_owner_optional && any_nested? %>
     @<%= singular_name %> = <%= class_name  %>.new({}.merge(<%= @nested_set.last[:singular] %> ? {<%= @object_owner_sym %>: <%= @object_owner_eval %>} : {}))<% else %>
@@ -324,6 +364,10 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   def namespace
     <% if @namespace %>'<%= @namespace %>/'<% else %><% end %>
   end
-end
+<% if @csv %>
+  def mime_for_export(format_type)
+    format_type == "xlsx" ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" : "text/csv"
+  end
+<% end %>end
 
 

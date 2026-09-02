@@ -2009,6 +2009,74 @@ List of field names (separated by commas)
 Leave off (do not specify) to sort by all sort-eligible fields
 
 
+## CSV / Excel Export
+A scaffold can export its list (respecting whatever search filters and sort order the user currently has applied) as a CSV or Excel file. Small result sets download immediately; large result sets are built in background job and the browser is notified via Turbo Streams when the file is ready, then the download starts automatically.
+
+### One-time setup
+
+Run this once per app, **before** generating any scaffold with `--csv`:
+
+```
+bin/rails generate hot_glue:csv_export_install
+```
+
+This copies the shared pieces every exporting controller depends on (`CsvConstructor`, the `CsvRequest` model + migration, `BuildCsvJob`, `DestroyCsvRequestJob`, `CsvRequestsController`, the Turbo Stream partials, and an `auto-download` Stimulus controller), and prints a checklist to finish:
+
+1. Add gems:
+```ruby
+gem "caxlsx"   # .xlsx / Excel export
+gem "csv"      # required on Ruby 3.4+ (csv is no longer in the default gemset)
+```
+
+2. Install Active Storage (the export file is stored as an attachment):
+```
+bin/rails active_storage:install
+```
+
+3. Add routes — the global download route once:
+```ruby
+resources :csv_requests, only: [] do
+  member { get :download }
+end
+```
+...then, for **each** scaffold you build with `--csv`, add an export route to
+that resource:
+```ruby
+resources :things do
+  collection { post :export }
+end
+```
+
+4. **Action Cable must be cross-process.** A large export runs in a background job and, on completion, broadcasts a Turbo Stream telling the browser the file is ready. The job and the web server are separate processes in any real deployment (and in dev too, if you run a separate worker), so the Action Cable adapter must be shared across processes — `solid_cable` or `redis` both work. The `async` adapter (Rails' dev default) only works in-process and will make the export appear to hang forever on "Preparing...". If you use the redis adapter, note Action Cable requires `redis < 6`:
+
+```ruby
+gem "redis", "~> 5.0"
+```
+
+### `--csv` (default: false)
+Builds the exporter into this controller: an `EXPORTABLE_FIELDS` constant, a `self.load_all_<plural>_query` class method (shared with `CsvConstructor` so an export always reflects the same search+sort logic as the interactive index), an `export` action, and an Export dropdown button (CSV / Excel) above the list. Opt in per scaffold with `--csv`.
+
+### `--csv-fields=name,desc,age`
+Comma-separated whitelist of which columns are written to the export file, and in what order. Defaults to every field passed to `--include`. Raises at generation time if you list a field that isn't in `--include`. `id` is never exportable, whitelisted or not.
+
+`--csv` cannot be combined with `--no-list` — there's no list to export — and raises at generation time if you try.
+
+### How it behaves at runtime
+- **Quick mode** (≤ 100 matching rows): the file is built in-process and streamed back immediately as an attachment — no job, no polling.
+
+- **Background mode** (> 100 matching rows): a `CsvRequest` row is created, a `BuildCsvJob` is queued, and the page shows a "Preparing your export…" panel. When the job finishes it attaches the file (via Active Storage) and broadcasts a Turbo Stream that replaces that panel with a download link, which the `auto-download` Stimulus controller clicks automatically — no second click required. The `CsvRequest` (and its attached file) are destroyed automatically ~5 minutes after download.
+
+### `--csv` with `--pundit`
+The export respects your Pundit scopes. `--csv` generates a `self.csv_export_scope(owner)` class method (`Pundit.policy_scope!(owner, Model)`) that `CsvConstructor` calls whenever it's present, for both quick and background exports:
+- Quick (synchronous) exports run inside the request, so the scope is the same `policy_scope(...)` the interactive index already uses.
+- Background exports run in a separate job process with no request/session, so the `export` action stores `pundit_user` on the `CsvRequest` (`owner`, the same nullable polymorphic column mentioned below) at creation time, and the job recomputes `Pundit.policy_scope!(owner, Model)` from that stored value when it runs.
+
+### Known limitations
+- Scaffolds generated without `--gd` and without `--pundit` (auth-scoped some other way, e.g. `current_user.things`) correctly scope the interactive index to `current_user`, but a *background* export's `CsvConstructor` call doesn't yet receive that scope — it falls back to the model's default. To be addressed once there's a dummy app with real login to build and test it against. (`--pundit` scoping is handled — see above.)
+
+- The `export` route helper only handles top-level and namespaced resources today, not `nested_set`-style nested routes.
+
+
 ## Attachments
 
 #### `--attachments=` Long form syntax with 1st and 2nd parameters
@@ -2176,8 +2244,10 @@ For Pagy version 9 or below
 4. add `include Pagy::Frontend` to ApplicationHelper
 
 For Pagy version 43 (there was a version jump)
-*NOT YET COMPATIBLE WITH PAGY 43*
-TODO: implement pagy 43
+Include pagy in your code (usually application_controller.rb)
+`include Pagy::Method`
+
+Breaking changes bewteen Pagy version 9 and version 42 force you to rebuild everything (every view) when upgrading Pagy. Hot Glue now detects which version of Pagy is installed and outputs the syntax for that version.
 
 ## "Thing" Label
 
@@ -2497,6 +2567,10 @@ These automatic pickups for partials are detected at build time. This means that
 
 
 # VERSION HISTORY
+
+#### 2026-09-05 - v0.9
+- CSV / Excel export: `--csv` (default false) and `--csv-fields=`. New `hot_glue:csv_export_install` generator sets up the shared `CsvConstructor`/`CsvRequest`/`BuildCsvJob` infrastructure. Quick (in-process) and background (job + Turbo Stream + auto-download) modes; the data output respects that you have sorted and searched too. Respects `--pundit` policy scopes on both quick and background exports. Raises if combined with `--no-list`. See "CSV / Excel Export" above for full docs.
+
 
 #### 2026-08-30 - v0.8
 - `--sortable` (true of flagged; false otherwise; does not take an argument)

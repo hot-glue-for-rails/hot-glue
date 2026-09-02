@@ -24,6 +24,7 @@ module LayoutStrategy
       (col_width/(builder.columns.count)).to_i
     end
     def list_classes; ""; end
+    def top_button_row_classes; ""; end
     def magic_button_classes; ""; end
     def row_classes; ""; end
     def row_heading_classes; ""; end

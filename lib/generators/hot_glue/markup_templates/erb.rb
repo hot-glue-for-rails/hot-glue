@@ -13,7 +13,8 @@ module  HotGlue
                   :form_path, :layout_object, :search_clear_button, :search_autosearch,
                   :stimmify, :stimmify_camel, :hidden_create, :hidden_update, :invisible_create,
                   :invisible_update, :plural, :phantom_search, :pagination_style,
-                  :namespace, :controller_build_folder, :sortable, :sortable_fields
+                  :namespace, :controller_build_folder, :sortable, :sortable_fields,
+                  :csv, :csv_fields
 
 
     def initialize(singular:, singular_class: ,
@@ -28,11 +29,14 @@ module  HotGlue
                  form_path: , stimmify: , stimmify_camel:, hidden_create:, hidden_update: ,
                  invisible_create:, invisible_update: , plural: , phantom_search:,
                    pagination_style:, namespace: nil, controller_build_folder: nil,
-                   sortable: false, sortable_fields: [] )
+                   sortable: false, sortable_fields: [],
+                   csv: true, csv_fields: [] )
 
 
       @sortable = sortable
       @sortable_fields = sortable_fields
+      @csv = csv
+      @csv_fields = csv_fields
       @form_path = form_path
       @search = search
       @search_fields = search_fields
