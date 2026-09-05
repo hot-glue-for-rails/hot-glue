@@ -152,7 +152,7 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
 
   # CSV/EXCEL EXPORT OPTIONS
   # requires a one-time `rails generate hot_glue:csv_export_install`
-  class_option :csv, type: :boolean, default: true # build the CSV/Excel exporter into this controller
+  class_option :csv, type: :boolean, default: false # build the CSV/Excel exporter into this controller
   class_option :csv_fields, default: nil # comma separated whitelist; defaults to all included fields
 
 
@@ -785,6 +785,10 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     end
 
     @csv = options['csv']
+
+    if @csv && @no_list
+      raise "--csv cannot be combined with --no-list: there is no list to export."
+    end
 
     if @csv
       if options['csv_fields']
@@ -2081,7 +2085,11 @@ class HotGlue::ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     # (current_user, policy_scope, etc.) which does not exist in a class method,
     # so it is injected as `scope`. God controllers have a context-free base
     # (Model.all) and keep it inline.
-    base = @god ? nil : "scope"
+    # Pundit's `policy_scope` is a controller-instance method (it depends on
+    # pundit_user), so even a --gd controller needs its scope injected from
+    # the instance when --pundit is enabled -- only a non-pundit --gd
+    # controller can compute its scope inline in the class method.
+    base = (@god && !pundit) ? nil : "scope"
     load_all_query_code(base_override: base).gsub("@#{plural}", plural).gsub("@q", "q")
   end
 

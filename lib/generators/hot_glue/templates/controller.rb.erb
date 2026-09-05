@@ -81,15 +81,19 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 <% if @sortable %>  SORTABLE_FIELDS = %w[<%= @sortable_fields.join(' ') %>].freeze
 <% end %><% if @csv %>  EXPORTABLE_FIELDS = %w[<%= @csv_fields.join(' ') %>].freeze
 <% end %>
-<% if @csv %>  def self.load_all_<%= plural %>_query(params:<% unless @god %>, scope: <%= class_name %>.all<% end %>)
+<% if @csv %>  def self.load_all_<%= plural %>_query(params:<% if !@god || @pundit %>, scope: <%= class_name %>.all<% end %>)
     q = params[:q]<% if @search == "set" %> || <%= search_default %><% end %>
 <%= load_all_query_class_method_code %>
 
     [q, <%= plural %>]
   end
-
+<% if @pundit %>
+  def self.csv_export_scope(owner)
+    Pundit.policy_scope!(owner, <%= class_name %>)
+  end
+<% end %>
   def load_all_<%= plural %>
-    @q, @<%= plural %> = self.class.load_all_<%= plural %>_query(params: params<% unless @god %>, scope: <%= load_all_base_scope %><% end %>)
+    @q, @<%= plural %> = self.class.load_all_<%= plural %>_query(params: params<% if !@god || @pundit %>, scope: <%= load_all_base_scope %><% end %>)
 <%= load_all_pagination_code %>
   end<% else %>  def load_all_<%= plural %><% if @search == "set" %>
     @q = params[:q] || <%= search_default %> <% end %>
@@ -113,7 +117,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 <% if @csv %>
   def export
     format_type = %w[csv xlsx].include?(params[:format_type]) ? params[:format_type] : "csv"
-    constructor = CsvConstructor.new(controller_name: "<%= controller_class_name %>", params: params)
+    constructor = CsvConstructor.new(controller_name: "<%= controller_class_name %>", params: params<% if @pundit %>, owner: pundit_user<% end %>)
 
     if constructor.count <= 100
       send_data constructor.build(format_type),
@@ -124,7 +128,8 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       csv_request = CsvRequest.create!(
         controller_name: "<%= controller_class_name %>",
         format: format_type,
-        query_params: params.slice(:sort, :direction, :q).to_unsafe_h
+        query_params: params.slice(:sort, :direction, :q).to_unsafe_h<% if @pundit %>,
+        owner: pundit_user<% end %>
       )
       BuildCsvJob.perform_later(csv_request.id)
       flash[:pending_csv_request_id] = csv_request.id

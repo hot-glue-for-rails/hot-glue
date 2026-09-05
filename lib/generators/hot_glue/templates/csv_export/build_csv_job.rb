@@ -5,7 +5,8 @@ class BuildCsvJob < ApplicationJob
 
     constructor = CsvConstructor.new(
       controller_name: csv_request.controller_name,
-      params: csv_request.query_params_as_params
+      params: csv_request.query_params_as_params,
+      owner: csv_request.owner
     )
     content = constructor.build(csv_request.format)
 

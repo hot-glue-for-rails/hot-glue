@@ -19,6 +19,7 @@ class LayoutStrategy::Tailwind < LayoutStrategy::Base
   end
 
   def list_classes; "overflow-x-auto w-full"; end
+  def top_button_row_classes; "flex justify-between items-start"; end
   def row_classes; "grid grid-cols-4 gap-x-16 py-5 px-4 text-sm text-gray-700 border-b border-gray-200 dark:border-gray-700"; end
   def row_heading_classes; "grid grid-cols-4 gap-x-16 p-4 text-sm font-medium text-gray-900 bg-gray-100 border-t border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-white"; end
   def page_begin; '<div class="overflow-hidden min-w-max"> '; end
