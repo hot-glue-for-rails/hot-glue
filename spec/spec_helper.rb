@@ -16,6 +16,7 @@ SimpleCov.start 'rails' do
   add_filter "/dummy/"
   add_filter "lib/hotglue/version.rb"
   add_filter "lib/generators/hot_glue/templates/capybara_login.rb"
+  add_filter "lib/generators/hot_glue/templates/csv_export/"
 end
 
 require "rails/all"
@@ -23,7 +24,14 @@ require 'rails/generators'
 require './lib/hot-glue.rb'
 
 # require the gem's core code
+#
+# lib/generators/hot_glue/templates/csv_export/*.rb are excluded: those files
+# are host-app templates (subclassing ApplicationJob/ApplicationRecord/
+# ApplicationController, which don't exist yet at this point in boot) meant to
+# be copied into a generated app by the install generator, not gem code.
 Dir["./lib/**/*.rb"].each do |x|
+  next if x.start_with?("./lib/generators/hot_glue/templates/csv_export/")
+
   require(x)
 end
 
