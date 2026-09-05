@@ -35,6 +35,10 @@ class LayoutStrategy::HotGlue < LayoutStrategy::Base
     "scaffold-list"
   end
 
+  def top_button_row_classes
+    "scaffold-button-row"
+  end
+
   def row_classes
     "scaffold-row"
   end

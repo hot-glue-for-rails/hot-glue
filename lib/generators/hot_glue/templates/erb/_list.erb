@@ -9,14 +9,24 @@
 
     <% if @new_button_position == 'above' %>
     <% unless @no_create %>
-      <%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +
+<% if @csv %>    <div class="<%= @layout_strategy.top_button_row_classes %>">
+<% end %>      <%= '<%= render partial: "' + ((@namespace+"/" if @namespace) || "") +
               @controller_build_folder +
               "/new_button\", locals: {
     #{@nested_set.collect{|arg| arg[:singular] + ": " + arg[:singular]}.join(",\n    ")} }" +
               ' %\>'.gsub('\\',"")  %>
-        <br />
+<% if @csv %>      <\%= render partial: "<%= namespace_with_trailing_dash %><%= @controller_build_folder %>/export_button" %>
+    </div>
+<% end %>        <br />
     <% end %>
     <% end %>
+<% if @csv %>
+    <div id="export-status">
+      <\% if @pending_csv_request %>
+        <\%= render partial: "csv_requests/pending", locals: { csv_request: @pending_csv_request } %>
+      <\% end %>
+    </div>
+<% end %>
 
     <% unless @no_list %>
       <% unless @no_list_heading %>

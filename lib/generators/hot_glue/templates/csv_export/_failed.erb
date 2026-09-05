@@ -1,0 +1,5 @@
+<%= turbo_frame_tag "csv_request_#{csv_request.id}" do %>
+  <div class="alert alert-danger">
+    Your export failed<%= ": #{csv_request.error_message}" if csv_request.error_message.present? %>.
+  </div>
+<% end %>

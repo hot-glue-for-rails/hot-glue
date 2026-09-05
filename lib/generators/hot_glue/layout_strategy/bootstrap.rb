@@ -54,6 +54,10 @@ class LayoutStrategy::Bootstrap < LayoutStrategy::Base
     "row hg-row"
   end
 
+  def top_button_row_classes
+    "d-flex justify-content-between align-items-start"
+  end
+
   def page_end
     '</div> </div>'
   end
